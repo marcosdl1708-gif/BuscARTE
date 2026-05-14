@@ -545,8 +545,9 @@
   async function cargarMensajes() {
     if (!convActiva) return
     try {
+      // Filtrar mensajes SOLO de esta conversación (entre estos 2 usuarios)
       const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/mensajes?or=(de_user_id.eq.${miUserId},para_user_id.eq.${miUserId})&order=created_at.asc`,
+        `${SUPABASE_URL}/rest/v1/mensajes?or=(and(de_user_id.eq.${miUserId},para_user_id.eq.${convActiva.otroId}),and(de_user_id.eq.${convActiva.otroId},para_user_id.eq.${miUserId}))&order=created_at.asc`,
         { headers }
       )
       const msgs = await res.json()
