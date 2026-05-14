@@ -181,6 +181,26 @@
   /* NAV LINKS CLICKABLE FIX */
   .nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap { pointer-events:auto !important; }
   nav a, nav button { pointer-events:auto !important; }
+  @media (max-width: 768px) {
+    .cursor, .cursor-ring { display: none; }
+    * { cursor: auto !important; }
+    nav { padding: .75rem 1rem; }
+    .nav-center { display: none; }
+    .layout { grid-template-columns: 1fr; }
+    .filters-sidebar { display: none; }
+    .results-area { padding: 1rem; }
+    .musicians-grid { grid-template-columns: 1fr; }
+    .results-header { flex-wrap: wrap; gap: .75rem; }
+    .results-toolbar { flex-wrap: wrap; gap: .5rem; }
+    .main-title { font-size: 1.8rem; }
+    .search-bar-wrap { padding: .5rem 1rem; gap: .5rem; }
+    #main-search { font-size: .9rem; }
+    .musician-card { padding: 1rem; }
+    .card-top { gap: .75rem; }
+    .card-avatar { width: 44px; height: 44px; font-size: .8rem; flex-shrink: 0; }
+    .card-name { font-size: 1rem; }
+    .card-cta { padding: .5rem 1rem; font-size: .8rem; }
+  }
 </style>
 </head>
 <body>

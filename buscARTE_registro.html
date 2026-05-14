@@ -515,6 +515,57 @@
   /* NAV LINKS CLICKABLE FIX */
   .nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap { pointer-events:auto !important; }
   nav a, nav button { pointer-events:auto !important; }
+  @media (max-width: 768px) {
+    .cursor, .cursor-ring { display: none !important; }
+    body { cursor: auto !important; }
+
+    /* Layout de 2 col → 1 col */
+    .page { grid-template-columns: 1fr !important; }
+    .left-panel { display: none !important; }
+    .right-panel { 
+      padding: 1.5rem 1.25rem !important;
+      min-height: 100vh !important;
+    }
+
+    /* Form */
+    .form-title { font-size: 1.5rem !important; }
+    .form-subtitle { font-size: .85rem !important; }
+    .field-row { grid-template-columns: 1fr !important; gap: 0 !important; }
+    .field input, .field select, .field textarea { 
+      font-size: 1rem !important; 
+      padding: .85rem .9rem !important;
+    }
+
+    /* Chips */
+    .chips { gap: .4rem !important; }
+    .chip { font-size: .78rem !important; padding: .4rem .7rem !important; }
+
+    /* Objetivos */
+    .objetivo-grid { grid-template-columns: 1fr 1fr !important; gap: .5rem !important; }
+    .objetivo-card { padding: .75rem !important; }
+    .objetivo-title { font-size: .8rem !important; }
+
+    /* Botones navegación */
+    .form-actions { 
+      flex-direction: column !important; 
+      gap: .5rem !important; 
+    }
+    .btn-back, .btn-next { 
+      width: 100% !important; 
+      text-align: center !important;
+    }
+
+    /* Steps dots */
+    .steps-progress { gap: .5rem !important; }
+
+    /* Artistas */
+    .artist-input-wrap { flex-direction: column !important; gap: .5rem !important; }
+    .artist-input-wrap input { font-size: 1rem !important; }
+    .artist-input-wrap button { width: 100% !important; }
+
+    /* hCaptcha */
+    #hcaptcha-box { transform: scale(0.9); transform-origin: left center; }
+  }
 </style>
   <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
 </head>

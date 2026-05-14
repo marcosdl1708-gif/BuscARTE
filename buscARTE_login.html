@@ -157,6 +157,18 @@
   /* NAV LINKS CLICKABLE FIX */
   .nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap { pointer-events:auto !important; }
   nav a, nav button { pointer-events:auto !important; }
+  @media (max-width: 768px) {
+    .cursor, .cursor-ring { display: none; }
+    * { cursor: auto !important; }
+    .login-layout { grid-template-columns: 1fr; min-height: 100vh; }
+    .login-left { display: none; }
+    .login-right { padding: 2rem 1.25rem; justify-content: center; }
+    .login-form-wrap { max-width: 100%; }
+    .login-logo { font-size: 1.8rem; }
+    .login-title { font-size: 1.6rem; }
+    .field input { font-size: 1rem; }
+    .btn-submit { font-size: 1rem; padding: 1rem; }
+  }
 </style>
 </head>
 <body>
