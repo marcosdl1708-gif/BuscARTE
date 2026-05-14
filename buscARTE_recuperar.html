@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>buscARTE — Recuperar contraseña</title>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root { --neon:#d4f53c;--negro:#0a0a0a;--blanco:#f2ede4;--gris:#888;--gris3:#2a2a2a; }
+    * { margin:0;padding:0;box-sizing:border-box; }
+    body { background:var(--negro);color:var(--blanco);font-family:'Archivo',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem; }
+    .card { background:#111;border:1px solid var(--gris3);padding:2.5rem;width:100%;max-width:440px;border-radius:4px; }
+    .logo { font-family:'Archivo Black',sans-serif;font-size:1.8rem;text-align:center;margin-bottom:2rem }
+    .logo span { color:var(--neon) }
+    h2 { font-size:1.3rem;margin-bottom:.4rem }
+    .sub { color:var(--gris);font-size:.85rem;margin-bottom:2rem;line-height:1.6 }
+    .field { margin-bottom:1.2rem }
+    label { display:block;font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gris);margin-bottom:.5rem }
+    input { width:100%;background:#0a0a0a;border:1px solid var(--gris3);color:var(--blanco);padding:.85rem 1rem;font-family:'Archivo',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s }
+    input:focus { border-color:var(--neon) }
+    .btn { width:100%;background:var(--neon);color:#000;border:none;padding:1rem;font-family:'Archivo Black',sans-serif;font-size:1rem;cursor:pointer;margin-top:.5rem;transition:opacity .2s }
+    .btn:hover { opacity:.85 }
+    .btn:disabled { opacity:.5;cursor:not-allowed }
+    .msg { padding:1rem;text-align:center;border-radius:4px;margin-bottom:1rem;font-size:.88rem }
+    .msg.error { background:rgba(255,85,85,.1);border:1px solid #ff5555;color:#ff5555 }
+    .msg.success { background:rgba(212,245,60,.1);border:1px solid var(--neon);color:var(--neon) }
+    .volver { text-align:center;margin-top:1.5rem;font-size:.85rem;color:var(--gris) }
+    .volver a { color:var(--neon);text-decoration:none }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo">busc<span>ARTE</span></div>
+
+  <div id="estado-form">
+    <h2>Recuperar contraseña 🔑</h2>
+    <p class="sub">Ingresá tu email y te mandamos un link para crear una nueva contraseña.</p>
+
+    <div id="msg-box"></div>
+
+    <div class="field">
+      <label>Tu email</label>
+      <input type="email" id="email-input" placeholder="tu@email.com" onkeydown="if(event.key==='Enter') solicitar()">
+    </div>
+    <button class="btn" id="btn-solicitar" onclick="solicitar()">Enviar link →</button>
+  </div>
+
+  <div id="estado-exito" style="display:none;text-align:center">
+    <div style="font-size:3rem;margin-bottom:1rem">📧</div>
+    <h2 style="margin-bottom:.5rem">¡Revisá tu email!</h2>
+    <p style="color:var(--gris);line-height:1.7">Si ese email está registrado, te mandamos un link para recuperar tu contraseña.<br><br>
+    <span style="font-size:.8rem">Revisá también la carpeta de spam.</span></p>
+  </div>
+
+  <div class="volver">
+    <a href="buscARTE_login.html">← Volver al login</a>
+  </div>
+</div>
+
+<script>
+  async function solicitar() {
+    const email = document.getElementById('email-input').value.trim()
+    const btn = document.getElementById('btn-solicitar')
+    const msgBox = document.getElementById('msg-box')
+
+    if (!email || !email.includes('@')) {
+      msgBox.innerHTML = '<div class="msg error">Por favor ingresá un email válido.</div>'
+      return
+    }
+
+    btn.disabled = true
+    btn.textContent = 'Enviando...'
+    msgBox.innerHTML = ''
+
+    try {
+      await fetch('/.netlify/functions/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accion: 'solicitar', email })
+      })
+      // Siempre mostrar éxito para no revelar si el email existe
+      document.getElementById('estado-form').style.display = 'none'
+      document.getElementById('estado-exito').style.display = 'block'
+    } catch(e) {
+      msgBox.innerHTML = '<div class="msg error">No se pudo conectar. Verificá tu conexión.</div>'
+      btn.disabled = false
+      btn.textContent = 'Enviar link →'
+    }
+  }
+</script>
+</body>
+</html>

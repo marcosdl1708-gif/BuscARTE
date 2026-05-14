@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>buscARTE — Nueva contraseña</title>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root { --neon:#d4f53c;--negro:#0a0a0a;--blanco:#f2ede4;--gris:#888;--gris3:#2a2a2a; }
+    * { margin:0;padding:0;box-sizing:border-box; }
+    body { background:var(--negro);color:var(--blanco);font-family:'Archivo',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem; }
+    .card { background:#111;border:1px solid var(--gris3);padding:2.5rem;width:100%;max-width:440px;border-radius:4px; }
+    .logo { font-family:'Archivo Black',sans-serif;font-size:1.8rem;text-align:center;margin-bottom:2rem }
+    .logo span { color:var(--neon) }
+    h2 { font-size:1.3rem;margin-bottom:.4rem }
+    .sub { color:var(--gris);font-size:.85rem;margin-bottom:2rem }
+    .field { margin-bottom:1.2rem }
+    label { display:block;font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gris);margin-bottom:.5rem }
+    input { width:100%;background:#0a0a0a;border:1px solid var(--gris3);color:var(--blanco);padding:.85rem 1rem;font-family:'Archivo',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s }
+    input:focus { border-color:var(--neon) }
+    .pass-feedback { font-size:.75rem;margin-top:.4rem;height:1rem }
+    .btn { width:100%;background:var(--neon);color:#000;border:none;padding:1rem;font-family:'Archivo Black',sans-serif;font-size:1rem;cursor:pointer;margin-top:.5rem;transition:opacity .2s }
+    .btn:hover { opacity:.85 }
+    .btn:disabled { opacity:.5;cursor:not-allowed }
+    .msg { padding:1rem;text-align:center;border-radius:4px;margin-bottom:1rem;font-size:.88rem }
+    .msg.error { background:rgba(255,85,85,.1);border:1px solid #ff5555;color:#ff5555 }
+    .msg.success { background:rgba(212,245,60,.1);border:1px solid var(--neon);color:var(--neon) }
+    .loading { display:none;text-align:center;color:var(--gris);font-size:.85rem;margin-bottom:1rem }
+    a { color:var(--neon);text-decoration:none }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo">busc<span>ARTE</span></div>
+
+  <!-- Estado: verificando token -->
+  <div id="estado-verificando">
+    <p style="text-align:center;color:var(--gris)">Verificando link...</p>
+  </div>
+
+  <!-- Estado: formulario nueva contraseña -->
+  <div id="estado-formulario" style="display:none">
+    <h2>Nueva contraseña 🔑</h2>
+    <p class="sub" id="saludo">Ingresá tu nueva contraseña.</p>
+    <div id="msg-box"></div>
+    <div class="field">
+      <label>Nueva contraseña</label>
+      <input type="password" id="pass1" placeholder="Mínimo 8 caracteres" oninput="validar()">
+      <div class="pass-feedback" id="feedback1"></div>
+    </div>
+    <div class="field">
+      <label>Repetir contraseña</label>
+      <input type="password" id="pass2" placeholder="Repetí la contraseña" oninput="validar()">
+      <div class="pass-feedback" id="feedback2"></div>
+    </div>
+    <button class="btn" id="btn-cambiar" onclick="cambiarPassword()" disabled>Guardar contraseña</button>
+  </div>
+
+  <!-- Estado: éxito -->
+  <div id="estado-exito" style="display:none;text-align:center">
+    <div style="font-size:3rem;margin-bottom:1rem">✅</div>
+    <h2 style="margin-bottom:.5rem">¡Listo!</h2>
+    <p style="color:var(--gris);margin-bottom:2rem">Tu contraseña fue cambiada exitosamente.</p>
+    <a href="buscARTE_login.html" style="background:var(--neon);color:#000;padding:1rem 2rem;display:inline-block;font-family:'Archivo Black',sans-serif">Ingresar →</a>
+  </div>
+
+  <!-- Estado: token inválido -->
+  <div id="estado-error" style="display:none;text-align:center">
+    <div style="font-size:3rem;margin-bottom:1rem">❌</div>
+    <h2 style="margin-bottom:.5rem">Link inválido</h2>
+    <p style="color:var(--gris);margin-bottom:2rem" id="error-msg">Este link expiró o no es válido.</p>
+    <a href="buscARTE_login.html" style="color:var(--neon)">Volver al login →</a>
+  </div>
+</div>
+
+<script>
+  const token = new URLSearchParams(window.location.search).get('token')
+
+  async function verificarToken() {
+    if (!token) {
+      mostrar('error', 'No se encontró el token de recuperación.')
+      return
+    }
+    try {
+      const res = await fetch('/.netlify/functions/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accion: 'verificar', token })
+      })
+      const data = await res.json()
+      if (data.valido) {
+        document.getElementById('estado-verificando').style.display = 'none'
+        document.getElementById('estado-formulario').style.display = 'block'
+        if (data.nombre) document.getElementById('saludo').textContent = `Hola ${data.nombre}, ingresá tu nueva contraseña.`
+      } else {
+        mostrar('error', data.error || 'Link inválido o expirado.')
+      }
+    } catch(e) {
+      mostrar('error', 'Error de conexión. Intentá de nuevo.')
+    }
+  }
+
+  function mostrar(estado, mensaje) {
+    document.getElementById('estado-verificando').style.display = 'none'
+    document.getElementById('estado-formulario').style.display = 'none'
+    if (estado === 'error') {
+      document.getElementById('estado-error').style.display = 'block'
+      document.getElementById('error-msg').textContent = mensaje
+    } else if (estado === 'exito') {
+      document.getElementById('estado-exito').style.display = 'block'
+    }
+  }
+
+  function validar() {
+    const p1 = document.getElementById('pass1').value
+    const p2 = document.getElementById('pass2').value
+    const fb1 = document.getElementById('feedback1')
+    const fb2 = document.getElementById('feedback2')
+    const btn = document.getElementById('btn-cambiar')
+
+    if (p1.length > 0 && p1.length < 8) {
+      fb1.textContent = `✗ Faltan ${8 - p1.length} caracteres`
+      fb1.style.color = '#ff5555'
+    } else if (p1.length >= 8) {
+      fb1.textContent = '✓ OK'
+      fb1.style.color = 'var(--neon)'
+    } else {
+      fb1.textContent = ''
+    }
+
+    if (p2.length > 0) {
+      if (p1 !== p2) {
+        fb2.textContent = '✗ Las contraseñas no coinciden'
+        fb2.style.color = '#ff5555'
+      } else {
+        fb2.textContent = '✓ Coinciden'
+        fb2.style.color = 'var(--neon)'
+      }
+    } else {
+      fb2.textContent = ''
+    }
+
+    btn.disabled = !(p1.length >= 8 && p1 === p2)
+  }
+
+  async function cambiarPassword() {
+    const btn = document.getElementById('btn-cambiar')
+    const nueva = document.getElementById('pass1').value
+    btn.disabled = true
+    btn.textContent = 'Guardando...'
+
+    try {
+      const res = await fetch('/.netlify/functions/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accion: 'cambiar', token, nueva_password: nueva })
+      })
+      const data = await res.json()
+      if (data.ok) {
+        mostrar('exito')
+      } else {
+        const msgBox = document.getElementById('msg-box')
+        msgBox.innerHTML = `<div class="msg error">${data.error}</div>`
+        btn.disabled = false
+        btn.textContent = 'Guardar contraseña'
+      }
+    } catch(e) {
+      btn.disabled = false
+      btn.textContent = 'Guardar contraseña'
+    }
+  }
+
+  verificarToken()
+</script>
+</body>
+</html>
