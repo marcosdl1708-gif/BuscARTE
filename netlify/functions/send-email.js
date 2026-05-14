@@ -80,6 +80,20 @@ exports.handler = async (event) => {
         </div>`
     }
 
+    } else if (tipo === 'contacto') {
+      subject = `[buscARTE] ${datos.asunto} — ${datos.nombre}`
+      html = `
+        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#0a0a0a;color:#f2ede4;padding:2rem;border-radius:8px">
+          <h2 style="color:#d4f53c">Nuevo mensaje de contacto</h2>
+          <p><strong>Nombre:</strong> ${datos.nombre}</p>
+          <p><strong>Email:</strong> ${datos.email}</p>
+          <p><strong>Asunto:</strong> ${datos.asunto}</p>
+          <div style="background:#1a1a1a;border-left:3px solid #d4f53c;padding:1rem;margin:1rem 0">
+            <p style="margin:0">${datos.mensaje}</p>
+          </div>
+        </div>`
+    }
+
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {

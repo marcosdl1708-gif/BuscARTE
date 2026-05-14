@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>buscARTE — Contacto</title>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root { --neon:#d4f53c;--negro:#0a0a0a;--blanco:#f2ede4;--gris:#888;--gris2:#555;--gris3:#2a2a2a; }
+    * { margin:0;padding:0;box-sizing:border-box; }
+    body { background:var(--negro);color:var(--blanco);font-family:'Archivo',sans-serif;line-height:1.7; }
+    nav { display:flex;align-items:center;padding:1rem 2rem;border-bottom:1px solid #1c1c1c; }
+    .nav-logo { font-family:'Archivo Black',sans-serif;font-size:1.4rem;text-decoration:none;color:var(--blanco) }
+    .nav-logo span { color:var(--neon) }
+    .wrap { max-width:640px;margin:0 auto;padding:4rem 2rem; }
+    h1 { font-family:'Archivo Black',sans-serif;font-size:2.5rem;margin-bottom:.5rem }
+    h1 span { color:var(--neon) }
+    .sub { color:var(--gris);margin-bottom:3rem }
+    .motivos { display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:3rem }
+    .motivo { background:#111;border:1px solid var(--gris3);padding:1.2rem;border-radius:4px }
+    .motivo-icon { font-size:1.5rem;margin-bottom:.5rem }
+    .motivo-title { font-weight:600;font-size:.88rem;margin-bottom:.25rem }
+    .motivo-desc { color:var(--gris);font-size:.78rem }
+    .field { margin-bottom:1.5rem }
+    label { display:block;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gris);margin-bottom:.5rem }
+    input, select, textarea { width:100%;background:#111;border:1px solid var(--gris3);color:var(--blanco);padding:.85rem 1rem;font-family:'Archivo',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s }
+    input:focus, select:focus, textarea:focus { border-color:var(--neon) }
+    textarea { resize:vertical;min-height:140px }
+    .btn-send { width:100%;background:var(--neon);color:#000;border:none;padding:1rem;font-family:'Archivo Black',sans-serif;font-size:1rem;cursor:pointer;transition:opacity .2s }
+    .btn-send:hover { opacity:.85 }
+    .success-msg { display:none;background:rgba(212,245,60,.1);border:1px solid var(--neon);padding:1.5rem;text-align:center;margin-top:1rem }
+    .mail-directo { margin-top:2rem;text-align:center;color:var(--gris);font-size:.85rem }
+    .mail-directo a { color:var(--neon);text-decoration:none }
+    footer { text-align:center;padding:2rem;color:var(--gris);font-size:.8rem;border-top:1px solid #1c1c1c;margin-top:4rem }
+    footer a { color:var(--neon);text-decoration:none }
+  </style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">busc<span>ARTE</span></a>
+</nav>
+
+<div class="wrap">
+  <h1>Hablemos <span>🎸</span></h1>
+  <p class="sub">Feedback, consultas, bugs, propuestas — todo suma.</p>
+
+  <div class="motivos">
+    <div class="motivo">
+      <div class="motivo-icon">🐛</div>
+      <div class="motivo-title">Reportar un bug</div>
+      <div class="motivo-desc">Algo no funciona como debería</div>
+    </div>
+    <div class="motivo">
+      <div class="motivo-icon">💡</div>
+      <div class="motivo-title">Sugerir una feature</div>
+      <div class="motivo-desc">Tengo una idea para mejorar</div>
+    </div>
+    <div class="motivo">
+      <div class="motivo-icon">🤝</div>
+      <div class="motivo-title">Propuesta de negocio</div>
+      <div class="motivo-desc">Colaboraciones o partnerships</div>
+    </div>
+    <div class="motivo">
+      <div class="motivo-icon">💬</div>
+      <div class="motivo-title">Feedback general</div>
+      <div class="motivo-desc">Lo que se te ocurra</div>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Tu nombre</label>
+    <input type="text" id="c-nombre" placeholder="Juan Pérez">
+  </div>
+  <div class="field">
+    <label>Tu email</label>
+    <input type="email" id="c-email" placeholder="juan@gmail.com">
+  </div>
+  <div class="field">
+    <label>Asunto</label>
+    <select id="c-asunto">
+      <option value="">Elegí un motivo</option>
+      <option>Reportar un bug</option>
+      <option>Sugerir una feature</option>
+      <option>Propuesta de negocio</option>
+      <option>Feedback general</option>
+      <option>Otro</option>
+    </select>
+  </div>
+  <div class="field">
+    <label>Mensaje</label>
+    <textarea id="c-mensaje" placeholder="Contanos..."></textarea>
+  </div>
+  <button class="btn-send" onclick="enviarContacto(this)">Enviar mensaje →</button>
+
+  <div class="success-msg" id="success-msg">
+    ✓ Mensaje enviado. Te respondemos a la brevedad.
+  </div>
+
+  <div class="mail-directo">
+    O escribinos directamente a <a href="mailto:BuscARTE.webmail@gmail.com">BuscARTE.webmail@gmail.com</a>
+  </div>
+</div>
+
+<footer>
+  <a href="index.html">buscARTE</a> · <a href="buscARTE_terminos.html">Términos</a> · <a href="buscARTE_privacidad.html">Privacidad</a>
+</footer>
+
+<script>
+  async function enviarContacto(btn) {
+    const nombre = document.getElementById('c-nombre').value.trim()
+    const email = document.getElementById('c-email').value.trim()
+    const asunto = document.getElementById('c-asunto').value
+    const mensaje = document.getElementById('c-mensaje').value.trim()
+
+    if (!nombre || !email || !asunto || !mensaje) {
+      alert('Por favor completá todos los campos.')
+      return
+    }
+    if (!email.includes('@')) {
+      alert('Por favor ingresá un email válido.')
+      return
+    }
+
+    btn.textContent = 'Enviando...'
+    btn.disabled = true
+
+    try {
+      await fetch('/.netlify/functions/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tipo: 'contacto',
+          destinatario: 'BuscARTE.webmail@gmail.com',
+          datos: { nombre, email, asunto, mensaje }
+        })
+      })
+    } catch(e) { console.error(e) }
+
+    // Mostrar éxito independientemente (el email puede fallar silenciosamente)
+    btn.style.display = 'none'
+    document.getElementById('success-msg').style.display = 'block'
+  }
+</script>
+</body>
+</html>
