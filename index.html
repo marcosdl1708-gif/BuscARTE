@@ -636,7 +636,12 @@
     /* NAV */
     nav { padding: .75rem 1rem !important; }
     .nav-links { display: none !important; }
-    .btn-ghost { display: none !important; }
+    .btn-ghost { 
+      display: inline-block !important;
+      padding: .45rem .9rem !important; 
+      font-size: .72rem !important;
+      letter-spacing: .04em !important;
+    }
     .btn-neon { 
       padding: .45rem .9rem !important; 
       font-size: .72rem !important;
@@ -687,6 +692,7 @@
       border-right: none !important; 
       border-bottom: 1px solid #1c1c1c !important; 
     }
+    .step::before { display: none !important; }
 
     /* SEARCH */
     .search-box { flex-direction: column !important; gap: .5rem !important; }
