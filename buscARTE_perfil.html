@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>buscARTE — Configurar perfil</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --negro: #080808;
+    --negro2: #111111;
+    --negro3: #1a1a1a;
+    --blanco: #f2ede4;
+    --neon: #d4f53c;
+    --rojo: #e8311a;
+    --gris: #888;
+    --gris2: #444;
+    --gris3: #2a2a2a;
+    --font-display: 'Archivo Black', sans-serif;
+    --font-body: 'Archivo', sans-serif;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--negro);
+    color: var(--blanco);
+    font-family: var(--font-body);
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+    cursor: none;
+  }
+  .cursor { width:10px;height:10px;background:var(--neon);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%); }
+  .cursor-ring { width:36px;height:36px;border:1px solid rgba(212,245,60,0.35);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .15s ease; }
+  body::before {
+    content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity:0.03;pointer-events:none;z-index:1000;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.2rem 3rem;
+    border-bottom: 1px solid #1c1c1c;
+    background: rgba(8,8,8,0.95);
+    backdrop-filter: blur(12px);
+  }
+  .nav-logo { font-family: var(--font-display); font-size: 1.4rem; color: var(--blanco); text-decoration: none; }
+  .nav-logo span { color: var(--neon); }
+  .nav-right { display: flex; align-items: center; gap: 1.5rem; }
+  .nav-user { font-size: 0.82rem; color: var(--gris); }
+  .nav-user strong { color: var(--blanco); font-weight: 400; }
+  .btn-neon {
+    background: var(--neon); border: none; color: var(--negro);
+    padding: 0.55rem 1.4rem; font-family: var(--font-body); font-weight: 500;
+    font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase;
+    cursor: none; transition: opacity 0.2s; text-decoration: none; display: inline-block;
+  }
+  .btn-neon:hover { opacity: 0.85; }
+  .btn-ghost {
+    background: transparent; border: 1px solid var(--gris2); color: var(--blanco);
+    padding: 0.55rem 1.4rem; font-family: var(--font-body); font-size: 0.82rem;
+    letter-spacing: 0.08em; text-transform: uppercase; cursor: none;
+    transition: border-color 0.2s; text-decoration: none; display: inline-block;
+  }
+  .btn-ghost:hover { border-color: var(--blanco); }
+
+  .top-spacer { height: 65px; }
+
+  /* LAYOUT */
+  .layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: calc(100vh - 65px);
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    border-right: 1px solid #1c1c1c;
+    padding: 2.5rem 0;
+    position: sticky;
+    top: 65px;
+    height: calc(100vh - 65px);
+    overflow-y: auto;
+    background: var(--negro2);
+  }
+  .sidebar-section {
+    padding: 0 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .sidebar-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gris2);
+    margin-bottom: 0.6rem;
+    padding: 0 0.5rem;
+  }
+  .sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.65rem 0.8rem;
+    color: var(--gris);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    border-left: 2px solid transparent;
+    cursor: none;
+  }
+  .sidebar-link:hover { color: var(--blanco); background: rgba(255,255,255,0.03); }
+  .sidebar-link.active { color: var(--neon); border-left-color: var(--neon); background: rgba(212,245,60,0.04); }
+  .sidebar-link .icon { font-size: 1rem; width: 20px; text-align: center; }
+  .sidebar-preview {
+    margin: 1.5rem;
+    border: 1px solid #1c1c1c;
+    padding: 1.2rem;
+    background: var(--negro);
+  }
+  .preview-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gris2);
+    margin-bottom: 0.8rem;
+  }
+  .preview-avatar {
+    width: 48px; height: 48px;
+    background: #0d2010;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    color: var(--neon);
+    margin-bottom: 0.7rem;
+  }
+  .preview-name { font-size: 0.9rem; font-weight: 500; margin-bottom: 0.2rem; }
+  .preview-meta { font-size: 0.75rem; color: var(--gris); margin-bottom: 0.6rem; }
+  .preview-complete {
+    font-size: 0.7rem;
+    color: var(--gris);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .complete-bar {
+    flex: 1;
+    height: 3px;
+    background: var(--gris3);
+    position: relative;
+    overflow: hidden;
+  }
+  .complete-fill {
+    position: absolute;
+    top: 0; left: 0;
+    height: 100%;
+    background: var(--neon);
+    width: 45%;
+    transition: width 0.5s ease;
+  }
+
+  /* MAIN CONTENT */
+  .main {
+    padding: 3rem 4rem;
+    max-width: 820px;
+  }
+  .page-header {
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #1c1c1c;
+  }
+  .page-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--neon);
+    margin-bottom: 0.6rem;
+  }
+  .page-title {
+    font-family: var(--font-display);
+    font-size: 2.8rem;
+    letter-spacing: -0.02em;
+    line-height: 0.95;
+    margin-bottom: 0.6rem;
+  }
+  .page-sub { color: var(--gris); font-size: 0.9rem; line-height: 1.6; }
+
+  /* SECCIONES */
+  .config-section {
+    margin-bottom: 3rem;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid #1c1c1c;
+  }
+  .config-section:last-child { border-bottom: none; }
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .section-title .s-icon { font-size: 1.1rem; }
+  .section-desc { font-size: 0.82rem; color: var(--gris); margin-bottom: 1.8rem; line-height: 1.6; }
+
+  /* CAMPOS */
+  .field { margin-bottom: 1.2rem; }
+  .field label {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--gris); margin-bottom: 0.5rem;
+  }
+  .field label .optional { color: var(--gris2); text-transform: none; letter-spacing: 0; font-size: 0.7rem; }
+  .field input, .field select, .field textarea {
+    width: 100%; background: var(--negro2); border: 1px solid var(--gris3);
+    color: var(--blanco); padding: 0.85rem 1rem; font-family: var(--font-body);
+    font-size: 0.92rem; font-weight: 300; outline: none;
+    transition: border-color 0.2s; appearance: none; border-radius: 0;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--neon); }
+  .field input::placeholder, .field textarea::placeholder { color: var(--gris2); }
+  .field textarea { resize: vertical; min-height: 100px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .char-count { font-size: 0.7rem; color: var(--gris2); text-align: right; margin-top: 0.3rem; }
+
+  /* FOTO */
+  .photo-area {
+    display: flex;
+    align-items: flex-start;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+  }
+  .photo-current {
+    width: 100px; height: 100px;
+    background: var(--negro3);
+    border: 1px solid var(--gris3);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display);
+    font-size: 2rem;
+    color: var(--neon);
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .photo-current img { width: 100%; height: 100%; object-fit: cover; display: none; }
+  .photo-upload-zone {
+    flex: 1;
+    border: 1px dashed var(--gris3);
+    padding: 1.5rem;
+    text-align: center;
+    cursor: none;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+  }
+  .photo-upload-zone:hover { border-color: var(--neon); background: rgba(212,245,60,0.02); }
+  .photo-upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: none; width: 100%; height: 100%; }
+  .upload-icon { font-size: 1.5rem; display: block; margin-bottom: 0.5rem; }
+  .upload-text { font-size: 0.82rem; color: var(--gris); line-height: 1.6; }
+  .upload-text strong { color: var(--blanco); font-weight: 400; }
+
+  /* REDES SOCIALES */
+  .redes-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .red-field {
+    display: flex;
+    border: 1px solid var(--gris3);
+    transition: border-color 0.2s;
+    overflow: hidden;
+  }
+  .red-field:focus-within { border-color: var(--neon); }
+  .red-prefix {
+    background: var(--negro3);
+    border-right: 1px solid var(--gris3);
+    padding: 0.85rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--gris);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .red-prefix .red-icon { font-size: 1rem; }
+  .red-input {
+    flex: 1;
+    background: var(--negro2);
+    border: none;
+    color: var(--blanco);
+    padding: 0.85rem 1rem;
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    font-weight: 300;
+    outline: none;
+    min-width: 0;
+  }
+  .red-input::placeholder { color: var(--gris2); }
+
+  /* VIDEOS — sección especial */
+  .videos-highlight {
+    background: rgba(212,245,60,0.04);
+    border: 1px solid rgba(212,245,60,0.15);
+    padding: 1.8rem;
+    margin-bottom: 1.5rem;
+  }
+  .videos-highlight-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+  }
+  .videos-badge {
+    background: var(--neon);
+    color: var(--negro);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.6rem;
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+  }
+  .videos-highlight-title {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.4rem;
+  }
+  .videos-highlight-desc {
+    font-size: 0.82rem;
+    color: var(--gris);
+    line-height: 1.65;
+  }
+  .videos-highlight-desc strong { color: var(--blanco); font-weight: 400; }
+  .videos-highlight-desc .examples {
+    margin-top: 0.6rem;
+    padding: 0.7rem 1rem;
+    background: rgba(0,0,0,0.3);
+    border-left: 2px solid var(--neon);
+    font-size: 0.78rem;
+    color: var(--gris);
+    line-height: 1.8;
+  }
+  .videos-highlight-desc .examples span { color: var(--neon); font-family: 'Courier New', monospace; }
+
+  .video-link-row {
+    display: flex;
+    gap: 0.7rem;
+    align-items: flex-start;
+    margin-bottom: 0.7rem;
+  }
+  .video-num {
+    width: 28px; height: 28px;
+    border: 1px solid var(--gris3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem;
+    color: var(--gris);
+    flex-shrink: 0;
+    margin-top: 0.5rem;
+    font-family: var(--font-display);
+    letter-spacing: 0.05em;
+  }
+  .video-link-input {
+    flex: 1;
+    background: var(--negro2);
+    border: 1px solid var(--gris3);
+    color: var(--blanco);
+    padding: 0.85rem 1rem;
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    font-weight: 300;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .video-link-input:focus { border-color: var(--neon); }
+  .video-link-input::placeholder { color: var(--gris2); }
+  .video-link-input.has-link { border-color: rgba(212,245,60,0.4); }
+
+  .add-video-btn {
+    background: transparent;
+    border: 1px dashed var(--gris3);
+    color: var(--gris);
+    padding: 0.75rem 1.5rem;
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    letter-spacing: 0.05em;
+    cursor: none;
+    transition: all 0.2s;
+    width: 100%;
+    margin-top: 0.3rem;
+  }
+  .add-video-btn:hover { border-color: var(--neon); color: var(--neon); }
+
+  /* CHIPS */
+  .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem; }
+  .chip {
+    padding: 0.4rem 0.9rem; border: 1px solid var(--gris3); color: var(--gris);
+    font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase;
+    cursor: none; transition: all 0.15s; user-select: none;
+    font-family: var(--font-body); background: transparent;
+  }
+  .chip:hover { border-color: #555; color: var(--blanco); }
+  .chip.selected { border-color: var(--neon); color: var(--neon); background: rgba(212,245,60,0.06); }
+
+  /* DISPONIBILIDAD */
+  .disponibilidad-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.7rem;
+  }
+  .disp-card {
+    border: 1px solid var(--gris3);
+    padding: 1rem;
+    cursor: none;
+    transition: all 0.2s;
+    background: transparent;
+    text-align: center;
+    color: var(--blanco);
+    font-family: var(--font-body);
+  }
+  .disp-card:hover { border-color: #444; background: var(--negro2); }
+  .disp-card.selected { border-color: var(--neon); background: rgba(212,245,60,0.04); }
+  .disp-icon { font-size: 1.4rem; display: block; margin-bottom: 0.4rem; }
+  .disp-title { font-size: 0.8rem; font-weight: 500; display: block; margin-bottom: 0.2rem; }
+  .disp-desc { font-size: 0.7rem; color: var(--gris); line-height: 1.4; }
+
+  /* EXPERIENCIA */
+  .exp-slider-wrap { margin-bottom: 0.5rem; }
+  .exp-labels { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--gris); margin-bottom: 0.5rem; }
+  input[type=range] {
+    width: 100%; -webkit-appearance: none; height: 3px;
+    background: var(--gris3); outline: none; cursor: none;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 18px; height: 18px;
+    background: var(--neon); border-radius: 0; cursor: none;
+  }
+  .exp-value {
+    text-align: center; font-family: var(--font-display);
+    font-size: 1.4rem; color: var(--neon); margin-top: 0.5rem;
+    letter-spacing: 0.04em;
+  }
+
+  /* SAVE BAR */
+  .save-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--negro2);
+    border-top: 1px solid #1c1c1c;
+    padding: 1rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 50;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+  }
+  .save-bar.visible { transform: translateY(0); }
+  .save-bar-text { font-size: 0.82rem; color: var(--gris); }
+  .save-bar-text strong { color: var(--neon); font-weight: 400; }
+  .save-actions { display: flex; gap: 1rem; }
+
+  /* HINT */
+  .hint {
+    font-size: 0.75rem;
+    color: var(--gris2);
+    margin-top: 0.4rem;
+    line-height: 1.5;
+    font-style: italic;
+  }
+  /* NAV DROPDOWN */
+  .nav-user { position:relative; }
+  .nav-avatar-wrap { display:flex;align-items:center;gap:.5rem;cursor:none;padding:.3rem .6rem;border:1px solid var(--gris3);transition:border-color .2s;user-select:none; }
+  .nav-avatar-wrap:hover { border-color:var(--gris2); }
+  .nav-avatar-circle { width:28px;height:28px;border-radius:50%;background:#0d2010;color:var(--neon);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.62rem;flex-shrink:0; }
+  .nav-avatar-name { font-size:.78rem;color:var(--blanco); }
+  .nav-avatar-chevron { font-size:.6rem;color:var(--gris);transition:transform .2s; }
+  .nav-avatar-wrap.open .nav-avatar-chevron { transform:rotate(180deg); }
+  .nav-dropdown { position:absolute;top:calc(100% + 8px);right:0;background:var(--negro2);border:1px solid #2a2a2a;min-width:200px;display:none;flex-direction:column;z-index:300; }
+  .nav-dropdown.open { display:flex; }
+  .nav-dropdown-item { display:flex;align-items:center;gap:.6rem;padding:.75rem 1.1rem;color:var(--gris);text-decoration:none;font-size:.82rem;transition:all .15s;background:transparent;border:none;font-family:var(--font-body);cursor:none;text-align:left;width:100%; }
+  .nav-dropdown-item:hover { background:rgba(255,255,255,.04);color:var(--blanco); }
+  .nav-dropdown-divider { height:1px;background:#1c1c1c;margin:.3rem 0; }
+  .nav-logout:hover { color:var(--rojo) !important; }
+  .nav-badge { background:var(--neon);color:var(--negro);font-size:.55rem;font-weight:700;padding:.1rem .4rem;margin-left:auto; }
+  /* NAV LINKS FIX */
+  .nav-links { list-style:none !important; display:flex !important; gap:2rem !important; padding:0 !important; margin:0 !important; }
+  .nav-links li { list-style:none !important; }
+  .nav-link { color:var(--gris);text-decoration:none;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;transition:color .2s; }
+  .nav-link:hover { color:var(--blanco); }
+  .nav-link.active { color:var(--neon); }
+  /* NAV AVATAR NAME — truncate long usernames */
+  .nav-avatar-name { font-size:.78rem;color:var(--blanco);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+  /* NAV LINKS CLICKABLE FIX */
+  .nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap { pointer-events:auto !important; }
+  nav a, nav button { pointer-events:auto !important; }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+
+<nav>
+  <a href="index.html" class="nav-logo">busc<span>ARTE</span></a>
+  <ul class="nav-links" style="list-style:none;display:flex;gap:2rem">
+    <li><a href="buscARTE_busqueda.html" class="nav-link">Músicos</a></li>
+    <li><a href="buscARTE_anuncios.html" class="nav-link">Anuncios</a></li>
+    <li><a href="buscARTE_mensajes.html" class="nav-link">Mensajes</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="nav-guest" id="nav-guest">
+      <a href="buscARTE_login.html" class="btn-ghost">Ingresar</a>
+      <a href="buscARTE_registro.html" class="btn-neon">Registrarse</a>
+    </div>
+    <div id="nav-user" style="display:none;position:relative">
+      <div class="nav-avatar-wrap" onclick="toggleUserMenu()" id="nav-avatar-btn">
+        <div class="nav-avatar-circle" id="nav-avatar-circle">?</div>
+        <span class="nav-avatar-name" id="nav-avatar-name">Mi perfil</span>
+        <span class="nav-avatar-chevron">▾</span>
+      </div>
+      <div class="nav-dropdown" id="nav-dropdown">
+        <a href="buscARTE_perfil_publico.html" class="nav-dropdown-item">👤 Mi perfil</a>
+        <a href="buscARTE_perfil.html" class="nav-dropdown-item">⚙️ Configurar perfil</a>
+        <a href="buscARTE_mensajes.html" class="nav-dropdown-item">💬 Mensajes <span class="nav-badge" id="nav-msg-badge" style="display:none"></span></a>
+        <a href="buscARTE_mis_anuncios.html" class="nav-dropdown-item">📋 Mis anuncios</a>
+        <a href="buscARTE_guardados.html" class="nav-dropdown-item">♡ Guardados</a>
+        <div class="nav-dropdown-divider"></div>
+        <button class="nav-dropdown-item nav-logout" onclick="logout()">↩ Cerrar sesión</button>
+      </div>
+    </div>
+  </div>
+</nav>
+<div class="top-spacer"></div>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-preview">
+      <div class="preview-label">Tu perfil</div>
+      <div class="preview-avatar" id="sidebar-avatar">?</div>
+      <div class="preview-name" id="sidebar-nombre">Tu nombre</div>
+      <div class="preview-meta" id="sidebar-meta">Músico · —</div>
+      <div class="preview-complete">
+        <span>45%</span>
+        <div class="complete-bar"><div class="complete-fill" id="complete-fill"></div></div>
+        <span>completo</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Configuración</div>
+      <a href="#foto" class="sidebar-link active" onclick="setActive(this)"><span class="icon">📷</span> Foto y bio</a>
+      <a href="#musica" class="sidebar-link" onclick="setActive(this)"><span class="icon">🎸</span> Mi música</a>
+      <a href="#disponibilidad" class="sidebar-link" onclick="setActive(this)"><span class="icon">📅</span> Disponibilidad</a>
+      <a href="#ensayo" class="sidebar-link" onclick="setActive(this)"><span class="icon">📍</span> Dónde ensayar</a>
+      <a href="#redes" class="sidebar-link" onclick="setActive(this)"><span class="icon">🔗</span> Redes y links</a>
+      <a href="#videos" class="sidebar-link" onclick="setActive(this)"><span class="icon">🎬</span> Mis videos</a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Cuenta</div>
+      <a href="#" class="sidebar-link"><span class="icon">⚙️</span> Configuración</a>
+      <a href="#" class="sidebar-link"><span class="icon">💎</span> Plan Premium</a>
+      <a href="#" class="sidebar-link"><span class="icon">↩️</span> Cerrar sesión</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main" onscroll="showSaveBar()">
+
+    <div class="page-header">
+      <div class="page-label">Tu espacio en buscARTE</div>
+      <div class="page-title">CONFIGURAR<br>PERFIL</div>
+      <p class="page-sub">Completá tu perfil para aparecer en más búsquedas y conectar con músicos afines. Cuanto más completo, mejor el matching.</p>
+    </div>
+
+    <!-- FOTO Y BIO -->
+    <div class="config-section" id="foto">
+      <div class="section-title"><span class="s-icon">📷</span> Foto y presentación</div>
+      <p class="section-desc">Tu cara pública en buscARTE. Una buena foto y una bio clara multiplican tus chances de ser contactado/a.</p>
+
+      <div class="photo-area">
+        <div class="photo-current">
+          <img id="preview-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%">
+          <span id="avatar-initials">?</span>
+        </div>
+        <div class="photo-upload-zone" id="upload-zone">
+          <input type="file" id="foto-input" accept="image/jpeg,image/png,image/webp" onchange="subirFoto(this)">
+          <span class="upload-icon" id="upload-icon">📸</span>
+          <p class="upload-text" id="upload-text"><strong>Hacé click o arrastrá una foto</strong><br>JPG, PNG o WebP · Máximo 2MB</p>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Nombre artístico o nombre completo</label>
+        <input type="text" id="reg-nombre-perfil" placeholder="Tu nombre artístico o completo" oninput="showSaveBar()">
+      </div>
+
+      <div class="field">
+        <label>
+          Bio <span class="optional">— Contales quién sos en pocas palabras</span>
+        </label>
+        <textarea id="bio-text" placeholder="Ej: Guitarrista con 8 años de experiencia, influenciada por el jazz y el rock progresivo. Busco banda con onda para tocar en vivo y grabar. Tengo local de ensayo en Almagro." oninput="countBio()"></textarea>
+        <div class="char-count"><span id="bio-count">0</span> / 300 caracteres</div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Edad <span class="optional">opcional</span></label>
+          <input type="number" placeholder="Ej: 26" min="15" max="80" oninput="showSaveBar()">
+        </div>
+        <div class="field">
+          <label>Género musical principal</label>
+          <select oninput="showSaveBar()">
+            <option disabled selected>Seleccioná uno</option>
+            <option>Rock Nacional</option>
+            <option>Jazz</option>
+            <option>Metal</option>
+            <option>Folklore</option>
+            <option>Tango</option>
+            <option>Indie</option>
+            <option>Pop</option>
+            <option>Cumbia</option>
+            <option>Electrónica</option>
+            <option>Otro</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- MI MÚSICA -->
+    <div class="config-section" id="musica">
+      <div class="section-title"><span class="s-icon">🎸</span> Mi música</div>
+      <p class="section-desc">Cuanto más detallado, mejor el matching. Esto es lo que la IA de buscARTE usa para conectarte con músicos afines.</p>
+
+      <div class="field">
+        <label>Instrumento/s principal/es</label>
+      </div>
+      <div class="chips" id="chips-inst">
+        <button class="chip selected" onclick="toggleChip(this)">Guitarra</button>
+        <button class="chip" onclick="toggleChip(this)">Bajo</button>
+        <button class="chip" onclick="toggleChip(this)">Batería</button>
+        <button class="chip" onclick="toggleChip(this)">Teclado / Piano</button>
+        <button class="chip" onclick="toggleChip(this)">Voz / Canto</button>
+        <button class="chip" onclick="toggleChip(this)">Violín</button>
+        <button class="chip" onclick="toggleChip(this)">Cello</button>
+        <button class="chip" onclick="toggleChip(this)">Saxo</button>
+        <button class="chip" onclick="toggleChip(this)">Trompeta</button>
+        <button class="chip" onclick="toggleChip(this)">Flauta</button>
+        <button class="chip" onclick="toggleChip(this)">Percusión</button>
+        <button class="chip" onclick="toggleChip(this)">Bandoneón</button>
+        <button class="chip" onclick="toggleChip(this)">DJ / Productor</button>
+        <button class="chip" onclick="toggleChip(this)">Arpa</button>
+        <button class="chip" onclick="toggleChip(this)">Charango</button>
+        <button class="chip" onclick="toggleChip(this)">Otro</button>
+      </div>
+
+      <div class="field" style="margin-top:1.2rem">
+        <label>Géneros musicales</label>
+      </div>
+      <div class="chips" id="chips-gen">
+        <button class="chip selected" onclick="toggleChip(this)">Jazz</button>
+        <button class="chip selected" onclick="toggleChip(this)">Fusión</button>
+        <button class="chip" onclick="toggleChip(this)">Rock</button>
+        <button class="chip" onclick="toggleChip(this)">Rock Nacional</button>
+        <button class="chip" onclick="toggleChip(this)">Metal</button>
+        <button class="chip" onclick="toggleChip(this)">Folklore</button>
+        <button class="chip" onclick="toggleChip(this)">Tango</button>
+        <button class="chip" onclick="toggleChip(this)">Cumbia</button>
+        <button class="chip" onclick="toggleChip(this)">Indie</button>
+        <button class="chip" onclick="toggleChip(this)">Pop</button>
+        <button class="chip" onclick="toggleChip(this)">Electrónica</button>
+        <button class="chip" onclick="toggleChip(this)">R&B</button>
+        <button class="chip" onclick="toggleChip(this)">Rap / Hip Hop</button>
+        <button class="chip" onclick="toggleChip(this)">Funk</button>
+        <button class="chip" onclick="toggleChip(this)">Soul</button>
+        <button class="chip" onclick="toggleChip(this)">Reggae</button>
+        <button class="chip" onclick="toggleChip(this)">Tropical</button>
+        <button class="chip" onclick="toggleChip(this)">Punk</button>
+        <button class="chip" onclick="toggleChip(this)">Blues</button>
+        <button class="chip" onclick="toggleChip(this)">Prog</button>
+        <button class="chip" onclick="toggleChip(this)">Bossanova</button>
+        <button class="chip" onclick="toggleChip(this)">Clásica</button>
+        <button class="chip" onclick="toggleChip(this)">Otro</button>
+      </div>
+
+      <div style="margin-top: 1.8rem;">
+        <div class="field">
+          <label>Años de experiencia tocando</label>
+        </div>
+        <div class="exp-slider-wrap">
+          <div class="exp-labels"><span>Estoy arrancando</span><span>Toda la vida</span></div>
+          <input type="range" min="0" max="30" value="8" oninput="updateExp(this)">
+          <div class="exp-value" id="exp-val">8 años</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DISPONIBILIDAD -->
+    <div class="config-section" id="disponibilidad">
+      <div class="section-title"><span class="s-icon">📅</span> Disponibilidad</div>
+      <p class="section-desc">¿Para qué estás disponible? Podés elegir varias opciones.</p>
+
+      <div class="disponibilidad-grid">
+        <button class="disp-card selected" onclick="toggleDisp(this)">
+          <span class="disp-icon">🎸</span>
+          <span class="disp-title">Banda estable</span>
+          <span class="disp-desc">Busco o me sumo a una banda con proyección</span>
+        </button>
+        <button class="disp-card" onclick="toggleDisp(this)">
+          <span class="disp-icon">🎤</span>
+          <span class="disp-title">Proyecto propio</span>
+          <span class="disp-desc">Tengo un proyecto y busco músicos</span>
+        </button>
+        <button class="disp-card" onclick="toggleDisp(this)">
+          <span class="disp-icon">🎹</span>
+          <span class="disp-title">Sesiones</span>
+          <span class="disp-desc">Disponible para grabar o tocar en shows</span>
+        </button>
+        <button class="disp-card selected" onclick="toggleDisp(this)">
+          <span class="disp-icon">🥁</span>
+          <span class="disp-title">Zapada / Jam</span>
+          <span class="disp-desc">Sin compromiso, tocar y pasarla bien</span>
+        </button>
+        <button class="disp-card" onclick="toggleDisp(this)">
+          <span class="disp-icon">🎓</span>
+          <span class="disp-title">Clases</span>
+          <span class="disp-desc">Doy o busco clases de mi instrumento</span>
+        </button>
+        <button class="disp-card" onclick="toggleDisp(this)">
+          <span class="disp-icon">🎙️</span>
+          <span class="disp-title">Producción</span>
+          <span class="disp-desc">Busco productor o colaboro en estudio</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- DÓNDE ENSAYAR -->
+    <div class="config-section" id="ensayo">
+      <div class="section-title"><span class="s-icon">📍</span> ¿Dónde podés ensayar?</div>
+      <p class="section-desc">Esto ayuda a coordinar con otros músicos. Elegí la opción que mejor te describe.</p>
+
+      <div class="disponibilidad-grid">
+        <button class="disp-card" onclick="selectEnsayo(this)">
+          <span class="disp-icon">🏠</span>
+          <span class="disp-title">En casa</span>
+          <span class="disp-desc">Tengo espacio en casa para ensayar</span>
+        </button>
+        <button class="disp-card selected" onclick="selectEnsayo(this)">
+          <span class="disp-icon">🎵</span>
+          <span class="disp-title">Sala propia</span>
+          <span class="disp-desc">Tengo una sala de ensayo propia</span>
+        </button>
+        <button class="disp-card" onclick="selectEnsayo(this)">
+          <span class="disp-icon">🏢</span>
+          <span class="disp-title">Alquilo sala</span>
+          <span class="disp-desc">Suelo alquilar sala de ensayo</span>
+        </button>
+        <button class="disp-card" onclick="selectEnsayo(this)">
+          <span class="disp-icon">🌳</span>
+          <span class="disp-title">Al aire libre</span>
+          <span class="disp-desc">Me banco ensayar en el parque u otros espacios abiertos</span>
+        </button>
+        <button class="disp-card" onclick="selectEnsayo(this)">
+          <span class="disp-icon">❌</span>
+          <span class="disp-title">Sin espacio propio</span>
+          <span class="disp-desc">No tengo espacio fijo, me adapto</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- REDES SOCIALES -->
+    <div class="config-section" id="redes">
+      <div class="section-title"><span class="s-icon">🔗</span> Redes sociales y contacto</div>
+      <p class="section-desc">Agregá tus perfiles para que otros músicos puedan escucharte y conocerte mejor. Todo opcional.</p>
+
+      <div class="field" style="margin-bottom:1.2rem">
+        <label>📱 WhatsApp / Celular <span style="color:var(--gris);font-size:.75rem">— si lo ponés, aparece en tu perfil público</span></label>
+        <input type="tel" id="celular-input" placeholder="Ej: +54 9 11 1234-5678" oninput="showSaveBar()" style="width:100%;background:var(--negro);border:1px solid var(--gris3);color:var(--blanco);padding:.75rem 1rem;font-family:var(--font-body);font-size:.88rem;outline:none;transition:border-color .2s">
+      </div>
+
+      <div class="redes-grid">
+        <div class="red-field">
+          <div class="red-prefix"><span class="red-icon">📸</span> instagram.com/</div>
+          <input class="red-input" type="text" placeholder="tu_usuario" oninput="showSaveBar()">
+        </div>
+        <div class="red-field">
+          <div class="red-prefix"><span class="red-icon">▶️</span> youtube.com/@</div>
+          <input class="red-input" type="text" placeholder="tu_canal" oninput="showSaveBar()">
+        </div>
+        <div class="red-field">
+          <div class="red-prefix"><span class="red-icon">🎵</span> tiktok.com/@</div>
+          <input class="red-input" type="text" placeholder="tu_usuario" oninput="showSaveBar()">
+        </div>
+        <div class="red-field">
+          <div class="red-prefix"><span class="red-icon">☁️</span> soundcloud.com/</div>
+          <input class="red-input" type="text" placeholder="tu_perfil" oninput="showSaveBar()">
+        </div>
+        <div class="red-field">
+          <div class="red-prefix"><span class="red-icon">🎧</span> open.spotify.com/</div>
+          <input class="red-input" type="text" placeholder="link de artista" oninput="showSaveBar()">
+        </div>
+        <div class="red-field">
+          <div class="red-prefix"><span class="red-icon">📘</span> facebook.com/</div>
+          <input class="red-input" type="text" placeholder="tu_pagina" oninput="showSaveBar()">
+        </div>
+        <div class="red-field">
+          <div class="red-prefix"><span class="red-icon">🐦</span> x.com/</div>
+          <input class="red-input" type="text" placeholder="tu_usuario" oninput="showSaveBar()">
+        </div>
+        <div class="red-field">
+          <div class="red-prefix"><span class="red-icon">🌐</span> Web propia</div>
+          <input class="red-input" type="text" placeholder="https://tuwebsite.com" oninput="showSaveBar()">
+        </div>
+      </div>
+    </div>
+
+    <!-- VIDEOS -->
+    <div class="config-section" id="videos">
+      <div class="section-title"><span class="s-icon">🎬</span> Mis videos tocando</div>
+      <p class="section-desc">Esta es tu vidriera. Mostrá cómo tocás y diferenciarte del resto.</p>
+
+      <div class="videos-highlight">
+        <div class="videos-highlight-header">
+          <span class="videos-badge">⭐ clave</span>
+          <div>
+            <div class="videos-highlight-title">¿Cómo subir tus videos?</div>
+            <div class="videos-highlight-desc">
+              No subas el archivo acá — <strong>pegá el link del video que ya tenés subido en otra plataforma</strong>. Funciona con cualquier servicio donde ya tengas tu material:
+              <div class="examples">
+                📺 <span>youtube.com/watch?v=...</span> — el más recomendado, gratis e ilimitado<br>
+                📁 <span>drive.google.com/file/d/...</span> — si lo tenés en tu Drive, compartilo como "cualquiera con el link"<br>
+                📱 <span>instagram.com/reel/...</span> — un reel o video de tu perfil<br>
+                🎵 <span>soundcloud.com/...</span> — también sirve para audio<br>
+                ☁️ <span>dropbox.com/s/...</span> o cualquier link público a un video
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="video-links">
+        <div class="video-link-row">
+          <div class="video-num">01</div>
+          <input class="video-link-input" type="url" placeholder="Pegá acá el link de tu video tocando..." oninput="onVideoInput(this)">
+        </div>
+        <div class="video-link-row">
+          <div class="video-num">02</div>
+          <input class="video-link-input" type="url" placeholder="Pegá acá el link de tu video tocando..." oninput="onVideoInput(this)">
+        </div>
+        <div class="video-link-row">
+          <div class="video-num">03</div>
+          <input class="video-link-input" type="url" placeholder="Pegá acá el link de tu video tocando..." oninput="onVideoInput(this)">
+        </div>
+      </div>
+      <p class="hint">💡 Tip: los perfiles con al menos un video reciben 3 veces más mensajes. Vale la pena subir aunque sea uno.</p>
+    </div>
+
+  </main>
+</div>
+
+<!-- SAVE BAR -->
+<div class="save-bar" id="save-bar">
+  <div class="save-bar-text">Tenés <strong>cambios sin guardar</strong></div>
+  <div class="save-actions">
+    <button class="btn-ghost" onclick="hideSaveBar()">Descartar</button>
+    <button class="btn-neon" onclick="saveProfile()">Guardar cambios</button>
+  </div>
+</div>
+
+<script>
+  // PROTECCIÓN: redirigir si no está logueado
+  (function() {
+    try {
+      if (localStorage.getItem('ba_logged') !== '1') {
+        window.location.replace('index.html');
+      }
+    } catch(e) {}
+  })();
+
+  // VARIABLES GLOBALES
+  const SUPABASE_URL = 'https://xiaanchoanxmampegoay.supabase.co'
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68'
+  const hdrs = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }
+  // CURSOR
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursor-ring');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
+  function animateCursor() {
+    cursor.style.left=mx+'px'; cursor.style.top=my+'px';
+    rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12;
+    ring.style.left=rx+'px'; ring.style.top=ry+'px';
+    requestAnimationFrame(animateCursor);
+  }
+  animateCursor();
+
+  // SIDEBAR ACTIVE
+  function setActive(el) {
+    document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  // CHIPS
+  function toggleChip(el) { el.classList.toggle('selected'); showSaveBar(); }
+
+  // DISPONIBILIDAD
+  function toggleDisp(el) { el.classList.toggle('selected'); showSaveBar(); }
+
+  // BIO COUNT
+  function countBio() {
+    const len = document.getElementById('bio-text').value.length;
+    document.getElementById('bio-count').textContent = len;
+    showSaveBar();
+  }
+
+  // EXP SLIDER
+  function updateExp(el) {
+    const v = parseInt(el.value);
+    document.getElementById('exp-val').textContent = v === 0 ? 'Estoy arrancando' : v === 30 ? '30+ años' : v + (v === 1 ? ' año' : ' años');
+    showSaveBar();
+  }
+
+  // SUBIR FOTO DE PERFIL
+  async function subirFoto(input) {
+    if (!input.files || !input.files[0]) return
+    const file = input.files[0]
+
+    // Validar tamaño
+    if (file.size > 2 * 1024 * 1024) {
+      alert('La foto no puede superar 2MB. Comprimila un poco y volvé a intentar.')
+      return
+    }
+
+    // Preview inmediato
+    const reader = new FileReader()
+    reader.onload = e => {
+      const img = document.getElementById('preview-img')
+      img.src = e.target.result
+      img.style.display = 'block'
+      document.getElementById('avatar-initials').style.display = 'none'
+    }
+    reader.readAsDataURL(file)
+
+    // Subir a Supabase Storage
+    document.getElementById('upload-text').innerHTML = '<strong>Subiendo foto...</strong>'
+    document.getElementById('upload-icon').textContent = '⏳'
+
+    try {
+      const miId = localStorage.getItem('ba_user_id')
+      const ext = file.name.split('.').pop()
+      const fileName = `${miId}-${Date.now()}.${ext}`
+
+      const res = await fetch(
+        `${SUPABASE_URL}/storage/v1/object/fotos-perfil/${fileName}`,
+        {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': file.type,
+            'x-upsert': 'true'
+          },
+          body: file
+        }
+      )
+
+      if (res.ok || res.status === 400) {
+        // 400 puede ocurrir con x-upsert si ya existe — la foto igual se sube
+        const fotoUrl = `${SUPABASE_URL}/storage/v1/object/public/fotos-perfil/${fileName}`
+
+        // Guardar URL en el perfil
+        const miIdActual = localStorage.getItem('ba_user_id')
+        if (miIdActual) {
+          await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${miIdActual}`, {
+            method: 'PATCH',
+            headers: { ...hdrs, 'Prefer': 'return=minimal' },
+            body: JSON.stringify({ foto_url: fotoUrl })
+          })
+        }
+
+        document.getElementById('upload-text').innerHTML = '<strong>✓ Foto guardada</strong>'
+        document.getElementById('upload-icon').textContent = '✅'
+        setTimeout(() => {
+          document.getElementById('upload-text').innerHTML = '<strong>Cambiá tu foto</strong>'
+          document.getElementById('upload-icon').textContent = '📸'
+        }, 2000)
+      } else {
+        throw new Error('Error al subir: ' + res.status)
+      }
+    } catch(e) {
+      document.getElementById('upload-text').innerHTML = '<strong>Error al subir. Intentá de nuevo.</strong>'
+      document.getElementById('upload-icon').textContent = '❌'
+      console.error(e)
+    }
+    showSaveBar()
+  }
+
+  // VIDEO INPUT
+  function onVideoInput(el) {
+    if (el.value.trim()) el.classList.add('has-link');
+    else el.classList.remove('has-link');
+    showSaveBar();
+  }
+
+  // SAVE BAR
+  let saveBarVisible = false;
+  function showSaveBar() {
+    document.getElementById('save-bar').classList.add('visible');
+    saveBarVisible = true;
+  }
+  function hideSaveBar() {
+    document.getElementById('save-bar').classList.remove('visible');
+    saveBarVisible = false;
+  }
+
+  // ENSAYO — selección única
+  function selectEnsayo(el) {
+    document.querySelectorAll('#ensayo .disp-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    showSaveBar();
+  }
+
+  // ═══ SUPABASE ═══
+  const miId = localStorage.getItem('ba_user_id')
+
+  // CARGAR PERFIL AL ENTRAR
+  async function cargarPerfil() {
+    if (!miId) return
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${miId}&select=*`, { headers: hdrs })
+      const [p] = await res.json()
+      if (!p) return
+
+      // Llenar campos de texto
+      const nombreInput = document.getElementById('reg-nombre-perfil') || document.querySelector('#foto input[type=text]')
+      if (nombreInput) nombreInput.value = p.nombre || ''
+      const celularInput = document.getElementById('celular-input')
+      if (celularInput && p.celular) celularInput.value = p.celular
+      const bioInput = document.getElementById('bio-text')
+      if (bioInput) { bioInput.value = p.bio || ''; countBio() }
+
+      // Marcar chips de instrumentos
+      if (p.instrumento) {
+        const insts = p.instrumento.split(',').map(s=>s.trim())
+        document.querySelectorAll('#chips-inst .chip').forEach(c => {
+          if (insts.includes(c.textContent.trim())) c.classList.add('selected')
+        })
+      }
+      // Marcar chips de géneros
+      if (p.generos) {
+        const gens = p.generos.split(',').map(s=>s.trim())
+        document.querySelectorAll('#chips-gen .chip').forEach(c => {
+          if (gens.includes(c.textContent.trim())) c.classList.add('selected')
+        })
+      }
+      // Videos
+      if (p.videos) {
+        const links = p.videos.split(',').map(s=>s.trim())
+        document.querySelectorAll('.video-link-input').forEach((input, i) => {
+          if (links[i]) { input.value = links[i]; input.classList.add('has-link') }
+        })
+      }
+      // Redes
+      if (p.redes) {
+        try {
+          const redes = JSON.parse(p.redes)
+          document.querySelectorAll('.red-input').forEach(input => {
+            const plat = input.closest('.red-field')?.querySelector('.red-prefix')?.textContent?.trim()
+            if (plat && redes[plat]) input.value = redes[plat]
+          })
+        } catch(e) {}
+      }
+      // Donde ensaya
+      if (p.donde_ensaya) {
+        document.querySelectorAll('#ensayo .disp-card').forEach(c => {
+          if (c.querySelector('.disp-title')?.textContent?.trim() === p.donde_ensaya) {
+            c.classList.add('selected')
+          }
+        })
+      }
+      // Disponibilidad
+      if (p.disponibilidad) {
+        const disps = p.disponibilidad.split(',').map(s=>s.trim())
+        document.querySelectorAll('#disponibilidad .disp-card').forEach(c => {
+          if (disps.includes(c.querySelector('.disp-title')?.textContent?.trim())) {
+            c.classList.add('selected')
+          }
+        })
+      }
+      // Preview avatar
+      if (p.foto_url) {
+        const img = document.getElementById('preview-img')
+        img.src = p.foto_url
+        img.style.display = 'block'
+        document.getElementById('avatar-initials').style.display = 'none'
+      } else {
+        document.getElementById('avatar-initials').textContent = (p.nombre||'?')[0].toUpperCase()
+      }
+      const sideAvatar = document.getElementById('sidebar-avatar')
+      const sideNombre = document.getElementById('sidebar-nombre')
+      const sideMeta = document.getElementById('sidebar-meta')
+      if (sideAvatar) sideAvatar.textContent = (p.nombre||'?')[0].toUpperCase()
+      if (sideNombre) sideNombre.textContent = p.nombre || 'Tu nombre'
+      if (sideMeta) sideMeta.textContent = `${p.instrumento?.split(',')[0]||'Músico'} · ${p.ciudad||'—'}`
+
+    } catch(e) { console.error('Error cargando perfil:', e) }
+  }
+
+  // GUARDAR PERFIL
+  async function saveProfile() {
+    const miIdActual = localStorage.getItem('ba_user_id')
+    if (!miIdActual) { alert('Necesitás estar logueado para guardar.'); return }
+    const btn = document.querySelector('.save-bar .btn-neon')
+    btn.textContent = 'Guardando...'
+    btn.disabled = true
+
+    // Recolectar datos
+    const nombre = (document.getElementById('reg-nombre-perfil') || document.querySelector('#foto input[type=text]'))?.value?.trim()
+    const bio = document.getElementById('bio-text')?.value?.trim()
+    const instrumento = [...document.querySelectorAll('#chips-inst .chip.selected')].map(c=>c.textContent.trim()).join(', ')
+    const generos = [...document.querySelectorAll('#chips-gen .chip.selected')].map(c=>c.textContent.trim()).join(', ')
+    const disponibilidad = [...document.querySelectorAll('#disponibilidad .disp-card.selected')].map(c=>c.querySelector('.disp-title')?.textContent?.trim()).join(', ')
+    const donde_ensaya = document.querySelector('#ensayo .disp-card.selected .disp-title')?.textContent?.trim() || ''
+    const videos = [...document.querySelectorAll('.video-link-input')].map(i=>i.value.trim()).filter(Boolean).join(', ')
+
+    // Redes como JSON
+    const redesObj = {}
+    document.querySelectorAll('.red-field').forEach(field => {
+      const plat = field.querySelector('.red-prefix')?.textContent?.trim()
+      const val = field.querySelector('.red-input')?.value?.trim()
+      if (plat && val) redesObj[plat] = val
+    })
+
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${miIdActual}`, {
+        method: 'PATCH',
+        headers: { ...hdrs, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ nombre, bio, instrumento, generos, disponibilidad, donde_ensaya, videos, redes: JSON.stringify(redesObj), celular: document.getElementById('celular-input')?.value?.trim() || null })
+      })
+
+      if (res.ok || res.status === 204) {
+        if (nombre) localStorage.setItem('ba_name', nombre)
+        btn.textContent = '✓ Guardado'
+        btn.style.background = '#a8c832'
+        setTimeout(() => { btn.textContent = 'Guardar cambios'; btn.style.background = ''; btn.disabled = false; hideSaveBar() }, 1800)
+      } else {
+        const errText = await res.text()
+        console.error('Save error:', res.status, errText)
+        alert('Error al guardar. Intentá de nuevo.')
+        btn.textContent = 'Guardar cambios'
+        btn.disabled = false
+      }
+    } catch(e) {
+      alert('No se pudo conectar. Verificá tu conexión.')
+      console.error(e)
+      btn.textContent = 'Guardar cambios'
+      btn.disabled = false
+    }
+  }
+
+  // Cargar al entrar
+  cargarPerfil()
+  window.addEventListener('scroll', () => {
+    const sections = ['foto','musica','disponibilidad','ensayo','redes','videos'];
+    let current = 'foto';
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.getBoundingClientRect().top < 150) current = id;
+    });
+    document.querySelectorAll('.sidebar-link').forEach(l => {
+      l.classList.remove('active');
+      if (l.getAttribute('href') === '#' + current) l.classList.add('active');
+    });
+  });
+  // NAV SESSION
+  (function initNav(){
+    const l=localStorage.getItem('ba_logged')==='1';
+    const n=localStorage.getItem('ba_name')||'Mi perfil';
+    const uid=localStorage.getItem('ba_user_id')||'';
+    const i=n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    if(l){
+      const g=document.getElementById('nav-guest');
+      const u=document.getElementById('nav-user');
+      if(g)g.style.display='none';
+      if(u)u.style.display='flex';
+      const c=document.getElementById('nav-avatar-circle');
+      if(c)c.textContent=i;
+      const nm=document.getElementById('nav-avatar-name');
+      if(nm)nm.textContent=n.split(' ')[0];
+      const b=document.getElementById('nav-msg-badge');
+      if(b)b.style.display='inline';
+      // Fix Mi perfil link with real user ID
+      const miPerfilLink=document.querySelector('.nav-dropdown-item[href*="perfil_publico"]');
+      if(miPerfilLink && uid) miPerfilLink.href='buscARTE_perfil_publico.html?id='+uid;
+    }
+  })();
+  function toggleUserMenu(){const w=document.getElementById('nav-avatar-btn');const d=document.getElementById('nav-dropdown');if(w)w.classList.toggle('open');if(d)d.classList.toggle('open');}
+  document.addEventListener('click',e=>{if(!e.target.closest('#nav-user')){document.getElementById('nav-avatar-btn')?.classList.remove('open');document.getElementById('nav-dropdown')?.classList.remove('open');}});
+  function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');window.location.href='index.html';}
+</script>
+</body>
+</html>

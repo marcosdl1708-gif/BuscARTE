@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>buscARTE — Mis guardados</title>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <style>
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --negro:#080808; --negro2:#111; --negro3:#1a1a1a;
+    --blanco:#f2ede4; --neon:#d4f53c; --rojo:#e8311a;
+    --gris:#888; --gris2:#444; --gris3:#2a2a2a;
+    --font-display:'Archivo Black',sans-serif;
+    --font-body:'Archivo',sans-serif;
+  }
+  body { background:var(--negro); color:var(--blanco); font-family:var(--font-body); font-weight:300; min-height:100vh; overflow-x:hidden; cursor:none; }
+  .cursor { width:10px;height:10px;background:var(--neon);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%); }
+  .cursor-ring { width:36px;height:36px;border:1px solid rgba(212,245,60,0.35);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .15s ease; }
+  body::before { content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");opacity:.03;pointer-events:none;z-index:1000; }
+
+  /* NAV */
+  nav { position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1rem 2.5rem;border-bottom:1px solid #1c1c1c;background:rgba(8,8,8,0.96);backdrop-filter:blur(12px); }
+  .nav-logo { font-family:var(--font-display);font-size:1.4rem;color:var(--blanco);text-decoration:none;flex-shrink:0; }
+  .nav-logo span { color:var(--neon); }
+  .nav-search { flex:1;max-width:500px;margin:0 2rem;display:flex; }
+  .nav-search input { flex:1;background:var(--negro2);border:1px solid var(--gris3);border-right:none;color:var(--blanco);padding:.6rem 1rem;font-family:var(--font-body);font-size:.88rem;font-weight:300;outline:none;transition:border-color .2s; }
+  .nav-search input:focus { border-color:var(--neon); }
+  .nav-search input::placeholder { color:var(--gris2); }
+  .nav-search button { background:var(--neon);border:none;color:var(--negro);padding:.6rem 1.2rem;font-family:var(--font-display);font-size:.78rem;letter-spacing:.06em;cursor:none;transition:opacity .2s;flex-shrink:0; }
+  .nav-search button:hover { opacity:.85; }
+  .nav-right { display:flex;align-items:center;gap:.8rem;flex-shrink:0; }
+  .btn-ghost { background:transparent;border:1px solid var(--gris2);color:var(--blanco);padding:.48rem 1rem;font-family:var(--font-body);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;cursor:none;transition:border-color .2s;text-decoration:none;display:inline-block; }
+  .btn-ghost:hover { border-color:var(--blanco); }
+  .btn-neon { background:var(--neon);border:none;color:var(--negro);padding:.48rem 1rem;font-family:var(--font-body);font-weight:500;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;cursor:none;transition:opacity .2s;text-decoration:none;display:inline-block; }
+  .btn-neon:hover { opacity:.85; }
+  .top-spacer { height:60px; }
+
+  /* LAYOUT */
+  .layout { display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 60px); }
+
+  /* FILTROS */
+  .filters-panel { border-right:1px solid #1c1c1c;padding:1.8rem 0;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto;background:var(--negro2); }
+  .filters-panel::-webkit-scrollbar { width:3px; }
+  .filters-panel::-webkit-scrollbar-thumb { background:var(--gris3); }
+  .filter-header { padding:0 1.5rem 1rem;border-bottom:1px solid #1c1c1c;margin-bottom:1.2rem;display:flex;align-items:center;justify-content:space-between; }
+  .filter-title { font-family:var(--font-display);font-size:.95rem; }
+  .filter-clear { font-size:.68rem;color:var(--neon);cursor:none;background:none;border:none;font-family:var(--font-body);letter-spacing:.08em;text-transform:uppercase;padding:0; }
+  .filter-group { padding:0 1.5rem;margin-bottom:1.4rem; }
+  .filter-group-label { font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gris2);margin-bottom:.6rem;display:block; }
+  .filter-group select, .filter-group input[type=text] { width:100%;background:var(--negro);border:1px solid var(--gris3);color:var(--blanco);padding:.62rem .9rem;font-family:var(--font-body);font-size:.82rem;font-weight:300;outline:none;transition:border-color .2s;appearance:none;border-radius:0; }
+  .filter-group select:focus, .filter-group input:focus { border-color:var(--neon); }
+  .filter-chips { display:flex;flex-wrap:wrap;gap:.35rem; }
+  .fchip { padding:.3rem .65rem;border:1px solid var(--gris3);color:var(--gris);font-size:.67rem;letter-spacing:.07em;text-transform:uppercase;cursor:none;transition:all .15s;background:transparent;font-family:var(--font-body); }
+  .fchip:hover { border-color:#555;color:var(--blanco); }
+  .fchip.on { border-color:var(--neon);color:var(--neon);background:rgba(212,245,60,.05); }
+  .filter-divider { height:1px;background:#1c1c1c;margin:0 1.5rem 1.4rem; }
+
+  /* RESULTADOS */
+  .results-area { padding:1.8rem 2rem; }
+  .results-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;padding-bottom:1.2rem;border-bottom:1px solid #1c1c1c; }
+  .results-count { font-family:var(--font-display);font-size:1.8rem;letter-spacing:-.02em;line-height:1; }
+  .results-count span { color:var(--neon); }
+  .results-sub { font-size:.75rem;color:var(--gris);margin-top:.2rem; }
+  .results-controls { display:flex;align-items:center;gap:.8rem; }
+  .sort-select { background:var(--negro2);border:1px solid var(--gris3);color:var(--blanco);padding:.45rem .9rem;font-family:var(--font-body);font-size:.78rem;outline:none;appearance:none;cursor:none; }
+  .nav-user { position:relative; }
+  .nav-avatar-wrap { display:flex;align-items:center;gap:.5rem;cursor:none;padding:.3rem .6rem;border:1px solid var(--gris3);transition:border-color .2s;user-select:none; }
+  .nav-avatar-wrap:hover { border-color:var(--gris2); }
+  .nav-avatar-circle { width:28px;height:28px;border-radius:50%;background:#0d2010;color:var(--neon);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.62rem;flex-shrink:0; }
+  .nav-avatar-name { font-size:.78rem;color:var(--blanco); }
+  .nav-avatar-chevron { font-size:.6rem;color:var(--gris);transition:transform .2s; }
+  .nav-avatar-wrap.open .nav-avatar-chevron { transform:rotate(180deg); }
+  .nav-dropdown { position:absolute;top:calc(100% + 8px);right:0;background:var(--negro2);border:1px solid #2a2a2a;min-width:200px;display:none;flex-direction:column;z-index:300; }
+  .nav-dropdown.open { display:flex; }
+  .nav-dropdown-item { display:flex;align-items:center;gap:.6rem;padding:.75rem 1.1rem;color:var(--gris);text-decoration:none;font-size:.82rem;transition:all .15s;background:transparent;border:none;font-family:var(--font-body);cursor:none;text-align:left;width:100%; }
+  .nav-dropdown-item:hover { background:rgba(255,255,255,.04);color:var(--blanco); }
+  .nav-dropdown-divider { height:1px;background:#1c1c1c;margin:.3rem 0; }
+  .nav-logout:hover { color:var(--rojo) !important; }
+  .nav-badge { background:var(--neon);color:var(--negro);font-size:.55rem;font-weight:700;padding:.1rem .4rem;margin-left:auto; }
+  .view-btn { background:transparent;border:none;color:var(--gris);padding:.38rem .6rem;font-size:.85rem;cursor:none;transition:all .15s; }
+  .view-btn.active { background:var(--negro3);color:var(--neon); }
+
+  .active-filters { display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.4rem;min-height:.5rem; }
+  .af-chip { display:inline-flex;align-items:center;gap:.35rem;padding:.25rem .6rem;background:rgba(212,245,60,.07);border:1px solid rgba(212,245,60,.2);color:var(--neon);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase; }
+  .af-remove { background:none;border:none;color:rgba(212,245,60,.5);cursor:none;font-size:.85rem;padding:0;line-height:1;transition:color .15s;font-family:var(--font-body); }
+  .af-remove:hover { color:var(--neon); }
+
+  /* GRID */
+  .musicians-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:#181818;overflow:hidden; }
+  .musicians-grid.list-view { grid-template-columns:1fr;background:transparent;gap:0; }
+  .musician-card { min-width:0;overflow:hidden; }
+
+  /* CARD — limpia y minimalista */
+  .musician-card { background:var(--negro);padding:1.4rem;cursor:none;transition:background .2s;position:relative;display:flex;flex-direction:column;gap:.8rem; }
+  .musician-card:hover { background:#0e0e0e; }
+  .musician-card.premium-card { border-top:2px solid var(--neon); }
+  .premium-dot { position:absolute;top:.75rem;right:.75rem;background:var(--neon);color:var(--negro);font-size:.55rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.12rem .4rem; }
+
+  .card-top { display:flex;align-items:center;gap:.85rem; }
+  .card-avatar { width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.9rem;flex-shrink:0;position:relative; }
+  .online-dot { position:absolute;bottom:1px;right:1px;width:8px;height:8px;background:#4caf50;border-radius:50%;border:2px solid var(--negro); }
+  .card-info { flex:1;min-width:0; }
+  .card-name { font-weight:500;font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:.1rem; }
+  .card-instrument { font-size:.72rem;color:var(--neon);margin-bottom:.08rem; }
+  .card-location { font-size:.7rem;color:var(--gris); }
+  .card-match { text-align:right;flex-shrink:0; }
+  .match-num { font-family:var(--font-display);font-size:1.25rem;color:var(--neon);line-height:1; }
+  .match-label { font-size:.56rem;color:var(--gris);letter-spacing:.08em;text-transform:uppercase; }
+
+  .card-tags { display:flex;gap:.3rem;flex-wrap:wrap; }
+  .ctag { font-size:.63rem;padding:.14rem .48rem;border:1px solid var(--gris3);color:var(--gris);text-transform:uppercase;letter-spacing:.06em; }
+
+  .card-bio { font-size:.78rem;color:var(--gris);line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+
+  .card-footer { display:flex;align-items:center;justify-content:space-between;gap:.8rem;padding-top:.75rem;border-top:1px solid #161616; }
+  .card-refs { font-size:.68rem;color:var(--gris2);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+  .card-refs em { color:var(--gris);font-style:normal; }
+  .card-cta { background:transparent;border:1px solid var(--gris3);color:var(--gris);padding:.35rem .85rem;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;cursor:none;transition:all .2s;font-family:var(--font-body);flex-shrink:0;text-decoration:none;display:inline-block;white-space:nowrap; }
+  .card-cta:hover { border-color:var(--neon);color:var(--neon); }
+
+  /* LIST VIEW */
+  .list-view .musician-card { flex-direction:row;align-items:center;padding:1rem 1.5rem;border-bottom:1px solid #141414; }
+  .list-view .card-top { flex:0 0 260px; }
+  .list-view .card-tags { flex:0 0 auto; }
+  .list-view .card-bio { flex:1;padding:0 1.5rem; }
+  .list-view .card-footer { border-top:none;padding-top:0;flex:0 0 auto; }
+  .list-view .card-refs { display:none; }
+
+  .load-more { padding:2.5rem;text-align:center;border-top:1px solid #1c1c1c; }
+  .btn-load { background:transparent;border:1px solid var(--gris3);color:var(--gris);padding:.75rem 2.5rem;font-family:var(--font-display);font-size:.85rem;letter-spacing:.06em;cursor:none;transition:all .2s; }
+  .btn-load:hover { border-color:var(--blanco);color:var(--blanco); }
+
+  .av-a{background:#0d2010;color:var(--neon);}
+  .av-b{background:#2a0a05;color:#ff6b5b;}
+  .av-c{background:#050d2a;color:#5b9fff;}
+  .av-d{background:#1a0d2a;color:#c45bff;}
+  .av-e{background:#2a1a05;color:#ffaa5b;}
+  .av-f{background:#0d1a2a;color:#5bd4ff;}
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .musician-card:nth-child(1){animation:fadeUp .3s .04s ease both}
+  .musician-card:nth-child(2){animation:fadeUp .3s .08s ease both}
+  .musician-card:nth-child(3){animation:fadeUp .3s .12s ease both}
+  .musician-card:nth-child(4){animation:fadeUp .3s .16s ease both}
+  .musician-card:nth-child(5){animation:fadeUp .3s .20s ease both}
+  .musician-card:nth-child(6){animation:fadeUp .3s .24s ease both}
+  .musician-card:nth-child(7){animation:fadeUp .3s .28s ease both}
+  .musician-card:nth-child(8){animation:fadeUp .3s .32s ease both}
+  .musician-card:nth-child(9){animation:fadeUp .3s .36s ease both}
+  /* NAV LINKS FIX */
+  .nav-links { list-style:none !important; display:flex !important; gap:2rem !important; padding:0 !important; margin:0 !important; }
+  .nav-links li { list-style:none !important; }
+  .nav-link { color:var(--gris);text-decoration:none;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;transition:color .2s; }
+  .nav-link:hover { color:var(--blanco); }
+  .nav-link.active { color:var(--neon); }
+  /* NAV AVATAR NAME — truncate long usernames */
+  .nav-avatar-name { font-size:.78rem;color:var(--blanco);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+  /* NAV LINKS CLICKABLE FIX */
+  .nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap { pointer-events:auto !important; }
+  nav a, nav button { pointer-events:auto !important; }
+</style>
+  <style>
+    .guardados-wrap { max-width:1100px;margin:0 auto;padding:2.5rem 2rem; }
+    .guardados-header { margin-bottom:2rem;border-bottom:1px solid #1c1c1c;padding-bottom:1.5rem; }
+    .guardados-title { font-family:var(--font-display);font-size:2.2rem;color:var(--blanco); }
+    .guardados-title span { color:var(--neon); }
+    .guardados-sub { color:var(--gris);font-size:.85rem;margin-top:.3rem; }
+    .guardados-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:#181818; }
+    @media(max-width:700px){ .guardados-grid{ grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+
+
+
+<main>
+  <div class="guardados-wrap">
+    <div class="guardados-header">
+      <div class="guardados-title">♡ Mis <span>guardados</span></div>
+      <div class="guardados-sub"><span id="result-num">0</span> músicos guardados</div>
+    </div>
+    <div class="guardados-grid" id="musicians-grid">
+      <div style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--gris);font-size:.88rem">Cargando...</div>
+    </div>
+  </div>
+</main>
+
+<script>
+  // PROTECCIÓN
+  (function() {
+    try { if (localStorage.getItem('ba_logged') !== '1') window.location.replace('index.html'); } catch(e) {}
+  })();
+
+  const SUPABASE_URL = 'https://xiaanchoanxmampegoay.supabase.co'
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68'
+  const hdrs = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+
+  // CURSOR
+  window.addEventListener('DOMContentLoaded', function() {
+    const cursor=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+    if (!cursor || !ring) return;
+    let mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+    (function tick(){cursor.style.left=mx+'px';cursor.style.top=my+'px';rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(tick);})();
+  });
+
+  const COLORES = ['#1a0a2e','#0a2e1a','#2e1a0a','#0a1a2e','#2e0a1a','#1a2e0a']
+  const TEXTO = ['#c45bff','#4cff9f','#ffaa5b','#5b9fff','#ff5b8a','#c9ff5b']
+
+  function colorIdx(nombre) {
+    if (!nombre) return 0
+    return nombre.charCodeAt(0) % COLORES.length
+  }
+  function getInitials(nombre) {
+    if (!nombre) return '?'
+    return nombre.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)
+  }
+
+  function buildCard(p) {
+    const idx = colorIdx(p.nombre)
+    const initials = getInitials(p.nombre)
+    const generos = (p.generos||'').split(',').map(g=>g.trim()).filter(Boolean).slice(0,3)
+    const location = [p.barrio, p.ciudad].filter(Boolean).join(', ')
+    const tags = generos.map(g=>`<span class="ctag">${g}</span>`).join('')
+    const refs = p.referentes ? `🎵 <em>${p.referentes.split(',').slice(0,3).join(', ')}</em>` : ''
+    const bio = p.bio || (p.instrumento ? `Toca ${p.instrumento}` : 'Músico en buscARTE')
+    const avatarHTML = p.foto_url
+      ? `<div class="card-avatar" style="background:#000;overflow:hidden"><img src="${p.foto_url}" style="width:100%;height:100%;object-fit:cover"></div>`
+      : `<div class="card-avatar" style="background:${COLORES[idx]};color:${TEXTO[idx]}">${initials}</div>`
+    return `<div class="musician-card" data-id="${p.id}">
+      <div class="card-top">
+        ${avatarHTML}
+        <div class="card-info">
+          <div class="card-name">${p.nombre||'Sin nombre'}</div>
+          <div class="card-instrument">${p.instrumento||'Músico'}</div>
+          <div class="card-location">${location ? '📍 '+location : ''}</div>
+        </div>
+        <button class="btn-unsave" onclick="quitarGuardado(${p.id}, this)" title="Quitar de guardados" style="margin-left:auto;background:none;border:none;color:#ff5555;font-size:1.2rem;cursor:pointer;padding:.5rem">♥</button>
+      </div>
+      ${tags ? `<div class="card-tags">${tags}</div>` : ''}
+      <div class="card-bio">${bio}</div>
+      <div class="card-footer">
+        <div class="card-refs">${refs}</div>
+        <a href="buscARTE_perfil_publico.html?id=${p.id}" class="card-cta">Ver perfil →</a>
+      </div>
+    </div>`
+  }
+
+  async function cargarGuardados() {
+    const miId = localStorage.getItem('ba_user_id')
+    if (!miId) return
+    const grid = document.getElementById('musicians-grid')
+    grid.innerHTML = '<div style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--gris);font-size:.88rem">Cargando...</div>'
+
+    try {
+      // Cargar IDs guardados
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles_guardados?user_id=eq.${miId}&select=perfil_id`, { headers: hdrs })
+      const guardados = await res.json()
+
+      if (!guardados.length) {
+        grid.innerHTML = `<div style="grid-column:1/-1;padding:4rem;text-align:center">
+          <div style="font-size:2rem;margin-bottom:1rem">♡</div>
+          <div style="font-family:var(--font-display);font-size:1.4rem;margin-bottom:.5rem">Sin guardados todavía</div>
+          <div style="color:var(--gris);font-size:.88rem">Cuando guardes un perfil va a aparecer acá. <a href="buscARTE_busqueda.html" style="color:var(--neon)">Buscar músicos →</a></div>
+        </div>`
+        const rn = document.getElementById('result-num'); if(rn) rn.textContent = '0'
+        return
+      }
+
+      const ids = guardados.map(g => g.perfil_id).join(',')
+      const pRes = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=in.(${ids})&select=id,nombre,instrumento,generos,ciudad,barrio,bio,referentes,foto_url`, { headers: hdrs })
+      const perfiles = await pRes.json()
+
+      grid.innerHTML = ''
+      perfiles.forEach(p => grid.insertAdjacentHTML('beforeend', buildCard(p)))
+      const rn2 = document.getElementById('result-num'); if(rn2) rn2.textContent = perfiles.length
+
+    } catch(e) {
+      grid.innerHTML = '<div style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--gris)">Error al cargar. Verificá tu conexión.</div>'
+      console.error(e)
+    }
+  }
+
+  async function quitarGuardado(perfilId, btn) {
+    const miId = localStorage.getItem('ba_user_id')
+    if (!miId) return
+    btn.textContent = '...'
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/perfiles_guardados?user_id=eq.${miId}&perfil_id=eq.${perfilId}`, {
+        method: 'DELETE',
+        headers: hdrs
+      })
+      btn.closest('.musician-card').style.opacity = '0'
+      btn.closest('.musician-card').style.transition = 'opacity .3s'
+      setTimeout(() => { btn.closest('.musician-card').remove(); cargarGuardados() }, 300)
+    } catch(e) { btn.textContent = '♥'; console.error(e) }
+  }
+
+  window.addEventListener('DOMContentLoaded', cargarGuardados);
+
+  // NAV SESSION
+  (function initNav(){
+    const l=localStorage.getItem('ba_logged')==='1';
+    const n=localStorage.getItem('ba_name')||'Mi perfil';
+    const uid=localStorage.getItem('ba_user_id')||'';
+    const i=n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    if(l){
+      const g=document.getElementById('nav-guest');const u=document.getElementById('nav-user');
+      if(g)g.style.display='none';if(u)u.style.display='flex';
+      const c=document.getElementById('nav-avatar-circle');if(c)c.textContent=i;
+      const nm=document.getElementById('nav-avatar-name');if(nm)nm.textContent=n.split(' ')[0];
+      const b=document.getElementById('nav-msg-badge');if(b)b.style.display='inline';
+      const miPerfilLink=document.querySelector('.nav-dropdown-item[href*="perfil_publico"]');
+      if(miPerfilLink && uid) miPerfilLink.href='buscARTE_perfil_publico.html?id='+uid;
+    }
+  })();
+  function toggleUserMenu(){const w=document.getElementById('nav-avatar-btn');const d=document.getElementById('nav-dropdown');if(w)w.classList.toggle('open');if(d)d.classList.toggle('open');}
+  document.addEventListener('click',e=>{if(!e.target.closest('#nav-user')){document.getElementById('nav-avatar-btn')?.classList.remove('open');document.getElementById('nav-dropdown')?.classList.remove('open');}});
+  function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');window.location.href='index.html';}
+</script>
+</body>
+</html>

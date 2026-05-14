@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>buscARTE — Detalle de anuncio</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --negro:#080808; --negro2:#111; --negro3:#1a1a1a;
+    --blanco:#f2ede4; --neon:#d4f53c; --rojo:#e8311a;
+    --gris:#888; --gris2:#444; --gris3:#2a2a2a;
+    --font-display:'Archivo Black',sans-serif;
+    --font-body:'Archivo',sans-serif;
+  }
+  body { background:var(--negro); color:var(--blanco); font-family:var(--font-body); font-weight:300; min-height:100vh; overflow-x:hidden; cursor:none; }
+  .cursor { width:10px;height:10px;background:var(--neon);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%); }
+  .cursor-ring { width:36px;height:36px;border:1px solid rgba(212,245,60,0.35);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .15s ease; }
+  body::before { content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");opacity:.03;pointer-events:none;z-index:1000; }
+
+  /* NAV */
+  nav { position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1rem 2.5rem;border-bottom:1px solid #1c1c1c;background:rgba(8,8,8,0.96);backdrop-filter:blur(12px); }
+  .nav-logo { font-family:var(--font-display);font-size:1.4rem;color:var(--blanco);text-decoration:none; }
+  .nav-logo span { color:var(--neon); }
+  .nav-back { color:var(--gris);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;transition:color .2s;display:flex;align-items:center;gap:.4rem; }
+  .nav-back:hover { color:var(--blanco); }
+  .nav-right { display:flex;gap:.8rem; }
+  .btn-ghost { background:transparent;border:1px solid var(--gris2);color:var(--blanco);padding:.48rem 1rem;font-family:var(--font-body);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;cursor:none;transition:border-color .2s;text-decoration:none;display:inline-block; }
+  .btn-ghost:hover { border-color:var(--blanco); }
+  .btn-neon { background:var(--neon);border:none;color:var(--negro);padding:.48rem 1rem;font-family:var(--font-body);font-weight:500;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;cursor:none;transition:opacity .2s;text-decoration:none;display:inline-block; }
+  .btn-neon:hover { opacity:.85; }
+  .top-spacer { height:60px; }
+
+  /* PREVIEW SWITCHER — solo para demo */
+  .demo-bar { background:rgba(212,245,60,.06);border-bottom:1px solid rgba(212,245,60,.15);padding:.6rem 2.5rem;display:flex;align-items:center;gap:1rem; }
+  .demo-label { font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--neon);flex-shrink:0; }
+  .demo-tabs { display:flex;gap:.4rem; }
+  .demo-tab { padding:.3rem .8rem;border:1px solid rgba(212,245,60,.2);color:var(--gris);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;cursor:none;transition:all .15s;background:transparent;font-family:var(--font-body); }
+  .demo-tab:hover { color:var(--blanco);border-color:rgba(212,245,60,.4); }
+  .demo-tab.active { background:var(--neon);color:var(--negro);border-color:var(--neon); }
+
+  /* PÁGINA */
+  .page-wrap { max-width:1100px;margin:0 auto;padding:2.5rem 2rem; }
+
+  /* BREADCRUMB */
+  .breadcrumb { display:flex;align-items:center;gap:.5rem;margin-bottom:1.8rem;font-size:.72rem;color:var(--gris2); }
+  .breadcrumb a { color:var(--gris);text-decoration:none;transition:color .2s; }
+  .breadcrumb a:hover { color:var(--blanco); }
+  .breadcrumb span { color:var(--gris3); }
+
+  /* LAYOUT DETALLE */
+  .detail-layout { display:grid;grid-template-columns:1fr 320px;gap:2rem;align-items:start; }
+
+  /* CONTENIDO PRINCIPAL */
+  .detail-main { }
+
+  /* BADGE TIPO */
+  .anuncio-tipo-badge { display:inline-flex;align-items:center;gap:.35rem;padding:.18rem .65rem;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;font-weight:500;margin-bottom:1rem; }
+  .badge-busco { background:rgba(58,123,213,.12);color:#5b9fff;border:1px solid rgba(58,123,213,.22); }
+  .badge-ofrezco { background:rgba(46,204,113,.1);color:#2ecc71;border:1px solid rgba(46,204,113,.2); }
+  .badge-vendo { background:rgba(245,166,35,.1);color:#f5a623;border:1px solid rgba(245,166,35,.2); }
+  .badge-jam { background:rgba(212,245,60,.08);color:var(--neon);border:1px solid rgba(212,245,60,.18); }
+
+  .detail-titulo { font-family:var(--font-display);font-size:clamp(1.6rem,3vw,2.4rem);letter-spacing:-.02em;line-height:1.1;margin-bottom:1rem; }
+
+  /* META ROW */
+  .detail-meta { display:flex;align-items:center;gap:1rem;flex-wrap:wrap;padding:1rem 0;border-top:1px solid #1c1c1c;border-bottom:1px solid #1c1c1c;margin-bottom:1.8rem; }
+  .meta-autor { display:flex;align-items:center;gap:.6rem;text-decoration:none;cursor:none;transition:opacity .2s; }
+  .meta-autor:hover { opacity:.75; }
+  .meta-avatar { width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.7rem;flex-shrink:0; }
+  .meta-name { font-size:.82rem;color:var(--blanco); }
+  .meta-sep { color:var(--gris3);font-size:.8rem; }
+  .meta-item { font-size:.75rem;color:var(--gris);display:flex;align-items:center;gap:.3rem; }
+  .meta-item strong { color:var(--blanco);font-weight:400; }
+
+  /* DESCRIPCIÓN */
+  .detail-desc { font-size:.92rem;color:var(--blanco);line-height:1.8;font-weight:300;margin-bottom:2rem; }
+  .detail-desc p + p { margin-top:1rem; }
+
+  /* TAGS SECCIÓN */
+  .detail-section { margin-bottom:1.8rem; }
+  .detail-section-title { font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gris2);margin-bottom:.7rem; }
+  .tags-row { display:flex;flex-wrap:wrap;gap:.4rem; }
+  .dtag { font-size:.72rem;padding:.22rem .65rem;border:1px solid var(--gris3);color:var(--gris);text-transform:uppercase;letter-spacing:.07em; }
+  .dtag-neon { border-color:rgba(212,245,60,.35);color:var(--neon); }
+
+  /* ══ VENDO: FOTO ══ */
+  .foto-section { margin-bottom:2rem; }
+  .foto-main { width:100%;aspect-ratio:4/3;background:var(--negro2);border:1px solid #1c1c1c;display:flex;align-items:center;justify-content:center;font-size:4rem;margin-bottom:.5rem;position:relative;overflow:hidden; }
+  .foto-main img { width:100%;height:100%;object-fit:cover; }
+  .foto-placeholder { display:flex;flex-direction:column;align-items:center;gap:.5rem; }
+  .foto-placeholder-text { font-size:.75rem;color:var(--gris2); }
+
+  /* ══ VENDO: FICHA TÉCNICA ══ */
+  .ficha { border:1px solid #1c1c1c;background:var(--negro2);margin-bottom:1.8rem; }
+  .ficha-row { display:flex;padding:.75rem 1.2rem;border-bottom:1px solid #161616; }
+  .ficha-row:last-child { border-bottom:none; }
+  .ficha-key { font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gris);width:120px;flex-shrink:0; }
+  .ficha-val { font-size:.85rem;color:var(--blanco); }
+  .ficha-val.price { font-family:var(--font-display);font-size:1.3rem;color:var(--neon);letter-spacing:-.01em; }
+  .ficha-val.condicion-nuevo { color:#2ecc71; }
+  .ficha-val.condicion-usado { color:#f5a623; }
+
+  /* ══ JAM: INFO DEL EVENTO ══ */
+  .evento-hero { background:var(--negro2);border:1px solid #1c1c1c;padding:1.8rem;margin-bottom:1.8rem; }
+  .evento-fecha-grande { font-family:var(--font-display);font-size:3rem;letter-spacing:-.02em;color:var(--neon);line-height:1;margin-bottom:.2rem; }
+  .evento-hora { font-size:1rem;color:var(--gris);margin-bottom:1rem; }
+  .evento-lugar { font-size:.9rem;color:var(--blanco);display:flex;align-items:center;gap:.5rem; }
+  .evento-precio { display:inline-flex;align-items:center;gap:.4rem;margin-top:1rem;padding:.3rem .8rem;border:1px solid rgba(212,245,60,.2);background:rgba(212,245,60,.06);color:var(--neon);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase; }
+
+  /* SIMILAR ANUNCIOS */
+  .similar-section { margin-top:2.5rem;padding-top:2rem;border-top:1px solid #1c1c1c; }
+  .similar-title { font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gris2);margin-bottom:1rem; }
+  .similar-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:#1c1c1c; }
+  .similar-item { background:var(--negro);padding:1rem;cursor:none;transition:background .2s;text-decoration:none;display:block; }
+  .similar-item:hover { background:var(--negro2); }
+  .similar-badge { font-size:.6rem;padding:.12rem .45rem;letter-spacing:.08em;text-transform:uppercase;display:inline-block;margin-bottom:.4rem; }
+  .similar-titulo { font-size:.82rem;font-weight:500;line-height:1.3;color:var(--blanco);margin-bottom:.3rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden; }
+  .similar-meta { font-size:.7rem;color:var(--gris2); }
+
+  /* SIDEBAR */
+  .detail-sidebar { position:sticky;top:80px; }
+  .sidebar-card { border:1px solid #1c1c1c;padding:1.5rem;background:var(--negro2);margin-bottom:1.2rem; }
+  .sidebar-card-title { font-family:var(--font-display);font-size:.9rem;letter-spacing:.02em;margin-bottom:.4rem; }
+  .sidebar-card-sub { font-size:.75rem;color:var(--gris);margin-bottom:1.2rem;line-height:1.6; }
+
+  /* FORM CONTACTO */
+  .contact-form { display:flex;flex-direction:column;gap:.7rem; }
+  .contact-form textarea { background:var(--negro);border:1px solid var(--gris3);color:var(--blanco);padding:.8rem;font-family:var(--font-body);font-size:.82rem;font-weight:300;outline:none;resize:none;height:90px;transition:border-color .2s; }
+  .contact-form textarea:focus { border-color:var(--neon); }
+  .contact-form textarea::placeholder { color:var(--gris2); }
+  .btn-send { background:var(--neon);border:none;color:var(--negro);padding:.78rem;font-family:var(--font-display);font-size:.88rem;letter-spacing:.04em;cursor:none;transition:opacity .2s;width:100%; }
+  .btn-send:hover { opacity:.85; }
+  .login-note { font-size:.7rem;color:var(--gris2);text-align:center;line-height:1.5; }
+  .login-note a { color:var(--neon);text-decoration:none; }
+
+  /* AUTOR CARD */
+  .autor-card { display:flex;align-items:center;gap:1rem;text-decoration:none;cursor:none;transition:opacity .2s;margin-bottom:1rem; }
+  .autor-card:hover { opacity:.8; }
+  .autor-avatar-big { width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:1rem;flex-shrink:0; }
+  .autor-info { flex:1; }
+  .autor-nombre { font-weight:500;font-size:.92rem;margin-bottom:.1rem; }
+  .autor-meta { font-size:.75rem;color:var(--gris); }
+  .btn-ver-perfil { width:100%;background:transparent;border:1px solid var(--gris3);color:var(--blanco);padding:.65rem;font-family:var(--font-body);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;cursor:none;transition:all .2s;text-align:center;text-decoration:none;display:block;margin-bottom:.6rem; }
+  .btn-ver-perfil:hover { border-color:var(--blanco); }
+
+  /* REPORTAR */
+  .report-link { font-size:.68rem;color:var(--gris2);text-align:center;display:block;cursor:none;transition:color .2s;text-decoration:none;margin-top:.5rem; }
+  .report-link:hover { color:var(--gris); }
+
+  /* ANIMACIONES */
+  @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+  .detail-main { animation:fadeUp .4s ease both; }
+  .detail-sidebar { animation:fadeUp .4s .1s ease both; }
+
+  /* VISTAS */
+  .anuncio-view { display:none; }
+  .anuncio-view.active { display:block; }
+  /* NAV DROPDOWN */
+  .nav-user { position:relative; }
+  .nav-avatar-wrap { display:flex;align-items:center;gap:.5rem;cursor:none;padding:.3rem .6rem;border:1px solid var(--gris3);transition:border-color .2s;user-select:none; }
+  .nav-avatar-wrap:hover { border-color:var(--gris2); }
+  .nav-avatar-circle { width:28px;height:28px;border-radius:50%;background:#0d2010;color:var(--neon);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.62rem;flex-shrink:0; }
+  .nav-avatar-name { font-size:.78rem;color:var(--blanco); }
+  .nav-avatar-chevron { font-size:.6rem;color:var(--gris);transition:transform .2s; }
+  .nav-avatar-wrap.open .nav-avatar-chevron { transform:rotate(180deg); }
+  .nav-dropdown { position:absolute;top:calc(100% + 8px);right:0;background:var(--negro2);border:1px solid #2a2a2a;min-width:200px;display:none;flex-direction:column;z-index:300; }
+  .nav-dropdown.open { display:flex; }
+  .nav-dropdown-item { display:flex;align-items:center;gap:.6rem;padding:.75rem 1.1rem;color:var(--gris);text-decoration:none;font-size:.82rem;transition:all .15s;background:transparent;border:none;font-family:var(--font-body);cursor:none;text-align:left;width:100%; }
+  .nav-dropdown-item:hover { background:rgba(255,255,255,.04);color:var(--blanco); }
+  .nav-dropdown-divider { height:1px;background:#1c1c1c;margin:.3rem 0; }
+  .nav-logout:hover { color:var(--rojo) !important; }
+  .nav-badge { background:var(--neon);color:var(--negro);font-size:.55rem;font-weight:700;padding:.1rem .4rem;margin-left:auto; }
+  /* NAV LINKS FIX */
+  .nav-links { list-style:none !important; display:flex !important; gap:2rem !important; padding:0 !important; margin:0 !important; }
+  .nav-links li { list-style:none !important; }
+  .nav-link { color:var(--gris);text-decoration:none;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;transition:color .2s; }
+  .nav-link:hover { color:var(--blanco); }
+  .nav-link.active { color:var(--neon); }
+  /* NAV AVATAR NAME — truncate long usernames */
+  .nav-avatar-name { font-size:.78rem;color:var(--blanco);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+  /* NAV LINKS CLICKABLE FIX */
+  .nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap { pointer-events:auto !important; }
+  nav a, nav button { pointer-events:auto !important; }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+
+<nav>
+  <a href="index.html" class="nav-logo">busc<span>ARTE</span></a>
+  <a href="buscARTE_anuncios.html" class="nav-back">← Volver al tablón</a>
+  <div class="nav-right">
+      <div class="nav-guest" id="nav-guest">
+      <a href="buscARTE_login.html" class="btn-ghost">Ingresar</a>
+      <a href="buscARTE_registro.html" class="btn-neon">Registrarse</a>
+    </div>
+    <div class="nav-user" id="nav-user" style="display:none">
+      <div class="nav-avatar-wrap" onclick="toggleUserMenu()" id="nav-avatar-btn">
+        <div class="nav-avatar-circle" id="nav-avatar-circle">?</div>
+        <span class="nav-avatar-name" id="nav-avatar-name">Mi perfil</span>
+        <span class="nav-avatar-chevron">&#9662;</span>
+      </div>
+      <div class="nav-dropdown" id="nav-dropdown">
+        <a href="buscARTE_perfil_publico.html" class="nav-dropdown-item">&#128100; Mi perfil</a>
+        <a href="buscARTE_perfil.html" class="nav-dropdown-item">&#9881;&#65039; Configurar perfil</a>
+        <a href="buscARTE_mensajes.html" class="nav-dropdown-item">&#128172; Mensajes <span class="nav-badge" id="nav-msg-badge" style="display:none"></span></a>
+        <a href="buscARTE_mis_anuncios.html" class="nav-dropdown-item">&#128203; Mis anuncios</a>
+        <a href="buscARTE_guardados.html" class="nav-dropdown-item">&#9825; Guardados</a>
+        <div class="nav-dropdown-divider"></div>
+        <button class="nav-dropdown-item nav-logout" onclick="logout()">&#8617; Cerrar sesión</button>
+      </div>
+    </div>
+  </div>
+</nav>
+<div class="top-spacer"></div>
+
+<!-- BARRA DE DEMO PARA VER LOS 4 TIPOS -->
+<div class="demo-bar" id="demo-bar" style="display:none">
+  <span class="demo-label">✦ Vista previa</span>
+  <div class="demo-tabs">
+    <button class="demo-tab active" onclick="showView('busco',this)">Busco músico</button>
+    <button class="demo-tab" onclick="showView('ofrezco',this)">Me ofrezco</button>
+    <button class="demo-tab" onclick="showView('jam',this)">Jam / Zapada</button>
+    <button class="demo-tab" onclick="showView('vende',this)">Vendo / Alquilo</button>
+  </div>
+</div>
+
+<div class="page-wrap" id="page-wrap">
+
+  <!-- ══════════ BUSCO MÚSICO ══════════ -->
+  <div class="anuncio-view active" id="view-busco">
+    <div class="breadcrumb">
+      <a href="buscARTE_anuncios.html">Tablón</a>
+      <span>›</span>
+      <a href="#">Busco músico</a>
+      <span>›</span>
+      Guitarrista para banda de metal prog
+    </div>
+    <div class="detail-layout">
+      <div class="detail-main">
+        <span class="anuncio-tipo-badge badge-busco">🔍 Busco músico</span>
+        <h1 class="detail-titulo">Buscamos guitarrista para banda de metal progresivo establecida</h1>
+        <div class="detail-meta">
+          <a href="buscARTE_perfil_publico.html" class="meta-autor">
+            <div class="meta-avatar av-b" style="background:#2a0a05;color:#ff6b5b">MR</div>
+            <span class="meta-name">Matías Ríos</span>
+          </a>
+          <span class="meta-sep">·</span>
+          <span class="meta-item">📍 Palermo, CABA</span>
+          <span class="meta-sep">·</span>
+          <span class="meta-item">🕐 Hace 4 horas</span>
+          <span class="meta-sep">·</span>
+          <span class="meta-item">👁 38 vistas</span>
+        </div>
+
+        <div class="detail-section">
+          <div class="detail-section-title">Descripción</div>
+          <div class="detail-desc">
+            <p>Somos una banda de metal progresivo con 3 años de trayectoria, una grabación de estudio en nuestro haber y varias fechas en venues de CABA. Buscamos un segundo guitarrista que complete nuestra formación y aporte su visión al proyecto.</p>
+            <p>Nuestras influencias van desde Tool y Opeth hasta Mastodon y Gojira. Ensayamos los jueves de 20 a 23hs en un local en Palermo, a veces sumamos un domingo extra antes de fechas. Necesitamos alguien que tenga equipo propio (al menos guitarra + ampli), que pueda comprometerse con los ensayos y que tenga experiencia tocando en vivo.</p>
+            <p>No buscamos solo un músico, buscamos alguien que quiera construir algo juntos a largo plazo. Si te identificás con lo que hacemos, escribinos.</p>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <div class="detail-section-title">Instrumento buscado</div>
+          <div class="tags-row">
+            <span class="dtag dtag-neon">Guitarra eléctrica</span>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <div class="detail-section-title">Géneros</div>
+          <div class="tags-row">
+            <span class="dtag dtag-neon">Metal</span>
+            <span class="dtag dtag-neon">Prog</span>
+            <span class="dtag">Rock</span>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <div class="detail-section-title">Zona de ensayo</div>
+          <div class="tags-row">
+            <span class="dtag">📍 Palermo, CABA</span>
+          </div>
+        </div>
+
+        <div class="similar-section">
+          <div class="similar-title">Otros anuncios similares</div>
+          <div class="similar-grid">
+            <a href="#" class="similar-item" onclick="return false">
+              <span class="similar-badge badge-busco" style="background:rgba(58,123,213,.12);color:#5b9fff;border:1px solid rgba(58,123,213,.22);">🔍 Busco músico</span>
+              <div class="similar-titulo">Busco bajista para banda de rock nacional — CABA</div>
+              <div class="similar-meta">📍 Almagro · Hace 2 hs</div>
+            </a>
+            <a href="#" class="similar-item" onclick="return false">
+              <span class="similar-badge badge-busco" style="background:rgba(58,123,213,.12);color:#5b9fff;border:1px solid rgba(58,123,213,.22);">🔍 Busco músico</span>
+              <div class="similar-titulo">Banda de metal busca cantante con experiencia en vivo</div>
+              <div class="similar-meta">📍 Floresta · Hace 6 hs</div>
+            </a>
+            <a href="#" class="similar-item" onclick="return false">
+              <span class="similar-badge badge-ofrezco" style="background:rgba(46,204,113,.1);color:#2ecc71;border:1px solid rgba(46,204,113,.2);">🎸 Me ofrezco</span>
+              <div class="similar-titulo">Guitarrista de metal busca banda — disponible ya</div>
+              <div class="similar-meta">📍 Caballito · Hace 8 hs</div>
+            </a>
+            <a href="#" class="similar-item" onclick="return false">
+              <span class="similar-badge badge-busco" style="background:rgba(58,123,213,.12);color:#5b9fff;border:1px solid rgba(58,123,213,.22);">🔍 Busco músico</span>
+              <div class="similar-titulo">Buscamos teclista para banda de prog rock con material propio</div>
+              <div class="similar-meta">📍 Belgrano · Hace 10 hs</div>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-sidebar">
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">Responder al anuncio</div>
+          <div class="sidebar-card-sub">Contale quién sos, qué tocás y por qué te interesa.</div>
+          <div class="contact-form">
+            <textarea placeholder="Hola Matías, soy guitarrista con 10 años de experiencia en metal/prog. Me interesan Tool y Opeth también. ¿Puedo sumarse a un ensayo para probar?"></textarea>
+            <button class="btn-send" onclick="sendMsg(this)">Enviar mensaje →</button>
+            <p class="login-note">¿Sin cuenta? <a href="buscARTE_registro.html">Registrate gratis</a> para responder.</p>
+          </div>
+        </div>
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">Publicado por</div>
+          <a href="buscARTE_perfil_publico.html" class="autor-card">
+            <div class="autor-avatar-big" style="background:#2a0a05;color:#ff6b5b">MR</div>
+            <div class="autor-info">
+              <div class="autor-nombre">Matías Ríos</div>
+              <div class="autor-meta">Guitarrista · Palermo</div>
+            </div>
+          </a>
+          <a href="buscARTE_perfil_publico.html" class="btn-ver-perfil">Ver perfil completo →</a>
+          <a href="#" class="report-link" onclick="return false">⚑ Reportar anuncio</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ ME OFREZCO ══════════ -->
+  <div class="anuncio-view" id="view-ofrezco">
+    <div class="breadcrumb">
+      <a href="buscARTE_anuncios.html">Tablón</a>
+      <span>›</span>
+      <a href="#">Me ofrezco</a>
+      <span>›</span>
+      Guitarrista para sesiones y shows
+    </div>
+    <div class="detail-layout">
+      <div class="detail-main">
+        <span class="anuncio-tipo-badge badge-ofrezco">🎸 Me ofrezco</span>
+        <h1 class="detail-titulo">Guitarrista disponible para sesiones de grabación y shows — CABA y GBA</h1>
+        <div class="detail-meta">
+          <a href="buscARTE_perfil_publico.html" class="meta-autor">
+            <div class="meta-avatar" style="background:#0d2010;color:var(--neon)">LM</div>
+            <span class="meta-name">Lucía Moreno</span>
+          </a>
+          <span class="meta-sep">·</span>
+          <span class="meta-item">📍 Almagro, CABA</span>
+          <span class="meta-sep">·</span>
+          <span class="meta-item">🕐 Hace 5 horas</span>
+          <span class="meta-sep">·</span>
+          <span class="meta-item">👁 52 vistas</span>
+        </div>
+
+        <div class="detail-section">
+          <div class="detail-section-title">Descripción</div>
+          <div class="detail-desc">
+            <p>Guitarrista con 8 años de experiencia en escena, formación en Conservatorio Municipal y trabajo en proyectos de jazz, rock y fusión. Disponible para sesiones de grabación en estudio, refuerzos en vivo y shows puntuales en CABA y Gran Buenos Aires.</p>
+            <p>Tengo equipo completo: Fender Stratocaster + ampli Fender Twin Reverb + pedalera completa. Disponible principalmente fines de semana y alguna noche de semana. Los precios los arreglamos según el tipo de trabajo — grabación de demo, sesiones largas o fecha en vivo son cosas distintas.</p>
+            <p>Si necesitás referencias de trabajos anteriores, con gusto te las comparto. Soy seria, puntual y me adapto al estilo que necesita el proyecto.</p>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <div class="detail-section-title">Instrumento/s</div>
+          <div class="tags-row">
+            <span class="dtag dtag-neon">Guitarra eléctrica</span>
+            <span class="dtag dtag-neon">Guitarra acústica</span>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <div class="detail-section-title">Géneros</div>
+          <div class="tags-row">
+            <span class="dtag dtag-neon">Jazz</span>
+            <span class="dtag dtag-neon">Fusión</span>
+            <span class="dtag">Rock</span>
+            <span class="dtag">Funk</span>
+            <span class="dtag">Blues</span>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <div class="detail-section-title">Zona</div>
+          <div class="tags-row">
+            <span class="dtag">📍 Almagro, CABA</span>
+            <span class="dtag">Gran Buenos Aires</span>
+          </div>
+        </div>
+
+        <div class="similar-section">
+          <div class="similar-title">Otros anuncios similares</div>
+          <div class="similar-grid">
+            <a href="#" class="similar-item" onclick="return false">
+              <span class="similar-badge badge-ofrezco" style="background:rgba(46,204,113,.1);color:#2ecc71;border:1px solid rgba(46,204,113,.2);">🎸 Me ofrezco</span>
+              <div class="similar-titulo">Bajista disponible para sesiones y proyectos estables</div>
+              <div class="similar-meta">📍 Boedo · Hace 3 hs</div>
+            </a>
+            <a href="#" class="similar-item" onclick="return false">
+              <span class="similar-badge badge-ofrezco" style="background:rgba(46,204,113,.1);color:#2ecc71;border:1px solid rgba(46,204,113,.2);">🎸 Me ofrezco</span>
+              <div class="similar-titulo">Teclista de jazz ofrece sesiones — home studio propio</div>
+              <div class="similar-meta">📍 Recoleta · Hace 7 hs</div>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-sidebar">
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">Contactar a Lucía</div>
+          <div class="sidebar-card-sub">Contale en qué consiste el trabajo y cuándo lo necesitás.</div>
+          <div class="contact-form">
+            <textarea placeholder="Hola Lucía, estoy grabando un demo de jazz/fusión y busco guitarrista para 2 o 3 temas. ¿Tenés disponibilidad la semana que viene?"></textarea>
+            <button class="btn-send" onclick="sendMsg(this)">Enviar mensaje →</button>
+            <p class="login-note">¿Sin cuenta? <a href="buscARTE_registro.html">Registrate gratis</a></p>
+          </div>
+        </div>
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">Publicado por</div>
+          <a href="buscARTE_perfil_publico.html" class="autor-card">
+            <div class="autor-avatar-big" style="background:#0d2010;color:var(--neon)">LM</div>
+            <div class="autor-info">
+              <div class="autor-nombre">Lucía Moreno</div>
+              <div class="autor-meta">Guitarrista · Almagro</div>
+            </div>
+          </a>
+          <a href="buscARTE_perfil_publico.html" class="btn-ver-perfil">Ver perfil completo →</a>
+          <a href="#" class="report-link" onclick="return false">⚑ Reportar anuncio</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ JAM / ZAPADA ══════════ -->
+  <div class="anuncio-view" id="view-jam">
+    <div class="breadcrumb">
+      <a href="buscARTE_anuncios.html">Tablón</a>
+      <span>›</span>
+      <a href="#">Jam / Zapada</a>
+      <span>›</span>
+      Jam de jazz — Parque Centenario
+    </div>
+    <div class="detail-layout">
+      <div class="detail-main">
+        <span class="anuncio-tipo-badge badge-jam">🥁 Jam / Zapada</span>
+        <h1 class="detail-titulo">Jam de jazz este sábado 18hs — Parque Centenario, CABA</h1>
+        <div class="detail-meta">
+          <a href="buscARTE_perfil_publico.html" class="meta-autor">
+            <div class="meta-avatar" style="background:#0d1a2a;color:#5bd4ff">NB</div>
+            <span class="meta-name">Nicolás Bustos</span>
+          </a>
+          <span class="meta-sep">·</span>
+          <span class="meta-item">📍 Parque Centenario, CABA</span>
+          <span class="meta-sep">·</span>
+          <span class="meta-item">🕐 Hace 6 horas</span>
+          <span class="meta-sep">·</span>
+          <span class="meta-item">👁 124 vistas</span>
+        </div>
+
+        <!-- INFO DEL EVENTO -->
+        <div class="evento-hero">
+          <div class="evento-fecha-grande">Sábado 17 de mayo</div>
+          <div class="evento-hora">18:00 hs</div>
+          <div class="evento-lugar">📍 Parque Centenario — Av. Díaz Vélez y Rojas, CABA</div>
+          <div class="evento-precio">🎟 Entrada libre y gratuita</div>
+        </div>
+
+        <div class="detail-section">
+          <div class="detail-section-title">Descripción</div>
+          <div class="detail-desc">
+            <p>Organizamos una jam session abierta en el Parque Centenario. El formato es estándar de jazz y algo de bossanova, pero si traés algo propio o querés improvisar libremente, todo suma.</p>
+            <p>No hace falta experiencia previa ni ser músico profesional. La idea es tocar, conocer gente y pasarla bien al aire libre. Traé tu instrumento, silla o manta, y si podés confirmar asistencia por mensaje para calcular cuántos somos.</p>
+            <p>En caso de lluvia se suspende y avisamos por acá y por Instagram.</p>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <div class="detail-section-title">Géneros del evento</div>
+          <div class="tags-row">
+            <span class="dtag dtag-neon">Jazz</span>
+            <span class="dtag dtag-neon">Bossanova</span>
+            <span class="dtag">Improvisación libre</span>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <div class="detail-section-title">Contacto y más info</div>
+          <div class="tags-row">
+            <span class="dtag">📸 @nicolasbustos.music</span>
+          </div>
+        </div>
+
+        <div class="similar-section">
+          <div class="similar-title">Otras jams y zapadas</div>
+          <div class="similar-grid">
+            <a href="#" class="similar-item" onclick="return false">
+              <span class="similar-badge badge-jam" style="background:rgba(212,245,60,.08);color:var(--neon);border:1px solid rgba(212,245,60,.18);">🥁 Jam</span>
+              <div class="similar-titulo">Jam de blues — Bar El Submarino, Palermo — Viernes 20hs</div>
+              <div class="similar-meta">📍 Palermo · Este viernes</div>
+            </a>
+            <a href="#" class="similar-item" onclick="return false">
+              <span class="similar-badge badge-jam" style="background:rgba(212,245,60,.08);color:var(--neon);border:1px solid rgba(212,245,60,.18);">🥁 Jam</span>
+              <div class="similar-titulo">Zapada de funk/soul — Parque Rivadavia — Domingo 17hs</div>
+              <div class="similar-meta">📍 Caballito · Este domingo</div>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-sidebar">
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">Me apunto</div>
+          <div class="sidebar-card-sub">Confirmá tu asistencia y contale al organizador qué instrumento traés.</div>
+          <div class="contact-form">
+            <textarea placeholder="¡Me anoto! Toco guitarra acústica. ¿Hay lugar para sentarse o llevo silla?"></textarea>
+            <button class="btn-send" onclick="sendMsg(this)">Confirmar asistencia →</button>
+            <p class="login-note">¿Sin cuenta? <a href="buscARTE_registro.html">Registrate gratis</a></p>
+          </div>
+        </div>
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">Organizador</div>
+          <a href="buscARTE_perfil_publico.html" class="autor-card">
+            <div class="autor-avatar-big" style="background:#0d1a2a;color:#5bd4ff">NB</div>
+            <div class="autor-info">
+              <div class="autor-nombre">Nicolás Bustos</div>
+              <div class="autor-meta">Guitarrista · Recoleta</div>
+            </div>
+          </a>
+          <a href="buscARTE_perfil_publico.html" class="btn-ver-perfil">Ver perfil →</a>
+          <a href="#" class="report-link" onclick="return false">⚑ Reportar anuncio</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ VENDO / ALQUILO ══════════ -->
+  <div class="anuncio-view" id="view-vende">
+    <div class="breadcrumb">
+      <a href="buscARTE_anuncios.html">Tablón</a>
+      <span>›</span>
+      <a href="#">Vendo / Alquilo</a>
+      <span>›</span>
+      Boss GT-1000 — Caballito
+    </div>
+    <div class="detail-layout">
+      <div class="detail-main">
+        <span class="anuncio-tipo-badge badge-vendo">🎛️ Vendo</span>
+        <h1 class="detail-titulo">Vendo pedalera Boss GT-1000 — impecable, con caja y manual</h1>
+        <div class="detail-meta">
+          <a href="buscARTE_perfil_publico.html" class="meta-autor">
+            <div class="meta-avatar" style="background:#2a1a05;color:#ffaa5b">FP</div>
+            <span class="meta-name">Franco Páez</span>
+          </a>
+          <span class="meta-sep">·</span>
+          <span class="meta-item">📍 Caballito, CABA</span>
+          <span class="meta-sep">·</span>
+          <span class="meta-item">🕐 Hace 10 horas</span>
+          <span class="meta-sep">·</span>
+          <span class="meta-item">👁 87 vistas</span>
+        </div>
+
+        <!-- FOTO -->
+        <div class="foto-section">
+          <div class="foto-main">
+            <div class="foto-placeholder">
+              <span style="font-size:3rem">🎛️</span>
+              <span class="foto-placeholder-text">Foto del vendedor</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- FICHA TÉCNICA -->
+        <div class="ficha">
+          <div class="ficha-row">
+            <span class="ficha-key">Precio</span>
+            <span class="ficha-val price">$850.000</span>
+          </div>
+          <div class="ficha-row">
+            <span class="ficha-key">Categoría</span>
+            <span class="ficha-val">Pedalera / Efectos</span>
+          </div>
+          <div class="ficha-row">
+            <span class="ficha-key">Marca</span>
+            <span class="ficha-val">Boss</span>
+          </div>
+          <div class="ficha-row">
+            <span class="ficha-key">Modelo</span>
+            <span class="ficha-val">GT-1000</span>
+          </div>
+          <div class="ficha-row">
+            <span class="ficha-key">Condición</span>
+            <span class="ficha-val condicion-usado">Usado — excelente estado</span>
+          </div>
+          <div class="ficha-row">
+            <span class="ficha-key">Zona</span>
+            <span class="ficha-val">Caballito, CABA — no envío</span>
+          </div>
+          <div class="ficha-row">
+            <span class="ficha-key">Pago</span>
+            <span class="ficha-val">Solo efectivo</span>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <div class="detail-section-title">Descripción</div>
+          <div class="detail-desc">
+            <p>Pedalera Boss GT-1000 en perfecto estado, comprada hace 8 meses en casa de música. Apenas usada en ensayos, nunca en vivo. No tiene ningún golpe ni rayón.</p>
+            <p>Incluye caja original, manual en español, fuente de alimentación original y cables. El precio es $850.000 y es negociable dentro de lo razonable. No acepto permuta ni lo divido en cuotas.</p>
+            <p>Disponible para ver y probar en persona en Caballito, coordinar por mensaje.</p>
+          </div>
+        </div>
+
+        <div class="similar-section">
+          <div class="similar-title">Otros artículos similares</div>
+          <div class="similar-grid">
+            <a href="#" class="similar-item" onclick="return false">
+              <span class="similar-badge badge-vendo" style="background:rgba(245,166,35,.1);color:#f5a623;border:1px solid rgba(245,166,35,.2);">🎛️ Vendo</span>
+              <div class="similar-titulo">Vendo pedal Boss DS-1 distorsión — impecable</div>
+              <div class="similar-meta">📍 Palermo · $45.000</div>
+            </a>
+            <a href="#" class="similar-item" onclick="return false">
+              <span class="similar-badge badge-vendo" style="background:rgba(245,166,35,.1);color:#f5a623;border:1px solid rgba(245,166,35,.2);">🎛️ Vendo</span>
+              <div class="similar-titulo">Line 6 HX Stomp — usado, buen estado, con fuente</div>
+              <div class="similar-meta">📍 Flores · $680.000</div>
+            </a>
+            <a href="#" class="similar-item" onclick="return false">
+              <span class="similar-badge badge-vendo" style="background:rgba(245,166,35,.1);color:#f5a623;border:1px solid rgba(245,166,35,.2);">🎛️ Vendo</span>
+              <div class="similar-titulo">Guitarra Fender Stratocaster Player — sunburst</div>
+              <div class="similar-meta">📍 San Telmo · $1.200.000</div>
+            </a>
+            <a href="#" class="similar-item" onclick="return false">
+              <span class="similar-badge badge-vendo" style="background:rgba(245,166,35,.1);color:#f5a623;border:1px solid rgba(245,166,35,.2);">🎛️ Vendo</span>
+              <div class="similar-titulo">Amplificador Fender Blues Junior — impecable</div>
+              <div class="similar-meta">📍 Boedo · $950.000</div>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-sidebar">
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">Consultar al vendedor</div>
+          <div class="sidebar-card-sub">Preguntá lo que necesitás antes de coordinar una visita.</div>
+          <div class="contact-form">
+            <textarea placeholder="Hola Franco, me interesa la Boss GT-1000. ¿Aceptás que la pruebe antes de comprar? ¿Cuándo puedo ir a Caballito?"></textarea>
+            <button class="btn-send" onclick="sendMsg(this)">Enviar consulta →</button>
+            <p class="login-note">¿Sin cuenta? <a href="buscARTE_registro.html">Registrate gratis</a></p>
+          </div>
+        </div>
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">Vendedor</div>
+          <a href="buscARTE_perfil_publico.html" class="autor-card">
+            <div class="autor-avatar-big" style="background:#2a1a05;color:#ffaa5b">FP</div>
+            <div class="autor-info">
+              <div class="autor-nombre">Franco Páez</div>
+              <div class="autor-meta">Guitarrista · Caballito</div>
+            </div>
+          </a>
+          <a href="buscARTE_perfil_publico.html" class="btn-ver-perfil">Ver perfil →</a>
+          <a href="#" class="report-link" onclick="return false">⚑ Reportar anuncio</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end page-wrap -->
+
+<script>
+  // PROTECCIÓN: redirigir si no está logueado
+  (function() {
+    try {
+      if (localStorage.getItem('ba_logged') !== '1') {
+        window.location.replace('index.html');
+      }
+    } catch(e) {}
+  })();
+  // CURSOR
+  window.addEventListener('DOMContentLoaded', function() {
+    const cursor=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+    if (!cursor || !ring) return;
+    let mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+    (function tick(){cursor.style.left=mx+'px';cursor.style.top=my+'px';rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(tick);})();
+  });
+
+  // SUPABASE
+  const SUPABASE_URL = 'https://xiaanchoanxmampegoay.supabase.co'
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68'
+  const hdrs = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }
+
+  function timeAgo(iso) {
+    if (!iso) return ''
+    const diff = Math.floor((new Date() - new Date(iso)) / 60000)
+    if (diff < 1) return 'Hace un momento'
+    if (diff < 60) return `Hace ${diff} min`
+    if (diff < 1440) return `Hace ${Math.floor(diff/60)} hs`
+    return `Hace ${Math.floor(diff/1440)} días`
+  }
+
+  const BADGES = { busco:'badge-busco', ofrezco:'badge-ofrezco', jam:'badge-jam', vende:'badge-vendo' }
+  const LABELS = { busco:'🔍 Busco músico', ofrezco:'🎸 Me ofrezco', jam:'🥁 Jam / Zapada', vende:'🎛️ Vendo' }
+
+  async function cargarAnuncio() {
+    const params = new URLSearchParams(window.location.search)
+    const id = params.get('id')
+
+    // Sin ID → mostrar demo
+    if (!id) {
+      document.getElementById('demo-bar').style.display = 'flex'
+      document.getElementById('view-busco').classList.add('active')
+      return
+    }
+
+    // Ocultar demo bar
+    document.getElementById('demo-bar').style.display = 'none'
+
+    try {
+      // Cargar anuncio
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/anuncios?id=eq.${id}&select=*`, { headers: hdrs })
+      const [a] = await res.json()
+      if (!a) { mostrarError('Anuncio no encontrado.'); return }
+
+      // Cargar autor
+      let autor = { nombre: 'Usuario', instrumento: 'Músico', ciudad: '' }
+      if (a.user_id) {
+        const pRes = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${a.user_id}&select=id,nombre,instrumento,ciudad`, { headers: hdrs })
+        const [p] = await pRes.json()
+        if (p) autor = p
+      }
+
+      // Incrementar vistas
+      fetch(`${SUPABASE_URL}/rest/v1/anuncios?id=eq.${id}`, {
+        method: 'PATCH',
+        headers: { ...hdrs, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ vistas: (a.vistas || 0) + 1 })
+      })
+
+      // Renderizar según tipo
+      const wrap = document.getElementById('page-wrap')
+      const badge = BADGES[a.tipo] || 'badge-busco'
+      const label = LABELS[a.tipo] || a.tipo
+      const initials = autor.nombre.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)
+
+      // Tags
+      const tags = [a.instrumentos, a.generos].filter(Boolean).join(',').split(',').map(t=>t.trim()).filter(Boolean)
+      const tagsHTML = tags.map(t=>`<span class="dtag dtag-neon">${t}</span>`).join('')
+
+      // Bloque especial según tipo
+      let especial = ''
+      if (a.tipo === 'vende') {
+        especial = `
+          ${a.foto_url ? `<div class="foto-section"><div class="foto-main"><img src="${a.foto_url}" style="width:100%;height:100%;object-fit:cover"></div></div>` : ''}
+          <div class="ficha">
+          ${a.precio ? `<div class="ficha-row"><span class="ficha-key">Precio</span><span class="ficha-val price">$${a.precio}</span></div>` : ''}
+          ${a.categoria_producto ? `<div class="ficha-row"><span class="ficha-key">Categoría</span><span class="ficha-val">${a.categoria_producto}</span></div>` : ''}
+          ${a.marca ? `<div class="ficha-row"><span class="ficha-key">Marca</span><span class="ficha-val">${a.marca}</span></div>` : ''}
+          ${a.condicion ? `<div class="ficha-row"><span class="ficha-key">Condición</span><span class="ficha-val">${a.condicion}</span></div>` : ''}
+          ${a.zona ? `<div class="ficha-row"><span class="ficha-key">Zona</span><span class="ficha-val">${a.zona}</span></div>` : ''}
+        </div>`
+      } else if (a.tipo === 'jam' && a.fecha_evento) {
+        const fecha = new Date(a.fecha_evento)
+        especial = `<div class="evento-hero">
+          <div class="evento-fecha-grande">${fecha.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'})}</div>
+          <div class="evento-hora">${fecha.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})} hs</div>
+          ${a.lugar ? `<div class="evento-lugar">📍 ${a.lugar}</div>` : ''}
+          ${a.precio_entrada ? `<div class="evento-precio">🎟 ${a.precio_entrada}</div>` : ''}
+        </div>`
+      }
+
+      wrap.innerHTML = `
+        <div class="breadcrumb">
+          <a href="buscARTE_anuncios.html">Tablón</a>
+          <span>›</span>
+          <a href="buscARTE_anuncios.html">${label}</a>
+          <span>›</span>
+          ${a.titulo||'Anuncio'}
+        </div>
+        <div class="detail-layout">
+          <div class="detail-main">
+            <span class="anuncio-tipo-badge ${badge}">${label}</span>
+            <h1 class="detail-titulo">${a.titulo||'Sin título'}</h1>
+            <div class="detail-meta">
+              <a href="buscARTE_perfil_publico.html?id=${a.user_id||''}" class="meta-autor">
+                <div class="meta-avatar" style="background:#0d2010;color:var(--neon)">${initials}</div>
+                <span class="meta-name">${autor.nombre}</span>
+              </a>
+              ${a.zona ? `<span class="meta-sep">·</span><span class="meta-item">📍 ${a.zona}</span>` : ''}
+              <span class="meta-sep">·</span><span class="meta-item">🕐 ${timeAgo(a.created_at)}</span>
+              <span class="meta-sep">·</span><span class="meta-item">👁 ${a.vistas||0} vistas</span>
+            </div>
+            ${especial}
+            ${a.descripcion ? `<div class="detail-section"><div class="detail-section-title">Descripción</div><div class="detail-desc"><p>${a.descripcion.replace(/\n/g,'</p><p>')}</p></div></div>` : ''}
+            ${tagsHTML ? `<div class="detail-section"><div class="detail-section-title">Géneros e instrumentos</div><div class="tags-row">${tagsHTML}</div></div>` : ''}
+          </div>
+          <div class="detail-sidebar">
+            <div class="sidebar-card">
+              <div class="sidebar-card-title">${a.tipo === 'jam' ? 'Me apunto' : a.tipo === 'vende' ? 'Consultar al vendedor' : 'Responder al anuncio'}</div>
+              <div class="sidebar-card-sub">Contale quién sos y por qué te interesa.</div>
+              <div class="contact-form">
+                <textarea placeholder="Escribí tu mensaje..."></textarea>
+                <button class="btn-send" onclick="sendMsg(this)" data-anuncio-id="${id}" data-para-id="${a.user_id||''}">Enviar mensaje →</button>
+                <p class="login-note">¿Sin cuenta? <a href="buscARTE_registro.html">Registrate gratis</a></p>
+              </div>
+            </div>
+            <div class="sidebar-card">
+              <div class="sidebar-card-title">Publicado por</div>
+              <a href="buscARTE_perfil_publico.html?id=${a.user_id||''}" class="autor-card">
+                <div class="autor-avatar-big" style="background:#0d2010;color:var(--neon)">${initials}</div>
+                <div class="autor-info">
+                  <div class="autor-nombre">${autor.nombre}</div>
+                  <div class="autor-meta">${autor.instrumento||'Músico'}${autor.ciudad ? ' · '+autor.ciudad : ''}</div>
+                </div>
+              </a>
+              <a href="buscARTE_perfil_publico.html?id=${a.user_id||''}" class="btn-ver-perfil">Ver perfil completo →</a>
+            </div>
+          </div>
+        </div>`
+
+      document.title = `buscARTE — ${a.titulo||'Anuncio'}`
+
+    } catch(e) {
+      mostrarError('Error al cargar el anuncio.')
+      console.error(e)
+    }
+  }
+
+  function mostrarError(msg) {
+    document.getElementById('page-wrap').innerHTML = `<div style="padding:5rem;text-align:center">
+      <div style="font-size:2rem;margin-bottom:1rem">😕</div>
+      <div style="font-family:var(--font-display);font-size:1.5rem;margin-bottom:.5rem">${msg}</div>
+      <a href="buscARTE_anuncios.html" style="color:var(--neon);text-decoration:none;font-size:.88rem">← Volver al tablón</a>
+    </div>`
+  }
+
+  async function sendMsg(btn) {
+    const ta = btn.previousElementSibling
+    const texto = ta?.value?.trim()
+    if (!texto) { ta?.focus(); return }
+
+    const miId = localStorage.getItem('ba_user_id')
+    const paraId = btn.dataset.paraId
+    const anuncioId = btn.dataset.anuncioId
+
+    if (!miId) { alert('Necesitás estar registrado para enviar mensajes.'); window.location.href='buscARTE_login.html'; return }
+
+    btn.textContent = 'Enviando...'
+    btn.disabled = true
+
+    try {
+      // Crear o encontrar conversación
+      const convRes = await fetch(
+        `${SUPABASE_URL}/rest/v1/conversaciones?or=(and(user1_id.eq.${miId},user2_id.eq.${paraId}),and(user1_id.eq.${paraId},user2_id.eq.${miId}))`,
+        { headers: hdrs }
+      )
+      let convs = await convRes.json()
+      let convId
+
+      if (convs.length) {
+        convId = convs[0].id
+      } else {
+        const nueva = await fetch(`${SUPABASE_URL}/rest/v1/conversaciones`, {
+          method: 'POST',
+          headers: { ...hdrs, 'Prefer': 'return=representation' },
+          body: JSON.stringify({ user1_id: parseInt(miId), user2_id: parseInt(paraId), anuncio_id: parseInt(anuncioId), ultimo_mensaje: texto })
+        })
+        const [conv] = await nueva.json()
+        convId = conv.id
+      }
+
+      await fetch(`${SUPABASE_URL}/rest/v1/mensajes`, {
+        method: 'POST',
+        headers: { ...hdrs, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ de_user_id: parseInt(miId), para_user_id: parseInt(paraId), contenido: texto })
+      })
+
+      await fetch(`${SUPABASE_URL}/rest/v1/conversaciones?id=eq.${convId}`, {
+        method: 'PATCH',
+        headers: { ...hdrs, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ ultimo_mensaje: texto, updated_at: new Date().toISOString() })
+      })
+
+      btn.textContent = '✓ Enviado'
+      btn.style.background = '#a8c832'
+      ta.value = ''
+      setTimeout(() => { btn.textContent = 'Ver en mensajes →'; btn.style.background = ''; btn.onclick = () => window.location.href='buscARTE_mensajes.html'; btn.disabled = false }, 1500)
+
+    } catch(e) { alert('Error al enviar.'); btn.textContent = 'Enviar mensaje →'; btn.disabled = false }
+  }
+
+  // DEMO SWITCHER — solo cuando no hay ID en URL
+  function showView(tipo, el) {
+    document.querySelectorAll('.anuncio-view').forEach(v=>v.classList.remove('active'))
+    document.querySelectorAll('.demo-tab').forEach(t=>t.classList.remove('active'))
+    document.getElementById('view-'+tipo).classList.add('active')
+    el.classList.add('active')
+    window.scrollTo({top:0,behavior:'smooth'})
+  }
+
+  // Guardar texto original de cada botón
+  document.querySelectorAll('.btn-send').forEach(b=>b.dataset.orig=b.textContent)
+
+  // Cargar anuncio real si hay ID en URL
+  cargarAnuncio();
+  // NAV SESSION
+  (function initNav(){
+    const l=localStorage.getItem('ba_logged')==='1';
+    const n=localStorage.getItem('ba_name')||'Mi perfil';
+    const uid=localStorage.getItem('ba_user_id')||'';
+    const i=n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    if(l){
+      const g=document.getElementById('nav-guest');const u=document.getElementById('nav-user');
+      if(g)g.style.display='none';if(u)u.style.display='flex';
+      const c=document.getElementById('nav-avatar-circle');if(c)c.textContent=i;
+      const nm=document.getElementById('nav-avatar-name');if(nm)nm.textContent=n.split(' ')[0];
+      const b=document.getElementById('nav-msg-badge');if(b)b.style.display='inline';
+      const miPerfilLink=document.querySelector('.nav-dropdown-item[href*="perfil_publico"]');
+      if(miPerfilLink && uid) miPerfilLink.href='buscARTE_perfil_publico.html?id='+uid;
+    }
+  })();
+  function toggleUserMenu(){const w=document.getElementById('nav-avatar-btn');const d=document.getElementById('nav-dropdown');if(w)w.classList.toggle('open');if(d)d.classList.toggle('open');}
+  document.addEventListener('click',e=>{if(!e.target.closest('#nav-user')){document.getElementById('nav-avatar-btn')?.classList.remove('open');document.getElementById('nav-dropdown')?.classList.remove('open');}});
+  function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');window.location.href='index.html';}
+</script>
+</body>
+</html>

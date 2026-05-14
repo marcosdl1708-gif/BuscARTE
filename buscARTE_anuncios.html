@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>buscARTE — Tablón de anuncios</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --negro:#080808; --negro2:#111; --negro3:#1a1a1a;
+    --blanco:#f2ede4; --neon:#d4f53c; --rojo:#e8311a;
+    --gris:#888; --gris2:#444; --gris3:#2a2a2a;
+    --font-display:'Archivo Black',sans-serif;
+    --font-body:'Archivo',sans-serif;
+  }
+  body { background:var(--negro); color:var(--blanco); font-family:var(--font-body); font-weight:300; min-height:100vh; overflow-x:hidden; cursor:none; }
+  .cursor { width:10px;height:10px;background:var(--neon);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%); }
+  .cursor-ring { width:36px;height:36px;border:1px solid rgba(212,245,60,0.35);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .15s ease; }
+  body::before { content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");opacity:.03;pointer-events:none;z-index:1000; }
+
+  /* NAV */
+  nav { position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1rem 2.5rem;border-bottom:1px solid #1c1c1c;background:rgba(8,8,8,0.96);backdrop-filter:blur(12px); }
+  .nav-logo { font-family:var(--font-display);font-size:1.4rem;color:var(--blanco);text-decoration:none; }
+  .nav-logo span { color:var(--neon); }
+  .nav-links { display:flex;gap:2rem;list-style:none; }
+  .nav-links a { color:var(--gris);text-decoration:none;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;transition:color .2s; }
+  .nav-links a:hover { color:var(--blanco); }
+  .nav-links a.active { color:var(--neon); }
+  .nav-right { display:flex;gap:.8rem; }
+  .btn-ghost { background:transparent;border:1px solid var(--gris2);color:var(--blanco);padding:.48rem 1rem;font-family:var(--font-body);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;cursor:none;transition:border-color .2s;text-decoration:none;display:inline-block; }
+  .btn-ghost:hover { border-color:var(--blanco); }
+  .btn-neon { background:var(--neon);border:none;color:var(--negro);padding:.48rem 1rem;font-family:var(--font-body);font-weight:500;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;cursor:none;transition:opacity .2s;text-decoration:none;display:inline-block; }
+  .btn-neon:hover { opacity:.85; }
+  .top-spacer { height:60px; }
+
+  /* LAYOUT */
+  .layout { display:grid;grid-template-columns:230px 1fr 280px;min-height:calc(100vh - 60px); }
+
+  /* ═══ PANEL DE FILTROS ═══ */
+  .filters-panel { border-right:1px solid #1c1c1c;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto;background:var(--negro2); }
+  .filters-panel::-webkit-scrollbar { width:3px; }
+  .filters-panel::-webkit-scrollbar-thumb { background:var(--gris3); }
+
+  .filter-header { padding:1.2rem 1.5rem 1rem;border-bottom:1px solid #1c1c1c;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--negro2);z-index:5; }
+  .filter-title-wrap { }
+  .filter-title { font-family:var(--font-display);font-size:.95rem; }
+  .filter-category-label { font-size:.62rem;color:var(--neon);letter-spacing:.1em;text-transform:uppercase;margin-top:.1rem; }
+  .filter-clear { font-size:.65rem;color:var(--gris2);cursor:none;background:none;border:none;font-family:var(--font-body);letter-spacing:.08em;text-transform:uppercase;padding:0;transition:color .2s; }
+  .filter-clear:hover { color:var(--neon); }
+
+  /* Paneles de filtros por categoría */
+  .filter-panel { display:none;padding:1.2rem 0 1rem; }
+  .filter-panel.active { display:block; }
+
+  .filter-group { padding:0 1.5rem;margin-bottom:1.3rem; }
+  .filter-group-label { font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gris2);margin-bottom:.6rem;display:block; }
+  .filter-group select, .filter-group input[type=text], .filter-group input[type=number] {
+    width:100%;background:var(--negro);border:1px solid var(--gris3);color:var(--blanco);
+    padding:.6rem .9rem;font-family:var(--font-body);font-size:.82rem;font-weight:300;
+    outline:none;transition:border-color .2s;appearance:none;border-radius:0;
+  }
+  .filter-group select:focus, .filter-group input:focus { border-color:var(--neon); }
+  .filter-chips { display:flex;flex-wrap:wrap;gap:.32rem; }
+  .fchip { padding:.28rem .6rem;border:1px solid var(--gris3);color:var(--gris);font-size:.65rem;letter-spacing:.07em;text-transform:uppercase;cursor:none;transition:all .15s;background:transparent;font-family:var(--font-body); }
+  .fchip:hover { border-color:#555;color:var(--blanco); }
+  .fchip.on { border-color:var(--neon);color:var(--neon);background:rgba(212,245,60,.05); }
+  .filter-divider { height:1px;background:#1c1c1c;margin:0 1.5rem 1.3rem; }
+  .price-range { display:grid;grid-template-columns:1fr 1fr;gap:.5rem; }
+
+  /* ═══ MAIN ═══ */
+  .anuncios-main { padding:1.8rem 2rem;border-right:1px solid #1c1c1c; }
+  .main-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;padding-bottom:1.2rem;border-bottom:1px solid #1c1c1c; }
+  .main-title { font-family:var(--font-display);font-size:1.8rem;letter-spacing:-.02em;line-height:1; }
+  .main-title span { color:var(--neon); }
+  .main-sub { font-size:.75rem;color:var(--gris);margin-top:.2rem; }
+  .btn-publish { background:var(--neon);border:none;color:var(--negro);padding:.62rem 1.4rem;font-family:var(--font-display);font-size:.82rem;letter-spacing:.04em;cursor:none;transition:opacity .2s;flex-shrink:0; }
+  .btn-publish:hover { opacity:.85; }
+
+  .tipo-tabs { display:flex;gap:0;margin-bottom:1.5rem;border:1px solid #1c1c1c; }
+  .tipo-tab { flex:1;padding:.56rem .3rem;font-size:.67rem;letter-spacing:.07em;text-transform:uppercase;background:transparent;border:none;color:var(--gris);cursor:none;transition:all .15s;font-family:var(--font-body);border-right:1px solid #1c1c1c;text-align:center;white-space:nowrap; }
+  .tipo-tab:last-child { border-right:none; }
+  .tipo-tab:hover { color:var(--blanco);background:rgba(255,255,255,.03); }
+  .tipo-tab.active { color:var(--negro);background:var(--neon);font-weight:500; }
+
+  /* ═══ ANUNCIOS ═══ */
+  .anuncios-lista { display:flex;flex-direction:column;gap:1px;background:#181818; }
+  .anuncio { background:var(--negro);padding:1.4rem 1.5rem;cursor:none;transition:background .2s;position:relative;animation:fadeUp .3s ease both; }
+  .anuncio:hover { background:#0e0e0e; }
+  .anuncio.pinned { border-left:3px solid var(--neon);background:rgba(212,245,60,.015); }
+  .anuncio-tipo-badge { display:inline-flex;align-items:center;gap:.3rem;padding:.15rem .55rem;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;font-weight:500;margin-bottom:.45rem; }
+  .badge-busco { background:rgba(58,123,213,.12);color:#5b9fff;border:1px solid rgba(58,123,213,.22); }
+  .badge-ofrezco { background:rgba(46,204,113,.1);color:#2ecc71;border:1px solid rgba(46,204,113,.2); }
+  .badge-vendo { background:rgba(245,166,35,.1);color:#f5a623;border:1px solid rgba(245,166,35,.2); }
+  .badge-jam { background:rgba(212,245,60,.08);color:var(--neon);border:1px solid rgba(212,245,60,.18); }
+  .badge-pro { background:var(--neon);color:var(--negro);font-size:.55rem;padding:.1rem .38rem;font-weight:700; }
+  .pin-label { position:absolute;top:.75rem;right:.75rem;font-size:.58rem;color:var(--neon);letter-spacing:.08em;text-transform:uppercase; }
+  .anuncio-titulo { font-family:var(--font-display);font-size:1rem;letter-spacing:-.01em;margin-bottom:.32rem;line-height:1.25;padding-right:4rem; }
+  .anuncio-desc { font-size:.79rem;color:var(--gris);line-height:1.6;margin-bottom:.85rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden; }
+  .anuncio-meta { display:flex;align-items:center;gap:.7rem;flex-wrap:wrap; }
+  .anuncio-autor { display:flex;align-items:center;gap:.4rem;text-decoration:none;cursor:none;transition:opacity .2s; }
+  .anuncio-autor:hover { opacity:.7; }
+  .autor-avatar { width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.56rem;flex-shrink:0; }
+  .autor-name { font-size:.72rem;color:var(--blanco); }
+  .anuncio-tag { font-size:.62rem;padding:.11rem .43rem;border:1px solid var(--gris3);color:var(--gris);text-transform:uppercase;letter-spacing:.05em; }
+  .anuncio-location { font-size:.67rem;color:var(--gris2); }
+  .anuncio-time { font-size:.63rem;color:var(--gris2);margin-left:auto; }
+  .anuncio-respond { background:transparent;border:1px solid var(--gris3);color:var(--gris);padding:.28rem .7rem;font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;cursor:none;transition:all .2s;font-family:var(--font-body); }
+  .anuncio-respond:hover { border-color:var(--neon);color:var(--neon); }
+
+  .reply-form { display:none;margin-top:1rem;padding-top:1rem;border-top:1px solid #181818;animation:fadeUp .2s ease; }
+  .reply-form.open { display:block; }
+  .reply-form textarea { width:100%;background:var(--negro2);border:1px solid var(--gris3);color:var(--blanco);padding:.7rem;font-family:var(--font-body);font-size:.82rem;font-weight:300;outline:none;resize:none;height:72px;transition:border-color .2s; }
+  .reply-form textarea:focus { border-color:var(--neon); }
+  .reply-form textarea::placeholder { color:var(--gris2); }
+  .reply-actions { display:flex;gap:.5rem;margin-top:.5rem;align-items:center; }
+  .btn-send-reply { background:var(--neon);border:none;color:var(--negro);padding:.48rem 1.1rem;font-family:var(--font-display);font-size:.76rem;letter-spacing:.04em;cursor:none;transition:opacity .2s; }
+  .btn-send-reply:hover { opacity:.85; }
+  .btn-cancel-reply { background:transparent;border:1px solid var(--gris3);color:var(--gris);padding:.48rem .9rem;font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;cursor:none;transition:all .2s;font-family:var(--font-body); }
+  .btn-cancel-reply:hover { border-color:var(--blanco);color:var(--blanco); }
+  .reply-note { font-size:.66rem;color:var(--gris2);margin-left:auto; }
+  .reply-note a { color:var(--neon);text-decoration:none; }
+
+  .load-more { padding:2rem;text-align:center;border-top:1px solid #1c1c1c; }
+  .btn-load { background:transparent;border:1px solid var(--gris3);color:var(--gris);padding:.62rem 2rem;font-family:var(--font-display);font-size:.8rem;letter-spacing:.06em;cursor:none;transition:all .2s; }
+  .btn-load:hover { border-color:var(--blanco);color:var(--blanco); }
+
+  /* ═══ SIDEBAR DERECHA ═══ */
+  .right-sidebar { padding:1.8rem 1.5rem;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto; }
+  .right-sidebar::-webkit-scrollbar { width:3px; }
+  .right-sidebar::-webkit-scrollbar-thumb { background:var(--gris3); }
+  .sidebar-card { border:1px solid #1c1c1c;padding:1.3rem;margin-bottom:1.3rem;background:var(--negro2); }
+  .sidebar-card-title { font-family:var(--font-display);font-size:.9rem;letter-spacing:.02em;margin-bottom:.35rem; }
+  .sidebar-card-sub { font-size:.74rem;color:var(--gris);margin-bottom:1rem;line-height:1.6; }
+  .publish-types { display:flex;flex-direction:column;gap:.4rem;margin-bottom:1rem; }
+  .publish-type { display:flex;align-items:center;gap:.6rem;padding:.52rem .72rem;border:1px solid var(--gris3);cursor:none;transition:all .15s;background:transparent;color:var(--blanco);font-family:var(--font-body);text-align:left; }
+  .publish-type:hover { border-color:#444;background:rgba(255,255,255,.02); }
+  .publish-type.selected { border-color:var(--neon);background:rgba(212,245,60,.04); }
+  .ptype-icon { font-size:.95rem;flex-shrink:0; }
+  .ptype-label { font-size:.76rem;font-weight:500;display:block;margin-bottom:.03rem; }
+  .ptype-desc { font-size:.65rem;color:var(--gris);line-height:1.3; }
+  .btn-publish-full { width:100%;background:var(--neon);border:none;color:var(--negro);padding:.68rem;font-family:var(--font-display);font-size:.83rem;letter-spacing:.04em;cursor:none;transition:opacity .2s; }
+  .btn-publish-full:hover { opacity:.85; }
+  .stats-row { display:flex;justify-content:space-between;align-items:center;padding:.42rem 0;border-bottom:1px solid #161616; }
+  .stats-row:last-child { border-bottom:none; }
+  .stats-label { font-size:.72rem;color:var(--gris); }
+  .stats-val { font-family:var(--font-display);font-size:.92rem;color:var(--neon); }
+
+  /* ═══ MODAL ═══ */
+  .modal-overlay { position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:500;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px); }
+  .modal-overlay.open { display:flex; }
+  .modal { background:var(--negro2);border:1px solid #2a2a2a;width:580px;max-width:92vw;max-height:92vh;overflow-y:auto;animation:fadeUp .25s ease; }
+  .modal::-webkit-scrollbar { width:3px; }
+  .modal::-webkit-scrollbar-thumb { background:var(--gris3); }
+  .modal-header { padding:1.3rem 1.8rem;border-bottom:1px solid #1c1c1c;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--negro2);z-index:10; }
+  .modal-title { font-family:var(--font-display);font-size:1.1rem;letter-spacing:-.01em; }
+  .modal-close { background:none;border:none;color:var(--gris);font-size:1.3rem;cursor:none;font-family:var(--font-body);padding:0;line-height:1;transition:color .15s; }
+  .modal-close:hover { color:var(--blanco); }
+
+  .modal-tipo-selector { padding:1.1rem 1.8rem;border-bottom:1px solid #1c1c1c;display:grid;grid-template-columns:repeat(4,1fr);gap:.45rem; }
+  .modal-tipo-btn { border:1px solid var(--gris3);padding:.65rem .3rem;cursor:none;transition:all .15s;background:transparent;color:var(--blanco);font-family:var(--font-body);text-align:center; }
+  .modal-tipo-btn:hover { border-color:#444;background:rgba(255,255,255,.02); }
+  .modal-tipo-btn.selected { border-color:var(--neon);background:rgba(212,245,60,.05); }
+  .modal-tipo-icon { font-size:1.1rem;display:block;margin-bottom:.28rem; }
+  .modal-tipo-label { font-size:.65rem;letter-spacing:.05em;text-transform:uppercase; }
+
+  .modal-form { padding:1.3rem 1.8rem;display:none; }
+  .modal-form.active { display:block; }
+  .mfield { margin-bottom:1rem; }
+  .mfield label { display:block;font-size:.67rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gris);margin-bottom:.42rem; }
+  .mfield label .opt { color:var(--gris2);text-transform:none;letter-spacing:0;font-size:.63rem; }
+  .mfield input, .mfield select, .mfield textarea { width:100%;background:var(--negro);border:1px solid var(--gris3);color:var(--blanco);padding:.72rem .9rem;font-family:var(--font-body);font-size:.85rem;font-weight:300;outline:none;transition:border-color .2s;appearance:none;border-radius:0; }
+  .mfield input:focus, .mfield select:focus, .mfield textarea:focus { border-color:var(--neon); }
+  .mfield input::placeholder, .mfield textarea::placeholder { color:var(--gris2); }
+  .mfield textarea { min-height:88px;resize:vertical; }
+  .mrow { display:grid;grid-template-columns:1fr 1fr;gap:.85rem; }
+
+  /* CHIPS MULTISELECCIÓN EN MODAL */
+  .mchips { display:flex;flex-wrap:wrap;gap:.32rem; }
+  .mchip { padding:.28rem .62rem;border:1px solid var(--gris3);color:var(--gris);font-size:.65rem;letter-spacing:.07em;text-transform:uppercase;cursor:none;transition:all .15s;background:transparent;font-family:var(--font-body); }
+  .mchip:hover { border-color:#555;color:var(--blanco); }
+  .mchip.on { border-color:var(--neon);color:var(--neon);background:rgba(212,245,60,.05); }
+
+  .foto-upload { border:1px dashed var(--gris3);padding:1.1rem;text-align:center;cursor:none;transition:border-color .2s;position:relative; }
+  .foto-upload:hover { border-color:var(--neon); }
+  .foto-upload input { position:absolute;inset:0;opacity:0;cursor:none;width:100%;height:100%; }
+  .foto-upload-text { font-size:.76rem;color:var(--gris);line-height:1.6; }
+  .foto-upload-text strong { color:var(--blanco);font-weight:400; }
+
+  .radio-group { display:flex;gap:.4rem;flex-wrap:wrap; }
+  .radio-btn { border:1px solid var(--gris3);padding:.5rem .8rem;cursor:none;transition:all .15s;background:transparent;color:var(--gris);font-family:var(--font-body);font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;text-align:center; }
+  .radio-btn:hover { border-color:#444;color:var(--blanco); }
+  .radio-btn.selected { border-color:var(--neon);color:var(--neon);background:rgba(212,245,60,.05); }
+
+  .modal-footer { padding:.85rem 1.8rem 1.3rem;display:flex;gap:.7rem;justify-content:flex-end;border-top:1px solid #1c1c1c; }
+  .btn-cancel { background:transparent;border:1px solid var(--gris3);color:var(--gris);padding:.58rem 1.3rem;font-family:var(--font-body);font-size:.76rem;letter-spacing:.08em;text-transform:uppercase;cursor:none;transition:all .2s; }
+  .btn-cancel:hover { border-color:var(--blanco);color:var(--blanco); }
+  .btn-submit { background:var(--neon);border:none;color:var(--negro);padding:.58rem 1.8rem;font-family:var(--font-display);font-size:.83rem;letter-spacing:.04em;cursor:none;transition:opacity .2s; }
+  .btn-submit:hover { opacity:.85; }
+
+  /* AVATARES */
+  .av-a{background:#0d2010;color:var(--neon);}
+  .av-b{background:#2a0a05;color:#ff6b5b;}
+  .av-c{background:#050d2a;color:#5b9fff;}
+  .av-d{background:#1a0d2a;color:#c45bff;}
+  .av-e{background:#2a1a05;color:#ffaa5b;}
+  .av-f{background:#0d1a2a;color:#5bd4ff;}
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .anuncio:nth-child(1){animation-delay:.04s}.anuncio:nth-child(2){animation-delay:.08s}
+  .anuncio:nth-child(3){animation-delay:.12s}.anuncio:nth-child(4){animation-delay:.16s}
+  .anuncio:nth-child(5){animation-delay:.20s}.anuncio:nth-child(6){animation-delay:.24s}
+  .anuncio:nth-child(7){animation-delay:.28s}
+  /* NAV DROPDOWN */
+  .nav-user { position:relative; }
+  .nav-avatar-wrap { display:flex;align-items:center;gap:.5rem;cursor:none;padding:.3rem .6rem;border:1px solid var(--gris3);transition:border-color .2s;user-select:none; }
+  .nav-avatar-wrap:hover { border-color:var(--gris2); }
+  .nav-avatar-circle { width:28px;height:28px;border-radius:50%;background:#0d2010;color:var(--neon);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.62rem;flex-shrink:0; }
+  .nav-avatar-name { font-size:.78rem;color:var(--blanco); }
+  .nav-avatar-chevron { font-size:.6rem;color:var(--gris);transition:transform .2s; }
+  .nav-avatar-wrap.open .nav-avatar-chevron { transform:rotate(180deg); }
+  .nav-dropdown { position:absolute;top:calc(100% + 8px);right:0;background:var(--negro2);border:1px solid #2a2a2a;min-width:200px;display:none;flex-direction:column;z-index:300; }
+  .nav-dropdown.open { display:flex; }
+  .nav-dropdown-item { display:flex;align-items:center;gap:.6rem;padding:.75rem 1.1rem;color:var(--gris);text-decoration:none;font-size:.82rem;transition:all .15s;background:transparent;border:none;font-family:var(--font-body);cursor:none;text-align:left;width:100%; }
+  .nav-dropdown-item:hover { background:rgba(255,255,255,.04);color:var(--blanco); }
+  .nav-dropdown-divider { height:1px;background:#1c1c1c;margin:.3rem 0; }
+  .nav-logout:hover { color:var(--rojo) !important; }
+  .nav-badge { background:var(--neon);color:var(--negro);font-size:.55rem;font-weight:700;padding:.1rem .4rem;margin-left:auto; }
+  /* NAV LINKS FIX */
+  .nav-links { list-style:none !important; display:flex !important; gap:2rem !important; padding:0 !important; margin:0 !important; }
+  .nav-links li { list-style:none !important; }
+  .nav-link { color:var(--gris);text-decoration:none;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;transition:color .2s; }
+  .nav-link:hover { color:var(--blanco); }
+  .nav-link.active { color:var(--neon); }
+  /* NAV AVATAR NAME — truncate long usernames */
+  .nav-avatar-name { font-size:.78rem;color:var(--blanco);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+  /* NAV LINKS CLICKABLE FIX */
+  .nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap { pointer-events:auto !important; }
+  nav a, nav button { pointer-events:auto !important; }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+
+<!-- ═══ MODAL ═══ -->
+<div class="modal-overlay" id="modal" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Publicar anuncio</div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-tipo-selector">
+      <button class="modal-tipo-btn selected" onclick="selectTipo('busco',this)"><span class="modal-tipo-icon">🔍</span><span class="modal-tipo-label">Busco músico</span></button>
+      <button class="modal-tipo-btn" onclick="selectTipo('ofrezco',this)"><span class="modal-tipo-icon">🎸</span><span class="modal-tipo-label">Me ofrezco</span></button>
+      <button class="modal-tipo-btn" onclick="selectTipo('jam',this)"><span class="modal-tipo-icon">🥁</span><span class="modal-tipo-label">Jam / Zapada</span></button>
+      <button class="modal-tipo-btn" onclick="selectTipo('vende',this)"><span class="modal-tipo-icon">🎛️</span><span class="modal-tipo-label">Vendo / Alquilo</span></button>
+    </div>
+
+    <!-- BUSCO MÚSICO -->
+    <div class="modal-form active" id="form-busco">
+      <div class="mfield"><label>Título</label><input type="text" placeholder="Ej: Busco bajista para banda de rock en CABA"></div>
+      <div class="mfield"><label>Descripción</label><textarea placeholder="Qué buscás, experiencia requerida, frecuencia de ensayo, si tenés sala..."></textarea></div>
+      <div class="mfield">
+        <label>Instrumento/s buscado/s <span class="opt">— podés elegir varios</span></label>
+        <div class="mchips">
+          <button class="mchip" onclick="this.classList.toggle('on')">Guitarra</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Bajo</button>
+          <button class="mchip on" onclick="this.classList.toggle('on')">Batería</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Teclado / Piano</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Voz / Canto</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Saxo</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Violín</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Trompeta</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Percusión</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">DJ / Productor</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Bandoneón</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Charango</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Flauta</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Cello</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Arpa</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Otro</button>
+        </div>
+      </div>
+      <div class="mfield">
+        <label>Género/s musicales <span class="opt">— podés elegir varios</span></label>
+        <div class="mchips">
+          <button class="mchip on" onclick="this.classList.toggle('on')">Rock</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Rock Nacional</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Metal</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Jazz</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Folklore</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Tango</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Cumbia</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Indie</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Pop</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Electrónica</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Funk</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Punk</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Blues</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Prog</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">R&B</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Rap / Hip Hop</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Reggae</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Tropical</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Clásica</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Bossanova</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Soul</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Otro</button>
+        </div>
+      </div>
+      <div class="mfield"><label>Zona / barrio</label><input type="text" placeholder="Ej: Almagro, CABA"></div>
+    </div>
+
+    <!-- ME OFREZCO -->
+    <div class="modal-form" id="form-ofrezco">
+      <div class="mfield"><label>Título</label><input type="text" placeholder="Ej: Guitarrista disponible para sesiones y shows — CABA"></div>
+      <div class="mfield"><label>Descripción</label><textarea placeholder="Quién sos, tu experiencia, qué ofrecés, si cobrás, disponibilidad horaria..."></textarea></div>
+      <div class="mfield">
+        <label>Instrumento/s que tocás <span class="opt">— podés elegir varios</span></label>
+        <div class="mchips">
+          <button class="mchip on" onclick="this.classList.toggle('on')">Guitarra</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Bajo</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Batería</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Teclado / Piano</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Voz / Canto</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Saxo</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Violín</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Trompeta</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Percusión</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">DJ / Productor</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Bandoneón</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Charango</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Flauta</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Cello</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Arpa</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Otro</button>
+        </div>
+      </div>
+      <div class="mfield">
+        <label>Género/s musicales <span class="opt">— podés elegir varios</span></label>
+        <div class="mchips">
+          <button class="mchip" onclick="this.classList.toggle('on')">Rock</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Rock Nacional</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Metal</button>
+          <button class="mchip on" onclick="this.classList.toggle('on')">Jazz</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Folklore</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Tango</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Cumbia</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Indie</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Pop</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Electrónica</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Funk</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Punk</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Blues</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Prog</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">R&B</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Rap / Hip Hop</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Reggae</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Tropical</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Clásica</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Bossanova</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Soul</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Otro</button>
+        </div>
+      </div>
+      <div class="mfield"><label>Zona / barrio</label><input type="text" placeholder="Ej: Palermo, CABA"></div>
+    </div>
+
+    <!-- JAM / ZAPADA -->
+    <div class="modal-form" id="form-jam">
+      <div class="mfield"><label>Nombre del evento</label><input type="text" id="jam-titulo" placeholder="Ej: Jam de jazz abierta — Parque Centenario"></div>
+      <div class="mfield"><label>Descripción</label><textarea placeholder="De qué se trata, géneros, quién puede venir, qué llevar, cómo confirmar asistencia..."></textarea></div>
+      <div class="mfield">
+        <label>Género/s musicales <span class="opt">— opcional</span></label>
+        <div class="mchips" id="jam-generos">
+          <button class="mchip on" onclick="this.classList.toggle('on')">Jazz</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Rock</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Blues</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Folklore</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Funk</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">R&B</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Bossanova</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Tango</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Pop</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Cumbia</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Variado</button>
+        </div>
+      </div>
+      <div class="mrow">
+        <div class="mfield"><label>Fecha</label><input type="date"></div>
+        <div class="mfield"><label>Hora</label><input type="time"></div>
+      </div>
+      <div class="mfield"><label>Lugar / dirección</label><input type="text" placeholder="Ej: Parque Centenario, CABA / Bar La Trastienda, Balvanera"></div>
+      <div class="mrow">
+        <div class="mfield"><label>Precio de entrada <span class="opt">opcional</span></label><input type="text" placeholder="Ej: Gratis / $2.000 / A la gorra"></div>
+        <div class="mfield"><label>Link de entradas o evento <span class="opt">opcional</span></label><input type="url" placeholder="https://..."></div>
+      </div>
+      <div class="mfield"><label>Contacto / más info <span class="opt">opcional</span></label><input type="text" placeholder="Ej: @usuario Instagram / WhatsApp..."></div>
+    </div>
+
+    <!-- VENDO / ALQUILO -->
+    <div class="modal-form" id="form-vende">
+      <div class="mrow">
+        <div class="mfield">
+          <label>Categoría</label>
+          <select>
+            <option disabled selected>¿Qué es?</option>
+            <option>Guitarra eléctrica</option><option>Guitarra acústica</option><option>Guitarra clásica</option>
+            <option>Bajo eléctrico</option><option>Bajo acústico</option>
+            <option>Batería acústica</option><option>Batería electrónica</option><option>Percusión</option>
+            <option>Teclado / Piano</option><option>Piano acústico</option>
+            <option>Saxo</option><option>Trompeta</option><option>Trombón</option><option>Flauta</option><option>Clarinete</option>
+            <option>Violín</option><option>Cello</option><option>Viola</option>
+            <option>Bandoneón / Acordeón</option><option>Charango / Guitarra folk</option>
+            <option>Amplificador guitarra</option><option>Amplificador bajo</option>
+            <option>Pedalera multiefectos</option><option>Pedal individual</option>
+            <option>Micrófono</option><option>Interfaz de audio</option>
+            <option>Equipo PA / Sonido</option><option>Monitores / Parlantes</option>
+            <option>Home Studio / Grabación</option>
+            <option>Sala de ensayo</option>
+            <option>Cuerdas / Púas / Accesorios</option>
+            <option>Estuche / Funda</option>
+            <option>Otro</option>
+          </select>
+        </div>
+        <div class="mfield"><label>Marca</label><input type="text" placeholder="Ej: Fender, Boss, Otra..."></div>
+      </div>
+      <div class="mfield">
+        <label>Condición</label>
+        <div class="radio-group">
+          <button class="radio-btn selected" onclick="selectRadio(this)">Nuevo</button>
+          <button class="radio-btn" onclick="selectRadio(this)">Usado — excelente</button>
+          <button class="radio-btn" onclick="selectRadio(this)">Usado — bueno</button>
+          <button class="radio-btn" onclick="selectRadio(this)">Para reparar</button>
+        </div>
+      </div>
+      <div class="mrow">
+        <div class="mfield"><label>Precio <span class="opt">— solo números, sin puntos ni símbolos</span></label><input type="number" id="vende-precio" min="0" placeholder="Ej: 450000"></div>
+        <div class="mfield"><label>Zona</label><input type="text" placeholder="Ej: Caballito, CABA"></div>
+      </div>
+      <div class="mfield"><label>Descripción</label><textarea placeholder="Modelo exacto, estado, qué incluye, si tiene caja, si aceptás permuta..."></textarea></div>
+      <div class="mfield">
+        <label>Foto <span class="opt">muy recomendada — genera más consultas</span></label>
+        <div class="foto-upload" id="foto-venta-zone" onclick="document.getElementById('foto-venta-input').click()" style="cursor:pointer">
+          <input type="file" id="foto-venta-input" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="subirFotoVenta(this)">
+          <img id="foto-venta-preview" style="display:none;width:100%;max-height:200px;object-fit:cover">
+          <p class="foto-upload-text" id="foto-venta-text"><strong>Hacé click para subir una foto</strong><br>JPG, PNG o WebP · Máx. 2MB</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-submit" onclick="submitAnuncio()">Publicar →</button>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">busc<span>ARTE</span></a>
+  <ul class="nav-links">
+    <li><a href="buscARTE_busqueda.html">Músicos</a></li>
+    <li><a href="#" class="active">Anuncios</a></li>
+    <li><a href="buscARTE_mensajes.html" class="nav-link">Mensajes</a></li>
+  </ul>
+  <div class="nav-right">
+      <div class="nav-guest" id="nav-guest">
+      <a href="buscARTE_login.html" class="btn-ghost">Ingresar</a>
+      <a href="buscARTE_registro.html" class="btn-neon">Registrarse</a>
+    </div>
+    <div class="nav-user" id="nav-user" style="display:none">
+      <div class="nav-avatar-wrap" onclick="toggleUserMenu()" id="nav-avatar-btn">
+        <div class="nav-avatar-circle" id="nav-avatar-circle">?</div>
+        <span class="nav-avatar-name" id="nav-avatar-name">Mi perfil</span>
+        <span class="nav-avatar-chevron">&#9662;</span>
+      </div>
+      <div class="nav-dropdown" id="nav-dropdown">
+        <a href="buscARTE_perfil_publico.html" class="nav-dropdown-item">&#128100; Mi perfil</a>
+        <a href="buscARTE_perfil.html" class="nav-dropdown-item">&#9881;&#65039; Configurar perfil</a>
+        <a href="buscARTE_mensajes.html" class="nav-dropdown-item">&#128172; Mensajes <span class="nav-badge" id="nav-msg-badge" style="display:none"></span></a>
+        <a href="buscARTE_mis_anuncios.html" class="nav-dropdown-item">&#128203; Mis anuncios</a>
+        <a href="buscARTE_guardados.html" class="nav-dropdown-item">&#9825; Guardados</a>
+        <div class="nav-dropdown-divider"></div>
+        <button class="nav-dropdown-item nav-logout" onclick="logout()">&#8617; Cerrar sesión</button>
+      </div>
+    </div>
+  </div>
+</nav>
+<div class="top-spacer"></div>
+
+<div class="layout">
+
+  <!-- ═══ FILTROS ADAPTATIVOS ═══ -->
+  <aside class="filters-panel">
+    <div class="filter-header">
+      <div class="filter-title-wrap">
+        <div class="filter-title">Filtros</div>
+        <div class="filter-category-label" id="filter-category-label">Busco músico · Me ofrezco</div>
+      </div>
+      <button class="filter-clear" onclick="clearFilters()">Limpiar</button>
+    </div>
+
+    <!-- FILTROS: BUSCO / OFREZCO -->
+    <div class="filter-panel active" id="fp-musico">
+      <div class="filter-group">
+        <span class="filter-group-label">Instrumento</span>
+        <div class="filter-chips">
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Guitarra</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Bajo</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Batería</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Teclado</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Voz</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Saxo</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Violín</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Trompeta</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Percusión</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">DJ</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Bandoneón</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Charango</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Flauta</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Cello</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Arpa</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Otro</button>
+        </div>
+      </div>
+      <div class="filter-divider"></div>
+      <div class="filter-group">
+        <span class="filter-group-label">Género</span>
+        <div class="filter-chips">
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Rock</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Rock Nacional</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Metal</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Jazz</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Folklore</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Tango</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Cumbia</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Indie</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Pop</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Electrónica</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Funk</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Punk</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Blues</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Prog</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">R&B</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Rap / Hip Hop</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Reggae</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Tropical</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Clásica</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Bossanova</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Soul</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Otro</button>
+        </div>
+      </div>
+      <div class="filter-divider"></div>
+      <div class="filter-group">
+        <span class="filter-group-label">Zona</span>
+        <select><option>Todo el país</option><option selected>Buenos Aires (CABA)</option><option>Gran Buenos Aires</option><option>Rosario</option><option>Córdoba</option><option>Mendoza</option></select>
+        <div style="margin-top:.5rem"><input type="text" id="zona-musico" placeholder="Barrio (ej: Almagro)" oninput="anunciosOffset=0;cargarAnuncios(false)"></div>
+      </div>
+    </div>
+
+    <!-- FILTROS: JAM / ZAPADA -->
+    <div class="filter-panel" id="fp-jam">
+      <div class="filter-group">
+        <span class="filter-group-label">Cuándo</span>
+        <div class="filter-chips">
+          <button class="fchip on" onclick="this.classList.toggle('on');filtrarJam()">Hoy</button>
+          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Este finde</button>
+          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Esta semana</button>
+          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Este mes</button>
+        </div>
+      </div>
+      <div class="filter-divider"></div>
+      <div class="filter-group">
+        <span class="filter-group-label">Entrada</span>
+        <div class="filter-chips">
+          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Gratis</button>
+          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">A la gorra</button>
+          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Con costo</button>
+        </div>
+      </div>
+      <div class="filter-divider"></div>
+      <div class="filter-group">
+        <span class="filter-group-label">Género musical</span>
+        <div class="filter-chips">
+          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Rock</button>
+          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Jazz</button>
+          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Blues</button>
+          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Folklore</button>
+          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Funk</button>
+          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">R&B</button>
+          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Rap / Hip Hop</button>
+          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Reggae</button>
+          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Pop</button>
+          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Cumbia</button>
+          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Tango</button>
+          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Bossanova</button>
+          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Variado</button>
+          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Otro</button>
+        </div>
+      </div>
+      <div class="filter-divider"></div>
+      <div class="filter-group">
+        <span class="filter-group-label">Zona</span>
+        <select><option>Todo el país</option><option selected>Buenos Aires (CABA)</option><option>Gran Buenos Aires</option><option>Rosario</option><option>Córdoba</option></select>
+        <div style="margin-top:.5rem"><input type="text" id="zona-jam" placeholder="Barrio / lugar" oninput="anunciosOffset=0;cargarAnuncios(false)"></div>
+      </div>
+    </div>
+
+    <!-- FILTROS: VENDO / ALQUILO -->
+    <div class="filter-panel" id="fp-vende">
+      <div class="filter-group">
+        <span class="filter-group-label">Categoría</span>
+        <div class="filter-chips">
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Guitarra</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Bajo</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Batería</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Teclado</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Vientos</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Cuerdas</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Amplificador</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Pedalera</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Micrófono</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Equipo PA</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Home Studio</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Sala ensayo</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Accesorios</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Otro</button>
+        </div>
+      </div>
+      <div class="filter-divider"></div>
+      <div class="filter-group">
+        <span class="filter-group-label">Condición</span>
+        <div class="filter-chips">
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Nuevo</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Usado</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Para reparar</button>
+        </div>
+      </div>
+      <div class="filter-divider"></div>
+      <div class="filter-group">
+        <span class="filter-group-label">Rango de precio</span>
+        <div class="price-range">
+          <input type="number" id="precio-min" placeholder="Mínimo $" oninput="anunciosOffset=0;cargarAnuncios(false)">
+          <input type="number" id="precio-max" placeholder="Máximo $" oninput="anunciosOffset=0;cargarAnuncios(false)">
+        </div>
+      </div>
+      <div class="filter-divider"></div>
+      <div class="filter-group">
+        <span class="filter-group-label">Zona</span>
+        <select><option>Todo el país</option><option selected>Buenos Aires (CABA)</option><option>Gran Buenos Aires</option><option>Rosario</option><option>Córdoba</option></select>
+        <div style="margin-top:.5rem"><input type="text" id="zona-vende" placeholder="Barrio (ej: Caballito)" oninput="anunciosOffset=0;cargarAnuncios(false)"></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══ ANUNCIOS ═══ -->
+  <div class="anuncios-main">
+    <div class="main-header">
+      <div>
+        <div class="main-title"><span>142</span> anuncios</div>
+        <div class="main-sub">en Buenos Aires · hoy</div>
+      </div>
+      <button class="btn-publish" onclick="openModal('busco')">+ Publicar anuncio</button>
+    </div>
+
+    <div class="tipo-tabs">
+      <button class="tipo-tab active" onclick="setTab(this,'todos')">Todos</button>
+      <button class="tipo-tab" onclick="setTab(this,'musico')">Busco músico</button>
+      <button class="tipo-tab" onclick="setTab(this,'ofrezco')">Me ofrezco</button>
+      <button class="tipo-tab" onclick="setTab(this,'jam')">Jam / Zapada</button>
+      <button class="tipo-tab" onclick="setTab(this,'vende')">Vendo / Alquilo</button>
+    </div>
+
+    <div class="anuncios-lista" id="anuncios-lista">
+      <div style="padding:3rem;text-align:center;color:var(--gris);font-size:.88rem" id="anuncios-loading">Cargando anuncios...</div>
+    </div>
+    <div class="load-more">
+      <button class="btn-load" id="btn-load-more" onclick="loadMoreAnuncios(this)" style="display:none">Cargar más anuncios</button>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <aside class="right-sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-card-title">Publicar anuncio</div>
+      <div class="sidebar-card-sub">¿Buscás alguien, te ofrecés, querés organizar una jam o vender algo?</div>
+      <div class="publish-types">
+        <button class="publish-type selected" onclick="selectPublishType(this,'busco')"><span class="ptype-icon">🔍</span><div><span class="ptype-label">Busco músico</span><span class="ptype-desc">Guitarrista, cantante, baterista...</span></div></button>
+        <button class="publish-type" onclick="selectPublishType(this,'ofrezco')"><span class="ptype-icon">🎸</span><div><span class="ptype-label">Me ofrezco</span><span class="ptype-desc">Estoy disponible para proyectos</span></div></button>
+        <button class="publish-type" onclick="selectPublishType(this,'jam')"><span class="ptype-icon">🥁</span><div><span class="ptype-label">Jam / Zapada</span><span class="ptype-desc">Organizá una jam abierta</span></div></button>
+        <button class="publish-type" onclick="selectPublishType(this,'vende')"><span class="ptype-icon">🎛️</span><div><span class="ptype-label">Vendo / Alquilo</span><span class="ptype-desc">Instrumentos, equipos, sala</span></div></button>
+      </div>
+      <button class="btn-publish-full" onclick="openModalFromSidebar()">Publicar gratis →</button>
+    </div>
+    <div class="sidebar-card">
+      <div style="font-size:.63rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gris2);margin-bottom:1rem;">Actividad en buscARTE</div>
+      <div class="stats-row"><span class="stats-label">Anuncios activos</span><span class="stats-val" id="sidebar-stat-anuncios">—</span></div>
+      <div class="stats-row"><span class="stats-label">Músicos registrados</span><span class="stats-val" id="sidebar-stat-musicos">—</span></div>
+    </div>
+  </aside>
+</div>
+
+<script>
+  // PROTECCIÓN: redirigir si no está logueado
+  (function() {
+    try {
+      if (localStorage.getItem('ba_logged') !== '1') {
+        window.location.replace('index.html');
+      }
+    } catch(e) {}
+  })();
+
+  // VARIABLES GLOBALES — deben estar primero
+  const SUPABASE_URL = 'https://xiaanchoanxmampegoay.supabase.co'
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68'
+  let fotoVentaUrl = null
+  let currentTipo = 'busco'
+  let tipoFiltro = 'todos'
+  let anunciosOffset = 0
+  const ANUNCIOS_PER_PAGE = 10
+  // CURSOR
+  window.addEventListener('DOMContentLoaded', function() {
+    const cursor=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+    if (!cursor || !ring) return;
+    let mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+    (function tick(){cursor.style.left=mx+'px';cursor.style.top=my+'px';rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(tick);})();
+  });
+
+  // TABS + FILTROS ADAPTATIVOS
+  const filterLabels = {
+    todos: 'Todos los anuncios',
+    musico: 'Busco músico',
+    ofrezco: 'Me ofrezco',
+    jam: 'Jam / Zapada',
+    vende: 'Vendo / Alquilo'
+  };
+  const filterPanels = {
+    todos: 'fp-musico',   // default: muestra filtros musico
+    musico: 'fp-musico',
+    ofrezco: 'fp-musico',
+    jam: 'fp-jam',
+    vende: 'fp-vende'
+  };
+
+  function setTab(el, tipo) {
+    document.querySelectorAll('.tipo-tab').forEach(t=>t.classList.remove('active'));
+    el.classList.add('active');
+    tipoFiltro = tipo === 'musico' ? 'busco' : tipo === 'ofrezco' ? 'ofrezco' : tipo;
+    document.querySelectorAll('.filter-panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById(filterPanels[tipo] || 'fp-musico').classList.add('active');
+    document.getElementById('filter-category-label').textContent = filterLabels[tipo] || '';
+    clearFilters();
+    cargarAnuncios(false);
+  }
+
+  function clearFilters() { document.querySelectorAll('.fchip.on').forEach(c=>c.classList.remove('on')); }
+
+  // SIDEBAR PUBLISH
+  let sidebarTipo = 'busco';
+  function selectPublishType(el, tipo) {
+    document.querySelectorAll('.publish-type').forEach(t=>t.classList.remove('selected'));
+    el.classList.add('selected');
+    sidebarTipo = tipo;
+  }
+  function openModalFromSidebar() { openModal(sidebarTipo); }
+
+  // MODAL
+  function openModal(tipo) {
+    tipo = tipo || 'busco';
+    const idx = {busco:0,ofrezco:1,jam:2,vende:3}[tipo] || 0;
+    document.querySelectorAll('.modal-tipo-btn').forEach((b,i)=>b.classList.toggle('selected',i===idx));
+    showForm(tipo);
+    document.getElementById('modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    document.getElementById('modal').classList.remove('open');
+    document.body.style.overflow = '';
+    // Reset all form inputs
+    document.querySelectorAll('.modal-form input, .modal-form textarea').forEach(el => el.value = '');
+    document.querySelectorAll('.modal-form .radio-btn').forEach((btn, i) => {
+      btn.classList.toggle('selected', i === 0);
+    });
+    // Reset foto venta
+    fotoVentaUrl = null;
+    const preview = document.getElementById('foto-venta-preview');
+    if (preview) { preview.style.display = 'none'; preview.src = ''; }
+    const fotoText = document.getElementById('foto-venta-text');
+    if (fotoText) fotoText.innerHTML = '<strong>Hacé click para subir una foto</strong><br>JPG, PNG o WebP · Máx. 2MB';
+  }
+  function closeModalOutside(e) { if(e.target===document.getElementById('modal')) closeModal(); }
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+
+  // SUBIR FOTO DE VENTA
+
+  async function subirFotoVenta(input) {
+    if (!input.files || !input.files[0]) return
+    const file = input.files[0]
+    if (file.size > 2 * 1024 * 1024) { alert('La foto no puede superar 2MB.'); return }
+
+    // Preview
+    const reader = new FileReader()
+    reader.onload = e => {
+      const preview = document.getElementById('foto-venta-preview')
+      preview.src = e.target.result
+      preview.style.display = 'block'
+      document.getElementById('foto-venta-text').style.display = 'none'
+    }
+    reader.readAsDataURL(file)
+
+    document.getElementById('foto-venta-text').innerHTML = '⏳ Subiendo...'
+
+    try {
+      const fileName = `venta-${Date.now()}-${file.name}`
+      const res = await fetch(
+        `${SUPABASE_URL}/storage/v1/object/fotos-anuncios/${fileName}`,
+        {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': file.type,
+            'x-upsert': 'true'
+          },
+          body: file
+        }
+      )
+      if (res.ok) {
+        fotoVentaUrl = `${SUPABASE_URL}/storage/v1/object/public/fotos-anuncios/${fileName}`
+        document.getElementById('foto-venta-text').innerHTML = '✅ Foto lista'
+      } else {
+        throw new Error('Error')
+      }
+    } catch(e) {
+      document.getElementById('foto-venta-text').innerHTML = '❌ Error al subir'
+      fotoVentaUrl = null
+    }
+  }
+
+
+  function selectTipo(tipo, el) {
+    currentTipo = tipo
+    document.querySelectorAll('.modal-tipo-btn').forEach(b=>b.classList.remove('selected'))
+    el.classList.add('selected')
+    showForm(tipo)
+  }
+  function showForm(tipo) {
+    document.querySelectorAll('.modal-form').forEach(f=>f.classList.remove('active'))
+    document.getElementById('form-'+tipo).classList.add('active')
+  }
+
+  function selectRadio(el) {
+    el.closest('.radio-group').querySelectorAll('.radio-btn').forEach(b=>b.classList.remove('selected'))
+    el.classList.add('selected')
+  }
+
+  async function submitAnuncio() {
+    const btn = document.querySelector('.btn-submit')
+    // Leer tipo desde el form activo — el método más confiable
+    const formActivo = document.querySelector('.modal-form.active')
+    const tipo = formActivo?.id?.replace('form-', '') || currentTipo
+
+    // Recolectar datos según el tipo
+    const miId = localStorage.getItem('ba_user_id')
+    let datos = { tipo, estado: 'activo', user_id: miId ? parseInt(miId) : null }
+
+    if (tipo === 'busco' || tipo === 'ofrezco') {
+      const form = document.getElementById('form-' + tipo)
+      datos.titulo = form.querySelector('input[type=text]')?.value?.trim()
+      datos.descripcion = form.querySelector('textarea')?.value?.trim()
+      datos.instrumentos = [...form.querySelectorAll('.mchip.on')].filter((_,i,a) => {
+        const labels = [...form.querySelectorAll('.mfield label')]
+        return true
+      }).slice(0, 20).map(c=>c.textContent).join(', ')
+      // Separar instrumentos y géneros
+      const chips = [...form.querySelectorAll('.mchip.on')]
+      const instrLabels = ['Guitarra','Bajo','Batería','Teclado / Piano','Voz / Canto','Saxo','Violín','Trompeta','Flauta','Percusión','DJ / Productor','Bandoneón','Charango','Cello','Arpa','Otro']
+      datos.instrumentos = chips.filter(c=>instrLabels.includes(c.textContent.trim())).map(c=>c.textContent.trim()).join(', ')
+      datos.generos = chips.filter(c=>!instrLabels.includes(c.textContent.trim())).map(c=>c.textContent.trim()).join(', ')
+      datos.zona = form.querySelector('input[placeholder*="barrio"], input[placeholder*="Barrio"], input[placeholder*="zona"]')?.value?.trim()
+
+    } else if (tipo === 'jam') {
+      const form = document.getElementById('form-jam')
+      datos.titulo = document.getElementById('jam-titulo')?.value?.trim()
+      datos.descripcion = form.querySelector('textarea')?.value?.trim()
+      datos.generos = [...document.querySelectorAll('#jam-generos .mchip.on')].map(c=>c.textContent.trim()).join(', ')
+      const fechaInput = form.querySelector('input[type="date"]')?.value
+      const horaInput = form.querySelector('input[type="time"]')?.value || '18:00'
+      datos.fecha_evento = fechaInput ? new Date(fechaInput + 'T' + horaInput).toISOString() : null
+      datos.lugar = form.querySelector('input[placeholder*="Lugar"], input[placeholder*="dirección"]')?.value?.trim()
+      datos.precio_entrada = form.querySelector('input[placeholder*="Gratis"], input[placeholder*="gorra"]')?.value?.trim()
+      datos.link_evento = form.querySelector('input[type="url"]')?.value?.trim()
+      datos.contacto_evento = form.querySelector('input[placeholder*="Instagram"], input[placeholder*="WhatsApp"]')?.value?.trim()
+      // Siempre generar título si está vacío
+      if (!datos.titulo && datos.lugar) datos.titulo = `Jam en ${datos.lugar}`
+      if (!datos.titulo) datos.titulo = 'Jam / Zapada'
+
+    } else if (tipo === 'vende') {
+      const form = document.getElementById('form-vende')
+      datos.categoria_producto = form.querySelector('select')?.value?.trim()
+      datos.marca = form.querySelector('input[placeholder*="Fender"]')?.value?.trim()
+      datos.condicion = form.querySelector('.radio-btn.selected')?.textContent?.trim()
+      const precioVal = parseFloat(document.getElementById('vende-precio')?.value)
+      datos.precio_num = isNaN(precioVal) ? null : precioVal
+      datos.precio = datos.precio_num ? `$${Math.round(datos.precio_num).toLocaleString('es-AR')}` : ''
+      datos.zona = form.querySelector('input[placeholder*="Caballito"]')?.value?.trim()
+      datos.descripcion = form.querySelector('textarea')?.value?.trim()
+      datos.foto_url = fotoVentaUrl || null
+      if (datos.categoria_producto) {
+        datos.titulo = `Vendo ${datos.categoria_producto}${datos.marca ? ' ' + datos.marca : ''}`
+      }
+    }
+
+    // Si es jam o vende sin título, generar automáticamente
+    if (!datos.titulo && tipo === 'jam') datos.titulo = datos.lugar ? `Jam en ${datos.lugar}` : 'Jam / Zapada'
+    if (!datos.titulo && tipo === 'vende') datos.titulo = datos.categoria_producto ? `Vendo ${datos.categoria_producto}` : 'Vendo instrumento'
+    if (!datos.titulo && tipo === 'ofrezco') datos.titulo = 'Me ofrezco como músico'
+
+    // Solo validar para busco
+    if (!datos.titulo) {
+      alert('Por favor completá el título del anuncio.')
+      return
+    }
+
+    btn.textContent = 'Publicando...'
+    btn.style.opacity = '0.7'
+    btn.disabled = true
+
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/anuncios`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify(datos)
+      })
+
+      if (res.ok || res.status === 201) {
+        btn.textContent = '✓ Publicado'
+        btn.style.background = '#a8c832'
+        btn.style.opacity = '1'
+        setTimeout(() => {
+          closeModal()
+          btn.textContent = 'Publicar →'
+          btn.style.background = ''
+          btn.disabled = false
+          // Recargar lista para mostrar el nuevo anuncio
+          anunciosOffset = 0
+          cargarAnuncios(false)
+        }, 1200)
+      } else {
+        const err = await res.json()
+        alert('Error al publicar. Intentá de nuevo.')
+        console.error(err)
+        btn.textContent = 'Publicar →'
+        btn.style.opacity = '1'
+        btn.disabled = false
+      }
+    } catch(e) {
+      alert('No se pudo conectar. Verificá tu conexión.')
+      console.error(e)
+      btn.textContent = 'Publicar →'
+      btn.style.opacity = '1'
+      btn.disabled = false
+    }
+  }
+
+  function agregarAnuncioAlTablon(a) {
+    const badges = { busco:'badge-busco', ofrezco:'badge-ofrezco', jam:'badge-jam', vende:'badge-vendo' }
+    const labels = { busco:'🔍 Busco músico', ofrezco:'🎸 Me ofrezco', jam:'🥁 Jam / Zapada', vende:'🎛️ Vendo' }
+    const nombre = localStorage.getItem('ba_name') || 'Vos'
+    const lista = document.getElementById('anuncios-lista')
+    const el = document.createElement('div')
+    el.className = 'anuncio'
+    el.style.animation = 'fadeUp .3s ease'
+    el.innerHTML = `
+      <span class="anuncio-tipo-badge ${badges[a.tipo]||'badge-busco'}">${labels[a.tipo]||a.tipo}</span>
+      <div class="anuncio-titulo">${a.titulo}</div>
+      <div class="anuncio-desc">${a.descripcion||''}</div>
+      <div class="anuncio-meta">
+        <span class="anuncio-autor"><span class="autor-name">${nombre}</span></span>
+        ${a.zona ? `<span class="anuncio-location">📍 ${a.zona}</span>` : ''}
+        <span class="anuncio-time">Ahora mismo</span>
+      </div>`
+    lista.insertBefore(el, lista.firstChild)
+  }
+
+  function filtrarJam() {
+    const generosActivos = [...document.querySelectorAll('#fp-jam .fchip.on')]
+      .map(c=>c.textContent.trim())
+      .filter(g => !['Hoy','Este finde','Esta semana','Este mes','Gratis','A la gorra','Con costo'].includes(g))
+    // Recargar con filtro de géneros
+    anunciosOffset = 0
+    cargarAnuncios(false)
+  }
+
+  // ── CARGAR ANUNCIOS DESDE SUPABASE ──
+
+  const BADGES = { busco:'badge-busco', ofrezco:'badge-ofrezco', jam:'badge-jam', vende:'badge-vendo' }
+  const LABELS = { busco:'🔍 Busco músico', ofrezco:'🎸 Me ofrezco', jam:'🥁 Jam / Zapada', vende:'🎛️ Vendo' }
+  const RESPOND_TEXT = { busco:'Responder →', ofrezco:'Responder →', jam:'Me apunto →', vende:'Consultar →' }
+
+  function timeAgo(iso) {
+    if (!iso) return ''
+    const diff = Math.floor((new Date() - new Date(iso)) / 60000)
+    if (diff < 1) return 'Ahora mismo'
+    if (diff < 60) return `Hace ${diff} min`
+    if (diff < 1440) return `Hace ${Math.floor(diff/60)} hs`
+    return `Hace ${Math.floor(diff/1440)} días`
+  }
+
+  function buildAnuncioCard(a, autorNombre) {
+    const badge = BADGES[a.tipo] || 'badge-busco'
+    const label = LABELS[a.tipo] || a.tipo
+    const respondText = RESPOND_TEXT[a.tipo] || 'Responder →'
+    const tags = [a.instrumentos, a.generos, a.categoria_producto].filter(Boolean).join(',').split(',').map(t=>t.trim()).filter(Boolean).slice(0,3)
+    const zona = a.zona || a.lugar || ''
+    const precio = a.precio ? (a.precio.startsWith('$') ? a.precio : `$${a.precio}`) : ''
+    const tagsHTML = [...tags, precio].filter(Boolean).map(t=>`<span class="anuncio-tag">${t}</span>`).join('')
+
+    return `<div class="anuncio" data-tipo="${a.tipo}" data-id="${a.id}" style="animation:fadeUp .3s ease both">
+      <span class="anuncio-tipo-badge ${badge}">${label}</span>
+      <div class="anuncio-titulo"><a href="buscARTE_anuncio_detalle.html?id=${a.id}" style="color:inherit;text-decoration:none">${a.titulo||'Sin título'}</a></div>
+      <div class="anuncio-desc">${a.descripcion||''}</div>
+      <div class="anuncio-meta">
+        <a href="buscARTE_perfil_publico.html?id=${a.user_id||''}" class="anuncio-autor">
+          <div class="autor-avatar" style="width:24px;height:24px;border-radius:50%;background:#0d2010;color:var(--neon);display:flex;align-items:center;justify-content:center;font-size:.56rem;font-family:var(--font-display)">${(autorNombre||'?')[0].toUpperCase()}</div>
+          <span class="autor-name">${autorNombre||'Usuario'}</span>
+        </a>
+        ${tagsHTML}
+        ${zona ? `<span class="anuncio-location">📍 ${zona}</span>` : ''}
+        <span class="anuncio-time">${timeAgo(a.created_at)}</span>
+        <button class="anuncio-respond" onclick="toggleReply(this)">${respondText}</button>
+      </div>
+      <div class="reply-form">
+        <textarea placeholder="Escribí tu respuesta..."></textarea>
+        <div class="reply-actions">
+          <button class="btn-send-reply" onclick="sendReply(this)">Enviar →</button>
+          <button class="btn-cancel-reply" onclick="toggleReply(this.closest('.anuncio').querySelector('.anuncio-respond'))">Cancelar</button>
+          <span class="reply-note">¿Sin cuenta? <a href="buscARTE_registro.html">Registrate gratis</a></span>
+        </div>
+      </div>
+    </div>`
+  }
+
+  async function cargarAnuncios(append = false) {
+    const lista = document.getElementById('anuncios-lista')
+    if (!append) {
+      lista.innerHTML = '<div style="padding:3rem;text-align:center;color:var(--gris);font-size:.88rem">Cargando anuncios...</div>'
+      anunciosOffset = 0
+    }
+
+    let query = `${SUPABASE_URL}/rest/v1/anuncios?estado=eq.activo&order=created_at.desc&limit=${ANUNCIOS_PER_PAGE}&offset=${anunciosOffset}`
+    if (tipoFiltro !== 'todos') query += `&tipo=eq.${tipoFiltro}`
+
+    // Leer chips activos del panel visible
+    const panelActivo = document.querySelector('.filter-panel.active')
+    if (panelActivo) {
+      const chipsOn = [...panelActivo.querySelectorAll('.fchip.on')].map(c=>c.textContent.trim())
+      
+      // Chips que NO son instrumento ni categoría (son géneros)
+      const noInstr = ['Rock','Rock Nacional','Metal','Jazz','Folklore','Tango','Cumbia','Indie','Pop','Electrónica','Funk','Punk','Blues','Prog','R&B','Rap / Hip Hop','Reggae','Tropical','Clásica','Bossanova','Soul','Otro','Variado',
+        'Hoy','Este finde','Esta semana','Este mes','Gratis','A la gorra','Con costo']
+      const noCateg = ['Nuevo','Usado','Para reparar']
+      const categLabels = ['Guitarra','Bajo','Batería','Teclado','Vientos','Cuerdas','Amplificador','Pedalera','Micrófono','Equipo PA','Home Studio','Sala ensayo','Accesorios','Otro']
+
+      const instrActivos = chipsOn.filter(c => !noInstr.includes(c) && !noCateg.includes(c) && !categLabels.includes(c))
+      const generosActivos = chipsOn.filter(c => noInstr.includes(c) && !['Hoy','Este finde','Esta semana','Este mes','Gratis','A la gorra','Con costo'].includes(c))
+      const catActiva = chipsOn.find(c => categLabels.includes(c))
+      const condActiva = chipsOn.find(c => noCateg.includes(c))
+
+      // Normalizar DJ/Prod. → buscar como "DJ"
+      // Filtro zona
+      const zonaInput = panelActivo.querySelector('input[id^="zona-"]')
+      const zonaVal = zonaInput?.value?.trim()
+      if (zonaVal) query += `&zona=ilike.*${encodeURIComponent(zonaVal)}*`
+
+      if (instrActivos.length) {
+        const instr = instrActivos[0]
+        query += `&instrumentos=ilike.*${encodeURIComponent(instr)}*`
+      }
+      if (generosActivos.length) query += `&generos=ilike.*${encodeURIComponent(generosActivos[0])}*`
+      if (catActiva && tipoFiltro === 'vende') query += `&categoria_producto=ilike.*${encodeURIComponent(catActiva)}*`
+      if (condActiva && tipoFiltro === 'vende') query += `&condicion=ilike.*${encodeURIComponent(condActiva)}*`
+      // Filtros de jam por fecha
+      const hoy = new Date(); hoy.setHours(0,0,0,0)
+      const manana = new Date(hoy); manana.setDate(manana.getDate()+1)
+      const finde = new Date(hoy); finde.setDate(finde.getDate()+7)
+      if (chipsOn.includes('Hoy')) query += `&fecha_evento=gte.${hoy.toISOString()}&fecha_evento=lt.${manana.toISOString()}`
+      else if (chipsOn.includes('Este finde')) { const v=new Date(hoy);v.setDate(v.getDate()+(6-v.getDay())); query += `&fecha_evento=gte.${hoy.toISOString()}&fecha_evento=lte.${v.toISOString()}` }
+      else if (chipsOn.includes('Esta semana')) query += `&fecha_evento=gte.${hoy.toISOString()}&fecha_evento=lte.${finde.toISOString()}`
+      // Filtro precio entrada jam
+      if (chipsOn.includes('Gratis')) query += `&precio_entrada=ilike.*gratis*`
+      else if (chipsOn.includes('A la gorra')) query += `&precio_entrada=ilike.*gorra*`
+      else if (chipsOn.includes('Con costo')) query += `&precio_entrada=not.ilike.*gratis*&precio_entrada=not.is.null`
+    }
+
+    // Filtro precio numérico — debe ir ANTES del fetch
+    const precioMin = parseFloat(document.getElementById('precio-min')?.value)
+    const precioMax = parseFloat(document.getElementById('precio-max')?.value)
+    if (!isNaN(precioMin) && precioMin > 0) query += `&precio_num=gte.${precioMin}`
+    if (!isNaN(precioMax) && precioMax > 0) query += `&precio_num=lte.${precioMax}`
+
+    try {
+      const res = await fetch(query, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } })
+      const anuncios = await res.json()
+
+      if (!append) lista.innerHTML = ''
+
+      if (!anuncios.length && !append) {
+        lista.innerHTML = `<div style="padding:4rem;text-align:center">
+          <div style="font-size:2rem;margin-bottom:1rem">📋</div>
+          <div style="font-family:var(--font-display);font-size:1.4rem;margin-bottom:.5rem">Sin anuncios todavía</div>
+          <div style="color:var(--gris);font-size:.88rem">Sé el primero en publicar algo.</div>
+        </div>`
+        document.querySelector('.main-title span').textContent = '0'
+        document.getElementById('btn-load-more').style.display = 'none'
+        return
+      }
+
+      // Cargar nombres de autores
+      const userIds = [...new Set(anuncios.map(a=>a.user_id).filter(Boolean))]
+      let autores = {}
+      if (userIds.length) {
+        const pRes = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=in.(${userIds.join(',')})&select=id,nombre`, {
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        })
+        const perfiles = await pRes.json()
+        perfiles.forEach(p => autores[p.id] = p.nombre)
+      }
+
+      anuncios.forEach(a => {
+        lista.insertAdjacentHTML('beforeend', buildAnuncioCard(a, autores[a.user_id]))
+      })
+
+      document.querySelector('.main-title span').textContent = anuncios.length + anunciosOffset
+      anunciosOffset += anuncios.length
+      document.getElementById('btn-load-more').style.display = anuncios.length === ANUNCIOS_PER_PAGE ? 'inline-block' : 'none'
+
+    } catch(e) {
+      lista.innerHTML = '<div style="padding:3rem;text-align:center;color:var(--gris)">Error al cargar. Verificá tu conexión.</div>'
+      console.error(e)
+    }
+  }
+
+  function loadMoreAnuncios(btn) {
+    btn.textContent = 'Cargando...'
+    cargarAnuncios(true).then(() => btn.textContent = 'Cargar más anuncios')
+  }
+
+  // Cargar al iniciar
+  cargarAnuncios(false);
+
+  function toggleReply(btn) {
+    const form = btn.closest('.anuncio').querySelector('.reply-form');
+    const isOpen = form.classList.contains('open');
+    document.querySelectorAll('.reply-form.open').forEach(f=>f.classList.remove('open'));
+    if (!isOpen) { form.classList.add('open'); setTimeout(()=>form.querySelector('textarea').focus(),100); }
+  }
+  function sendReply(btn) {
+    const form = btn.closest('.reply-form');
+    const ta = form.querySelector('textarea');
+    if (!ta.value.trim()) { ta.focus(); return; }
+    btn.textContent = '✓ Enviado';
+    btn.style.background = '#a8c832';
+    ta.value = '';
+    setTimeout(()=>{ form.classList.remove('open'); btn.textContent='Enviar →'; btn.style.background=''; }, 1400);
+  }
+  // NAV SESSION
+  (function initNav(){
+    const l=localStorage.getItem('ba_logged')==='1';
+    const n=localStorage.getItem('ba_name')||'Mi perfil';
+    const uid=localStorage.getItem('ba_user_id')||'';
+    const i=n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    if(l){
+      const g=document.getElementById('nav-guest');
+      const u=document.getElementById('nav-user');
+      if(g)g.style.display='none';
+      if(u)u.style.display='flex';
+      const c=document.getElementById('nav-avatar-circle');
+      if(c)c.textContent=i;
+      const nm=document.getElementById('nav-avatar-name');
+      if(nm)nm.textContent=n.split(' ')[0];
+      const b=document.getElementById('nav-msg-badge');
+      if(b)b.style.display='inline';
+      // Fix Mi perfil link with real user ID
+      const miPerfilLink=document.querySelector('.nav-dropdown-item[href*="perfil_publico"]');
+      if(miPerfilLink && uid) miPerfilLink.href='buscARTE_perfil_publico.html?id='+uid;
+    }
+  })();
+  // STATS SIDEBAR REALES
+  async function cargarStatsSidebar() {
+    try {
+      const [rm, ra] = await Promise.all([
+        fetch(`${SUPABASE_URL}/rest/v1/perfiles?select=id`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Prefer': 'count=exact' } }),
+        fetch(`${SUPABASE_URL}/rest/v1/anuncios?estado=eq.activo&select=id`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Prefer': 'count=exact' } })
+      ])
+      const totalMusicos = rm.headers.get('content-range')?.split('/')[1]
+      const totalAnuncios = ra.headers.get('content-range')?.split('/')[1]
+      const sm = document.getElementById('sidebar-stat-musicos')
+      const sa = document.getElementById('sidebar-stat-anuncios')
+      if (sm && totalMusicos) sm.textContent = totalMusicos
+      if (sa && totalAnuncios) sa.textContent = totalAnuncios
+    } catch(e) {}
+  }
+  cargarStatsSidebar();
+
+  function toggleUserMenu(){const w=document.getElementById('nav-avatar-btn');const d=document.getElementById('nav-dropdown');if(w)w.classList.toggle('open');if(d)d.classList.toggle('open');}
+  document.addEventListener('click',e=>{if(!e.target.closest('#nav-user')){document.getElementById('nav-avatar-btn')?.classList.remove('open');document.getElementById('nav-dropdown')?.classList.remove('open');}});
+  function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');window.location.href='index.html';}
+</script>
+</body>
+</html>

@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>buscARTE — Buscar músicos</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --negro:#080808; --negro2:#111; --negro3:#1a1a1a;
+    --blanco:#f2ede4; --neon:#d4f53c; --rojo:#e8311a;
+    --gris:#888; --gris2:#444; --gris3:#2a2a2a;
+    --font-display:'Archivo Black',sans-serif;
+    --font-body:'Archivo',sans-serif;
+  }
+  body { background:var(--negro); color:var(--blanco); font-family:var(--font-body); font-weight:300; min-height:100vh; overflow-x:hidden; cursor:none; }
+  .cursor { width:10px;height:10px;background:var(--neon);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%); }
+  .cursor-ring { width:36px;height:36px;border:1px solid rgba(212,245,60,0.35);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .15s ease; }
+  body::before { content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");opacity:.03;pointer-events:none;z-index:1000; }
+
+  /* NAV */
+  nav { position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1rem 2.5rem;border-bottom:1px solid #1c1c1c;background:rgba(8,8,8,0.96);backdrop-filter:blur(12px); }
+  .nav-logo { font-family:var(--font-display);font-size:1.4rem;color:var(--blanco);text-decoration:none;flex-shrink:0; }
+  .nav-logo span { color:var(--neon); }
+  .nav-search { flex:1;max-width:500px;margin:0 2rem;display:flex; }
+  .nav-search input { flex:1;background:var(--negro2);border:1px solid var(--gris3);border-right:none;color:var(--blanco);padding:.6rem 1rem;font-family:var(--font-body);font-size:.88rem;font-weight:300;outline:none;transition:border-color .2s; }
+  .nav-search input:focus { border-color:var(--neon); }
+  .nav-search input::placeholder { color:var(--gris2); }
+  .nav-search button { background:var(--neon);border:none;color:var(--negro);padding:.6rem 1.2rem;font-family:var(--font-display);font-size:.78rem;letter-spacing:.06em;cursor:none;transition:opacity .2s;flex-shrink:0; }
+  .nav-search button:hover { opacity:.85; }
+  .nav-right { display:flex;align-items:center;gap:.8rem;flex-shrink:0; }
+  .btn-ghost { background:transparent;border:1px solid var(--gris2);color:var(--blanco);padding:.48rem 1rem;font-family:var(--font-body);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;cursor:none;transition:border-color .2s;text-decoration:none;display:inline-block; }
+  .btn-ghost:hover { border-color:var(--blanco); }
+  .btn-neon { background:var(--neon);border:none;color:var(--negro);padding:.48rem 1rem;font-family:var(--font-body);font-weight:500;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;cursor:none;transition:opacity .2s;text-decoration:none;display:inline-block; }
+  .btn-neon:hover { opacity:.85; }
+  .top-spacer { height:60px; }
+
+  /* LAYOUT */
+  .layout { display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 60px); }
+
+  /* FILTROS */
+  .filters-panel { border-right:1px solid #1c1c1c;padding:1.8rem 0;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto;background:var(--negro2); }
+  .filters-panel::-webkit-scrollbar { width:3px; }
+  .filters-panel::-webkit-scrollbar-thumb { background:var(--gris3); }
+  .filter-header { padding:0 1.5rem 1rem;border-bottom:1px solid #1c1c1c;margin-bottom:1.2rem;display:flex;align-items:center;justify-content:space-between; }
+  .filter-title { font-family:var(--font-display);font-size:.95rem; }
+  .filter-clear { font-size:.68rem;color:var(--neon);cursor:none;background:none;border:none;font-family:var(--font-body);letter-spacing:.08em;text-transform:uppercase;padding:0; }
+  .filter-group { padding:0 1.5rem;margin-bottom:1.4rem; }
+  .filter-group-label { font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gris2);margin-bottom:.6rem;display:block; }
+  .filter-group select, .filter-group input[type=text] { width:100%;background:var(--negro);border:1px solid var(--gris3);color:var(--blanco);padding:.62rem .9rem;font-family:var(--font-body);font-size:.82rem;font-weight:300;outline:none;transition:border-color .2s;appearance:none;border-radius:0; }
+  .filter-group select:focus, .filter-group input:focus { border-color:var(--neon); }
+  .filter-chips { display:flex;flex-wrap:wrap;gap:.35rem; }
+  .fchip { padding:.3rem .65rem;border:1px solid var(--gris3);color:var(--gris);font-size:.67rem;letter-spacing:.07em;text-transform:uppercase;cursor:none;transition:all .15s;background:transparent;font-family:var(--font-body); }
+  .fchip:hover { border-color:#555;color:var(--blanco); }
+  .fchip.on { border-color:var(--neon);color:var(--neon);background:rgba(212,245,60,.05); }
+  .filter-divider { height:1px;background:#1c1c1c;margin:0 1.5rem 1.4rem; }
+
+  /* RESULTADOS */
+  .results-area { padding:1.8rem 2rem; }
+  .results-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;padding-bottom:1.2rem;border-bottom:1px solid #1c1c1c; }
+  .results-count { font-family:var(--font-display);font-size:1.8rem;letter-spacing:-.02em;line-height:1; }
+  .results-count span { color:var(--neon); }
+  .results-sub { font-size:.75rem;color:var(--gris);margin-top:.2rem; }
+  .results-controls { display:flex;align-items:center;gap:.8rem; }
+  .sort-select { background:var(--negro2);border:1px solid var(--gris3);color:var(--blanco);padding:.45rem .9rem;font-family:var(--font-body);font-size:.78rem;outline:none;appearance:none;cursor:none; }
+  .nav-user { position:relative; }
+  .nav-avatar-wrap { display:flex;align-items:center;gap:.5rem;cursor:none;padding:.3rem .6rem;border:1px solid var(--gris3);transition:border-color .2s;user-select:none; }
+  .nav-avatar-wrap:hover { border-color:var(--gris2); }
+  .nav-avatar-circle { width:28px;height:28px;border-radius:50%;background:#0d2010;color:var(--neon);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.62rem;flex-shrink:0; }
+  .nav-avatar-name { font-size:.78rem;color:var(--blanco); }
+  .nav-avatar-chevron { font-size:.6rem;color:var(--gris);transition:transform .2s; }
+  .nav-avatar-wrap.open .nav-avatar-chevron { transform:rotate(180deg); }
+  .nav-dropdown { position:absolute;top:calc(100% + 8px);right:0;background:var(--negro2);border:1px solid #2a2a2a;min-width:200px;display:none;flex-direction:column;z-index:300; }
+  .nav-dropdown.open { display:flex; }
+  .nav-dropdown-item { display:flex;align-items:center;gap:.6rem;padding:.75rem 1.1rem;color:var(--gris);text-decoration:none;font-size:.82rem;transition:all .15s;background:transparent;border:none;font-family:var(--font-body);cursor:none;text-align:left;width:100%; }
+  .nav-dropdown-item:hover { background:rgba(255,255,255,.04);color:var(--blanco); }
+  .nav-dropdown-divider { height:1px;background:#1c1c1c;margin:.3rem 0; }
+  .nav-logout:hover { color:var(--rojo) !important; }
+  .nav-badge { background:var(--neon);color:var(--negro);font-size:.55rem;font-weight:700;padding:.1rem .4rem;margin-left:auto; }
+  .view-btn { background:transparent;border:none;color:var(--gris);padding:.38rem .6rem;font-size:.85rem;cursor:none;transition:all .15s; }
+  .view-btn.active { background:var(--negro3);color:var(--neon); }
+
+  .active-filters { display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.4rem;min-height:.5rem; }
+  .af-chip { display:inline-flex;align-items:center;gap:.35rem;padding:.25rem .6rem;background:rgba(212,245,60,.07);border:1px solid rgba(212,245,60,.2);color:var(--neon);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase; }
+  .af-remove { background:none;border:none;color:rgba(212,245,60,.5);cursor:none;font-size:.85rem;padding:0;line-height:1;transition:color .15s;font-family:var(--font-body); }
+  .af-remove:hover { color:var(--neon); }
+
+  /* GRID */
+  .musicians-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:#181818;overflow:hidden; }
+  .musicians-grid.list-view { grid-template-columns:1fr;background:transparent;gap:0; }
+  .musician-card { min-width:0;overflow:hidden; }
+
+  /* CARD — limpia y minimalista */
+  .musician-card { background:var(--negro);padding:1.4rem;cursor:none;transition:background .2s;position:relative;display:flex;flex-direction:column;gap:.8rem; }
+  .musician-card:hover { background:#0e0e0e; }
+  .musician-card.premium-card { border-top:2px solid var(--neon); }
+  .premium-dot { position:absolute;top:.75rem;right:.75rem;background:var(--neon);color:var(--negro);font-size:.55rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.12rem .4rem; }
+
+  .card-top { display:flex;align-items:center;gap:.85rem; }
+  .card-avatar { width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.9rem;flex-shrink:0;position:relative; }
+  .online-dot { position:absolute;bottom:1px;right:1px;width:8px;height:8px;background:#4caf50;border-radius:50%;border:2px solid var(--negro); }
+  .card-info { flex:1;min-width:0; }
+  .card-name { font-weight:500;font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:.1rem; }
+  .card-instrument { font-size:.72rem;color:var(--neon);margin-bottom:.08rem; }
+  .card-location { font-size:.7rem;color:var(--gris); }
+  .card-match { text-align:right;flex-shrink:0; }
+  .match-num { font-family:var(--font-display);font-size:1.25rem;color:var(--neon);line-height:1; }
+  .match-label { font-size:.56rem;color:var(--gris);letter-spacing:.08em;text-transform:uppercase; }
+
+  .card-tags { display:flex;gap:.3rem;flex-wrap:wrap; }
+  .ctag { font-size:.63rem;padding:.14rem .48rem;border:1px solid var(--gris3);color:var(--gris);text-transform:uppercase;letter-spacing:.06em; }
+
+  .card-bio { font-size:.78rem;color:var(--gris);line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+
+  .card-footer { display:flex;align-items:center;justify-content:space-between;gap:.8rem;padding-top:.75rem;border-top:1px solid #161616; }
+  .card-refs { font-size:.68rem;color:var(--gris2);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+  .card-refs em { color:var(--gris);font-style:normal; }
+  .card-cta { background:transparent;border:1px solid var(--gris3);color:var(--gris);padding:.35rem .85rem;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;cursor:none;transition:all .2s;font-family:var(--font-body);flex-shrink:0;text-decoration:none;display:inline-block;white-space:nowrap; }
+  .card-cta:hover { border-color:var(--neon);color:var(--neon); }
+
+  /* LIST VIEW */
+  .list-view .musician-card { flex-direction:row;align-items:center;padding:1rem 1.5rem;border-bottom:1px solid #141414; }
+  .list-view .card-top { flex:0 0 260px; }
+  .list-view .card-tags { flex:0 0 auto; }
+  .list-view .card-bio { flex:1;padding:0 1.5rem; }
+  .list-view .card-footer { border-top:none;padding-top:0;flex:0 0 auto; }
+  .list-view .card-refs { display:none; }
+
+  .load-more { padding:2.5rem;text-align:center;border-top:1px solid #1c1c1c; }
+  .btn-load { background:transparent;border:1px solid var(--gris3);color:var(--gris);padding:.75rem 2.5rem;font-family:var(--font-display);font-size:.85rem;letter-spacing:.06em;cursor:none;transition:all .2s; }
+  .btn-load:hover { border-color:var(--blanco);color:var(--blanco); }
+
+  .av-a{background:#0d2010;color:var(--neon);}
+  .av-b{background:#2a0a05;color:#ff6b5b;}
+  .av-c{background:#050d2a;color:#5b9fff;}
+  .av-d{background:#1a0d2a;color:#c45bff;}
+  .av-e{background:#2a1a05;color:#ffaa5b;}
+  .av-f{background:#0d1a2a;color:#5bd4ff;}
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .musician-card:nth-child(1){animation:fadeUp .3s .04s ease both}
+  .musician-card:nth-child(2){animation:fadeUp .3s .08s ease both}
+  .musician-card:nth-child(3){animation:fadeUp .3s .12s ease both}
+  .musician-card:nth-child(4){animation:fadeUp .3s .16s ease both}
+  .musician-card:nth-child(5){animation:fadeUp .3s .20s ease both}
+  .musician-card:nth-child(6){animation:fadeUp .3s .24s ease both}
+  .musician-card:nth-child(7){animation:fadeUp .3s .28s ease both}
+  .musician-card:nth-child(8){animation:fadeUp .3s .32s ease both}
+  .musician-card:nth-child(9){animation:fadeUp .3s .36s ease both}
+  /* NAV LINKS FIX */
+  .nav-links { list-style:none !important; display:flex !important; gap:2rem !important; padding:0 !important; margin:0 !important; }
+  .nav-links li { list-style:none !important; }
+  .nav-link { color:var(--gris);text-decoration:none;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;transition:color .2s; }
+  .nav-link:hover { color:var(--blanco); }
+  .nav-link.active { color:var(--neon); }
+  /* NAV AVATAR NAME — truncate long usernames */
+  .nav-avatar-name { font-size:.78rem;color:var(--blanco);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+  /* NAV LINKS CLICKABLE FIX */
+  .nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap { pointer-events:auto !important; }
+  nav a, nav button { pointer-events:auto !important; }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+
+<nav>
+  <a href="index.html" class="nav-logo">busc<span>ARTE</span></a>
+  <div class="nav-search">
+    <input type="text" id="main-search" placeholder="Ej: bajista de jazz en Palermo...">
+    <button onclick="doSearch()">BUSCAR</button>
+  </div>
+  <div class="nav-right">
+    <ul class="nav-links" style="margin-right:.8rem">
+      <li><a href="buscARTE_busqueda.html" class="nav-link">Músicos</a></li>
+      <li><a href="buscARTE_anuncios.html" class="nav-link">Anuncios</a></li>
+      <li><a href="buscARTE_mensajes.html" class="nav-link">Mensajes</a></li>
+    </ul>
+    <div class="nav-guest" id="nav-guest">
+      <a href="buscARTE_login.html" class="btn-ghost">Ingresar</a>
+      <a href="buscARTE_registro.html" class="btn-neon">Registrarse</a>
+    </div>
+    <div class="nav-user" id="nav-user" style="display:none">
+      <div class="nav-avatar-wrap" onclick="toggleUserMenu()" id="nav-avatar-btn">
+        <div class="nav-avatar-circle" id="nav-avatar-circle">?</div>
+        <span class="nav-avatar-name" id="nav-avatar-name">Mi perfil</span>
+        <span class="nav-avatar-chevron">▾</span>
+      </div>
+      <div class="nav-dropdown" id="nav-dropdown">
+        <a href="buscARTE_perfil_publico.html" class="nav-dropdown-item">👤 Mi perfil</a>
+        <a href="buscARTE_perfil.html" class="nav-dropdown-item">⚙️ Configurar perfil</a>
+        <a href="buscARTE_mensajes.html" class="nav-dropdown-item">💬 Mensajes <span class="nav-badge" id="nav-msg-badge" style="display:none"></span></a>
+        <a href="buscARTE_mis_anuncios.html" class="nav-dropdown-item">📋 Mis anuncios</a>
+        <a href="buscARTE_guardados.html" class="nav-dropdown-item">♡ Guardados</a>
+        <div class="nav-dropdown-divider"></div>
+        <button class="nav-dropdown-item nav-logout" onclick="logout()">↩ Cerrar sesión</button>
+      </div>
+    </div>
+  </div>
+</nav>
+<div class="top-spacer"></div>
+
+<div class="layout">
+
+  <aside class="filters-panel">
+    <div class="filter-header">
+      <div class="filter-title">Filtros</div>
+      <button class="filter-clear" onclick="clearFilters()">Limpiar</button>
+    </div>
+    <div class="filter-group">
+      <span class="filter-group-label">Instrumento</span>
+      <div class="filter-chips">
+        <button class="fchip" onclick="toggleFilter(this)">Guitarra</button>
+        <button class="fchip" onclick="toggleFilter(this)">Bajo</button>
+        <button class="fchip" onclick="toggleFilter(this)">Batería</button>
+        <button class="fchip" onclick="toggleFilter(this)">Teclado</button>
+        <button class="fchip" onclick="toggleFilter(this)">Voz</button>
+        <button class="fchip" onclick="toggleFilter(this)">Saxo</button>
+        <button class="fchip" onclick="toggleFilter(this)">Violín</button>
+        <button class="fchip" onclick="toggleFilter(this)">Cello</button>
+        <button class="fchip" onclick="toggleFilter(this)">Trompeta</button>
+        <button class="fchip" onclick="toggleFilter(this)">Flauta</button>
+        <button class="fchip" onclick="toggleFilter(this)">Percusión</button>
+        <button class="fchip" onclick="toggleFilter(this)">DJ/Prod.</button>
+        <button class="fchip" onclick="toggleFilter(this)">Bandoneón</button>
+        <button class="fchip" onclick="toggleFilter(this)">Charango</button>
+        <button class="fchip" onclick="toggleFilter(this)">Arpa</button>
+        <button class="fchip" onclick="toggleFilter(this)">Otro</button>
+      </div>
+    </div>
+    <div class="filter-divider"></div>
+    <div class="filter-group">
+      <span class="filter-group-label">Género</span>
+      <div class="filter-chips">
+        <button class="fchip" onclick="toggleFilter(this)">Rock</button>
+        <button class="fchip" onclick="toggleFilter(this)">Rock Nacional</button>
+        <button class="fchip" onclick="toggleFilter(this)">Metal</button>
+        <button class="fchip" onclick="toggleFilter(this)">Jazz</button>
+        <button class="fchip" onclick="toggleFilter(this)">Folklore</button>
+        <button class="fchip" onclick="toggleFilter(this)">Tango</button>
+        <button class="fchip" onclick="toggleFilter(this)">Cumbia</button>
+        <button class="fchip" onclick="toggleFilter(this)">Indie</button>
+        <button class="fchip" onclick="toggleFilter(this)">Pop</button>
+        <button class="fchip" onclick="toggleFilter(this)">Electrónica</button>
+        <button class="fchip" onclick="toggleFilter(this)">R&B</button>
+        <button class="fchip" onclick="toggleFilter(this)">Rap / Hip Hop</button>
+        <button class="fchip" onclick="toggleFilter(this)">Funk</button>
+        <button class="fchip" onclick="toggleFilter(this)">Soul</button>
+        <button class="fchip" onclick="toggleFilter(this)">Reggae</button>
+        <button class="fchip" onclick="toggleFilter(this)">Tropical</button>
+        <button class="fchip" onclick="toggleFilter(this)">Punk</button>
+        <button class="fchip" onclick="toggleFilter(this)">Blues</button>
+        <button class="fchip" onclick="toggleFilter(this)">Prog</button>
+        <button class="fchip" onclick="toggleFilter(this)">Bossanova</button>
+        <button class="fchip" onclick="toggleFilter(this)">Clásica</button>
+        <button class="fchip" onclick="toggleFilter(this)">Otro</button>
+      </div>
+    </div>
+    <div class="filter-divider"></div>
+    <div class="filter-group">
+      <span class="filter-group-label">Ubicación</span>
+      <select style="margin-bottom:.6rem">
+        <option>Todo el país</option>
+        <option selected>Buenos Aires (CABA)</option>
+        <option>Gran Buenos Aires</option>
+        <option>Rosario</option>
+        <option>Córdoba</option>
+        <option>Mendoza</option>
+        <option>La Plata</option>
+        <option>Mar del Plata</option>
+        <option>Tucumán</option>
+        <option>Salta</option>
+      </select>
+      <input type="text" placeholder="Barrio / zona (ej: Almagro)">
+    </div>
+    <div class="filter-divider"></div>
+    <div class="filter-group">
+      <span class="filter-group-label">Busca</span>
+      <div class="filter-chips">
+        <button class="fchip" onclick="toggleFilter(this)">Banda</button>
+        <button class="fchip" onclick="toggleFilter(this)">Sesiones</button>
+        <button class="fchip" onclick="toggleFilter(this)">Zapada</button>
+        <button class="fchip" onclick="toggleFilter(this)">Proyecto</button>
+        <button class="fchip" onclick="toggleFilter(this)">Clases</button>
+      </div>
+    </div>
+    <div class="filter-divider"></div>
+    <div class="filter-group">
+      <span class="filter-group-label">Artista referente</span>
+      <input type="text" id="referente-input" placeholder="Ej: Linkin Park, Soda..." oninput="musicosOffset=0;cargarMusicos(false)">
+      <div style="font-size:.67rem;color:var(--gris2);margin-top:.4rem;line-height:1.5;">Músicos que escuchan lo mismo que vos</div>
+    </div>
+    <div class="filter-divider"></div>
+    <div class="filter-group">
+      <span class="filter-group-label">Extras</span>
+      <div class="filter-chips">
+        <button class="fchip" onclick="toggleFilter(this)">Con videos</button>
+        <button class="fchip" onclick="toggleFilter(this)">Online ahora</button>
+        <button class="fchip" onclick="toggleFilter(this)">Con local</button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="results-area">
+    <div class="results-header">
+      <div>
+        <div class="results-count"><span id="result-num">247</span> músicos</div>
+        <div class="results-sub" id="result-sub">todos los músicos</div>
+      </div>
+      <div class="results-controls">
+        <select class="sort-select">
+          <option>Mayor afinidad</option>
+          <option>Más recientes</option>
+          <option>Más activos</option>
+        </select>
+        <div class="view-toggle">
+          <button class="view-btn active" id="btn-grid" onclick="setView('grid')" title="Grilla">⊞</button>
+          <button class="view-btn" id="btn-list" onclick="setView('list')" title="Lista">☰</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="active-filters" id="active-filters"></div>
+
+    <div class="musicians-grid" id="musicians-grid">
+      <div style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--gris);font-size:.88rem" id="loading-state">
+        Cargando músicos...
+      </div>
+    </div>
+
+    <div class="load-more">
+      <button class="btn-load" id="btn-load-more" onclick="loadMore()" style="display:none">Cargar más músicos</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // PROTECCIÓN: redirigir si no está logueado
+  (function() {
+    try {
+      if (localStorage.getItem('ba_logged') !== '1') {
+        window.location.replace('index.html');
+      }
+    } catch(e) {}
+  })();
+  // CURSOR - esperar DOM
+  window.addEventListener('DOMContentLoaded', function() {
+    const cursor=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+    if (!cursor || !ring) return;
+    let mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+    (function tick(){cursor.style.left=mx+'px';cursor.style.top=my+'px';rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(tick);})();
+  });
+
+  // SUPABASE
+  const SUPABASE_URL = 'https://xiaanchoanxmampegoay.supabase.co'
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68'
+
+  const COLORES = ['#0d2010','#2a0a05','#050d2a','#1a0d2a','#2a1a05','#0d1a2a']
+  const TEXTO = ['var(--neon)','#ff6b5b','#5b9fff','#c45bff','#ffaa5b','#5bd4ff']
+
+  let offset = 0
+  const PER_PAGE = 9
+  let activeFilters = { instrumentos: [], generos: [], ciudad: '', busca: [], referente: '' }
+
+  function getInitials(nombre) {
+    if (!nombre) return '??'
+    return nombre.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)
+  }
+  function colorIdx(nombre) {
+    let h = 0
+    for (let c of (nombre||'')) h = (h * 31 + c.charCodeAt(0)) % COLORES.length
+    return h
+  }
+
+  function buildCard(p) {
+    const idx = colorIdx(p.nombre)
+    const initials = getInitials(p.nombre)
+    const generos = (p.generos||'').split(',').map(g=>g.trim()).filter(Boolean).slice(0,3)
+    const location = [p.barrio, p.ciudad].filter(Boolean).join(', ')
+    const tags = generos.map(g=>`<span class="ctag">${g}</span>`).join('')
+    const refs = p.referentes ? `🎵 <em>${p.referentes.split(',').slice(0,3).join(', ')}</em>` : ''
+    const bio = p.bio || (p.instrumento ? `Toca ${p.instrumento}` : 'Músico en buscARTE')
+
+    const avatarHTML = p.foto_url
+      ? `<div class="card-avatar" style="background:#000;overflow:hidden"><img src="${p.foto_url}" style="width:100%;height:100%;object-fit:cover"></div>`
+      : `<div class="card-avatar" style="background:${COLORES[idx]};color:${TEXTO[idx]}">${initials}</div>`
+
+    return `<div class="musician-card" data-id="${p.id}">
+      <div class="card-top">
+        ${avatarHTML}
+        <div class="card-info">
+          <div class="card-name">${p.nombre||'Sin nombre'}</div>
+          <div class="card-instrument">${p.instrumento||'Músico'}</div>
+          <div class="card-location">${location ? '📍 '+location : ''}</div>
+        </div>
+      </div>
+      ${tags ? `<div class="card-tags">${tags}</div>` : ''}
+      <div class="card-bio">${bio}</div>
+      <div class="card-footer">
+        <div class="card-refs">${refs}</div>
+        <a href="buscARTE_perfil_publico.html?id=${p.id}" class="card-cta">Ver perfil →</a>
+      </div>
+    </div>`
+  }
+
+  async function cargarMusicos(append = false) {
+    const grid = document.getElementById('musicians-grid')
+    const loading = document.getElementById('loading-state')
+
+    if (!append) {
+      grid.innerHTML = '<div style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--gris);font-size:.88rem" id="loading-state">Cargando músicos...</div>'
+      offset = 0
+    }
+
+    // Construir query con filtros
+    let query = `${SUPABASE_URL}/rest/v1/perfiles?select=id,nombre,instrumento,generos,ciudad,barrio,bio,referentes,disponibilidad,foto_url&order=created_at.desc&limit=${PER_PAGE}&offset=${offset}`
+
+    // Filtro de búsqueda por texto — diccionario de sinónimos
+    const searchVal = document.getElementById('main-search')?.value?.trim()
+
+    if (searchVal) {
+      const sv = searchVal.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+
+      // Diccionario: palabras clave → campos de Supabase
+      const instrMap = {
+        'guitarra':'Guitarra','guitarrista':'Guitarra','guitarrero':'Guitarra',
+        'bajo':'Bajo','bajista':'Bajo',
+        'bateria':'Batería','baterista':'Batería','drums':'Batería',
+        'teclado':'Teclado / Piano','piano':'Teclado / Piano','pianista':'Teclado / Piano','tecladista':'Teclado / Piano',
+        'voz':'Voz / Canto','canto':'Voz / Canto','cantante':'Voz / Canto','vocalista':'Voz / Canto','cantor':'Voz / Canto',
+        'violin':'Violín','violinista':'Violín',
+        'saxo':'Saxo','saxofonista':'Saxo','saxofon':'Saxo',
+        'trompeta':'Trompeta','trompetista':'Trompeta',
+        'percusion':'Percusión','percusionista':'Percusión',
+        'dj':'DJ / Productor','productor':'DJ / Productor',
+        'bandoneon':'Bandoneón','bandeonista':'Bandoneón',
+        'flauta':'Flauta','flautista':'Flauta',
+        'cello':'Cello','celos':'Cello','chelista':'Cello',
+        'charango':'Charango',
+        'arpa':'Arpa','harpista':'Arpa'
+      }
+      const genMap = {
+        'rock':'Rock','rockero':'Rock','rocker':'Rock',
+        'jazz':'Jazz','jazzero':'Jazz',
+        'folklore':'Folklore','folclorista':'Folklore','folklorista':'Folklore','folclore':'Folklore',
+        'tango':'Tango','tanguero':'Tango',
+        'cumbia':'Cumbia','cumbiero':'Cumbia',
+        'metal':'Metal','metalero':'Metal',
+        'pop':'Pop',
+        'indie':'Indie',
+        'funk':'Funk','funkero':'Funk',
+        'blues':'Blues',
+        'reggae':'Reggae',
+        'electronica':'Electrónica','electronico':'Electrónica','dj':'Electrónica',
+        'punk':'Punk',
+        'hip hop':'Rap/Hip Hop','rap':'Rap/Hip Hop','hiphop':'Rap/Hip Hop',
+        'clasica':'Clásica','clasico':'Clásica',
+        'bossanova':'Bossanova','bossa':'Bossanova',
+        'progresivo':'Prog','prog':'Prog',
+        'fusion':'Fusión'
+      }
+
+      // Partir búsqueda en palabras
+      const palabras = sv.split(/\s+/)
+      let instrDetected = null
+      let genDetected = null
+      let zonaWords = []
+
+      for (const p of palabras) {
+        if (instrMap[p]) { instrDetected = instrMap[p]; continue }
+        if (genMap[p]) { genDetected = genMap[p]; continue }
+        if (['en','de','del','la','el','un','una','para','con'].includes(p)) continue
+        // Solo agregar a zona si parece una ubicación (más de 3 letras y no es claramente un artista/término musical)
+        zonaWords.push(p)
+      }
+
+      const zona = zonaWords.join(' ').trim()
+
+      // Si no detectamos instrumento ni género, usar RPC full-text
+      // (evita que nombres de artistas como "deny" se busquen como zona)
+      if (!instrDetected && !genDetected) {
+        const rpcRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/buscar_musicos`, {
+          method: 'POST',
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ termino: searchVal })
+        })
+        const perfiles = await rpcRes.json()
+        if (!append) grid.innerHTML = ''
+        if (!perfiles.length) {
+          grid.innerHTML = `<div style="grid-column:1/-1;padding:4rem;text-align:center">
+            <div style="font-size:2rem;margin-bottom:1rem">🎸</div>
+            <div style="font-family:var(--font-display);font-size:1.4rem;margin-bottom:.5rem">Sin resultados</div>
+            <div style="color:var(--gris);font-size:.88rem">Probá con otro término o <a href="buscARTE_registro.html" style="color:var(--neon)">registrate</a> para aparecer acá.</div>
+          </div>`
+          document.getElementById('result-num').textContent = '0'
+          return
+        }
+        perfiles.forEach(p => grid.insertAdjacentHTML('beforeend', buildCard(p)))
+        document.getElementById('result-num').textContent = perfiles.length
+        document.getElementById('btn-load-more').style.display = 'none'
+        return
+      }
+
+      const sbRes = await fetch(q, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } })
+      let perfiles = await sbRes.json()
+
+      // Si no hay resultados con zona exacta, intentar solo instrumento/género
+      if (!perfiles.length && zona && (instrDetected || genDetected)) {
+        let q2 = `${SUPABASE_URL}/rest/v1/perfiles?select=id,nombre,instrumento,generos,ciudad,barrio,bio,referentes,disponibilidad,foto_url&order=created_at.desc`
+        if (instrDetected) q2 += `&instrumento=ilike.*${encodeURIComponent(instrDetected)}*`
+        if (genDetected) q2 += `&generos=ilike.*${encodeURIComponent(genDetected)}*`
+        const sbRes2 = await fetch(q2, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } })
+        perfiles = await sbRes2.json()
+      }
+
+      if (!append) grid.innerHTML = ''
+      if (!perfiles.length) {
+        grid.innerHTML = `<div style="grid-column:1/-1;padding:4rem;text-align:center">
+          <div style="font-size:2rem;margin-bottom:1rem">🎸</div>
+          <div style="font-family:var(--font-display);font-size:1.4rem;margin-bottom:.5rem">Sin resultados</div>
+          <div style="color:var(--gris);font-size:.88rem">Probá con otro término o <a href="buscARTE_registro.html" style="color:var(--neon)">registrate</a> para aparecer acá.</div>
+        </div>`
+        document.getElementById('result-num').textContent = '0'
+        return
+      }
+      perfiles.forEach(p => grid.insertAdjacentHTML('beforeend', buildCard(p)))
+      document.getElementById('result-num').textContent = perfiles.length
+      document.getElementById('btn-load-more').style.display = 'none'
+      return
+    }
+
+    // Sin texto — usar query normal con filtros de chips
+    if (!searchVal && activeFilters.instrumentos.length) {
+      query += `&instrumento=ilike.*${encodeURIComponent(activeFilters.instrumentos[0])}*`
+    }
+    // Filtro género (solo si no hay búsqueda de texto)
+    if (!searchVal && activeFilters.generos.length) {
+      query += `&generos=ilike.*${encodeURIComponent(activeFilters.generos[0])}*`
+    }
+    // Filtro ciudad siempre aplica
+    if (activeFilters.ciudad) {
+      query += `&ciudad=ilike.*${encodeURIComponent(activeFilters.ciudad)}*`
+    }
+    // Filtro artista referente
+    const refVal = document.getElementById('referente-input')?.value?.trim()
+    if (refVal) {
+      query += `&referentes=ilike.*${encodeURIComponent(refVal)}*`
+    }
+
+    try {
+      const res = await fetch(query, {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+      })
+      const perfiles = await res.json()
+
+      if (!append) grid.innerHTML = ''
+
+      if (!perfiles.length && !append) {
+        grid.innerHTML = `<div style="grid-column:1/-1;padding:4rem;text-align:center">
+          <div style="font-size:2rem;margin-bottom:1rem">🎸</div>
+          <div style="font-family:var(--font-display);font-size:1.4rem;margin-bottom:.5rem">Sin resultados</div>
+          <div style="color:var(--gris);font-size:.88rem">Probá cambiando los filtros o <a href="buscARTE_registro.html" style="color:var(--neon)">registrarte</a> para aparecer acá.</div>
+        </div>`
+        document.getElementById('result-num').textContent = '0'
+        return
+      }
+
+      perfiles.forEach(p => {
+        grid.insertAdjacentHTML('beforeend', buildCard(p))
+      })
+
+      // Contar total
+      const countRes = await fetch(
+        `${SUPABASE_URL}/rest/v1/perfiles?select=id`,
+        { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Prefer': 'count=exact' } }
+      )
+      const total = countRes.headers.get('content-range')?.split('/')[1] || perfiles.length
+      document.getElementById('result-num').textContent = total
+
+      offset += perfiles.length
+      document.getElementById('btn-load-more').style.display = perfiles.length === PER_PAGE ? 'inline-block' : 'none'
+
+    } catch(e) {
+      grid.innerHTML = '<div style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--gris)">Error al cargar. Verificá tu conexión.</div>'
+      console.error(e)
+    }
+  }
+
+  function loadMore() {
+    const btn = document.getElementById('btn-load-more')
+    btn.textContent = 'Cargando...'
+    cargarMusicos(true).then(() => btn.textContent = 'Cargar más músicos')
+  }
+
+  // FILTROS
+  function toggleFilter(el) {
+    el.classList.toggle('on')
+    const active = [...document.querySelectorAll('.fchip.on')].map(c=>c.textContent.trim())
+    document.getElementById('active-filters').innerHTML = active.map(f=>
+      `<span class="af-chip">${f} <button class="af-remove" onclick="this.closest('.af-chip').remove();applyFilters()">×</button></span>`
+    ).join('')
+    applyFilters()
+  }
+
+  function applyFilters() {
+    const onChips = [...document.querySelectorAll('.fchip.on')].map(c=>c.textContent.trim())
+    const instrLabels = ['Guitarra','Bajo','Batería','Teclado','Voz','Saxo','Violín','Cello','Trompeta','Flauta','Percusión','DJ/Prod.','Bandoneón','Charango','Arpa','Otro']
+    activeFilters.instrumentos = onChips.filter(c => instrLabels.includes(c))
+    activeFilters.generos = onChips.filter(c => !instrLabels.includes(c))
+    cargarMusicos(false)
+  }
+
+  function clearFilters() {
+    document.querySelectorAll('.fchip.on').forEach(c=>c.classList.remove('on'))
+    document.getElementById('active-filters').innerHTML = ''
+    activeFilters = { instrumentos:[], generos:[], ciudad:'', busca:[], referente:'' }
+    cargarMusicos(false)
+  }
+
+  function setView(v) {
+    document.getElementById('musicians-grid').classList.toggle('list-view',v==='list')
+    document.getElementById('btn-grid').classList.toggle('active',v==='grid')
+    document.getElementById('btn-list').classList.toggle('active',v==='list')
+  }
+
+  function doSearch() {
+    const q = document.getElementById('main-search').value
+    document.getElementById('result-sub').textContent = 'todos los músicos'
+    cargarMusicos(false)
+  }
+
+  window.addEventListener('DOMContentLoaded', function() {
+    // Buscar al presionar Enter
+    document.getElementById('main-search').addEventListener('keydown', e => {
+      if (e.key === 'Enter') doSearch()
+    })
+
+    // Leer parámetros del index si vienen
+    const urlParams = new URLSearchParams(window.location.search)
+    if (urlParams.get('q')) document.getElementById('main-search').value = urlParams.get('q')
+    if (urlParams.get('instrumento')) {
+      const chip = [...document.querySelectorAll('.filter-chip, .fchip')].find(c => c.textContent.trim() === urlParams.get('instrumento'))
+      if (chip) { chip.classList.add('active','on'); activeFilters.instrumentos = [urlParams.get('instrumento')] }
+    }
+    if (urlParams.get('genero')) {
+      const chip = [...document.querySelectorAll('.filter-chip, .fchip')].find(c => c.textContent.trim() === urlParams.get('genero'))
+      if (chip) { chip.classList.add('active','on'); activeFilters.generos = [urlParams.get('genero')] }
+    }
+
+    cargarMusicos(false);
+  });
+
+  // NAV SESSION
+  (function initNav(){
+    const l=localStorage.getItem('ba_logged')==='1';
+    const n=localStorage.getItem('ba_name')||'Mi perfil';
+    const uid=localStorage.getItem('ba_user_id')||'';
+    const i=n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    if(l){
+      const g=document.getElementById('nav-guest');
+      const u=document.getElementById('nav-user');
+      if(g)g.style.display='none';
+      if(u)u.style.display='flex';
+      const c=document.getElementById('nav-avatar-circle');
+      if(c)c.textContent=i;
+      const nm=document.getElementById('nav-avatar-name');
+      if(nm)nm.textContent=n.split(' ')[0];
+      const b=document.getElementById('nav-msg-badge');
+      if(b)b.style.display='inline';
+      const miPerfilLink=document.querySelector('.nav-dropdown-item[href*="perfil_publico"]');
+      if(miPerfilLink && uid) miPerfilLink.href='buscARTE_perfil_publico.html?id='+uid;
+    }
+  })();
+  function toggleUserMenu(){const w=document.getElementById('nav-avatar-btn');const d=document.getElementById('nav-dropdown');if(w)w.classList.toggle('open');if(d)d.classList.toggle('open');}
+  document.addEventListener('click',e=>{if(!e.target.closest('#nav-user')){document.getElementById('nav-avatar-btn')?.classList.remove('open');document.getElementById('nav-dropdown')?.classList.remove('open');}});
+  function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');window.location.href='index.html';}
+</script>
+</body>
+</html>

@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lucía Moreno — buscARTE</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --negro:#080808; --negro2:#111; --negro3:#1a1a1a;
+    --blanco:#f2ede4; --neon:#d4f53c; --rojo:#e8311a;
+    --gris:#888; --gris2:#444; --gris3:#2a2a2a;
+    --font-display:'Archivo Black',sans-serif;
+    --font-body:'Archivo',sans-serif;
+  }
+  body { background:var(--negro); color:var(--blanco); font-family:var(--font-body); font-weight:300; min-height:100vh; overflow-x:hidden; cursor:none; }
+  .cursor { width:10px;height:10px;background:var(--neon);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%); }
+  .cursor-ring { width:36px;height:36px;border:1px solid rgba(212,245,60,0.35);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .15s ease; }
+  body::before { content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");opacity:.03;pointer-events:none;z-index:1000; }
+
+  /* NAV */
+  nav { position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1rem 2.5rem;border-bottom:1px solid #1c1c1c;background:rgba(8,8,8,0.96);backdrop-filter:blur(12px); }
+  .nav-logo { font-family:var(--font-display);font-size:1.4rem;color:var(--blanco);text-decoration:none; }
+  .nav-logo span { color:var(--neon); }
+  .nav-back { color:var(--gris);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;transition:color .2s;display:flex;align-items:center;gap:.4rem; }
+  .nav-back:hover { color:var(--blanco); }
+  .nav-right { display:flex;gap:.8rem; }
+  .btn-ghost { background:transparent;border:1px solid var(--gris2);color:var(--blanco);padding:.48rem 1rem;font-family:var(--font-body);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;cursor:none;transition:border-color .2s;text-decoration:none;display:inline-block; }
+  .btn-ghost:hover { border-color:var(--blanco); }
+  .btn-neon { background:var(--neon);border:none;color:var(--negro);padding:.48rem 1rem;font-family:var(--font-body);font-weight:500;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;cursor:none;transition:opacity .2s;text-decoration:none;display:inline-block; }
+  .btn-neon:hover { opacity:.85; }
+  .top-spacer { height:60px; }
+
+  /* HERO DEL PERFIL */
+  .profile-hero {
+    border-bottom:1px solid #1c1c1c;
+    padding:3.5rem 4rem 2.5rem;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero-bg-name {
+    position:absolute;
+    right:-2rem; top:50%;
+    transform:translateY(-50%);
+    font-family:var(--font-display);
+    font-size:11rem;
+    color:transparent;
+    -webkit-text-stroke:1px #161616;
+    line-height:1;
+    pointer-events:none;
+    user-select:none;
+    letter-spacing:-.04em;
+    white-space:nowrap;
+  }
+  .hero-content { display:grid;grid-template-columns:auto 1fr auto;gap:2.5rem;align-items:start;position:relative;z-index:1; }
+
+  /* AVATAR GRANDE */
+  .profile-avatar-wrap { position:relative; }
+  .profile-avatar {
+    width:110px;height:110px;border-radius:50%;
+    background:#0d2010;
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-display);font-size:2.2rem;
+    color:var(--neon);
+    border:2px solid #1c1c1c;
+    flex-shrink:0;
+  }
+  .profile-online {
+    position:absolute;bottom:6px;right:6px;
+    width:14px;height:14px;background:#4caf50;
+    border-radius:50%;border:3px solid var(--negro);
+  }
+  .premium-ring {
+    position:absolute;inset:-4px;
+    border-radius:50%;
+    border:2px solid var(--neon);
+    pointer-events:none;
+  }
+
+  /* INFO PRINCIPAL */
+  .profile-main { }
+  .profile-top-row { display:flex;align-items:center;gap:1rem;margin-bottom:.4rem;flex-wrap:wrap; }
+  .profile-name { font-family:var(--font-display);font-size:2.4rem;letter-spacing:-.02em;line-height:1; }
+  .profile-premium-badge { background:var(--neon);color:var(--negro);font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.2rem .55rem;margin-top:.3rem; }
+  .profile-instrument { font-size:1rem;color:var(--neon);margin-bottom:.3rem; }
+  .profile-location { font-size:.82rem;color:var(--gris);margin-bottom:1rem;display:flex;align-items:center;gap:.3rem; }
+
+  .profile-tagline {
+    font-size:.95rem;color:var(--blanco);line-height:1.65;
+    max-width:600px;margin-bottom:1.2rem;
+    padding-left:1rem;
+    border-left:2px solid var(--neon);
+    font-style:italic;
+    font-weight:300;
+  }
+  .ai-label { font-size:.62rem;color:var(--gris2);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.3rem;display:flex;align-items:center;gap:.3rem; }
+  .ai-label::before { content:'✦';color:var(--neon);font-size:.6rem; }
+
+  .profile-tags { display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:0; }
+  .ptag { font-size:.7rem;padding:.2rem .6rem;border:1px solid var(--gris3);color:var(--gris);text-transform:uppercase;letter-spacing:.07em; }
+  .ptag-neon { border-color:rgba(212,245,60,.35);color:var(--neon); }
+
+  /* ACCIONES */
+  .profile-actions { display:flex;flex-direction:column;gap:.7rem;align-items:flex-end; }
+  .btn-contact {
+    background:var(--neon);border:none;color:var(--negro);
+    padding:.75rem 1.8rem;font-family:var(--font-display);
+    font-size:.9rem;letter-spacing:.04em;cursor:none;
+    transition:opacity .2s;white-space:nowrap;
+  }
+  .btn-contact:hover { opacity:.85; }
+  .btn-save {
+    background:transparent;border:1px solid var(--gris3);color:var(--gris);
+    padding:.75rem 1.8rem;font-family:var(--font-body);
+    font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;
+    cursor:none;transition:all .2s;white-space:nowrap;
+  }
+  .btn-save:hover { border-color:var(--blanco);color:var(--blanco); }
+  .profile-match-hero {
+    text-align:center;padding:.8rem 1.2rem;
+    border:1px solid rgba(212,245,60,.2);
+    background:rgba(212,245,60,.04);
+  }
+  .match-big { font-family:var(--font-display);font-size:2rem;color:var(--neon);line-height:1; }
+  .match-big-label { font-size:.6rem;color:var(--gris);letter-spacing:.1em;text-transform:uppercase;margin-top:.1rem; }
+
+  /* STATS ROW */
+  .profile-stats {
+    display:flex;gap:0;border-top:1px solid #1c1c1c;
+    margin-top:2rem;
+  }
+  .pstat { padding:1rem 2rem;border-right:1px solid #1c1c1c;display:flex;flex-direction:column;gap:.15rem; }
+  .pstat:last-child { border-right:none; }
+  .pstat-num { font-family:var(--font-display);font-size:1.3rem;letter-spacing:-.01em; }
+  .pstat-num span { color:var(--neon); }
+  .pstat-label { font-size:.65rem;color:var(--gris);text-transform:uppercase;letter-spacing:.1em; }
+
+  /* LAYOUT BODY */
+  .profile-body { display:grid;grid-template-columns:1fr 320px;gap:0; }
+
+  /* CONTENIDO PRINCIPAL */
+  .profile-content { padding:2.5rem 4rem;border-right:1px solid #1c1c1c; }
+
+  .section { margin-bottom:2.8rem; }
+  .section-title {
+    font-family:var(--font-display);font-size:1rem;letter-spacing:.04em;
+    margin-bottom:1.2rem;padding-bottom:.7rem;
+    border-bottom:1px solid #1c1c1c;
+    display:flex;align-items:center;gap:.5rem;
+    color:var(--gris);text-transform:uppercase;font-size:.72rem;letter-spacing:.18em;
+  }
+  .section-title .icon { font-size:.9rem; }
+
+  /* BIO */
+  .bio-text { font-size:.92rem;color:var(--blanco);line-height:1.8;font-weight:300; }
+
+  /* GÉNEROS */
+  .generos-grid { display:flex;flex-wrap:wrap;gap:.5rem; }
+  .genero-chip { padding:.4rem 1rem;border:1px solid var(--gris3);color:var(--gris);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;transition:all .2s;cursor:none; }
+  .genero-chip:hover { border-color:var(--neon);color:var(--neon); }
+  .genero-chip.primary { border-color:rgba(212,245,60,.4);color:var(--neon); }
+
+  /* REFERENTES */
+  .referentes-list { display:flex;flex-wrap:wrap;gap:.5rem; }
+  .ref-chip { display:flex;align-items:center;gap:.5rem;padding:.45rem 1rem;background:var(--negro2);border:1px solid var(--gris3);font-size:.8rem;color:var(--blanco);transition:border-color .2s;cursor:none; }
+  .ref-chip:hover { border-color:var(--gris2); }
+  .ref-icon { font-size:.85rem; }
+
+  /* VIDEOS */
+  .videos-grid { display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#1c1c1c; }
+  .video-item {
+    background:var(--negro2);
+    aspect-ratio:16/9;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:.6rem;cursor:none;transition:background .2s;
+    position:relative;overflow:hidden;
+    text-decoration:none;
+  }
+  .video-item:hover { background:#161616; }
+  .video-item:hover .play-btn { transform:scale(1.1); }
+  .play-btn {
+    width:44px;height:44px;border-radius:50%;
+    background:rgba(212,245,60,.15);border:1px solid rgba(212,245,60,.3);
+    display:flex;align-items:center;justify-content:center;
+    font-size:1rem;transition:transform .2s;
+    color:var(--neon);
+  }
+  .video-platform { font-size:.7rem;color:var(--gris);letter-spacing:.08em;text-transform:uppercase; }
+  .video-label { font-size:.75rem;color:var(--blanco);text-align:center;padding:0 1rem; }
+  .video-item-empty {
+    background:var(--negro);
+    border:1px dashed var(--gris3);
+    aspect-ratio:16/9;
+    display:flex;align-items:center;justify-content:center;
+    font-size:.75rem;color:var(--gris2);
+  }
+
+  /* DISPONIBILIDAD */
+  .disp-chips { display:flex;flex-wrap:wrap;gap:.5rem; }
+  .disp-chip { padding:.4rem 1rem;border:1px solid var(--gris3);font-size:.75rem;color:var(--gris);text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center;gap:.4rem; }
+  .disp-chip.active { border-color:rgba(212,245,60,.35);color:var(--neon); }
+
+  /* REDES */
+  .redes-list { display:flex;flex-wrap:wrap;gap:.5rem; }
+  .red-link { display:flex;align-items:center;gap:.5rem;padding:.45rem 1rem;border:1px solid var(--gris3);color:var(--gris);font-size:.8rem;text-decoration:none;transition:all .2s;cursor:none; }
+  .red-link:hover { border-color:var(--blanco);color:var(--blanco); }
+
+  /* SIDEBAR DERECHA */
+  .profile-sidebar { padding:2.5rem 2rem; }
+
+  .sidebar-card { border:1px solid #1c1c1c;padding:1.5rem;margin-bottom:1.5rem;background:var(--negro2); }
+  .sidebar-card-title { font-family:var(--font-display);font-size:.85rem;letter-spacing:.04em;margin-bottom:1rem;color:var(--gris);text-transform:uppercase;font-size:.68rem;letter-spacing:.15em; }
+
+  /* CONTACTO */
+  .contact-form { display:flex;flex-direction:column;gap:.7rem; }
+  .contact-form textarea {
+    background:var(--negro);border:1px solid var(--gris3);color:var(--blanco);
+    padding:.8rem;font-family:var(--font-body);font-size:.82rem;font-weight:300;
+    outline:none;resize:none;height:90px;transition:border-color .2s;
+  }
+  .contact-form textarea:focus { border-color:var(--neon); }
+  .contact-form textarea::placeholder { color:var(--gris2); }
+  .btn-send {
+    background:var(--neon);border:none;color:var(--negro);
+    padding:.75rem;font-family:var(--font-display);font-size:.85rem;
+    letter-spacing:.04em;cursor:none;transition:opacity .2s;width:100%;
+  }
+  .btn-send:hover { opacity:.85; }
+  .login-note { font-size:.7rem;color:var(--gris2);text-align:center;line-height:1.5; }
+  .login-note a { color:var(--neon);text-decoration:none; }
+
+  /* MÚSICOS SIMILARES */
+  .similar-list { display:flex;flex-direction:column;gap:0; }
+  .similar-item {
+    display:flex;align-items:center;gap:.8rem;
+    padding:.8rem 0;border-bottom:1px solid #1c1c1c;
+    text-decoration:none;cursor:none;transition:opacity .2s;
+  }
+  .similar-item:last-child { border-bottom:none; }
+  .similar-item:hover { opacity:.75; }
+  .sim-avatar { width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.75rem;flex-shrink:0; }
+  .sim-info { flex:1;min-width:0; }
+  .sim-name { font-size:.82rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+  .sim-meta { font-size:.7rem;color:var(--gris); }
+  .sim-match { font-family:var(--font-display);font-size:.9rem;color:var(--neon);flex-shrink:0; }
+
+  /* REPORTAR */
+  .report-link { font-size:.68rem;color:var(--gris2);text-align:center;display:block;cursor:none;transition:color .2s;text-decoration:none;margin-top:.5rem; }
+  .report-link:hover { color:var(--gris); }
+
+  /* ANIMACIONES */
+  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+  .profile-hero { animation:fadeUp .5s ease both; }
+  .profile-content { animation:fadeUp .5s .1s ease both; }
+  .profile-sidebar { animation:fadeUp .5s .15s ease both; }
+  /* NAV DROPDOWN */
+  .nav-user { position:relative; }
+  .nav-avatar-wrap { display:flex;align-items:center;gap:.5rem;cursor:none;padding:.3rem .6rem;border:1px solid var(--gris3);transition:border-color .2s;user-select:none; }
+  .nav-avatar-wrap:hover { border-color:var(--gris2); }
+  .nav-avatar-circle { width:28px;height:28px;border-radius:50%;background:#0d2010;color:var(--neon);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.62rem;flex-shrink:0; }
+  .nav-avatar-name { font-size:.78rem;color:var(--blanco); }
+  .nav-avatar-chevron { font-size:.6rem;color:var(--gris);transition:transform .2s; }
+  .nav-avatar-wrap.open .nav-avatar-chevron { transform:rotate(180deg); }
+  .nav-dropdown { position:absolute;top:calc(100% + 8px);right:0;background:var(--negro2);border:1px solid #2a2a2a;min-width:200px;display:none;flex-direction:column;z-index:300; }
+  .nav-dropdown.open { display:flex; }
+  .nav-dropdown-item { display:flex;align-items:center;gap:.6rem;padding:.75rem 1.1rem;color:var(--gris);text-decoration:none;font-size:.82rem;transition:all .15s;background:transparent;border:none;font-family:var(--font-body);cursor:none;text-align:left;width:100%; }
+  .nav-dropdown-item:hover { background:rgba(255,255,255,.04);color:var(--blanco); }
+  .nav-dropdown-divider { height:1px;background:#1c1c1c;margin:.3rem 0; }
+  .nav-logout:hover { color:var(--rojo) !important; }
+  .nav-badge { background:var(--neon);color:var(--negro);font-size:.55rem;font-weight:700;padding:.1rem .4rem;margin-left:auto; }
+  /* NAV LINKS FIX */
+  .nav-links { list-style:none !important; display:flex !important; gap:2rem !important; padding:0 !important; margin:0 !important; }
+  .nav-links li { list-style:none !important; }
+  .nav-link { color:var(--gris);text-decoration:none;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;transition:color .2s; }
+  .nav-link:hover { color:var(--blanco); }
+  .nav-link.active { color:var(--neon); }
+  /* NAV AVATAR NAME — truncate long usernames */
+  .nav-avatar-name { font-size:.78rem;color:var(--blanco);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+  /* NAV LINKS CLICKABLE FIX */
+  .nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap { pointer-events:auto !important; }
+  nav a, nav button { pointer-events:auto !important; }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+
+<nav>
+  <a href="index.html" class="nav-logo">busc<span>ARTE</span></a>
+  <a href="buscARTE_busqueda.html" class="nav-back">← Volver a resultados</a>
+  <div class="nav-right">
+      <div class="nav-guest" id="nav-guest">
+      <a href="buscARTE_login.html" class="btn-ghost">Ingresar</a>
+      <a href="buscARTE_registro.html" class="btn-neon">Registrarse</a>
+    </div>
+    <div class="nav-user" id="nav-user" style="display:none">
+      <div class="nav-avatar-wrap" onclick="toggleUserMenu()" id="nav-avatar-btn">
+        <div class="nav-avatar-circle" id="nav-avatar-circle">?</div>
+        <span class="nav-avatar-name" id="nav-avatar-name">Mi perfil</span>
+        <span class="nav-avatar-chevron">&#9662;</span>
+      </div>
+      <div class="nav-dropdown" id="nav-dropdown">
+        <a href="buscARTE_perfil_publico.html" class="nav-dropdown-item">&#128100; Mi perfil</a>
+        <a href="buscARTE_perfil.html" class="nav-dropdown-item">&#9881;&#65039; Configurar perfil</a>
+        <a href="buscARTE_mensajes.html" class="nav-dropdown-item">&#128172; Mensajes <span class="nav-badge" id="nav-msg-badge" style="display:none"></span></a>
+        <a href="buscARTE_mis_anuncios.html" class="nav-dropdown-item">&#128203; Mis anuncios</a>
+        <a href="buscARTE_guardados.html" class="nav-dropdown-item">&#9825; Guardados</a>
+        <div class="nav-dropdown-divider"></div>
+        <button class="nav-dropdown-item nav-logout" onclick="logout()">&#8617; Cerrar sesión</button>
+      </div>
+    </div>
+  </div>
+</nav>
+<div class="top-spacer"></div>
+
+<!-- HERO -->
+<div class="profile-hero">
+  <div class="hero-bg-name" id="hero-bg-name">—</div>
+  <div class="hero-content">
+
+    <div class="profile-avatar-wrap">
+      <div class="profile-avatar" id="perfil-avatar">?</div>
+      <div class="profile-online"></div>
+      <div class="premium-ring"></div>
+    </div>
+
+    <div class="profile-main">
+      <div class="profile-top-row">
+        <div class="profile-name" id="perfil-nombre">—</div>
+        <span class="profile-premium-badge">★ Premium</span>
+      </div>
+      <div class="profile-instrument" id="perfil-instrumento">—</div>
+      <div class="profile-location" id="perfil-ubicacion"></div>
+
+      <div class="ai-label">✦ Resumen generado por buscARTE IA</div>
+      <div class="profile-tagline" id="perfil-tagline" style="color:var(--gris);font-size:.82rem;font-style:italic">
+        Generando resumen...
+      </div>
+
+      <div class="profile-tags" id="perfil-tags">
+        
+        
+        
+        <span class="ptag">Funk</span>
+        <span class="ptag">Bossanova</span>
+      </div>
+    </div>
+
+    <div class="profile-actions">
+      <div class="profile-match-hero">
+        <div class="match-big" style="display:none">98%</div>
+        <div class="match-big-label" style="display:none">afinidad</div>
+      </div>
+      <button class="btn-contact" onclick="document.querySelector('.contact-form textarea').focus()">Contactar →</button>
+      <button class="btn-save" id="save-btn" onclick="toggleSave()">♡ Guardar perfil</button>
+    </div>
+
+  </div>
+
+  <div class="profile-stats">
+    <div class="pstat">
+      <div class="pstat-num" id="stat-exp">—</div>
+      <div class="pstat-label">Experiencia</div>
+    </div>
+    <div class="pstat">
+      <div class="pstat-num" id="stat-videos">—</div>
+      <div class="pstat-label">Tocando</div>
+    </div>
+    <div class="pstat">
+      <div class="pstat-num">🎵<span></span></div>
+      <div class="pstat-label">—</div>
+    </div>
+    <div class="pstat">
+      <div class="pstat-num" style="color:var(--neon)">—</div>
+      <div class="pstat-label">Ahora mismo</div>
+    </div>
+    <div class="pstat">
+      <div class="pstat-num">—<span></span></div>
+      <div class="pstat-label">Zona de actividad</div>
+    </div>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="profile-body">
+
+  <!-- CONTENIDO -->
+  <div class="profile-content">
+
+    <div class="section">
+      <div class="section-title"><span class="icon">👤</span> Sobre mí</div>
+      <p class="bio-text" id="perfil-bio-text">—</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon">🎵</span> Géneros</div>
+      <div class="generos-grid" id="perfil-generos">—</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon">🎸</span> Referentes musicales</div>
+      <div class="referentes-list" id="perfil-referentes">—</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon">🎬</span> Videos tocando</div>
+      <div class="videos-grid" id="perfil-videos"><div class="video-item-empty">Sin videos cargados</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon">📅</span> Disponible para</div>
+      <div class="disp-chips" id="perfil-disponibilidad">—</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon">🔗</span> Redes</div>
+      <div class="redes-list" id="perfil-redes">—</div>
+    </div>
+
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="profile-sidebar">
+
+    <div class="sidebar-card">
+      <div class="sidebar-card-title">Enviar mensaje</div>
+      <div class="contact-form">
+        <textarea placeholder="Escribí tu mensaje..."></textarea>
+        <button class="btn-send" onclick="sendMessage()">Enviar →</button>
+        <p class="login-note">¿No tenés cuenta? <a href="buscARTE_registro.html">Registrate gratis</a> para contactar músicos.</p>
+      </div>
+    </div>
+
+    <a href="#" class="report-link" onclick="return false">⚑ Reportar perfil</a>
+
+  </div>
+</div>
+
+<script>
+  // PROTECCIÓN: redirigir si no está logueado
+  (function() {
+    try {
+      if (localStorage.getItem('ba_logged') !== '1') {
+        window.location.replace('index.html');
+      }
+    } catch(e) {}
+  })();
+  window.addEventListener('DOMContentLoaded', function() {
+    const cursor=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+    if (!cursor || !ring) return;
+    let mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+    (function tick(){cursor.style.left=mx+'px';cursor.style.top=my+'px';rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(tick);})();
+  });
+
+  let saved = false;
+  // GUARDAR / DESGUARDAR PERFIL
+  let yaGuardado = false
+
+  async function toggleSave() {
+    const miId = localStorage.getItem('ba_user_id')
+    if (!miId) { window.location.href = 'buscARTE_login.html'; return }
+    const params = new URLSearchParams(window.location.search)
+    const perfilId = params.get('id') || miId
+    const btn = document.getElementById('save-btn')
+
+    if (yaGuardado) {
+      await fetch(`${SUPABASE_URL}/rest/v1/perfiles_guardados?user_id=eq.${miId}&perfil_id=eq.${perfilId}`, {
+        method: 'DELETE', headers: hdrs
+      })
+      yaGuardado = false
+      btn.textContent = '♡ Guardar perfil'
+      btn.style.background = ''
+      btn.style.color = ''
+    } else {
+      await fetch(`${SUPABASE_URL}/rest/v1/perfiles_guardados`, {
+        method: 'POST',
+        headers: { ...hdrs, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ user_id: parseInt(miId), perfil_id: parseInt(perfilId) })
+      })
+      yaGuardado = true
+      btn.textContent = '♥ Guardado'
+      btn.style.background = 'rgba(255,85,85,.15)'
+      btn.style.color = '#ff5555'
+    }
+  }
+
+  async function verificarGuardado(perfilId) {
+    const miId = localStorage.getItem('ba_user_id')
+    if (!miId || miId === String(perfilId)) {
+      document.getElementById('save-btn').style.display = 'none'
+      return
+    }
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles_guardados?user_id=eq.${miId}&perfil_id=eq.${perfilId}&select=id`, { headers: hdrs })
+      const data = await res.json()
+      yaGuardado = data.length > 0
+      const btn = document.getElementById('save-btn')
+      if (yaGuardado) {
+        btn.textContent = '♥ Guardado'
+        btn.style.background = 'rgba(255,85,85,.15)'
+        btn.style.color = '#ff5555'
+      }
+    } catch(e) {}
+  }
+
+  // SUPABASE
+  const SUPABASE_URL = 'https://xiaanchoanxmampegoay.supabase.co'
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68'
+  const hdrs = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }
+
+  // CARGAR PERFIL REAL DESDE URL
+  async function cargarPerfilPublico() {
+    const params = new URLSearchParams(window.location.search)
+    const id = params.get('id') || localStorage.getItem('ba_user_id')
+    if (!id) return
+
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${id}&select=*`, { headers: hdrs })
+      const [p] = await res.json()
+      if (!p) return
+
+      const initials = p.nombre ? p.nombre.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) : '?'
+      const generos = (p.generos||'').split(',').map(g=>g.trim()).filter(Boolean)
+      const instrumento = (p.instrumento||'').split(',').map(i=>i.trim()).filter(Boolean)
+      const ubicacion = [p.barrio, p.ciudad].filter(Boolean).join(', ')
+
+      // Hero background name
+      const heroBg = document.getElementById('hero-bg-name')
+      if (heroBg) heroBg.textContent = (p.nombre||'').split(' ')[0].toUpperCase()
+
+      // Actualizar elementos por ID
+      const av = document.getElementById('perfil-avatar')
+      if (av) {
+        if (p.foto_url) {
+          av.innerHTML = `<img src="${p.foto_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`
+        } else {
+          av.textContent = initials
+        }
+      }
+
+      const nom = document.getElementById('perfil-nombre')
+      if (nom) nom.textContent = p.nombre || 'Sin nombre'
+
+      const inst = document.getElementById('perfil-instrumento')
+      if (inst) inst.textContent = instrumento.join(' · ') || 'Músico'
+
+      const ubi = document.getElementById('perfil-ubicacion')
+      if (ubi) ubi.textContent = ubicacion ? '📍 ' + ubicacion : ''
+
+      // Bio
+      const bioEl = document.getElementById('perfil-bio-text') || document.getElementById('perfil-bio')
+      if (bioEl) bioEl.innerHTML = p.bio ? p.bio.replace(/\n/g,'<br>') : '—'
+
+      // Géneros
+      const generosEl = document.getElementById('perfil-generos')
+      if (generosEl) {
+        generosEl.innerHTML = generos.length
+          ? generos.map(g=>`<span class="genero-chip primary">${g}</span>`).join('')
+          : '—'
+      }
+
+      // Tags (hero)
+      const tags = document.getElementById('perfil-tags')
+      if (tags) {
+        tags.innerHTML = generos.slice(0,3).map(g=>`<span class="ptag">${g}</span>`).join('')
+      }
+
+      // Referentes
+      const refsEl = document.getElementById('perfil-referentes') || document.getElementById('perfil-refs')
+      if (refsEl) {
+        refsEl.innerHTML = p.referentes
+          ? p.referentes.split(',').map(r=>`<span class="ref-chip"><span class="ref-icon">🎸</span>${r.trim()}</span>`).join('')
+          : '—'
+      }
+
+      // Disponibilidad
+      const dispEl = document.getElementById('perfil-disponibilidad')
+      if (dispEl) {
+        dispEl.innerHTML = p.disponibilidad
+          ? p.disponibilidad.split(',').map(d=>`<span class="disp-chip active">${d.trim()}</span>`).join('')
+          : '—'
+      }
+
+      // Videos
+      const videosEl = document.getElementById('perfil-videos')
+      if (videosEl && p.videos) {
+        const links = p.videos.split(',').map(v=>v.trim()).filter(Boolean)
+        if (links.length) {
+          videosEl.innerHTML = links.map(link=>`
+            <a href="${link}" target="_blank" class="video-item">
+              <div class="play-btn">▶</div>
+              <div class="video-platform">${link.includes('youtube') ? 'YouTube' : link.includes('instagram') ? 'Instagram' : 'Video'}</div>
+              <div class="video-label">${link}</div>
+            </a>`).join('') + '<div class="video-item-empty">+ Espacio disponible</div>'
+        }
+      }
+
+      // Redes
+      const redesEl = document.getElementById('perfil-redes')
+      if (redesEl) {
+        let redesHtml = ''
+        // WhatsApp/celular primero si existe
+        if (p.celular) {
+          const numeroLimpio = p.celular.replace(/\D/g,'')
+          redesHtml += `<a href="https://wa.me/${numeroLimpio}" target="_blank" class="red-link" style="background:rgba(37,211,102,.1);border-color:rgba(37,211,102,.3);color:#25d366">💬 WhatsApp</a>`
+        }
+        if (p.redes) {
+          try {
+            const redes = JSON.parse(p.redes)
+            const links = Object.entries(redes).filter(([,v])=>v).map(([k,v])=>
+              `<a href="${v.startsWith('http')?v:'https://'+v}" target="_blank" class="red-link">${k} ${v}</a>`
+            )
+            redesHtml += links.join('')
+          } catch(e) {}
+        }
+        redesEl.innerHTML = redesHtml || '—'
+      }
+
+      // Stats
+      const statExp = document.getElementById('stat-exp')
+      if (statExp) statExp.innerHTML = p.disponibilidad ? `${p.disponibilidad.split(',').length}<span> items</span>` : '—'
+      const statVideos = document.getElementById('stat-videos')
+      if (statVideos) {
+        const videoCount = p.videos ? p.videos.split(',').filter(v=>v.trim()).length : 0
+        statVideos.innerHTML = videoCount ? `${videoCount}<span> videos</span>` : '—'
+      }
+
+      // Zona de actividad
+      const pstats = document.querySelectorAll('.pstat-num')
+      if (pstats[4]) pstats[4].textContent = p.ciudad || '—'
+
+      // % Afinidad basado en artistas favoritos compartidos
+      let miReferentes = localStorage.getItem('ba_referentes') || ''
+      let miGeneros = localStorage.getItem('ba_generos') || ''
+      // Si no está en localStorage, intentar cargar desde Supabase
+      if (!miReferentes && localStorage.getItem('ba_user_id')) {
+        try {
+          const miRes = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${localStorage.getItem('ba_user_id')}&select=referentes,generos`, { headers: hdrs })
+          const [miP] = await miRes.json()
+          if (miP) { miReferentes = miP.referentes||''; miGeneros = miP.generos||'' }
+        } catch(e) {}
+      }
+      const afinidadEl = document.querySelector('.match-big')
+      if (afinidadEl && p.id !== parseInt(localStorage.getItem('ba_user_id'))) {
+        const misRef = miReferentes.toLowerCase().split(',').map(r=>r.trim()).filter(Boolean)
+        const susRef = (p.referentes||'').toLowerCase().split(',').map(r=>r.trim()).filter(Boolean)
+        const misGen = miGeneros.toLowerCase().split(',').map(g=>g.trim()).filter(Boolean)
+        const susGen = (p.generos||'').toLowerCase().split(',').map(g=>g.trim()).filter(Boolean)
+        let pts = 0
+        misRef.forEach(r => { if (susRef.some(sr => sr.includes(r) || r.includes(sr))) pts += 2 })
+        misGen.forEach(g => { if (susGen.includes(g)) pts += 1 })
+        const maxPts = Math.max(misRef.length * 2 + misGen.length, 1)
+        const pct = Math.min(Math.round((pts / maxPts) * 100), 99)
+        if (pct > 0) {
+          afinidadEl.textContent = pct + '%'
+          afinidadEl.style.display = 'block'
+          document.querySelector('.match-big-label').style.display = 'block'
+        }
+      }
+
+      // Verificar si ya está guardado
+      verificarGuardado(id)
+
+      // Título de la página y placeholder contacto
+      document.title = `buscARTE — ${p.nombre}`
+      const textarea = document.querySelector('.contact-form textarea')
+      if (textarea) textarea.placeholder = `Hola ${p.nombre?.split(' ')[0]}, vi tu perfil y me interesa conectar...`
+
+      // Resumen — usar bio del usuario o generar uno básico
+      const tagline = document.getElementById('perfil-tagline')
+      if (tagline) {
+        const instr = instrumento[0] || 'Músico'
+        const gen = generos[0] || ''
+        const loc = p.barrio || p.ciudad || ''
+        const busca = p.disponibilidad?.split(',')?.[0]?.trim() || ''
+        const frase = p.bio
+          ? p.bio.split('.')[0]  // Primera oración de la bio
+          : `${instr}${gen ? ' de ' + gen : ''}${loc ? ' en ' + loc : ''}${busca ? '. Busca ' + busca.toLowerCase() : ''}.`
+        tagline.textContent = `"${frase}"`
+        tagline.style.color = ''
+        tagline.style.fontStyle = ''
+      }
+    } catch(e) { console.error('Error cargando perfil:', e) }
+  }
+
+
+
+  cargarPerfilPublico()
+
+  async function sendMessage() {
+    const ta = document.querySelector('.contact-form textarea')
+    const btn = document.querySelector('.btn-send')
+    const texto = ta.value.trim()
+    if (!texto) { ta.focus(); return }
+
+    const miId = localStorage.getItem('ba_user_id')
+
+    // Si no está logueado, redirigir al login
+    if (!miId) {
+      alert('Necesitás estar registrado para enviar mensajes.')
+      window.location.href = 'buscARTE_login.html'
+      return
+    }
+
+    btn.textContent = 'Enviando...'
+    btn.style.opacity = '0.7'
+    btn.disabled = true
+
+    try {
+      // Obtener ID del perfil que se está viendo desde la URL
+      const params = new URLSearchParams(window.location.search)
+      const paraId = params.get('id')
+
+      if (!paraId) {
+        // Sin ID en URL, solo mostrar confirmación visual
+        btn.textContent = '✓ Mensaje enviado'
+        btn.style.background = '#a8c832'
+        ta.value = ''
+        setTimeout(()=>{ btn.textContent='Enviar →'; btn.style.background=''; btn.style.opacity='1'; btn.disabled=false }, 2000)
+        return
+      }
+
+      // Crear o encontrar conversación existente
+      const convRes = await fetch(
+        `${SUPABASE_URL}/rest/v1/conversaciones?or=(and(user1_id.eq.${miId},user2_id.eq.${paraId}),and(user1_id.eq.${paraId},user2_id.eq.${miId}))`,
+        { headers: hdrs }
+      )
+      let convs = await convRes.json()
+      let convId
+
+      if (convs.length) {
+        convId = convs[0].id
+      } else {
+        // Crear nueva conversación
+        const nueva = await fetch(`${SUPABASE_URL}/rest/v1/conversaciones`, {
+          method: 'POST',
+          headers: { ...hdrs, 'Prefer': 'return=representation' },
+          body: JSON.stringify({ user1_id: parseInt(miId), user2_id: parseInt(paraId), ultimo_mensaje: texto })
+        })
+        const [conv] = await nueva.json()
+        convId = conv.id
+      }
+
+      // Guardar mensaje
+      await fetch(`${SUPABASE_URL}/rest/v1/mensajes`, {
+        method: 'POST',
+        headers: { ...hdrs, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ de_user_id: parseInt(miId), para_user_id: parseInt(paraId), contenido: texto })
+      })
+
+      // Actualizar último mensaje
+      await fetch(`${SUPABASE_URL}/rest/v1/conversaciones?id=eq.${convId}`, {
+        method: 'PATCH',
+        headers: { ...hdrs, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ ultimo_mensaje: texto, updated_at: new Date().toISOString() })
+      })
+
+      btn.textContent = '✓ Mensaje enviado'
+      btn.style.background = '#a8c832'
+      btn.style.opacity = '1'
+      ta.value = ''
+      setTimeout(()=>{
+        btn.textContent = 'Ver en mensajes →'
+        btn.style.background = ''
+        btn.onclick = () => window.location.href = 'buscARTE_mensajes.html'
+        btn.disabled = false
+      }, 1500)
+
+    } catch(e) {
+      alert('Error al enviar. Intentá de nuevo.')
+      console.error(e)
+      btn.textContent = 'Enviar →'
+      btn.style.opacity = '1'
+      btn.disabled = false
+    }
+  }
+  // NAV SESSION
+  (function initNav(){
+    const l=localStorage.getItem('ba_logged')==='1';
+    const n=localStorage.getItem('ba_name')||'Mi perfil';
+    const uid=localStorage.getItem('ba_user_id')||'';
+    const i=n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    if(l){
+      const g=document.getElementById('nav-guest');
+      const u=document.getElementById('nav-user');
+      if(g)g.style.display='none';
+      if(u)u.style.display='flex';
+      const c=document.getElementById('nav-avatar-circle');
+      if(c)c.textContent=i;
+      const nm=document.getElementById('nav-avatar-name');
+      if(nm)nm.textContent=n.split(' ')[0];
+      const b=document.getElementById('nav-msg-badge');
+      if(b)b.style.display='inline';
+      // Fix Mi perfil link with real user ID
+      const miPerfilLink=document.querySelector('.nav-dropdown-item[href*="perfil_publico"]');
+      if(miPerfilLink && uid) miPerfilLink.href='buscARTE_perfil_publico.html?id='+uid;
+    }
+  })();
+  function toggleUserMenu(){const w=document.getElementById('nav-avatar-btn');const d=document.getElementById('nav-dropdown');if(w)w.classList.toggle('open');if(d)d.classList.toggle('open');}
+  document.addEventListener('click',e=>{if(!e.target.closest('#nav-user')){document.getElementById('nav-avatar-btn')?.classList.remove('open');document.getElementById('nav-dropdown')?.classList.remove('open');}});
+  function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');window.location.href='index.html';}
+</script>
+</body>
+</html>

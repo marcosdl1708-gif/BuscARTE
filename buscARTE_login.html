@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>buscARTE — Ingresar</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --negro:#080808; --negro2:#111; --negro3:#1a1a1a;
+    --blanco:#f2ede4; --neon:#d4f53c; --rojo:#e8311a;
+    --gris:#888; --gris2:#444; --gris3:#2a2a2a;
+    --font-display:'Archivo Black',sans-serif;
+    --font-body:'Archivo',sans-serif;
+  }
+  body { background:var(--negro); color:var(--blanco); font-family:var(--font-body); font-weight:300; min-height:100vh; overflow-x:hidden; cursor:none; display:flex; flex-direction:column; }
+  .cursor { width:10px;height:10px;background:var(--neon);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%); }
+  .cursor-ring { width:36px;height:36px;border:1px solid rgba(212,245,60,0.35);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .15s ease; }
+  body::before { content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");opacity:.03;pointer-events:none;z-index:1000; }
+
+  /* NAV */
+  nav { display:flex;align-items:center;justify-content:space-between;padding:1.4rem 3rem;border-bottom:1px solid #1c1c1c; }
+  .nav-logo { font-family:var(--font-display);font-size:1.5rem;color:var(--blanco);text-decoration:none; }
+  .nav-logo span { color:var(--neon); }
+  .nav-back { color:var(--gris);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;transition:color .2s; }
+  .nav-back:hover { color:var(--blanco); }
+
+  /* LAYOUT */
+  .page { display:grid;grid-template-columns:1fr 1fr;flex:1;min-height:calc(100vh - 65px); }
+
+  /* PANEL IZQUIERDO */
+  .left-panel {
+    background:var(--negro2);
+    border-right:1px solid #1c1c1c;
+    display:flex;flex-direction:column;
+    justify-content:space-between;
+    padding:3rem;
+    position:relative;
+    overflow:hidden;
+  }
+  .left-bg {
+    position:absolute;
+    bottom:-2rem;left:-1rem;
+    font-family:var(--font-display);
+    font-size:16rem;
+    color:transparent;
+    -webkit-text-stroke:1px #1e1e1e;
+    line-height:1;
+    pointer-events:none;
+    user-select:none;
+    letter-spacing:-.04em;
+  }
+  .left-content { flex:1;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:1; }
+  .left-label { font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--neon);margin-bottom:1rem; }
+  .left-title { font-family:var(--font-display);font-size:clamp(3rem,5vw,4.5rem);line-height:.92;letter-spacing:-.02em;margin-bottom:1.2rem; }
+  .left-desc { color:var(--gris);font-size:.92rem;line-height:1.7;max-width:340px; }
+
+  /* TESTIMONIOS */
+  .testimonials { position:relative;z-index:1; }
+  .testimonial { border-left:2px solid var(--neon);padding:.8rem 1rem;margin-bottom:.8rem;animation:fadeIn .5s ease both; }
+  .testimonial-text { font-size:.82rem;color:var(--blanco);line-height:1.6;margin-bottom:.3rem;font-style:italic; }
+  .testimonial-autor { font-size:.72rem;color:var(--gris); }
+
+  /* PANEL DERECHO */
+  .right-panel { display:flex;align-items:center;justify-content:center;padding:3rem; }
+  .form-wrap { width:100%;max-width:400px; }
+
+  .form-title { font-family:var(--font-display);font-size:2rem;letter-spacing:-.02em;margin-bottom:.4rem; }
+  .form-sub { color:var(--gris);font-size:.88rem;margin-bottom:2rem;line-height:1.6; }
+
+  /* GOOGLE BTN */
+  .btn-google {
+    width:100%;background:var(--negro2);border:1px solid var(--gris3);color:var(--blanco);
+    padding:.88rem;font-family:var(--font-body);font-size:.88rem;letter-spacing:.04em;
+    cursor:none;transition:border-color .2s;display:flex;align-items:center;justify-content:center;gap:.8rem;
+    margin-bottom:1.5rem;
+  }
+  .btn-google:hover { border-color:var(--gris2); }
+
+  .divider { display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;color:var(--gris2);font-size:.75rem;letter-spacing:.1em;text-transform:uppercase; }
+  .divider::before, .divider::after { content:'';flex:1;height:1px;background:#2a2a2a; }
+
+  /* CAMPOS */
+  .field { margin-bottom:1.1rem; }
+  .field label { display:flex;justify-content:space-between;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gris);margin-bottom:.45rem; }
+  .field label a { color:var(--neon);text-decoration:none;text-transform:none;letter-spacing:0;font-size:.72rem;transition:opacity .2s; }
+  .field label a:hover { opacity:.7; }
+  .field input {
+    width:100%;background:var(--negro2);border:1px solid var(--gris3);color:var(--blanco);
+    padding:.88rem 1rem;font-family:var(--font-body);font-size:.92rem;font-weight:300;
+    outline:none;transition:border-color .2s;
+  }
+  .field input:focus { border-color:var(--neon); }
+  .field input::placeholder { color:var(--gris2); }
+
+  /* PASSWORD TOGGLE */
+  .pass-wrap { position:relative; }
+  .pass-wrap input { padding-right:3rem; }
+  .pass-toggle { position:absolute;right:.9rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--gris);cursor:none;font-size:.85rem;transition:color .2s;font-family:var(--font-body);padding:0; }
+  .pass-toggle:hover { color:var(--blanco); }
+
+  /* ERROR */
+  .field-error { font-size:.72rem;color:var(--rojo);margin-top:.35rem;display:none; }
+  .field.error input { border-color:var(--rojo); }
+  .field.error .field-error { display:block; }
+
+  /* SUBMIT */
+  .btn-submit {
+    width:100%;background:var(--neon);border:none;color:var(--negro);
+    padding:.88rem;font-family:var(--font-display);font-size:.95rem;letter-spacing:.04em;
+    cursor:none;transition:opacity .2s;margin-top:.5rem;margin-bottom:1.2rem;
+    display:flex;align-items:center;justify-content:center;gap:.5rem;
+  }
+  .btn-submit:hover { opacity:.85; }
+  .btn-submit.loading { opacity:.6;pointer-events:none; }
+
+  .register-link { text-align:center;font-size:.82rem;color:var(--gris); }
+  .register-link a { color:var(--neon);text-decoration:none;transition:opacity .2s; }
+  .register-link a:hover { opacity:.7; }
+
+  /* LOADING SPINNER */
+  .spinner { width:16px;height:16px;border:2px solid rgba(8,8,8,.3);border-top-color:var(--negro);border-radius:50%;animation:spin .6s linear infinite;display:none; }
+  .btn-submit.loading .spinner { display:block; }
+  .btn-submit.loading .btn-text { display:none; }
+
+  /* SUCCESS STATE */
+  .success-bar { background:rgba(212,245,60,.08);border:1px solid rgba(212,245,60,.2);padding:.8rem 1rem;display:none;align-items:center;gap:.6rem;margin-bottom:1rem;font-size:.82rem;color:var(--neon); }
+  .success-bar.show { display:flex; }
+
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes spin { to{transform:rotate(360deg)} }
+
+  .form-wrap { animation:fadeIn .4s ease both; }
+  /* NAV LINKS CLICKABLE FIX */
+  .nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap { pointer-events:auto !important; }
+  nav a, nav button { pointer-events:auto !important; }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+
+<nav>
+  <a href="index.html" class="nav-logo">busc<span>ARTE</span></a>
+  <a href="index.html" class="nav-back">← Volver al inicio</a>
+</nav>
+
+<div class="page">
+
+  <!-- PANEL IZQUIERDO -->
+  <div class="left-panel">
+    <div class="left-bg">↩</div>
+    <div class="left-content">
+      <div class="left-label">Bienvenido/a de vuelta</div>
+      <div class="left-title">INGRESÁ<br>A TU<br>PERFIL</div>
+      <p class="left-desc">Tu comunidad de músicos te está esperando. Nuevos anuncios, mensajes y conexiones cada día.</p>
+    </div>
+    <div class="testimonials">
+      <div class="testimonial" style="animation-delay:.1s">
+        <p class="testimonial-text">"Encontré al bajista que buscaba en 3 días. Imposible sin buscARTE."</p>
+        <p class="testimonial-autor">— Agustina G., guitarrista · Villa Crespo</p>
+      </div>
+      <div class="testimonial" style="animation-delay:.2s">
+        <p class="testimonial-text">"La primera jam que organicé tuvo 12 músicos. Nunca imaginé que fuera tan fácil."</p>
+        <p class="testimonial-autor">— Nicolás B., guitarrista · Recoleta</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL DERECHO -->
+  <div class="right-panel">
+    <div class="form-wrap">
+      <div class="form-title">Ingresá 👋</div>
+      <p class="form-sub">¿No tenés cuenta? <a href="buscARTE_registro.html" style="color:var(--neon);text-decoration:none;">Registrate gratis</a></p>
+
+      <div class="divider">con tu email</div>
+
+      <div class="success-bar" id="success-bar">
+        ✓ Ingreso exitoso — redirigiendo...
+      </div>
+
+      <div class="field" id="field-email">
+        <label>Email</label>
+        <input type="email" id="email" placeholder="tu@email.com" oninput="clearError('field-email')">
+        <div class="field-error">Ingresá un email válido</div>
+      </div>
+
+      <div class="field" id="field-pass">
+        <label>
+          Contraseña
+          <a href="buscARTE_recuperar.html">¿Olvidaste tu contraseña?</a>
+        </label>
+        <div class="pass-wrap">
+          <input type="password" id="password" placeholder="Tu contraseña" oninput="clearError('field-pass')" onkeydown="if(event.key==='Enter') login()">
+          <button class="pass-toggle" onclick="togglePass()" id="pass-toggle-btn">👁</button>
+        </div>
+        <div class="field-error">Contraseña incorrecta</div>
+      </div>
+
+      <button class="btn-submit" id="btn-submit" onclick="login()">
+        <span class="btn-text">Ingresar →</span>
+        <div class="spinner"></div>
+      </button>
+
+      <p class="register-link">¿Primera vez? <a href="buscARTE_registro.html">Creá tu perfil gratis</a></p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // CURSOR
+  window.addEventListener('DOMContentLoaded', function() {
+    const cursor=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+    if (!cursor || !ring) return;
+    let mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+    (function tick(){cursor.style.left=mx+'px';cursor.style.top=my+'px';rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(tick);})();
+  });
+
+  // TOGGLE CONTRASEÑA
+  function togglePass() {
+    const input = document.getElementById('password');
+    const btn = document.getElementById('pass-toggle-btn');
+    if (input.type === 'password') { input.type = 'text'; btn.textContent = '🙈'; }
+    else { input.type = 'password'; btn.textContent = '👁'; }
+  }
+
+  // LIMPIAR ERROR
+  function clearError(fieldId) {
+    document.getElementById(fieldId).classList.remove('error');
+  }
+
+  // SUPABASE
+  const SUPABASE_URL = 'https://xiaanchoanxmampegoay.supabase.co'
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68'
+
+  async function login() {
+    const email = document.getElementById('email').value.trim()
+    const pass = document.getElementById('password').value
+    let valid = true
+
+    if (!email || !email.includes('@')) { document.getElementById('field-email').classList.add('error'); valid = false; }
+    if (!pass) { document.getElementById('field-pass').classList.add('error'); valid = false; }
+    if (!valid) return
+
+    const btn = document.getElementById('btn-submit')
+    btn.classList.add('loading')
+
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/login_usuario`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`
+        },
+        body: JSON.stringify({ p_email: email, p_password: pass })
+      })
+      const user = await res.json()
+
+      if (user && user.id) {
+        localStorage.setItem('ba_logged', '1')
+        localStorage.setItem('ba_name', user.nombre || email.split('@')[0])
+        localStorage.setItem('ba_user_id', String(user.id))
+        localStorage.setItem('ba_referentes', user.referentes||'')
+        localStorage.setItem('ba_generos', user.generos||'')
+        document.getElementById('success-bar').classList.add('show')
+        setTimeout(() => { window.location.href = 'buscARTE_busqueda.html' }, 1200)
+      } else {
+        document.getElementById('field-pass').classList.add('error')
+        document.querySelector('#field-pass .field-error').textContent = user.error || 'Email o contraseña incorrectos'
+        btn.classList.remove('loading')
+      }
+    } catch (e) {
+      alert('No se pudo conectar. Verificá tu conexión.')
+      console.error(e)
+      btn.classList.remove('loading')
+    }
+  }
+
+  function loginGoogle() {
+    const btn = document.querySelector('.btn-google')
+    btn.textContent = 'Conectando con Google...'
+    btn.style.color = 'var(--gris)'
+    setTimeout(() => {
+      localStorage.setItem('ba_logged', '1')
+      localStorage.setItem('ba_name', 'Usuario')
+      document.getElementById('success-bar').classList.add('show')
+      setTimeout(() => { window.location.href = 'buscARTE_busqueda.html' }, 1200)
+    }, 1400)
+  }
+</script>
+</body>
+</html>

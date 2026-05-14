@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>buscARTE — Encontrá tu lugar en la escena</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --negro: #080808;
+    --negro2: #111111;
+    --negro3: #1a1a1a;
+    --blanco: #f2ede4;
+    --neon: #d4f53c;
+    --rojo: #e8311a;
+    --gris: #888;
+    --gris2: #444;
+    --font-display: 'Archivo Black', sans-serif;
+    --font-body: 'Archivo', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--negro);
+    color: var(--blanco);
+    font-family: var(--font-body);
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CURSOR PERSONALIZADO */
+  .cursor {
+    width: 10px; height: 10px;
+    background: var(--neon);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s, width 0.2s, height 0.2s;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(212,245,60,0.4);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: all 0.15s ease;
+  }
+  a:hover ~ .cursor, button:hover ~ .cursor { width: 20px; height: 20px; }
+
+  /* GRAIN OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity: 0.035;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.4rem 3rem;
+    border-bottom: 1px solid #1c1c1c;
+    background: rgba(8,8,8,0.92);
+    backdrop-filter: blur(12px);
+  }
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    letter-spacing: -0.01em;
+    color: var(--blanco);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--neon); }
+  .nav-links {
+    display: flex; gap: 2.5rem; list-style: none;
+  }
+  .nav-links a {
+    color: var(--gris);
+    text-decoration: none;
+    font-size: 0.82rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--blanco); }
+  .nav-right { display: flex; gap: 1rem; align-items: center; }
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--gris2);
+    color: var(--blanco);
+    padding: 0.55rem 1.4rem;
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: none;
+    transition: border-color 0.2s, color 0.2s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-ghost:hover { border-color: var(--blanco); }
+  .btn-neon {
+    background: var(--neon);
+    border: none;
+    color: var(--negro);
+    padding: 0.55rem 1.4rem;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: none;
+    transition: opacity 0.2s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-neon:hover { opacity: 0.85; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 0 3rem 5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg-text {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--font-display);
+    font-size: clamp(10rem, 22vw, 22rem);
+    color: transparent;
+    -webkit-text-stroke: 1px #1e1e1e;
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+    letter-spacing: -0.04em;
+    opacity: 0.6;
+  }
+
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gris);
+    margin-bottom: 1.8rem;
+    animation: fadeUp 0.8s ease both;
+  }
+  .hero-tag::before {
+    content: '';
+    display: block;
+    width: 28px; height: 1px;
+    background: var(--neon);
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(4.5rem, 10vw, 9.5rem);
+    line-height: 0.88;
+    letter-spacing: -0.03em;
+    margin-bottom: 2rem;
+    animation: fadeUp 0.8s 0.1s ease both;
+  }
+  h1 .accent { color: var(--neon); }
+  h1 .rojo { color: var(--rojo); }
+
+  .hero-bottom {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+  .hero-desc {
+    max-width: 420px;
+    color: var(--gris);
+    font-size: 1rem;
+    line-height: 1.75;
+    font-weight: 300;
+  }
+  .hero-desc strong { color: var(--blanco); font-weight: 400; }
+  .hero-actions { display: flex; gap: 1rem; align-items: center; }
+  .hero-scroll {
+    position: absolute; bottom: 2.5rem; left: 50%;
+    transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+    color: var(--gris2);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    animation: bounce 2s infinite;
+  }
+  .hero-scroll::after {
+    content: '';
+    display: block;
+    width: 1px; height: 40px;
+    background: linear-gradient(to bottom, var(--gris2), transparent);
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    border-top: 1px solid #1c1c1c;
+    border-bottom: 1px solid #1c1c1c;
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    position: relative; z-index: 2;
+  }
+  .stat-item {
+    padding: 2.5rem 3rem;
+    border-right: 1px solid #1c1c1c;
+    transition: background 0.3s;
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-item:hover { background: var(--negro2); }
+  .stat-num {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 0.3rem;
+  }
+  .stat-num span { color: var(--neon); }
+  .stat-label {
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gris);
+  }
+
+  /* GENRES TICKER */
+  .ticker-wrap {
+    overflow: hidden;
+    border-bottom: 1px solid #1c1c1c;
+    padding: 1.2rem 0;
+    background: var(--negro2);
+  }
+  .ticker {
+    display: flex; gap: 0;
+    animation: ticker 30s linear infinite;
+    width: max-content;
+  }
+  .ticker:hover { animation-play-state: paused; }
+  .ticker-item {
+    display: flex; align-items: center; gap: 0;
+    white-space: nowrap;
+  }
+  .ticker-text {
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0 2.5rem;
+    color: var(--gris2);
+    transition: color 0.2s;
+  }
+  .ticker-item:hover .ticker-text { color: var(--neon); }
+  .ticker-sep {
+    color: var(--neon);
+    font-size: 0.6rem;
+  }
+
+  /* SECCIÓN: CÓMO FUNCIONA */
+  .section { padding: 7rem 3rem; }
+  .section-header {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    margin-bottom: 4rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #1c1c1c;
+  }
+  .section-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--neon);
+    margin-bottom: 0.8rem;
+  }
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.8rem, 5vw, 4.5rem);
+    line-height: 0.92;
+    letter-spacing: -0.02em;
+  }
+  .section-sub {
+    color: var(--gris);
+    font-size: 0.9rem;
+    line-height: 1.7;
+    max-width: 280px;
+    text-align: right;
+  }
+
+  .steps {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: #1c1c1c;
+    border: 1px solid #1c1c1c;
+  }
+  .step {
+    background: var(--negro);
+    padding: 3rem;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+  }
+  .step:hover { background: var(--negro2); }
+  .step::before {
+    content: attr(data-num);
+    position: absolute;
+    top: -0.5rem; right: 1.5rem;
+    font-family: var(--font-display);
+    font-size: 8rem;
+    color: #161616;
+    line-height: 1;
+    pointer-events: none;
+    transition: color 0.3s;
+  }
+  .step:hover::before { color: #1e1e1e; }
+  .step-icon {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    display: block;
+  }
+  .step-title {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.8rem;
+  }
+  .step-desc {
+    color: var(--gris);
+    font-size: 0.88rem;
+    line-height: 1.7;
+  }
+
+  /* PERFILES MUESTRA */
+  .profiles-section {
+    padding: 7rem 3rem;
+    background: var(--negro2);
+    border-top: 1px solid #1c1c1c;
+    border-bottom: 1px solid #1c1c1c;
+  }
+  .profiles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: #222;
+    border: 1px solid #222;
+    margin-top: 4rem;
+  }
+  .profile-card {
+    background: var(--negro2);
+    padding: 2rem;
+    transition: background 0.3s, transform 0.3s;
+    position: relative;
+  }
+  .profile-card:hover {
+    background: #161616;
+    transform: translateY(-2px);
+  }
+  .profile-top {
+    display: flex; align-items: center; gap: 1rem;
+    margin-bottom: 1.2rem;
+  }
+  .avatar {
+    width: 50px; height: 50px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+  .av-g { background: #0d2010; color: var(--neon); }
+  .av-r { background: #2a0a05; color: #ff6b5b; }
+  .av-b { background: #050d2a; color: #5b9fff; }
+  .profile-name {
+    font-weight: 500;
+    font-size: 1rem;
+    margin-bottom: 0.15rem;
+  }
+  .profile-meta {
+    font-size: 0.78rem;
+    color: var(--gris);
+  }
+  .profile-tags {
+    display: flex; flex-wrap: wrap; gap: 0.4rem;
+    margin-bottom: 1.2rem;
+  }
+  .tag {
+    font-size: 0.68rem;
+    padding: 0.2rem 0.6rem;
+    border: 1px solid #2a2a2a;
+    color: var(--gris);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .tag-neon { border-color: var(--neon); color: var(--neon); }
+  .profile-footer {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid #222;
+  }
+  .profile-looking {
+    font-size: 0.75rem;
+    color: var(--gris);
+  }
+  .profile-looking strong { color: var(--blanco); font-weight: 400; }
+  .match {
+    font-size: 0.72rem;
+    background: rgba(212,245,60,0.1);
+    color: var(--neon);
+    padding: 0.2rem 0.6rem;
+    letter-spacing: 0.05em;
+  }
+
+  /* BUSCAR SECTION */
+  .search-section {
+    padding: 7rem 3rem;
+  }
+  .search-box {
+    display: flex; gap: 0;
+    border: 1px solid #2a2a2a;
+    margin-top: 3rem;
+    margin-bottom: 2rem;
+  }
+  .search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--blanco);
+    padding: 1.2rem 1.5rem;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 300;
+    outline: none;
+  }
+  .search-input::placeholder { color: var(--gris2); }
+  .search-btn {
+    background: var(--neon);
+    border: none;
+    color: var(--negro);
+    padding: 1.2rem 2.5rem;
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    letter-spacing: 0.08em;
+    cursor: none;
+    transition: opacity 0.2s;
+  }
+  .search-btn:hover { opacity: 0.85; }
+  .filters {
+    display: flex; gap: 1rem; flex-wrap: wrap;
+  }
+  .filter-select {
+    background: var(--negro2);
+    border: 1px solid #2a2a2a;
+    color: var(--gris);
+    padding: 0.7rem 1.2rem;
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    cursor: none;
+    outline: none;
+    transition: border-color 0.2s;
+    appearance: none;
+    padding-right: 2rem;
+  }
+  .filter-select:hover { border-color: #444; }
+
+  /* CTA FINAL */
+  .cta-section {
+    padding: 8rem 3rem;
+    text-align: center;
+    border-top: 1px solid #1c1c1c;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-bg {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(212,245,60,0.04) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cta-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--neon);
+    margin-bottom: 1.5rem;
+    display: block;
+  }
+  .cta-title {
+    font-family: var(--font-display);
+    font-size: clamp(3.5rem, 8vw, 7rem);
+    line-height: 0.9;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.5rem;
+  }
+  .cta-title .accent { color: var(--neon); }
+  .cta-sub {
+    color: var(--gris);
+    font-size: 1rem;
+    line-height: 1.7;
+    max-width: 420px;
+    margin: 0 auto 3rem;
+  }
+  .cta-domain {
+    display: inline-block;
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    color: var(--gris2);
+    border: 1px solid #2a2a2a;
+    padding: 0.5rem 1.5rem;
+    margin-bottom: 2.5rem;
+    font-family: 'Courier New', monospace;
+  }
+  .cta-domain span { color: var(--neon); }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid #1c1c1c;
+    padding: 2.5rem 3rem;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer-logo {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    letter-spacing: -0.01em;
+  }
+  .footer-logo span { color: var(--neon); }
+  .footer-links {
+    display: flex; gap: 2rem; list-style: none;
+  }
+  .footer-links a {
+    color: var(--gris);
+    text-decoration: none;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--blanco); }
+  .footer-copy {
+    font-size: 0.75rem;
+    color: var(--gris2);
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes ticker {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(8px); }
+  }
+
+  /* SCROLL REVEAL */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  /* NAV DROPDOWN */
+  .nav-user { position:relative; }
+  .nav-avatar-wrap { display:flex;align-items:center;gap:.5rem;cursor:none;padding:.3rem .6rem;border:1px solid var(--gris3);transition:border-color .2s;user-select:none; }
+  .nav-avatar-wrap:hover { border-color:var(--gris2); }
+  .nav-avatar-circle { width:28px;height:28px;border-radius:50%;background:#0d2010;color:var(--neon);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.62rem;flex-shrink:0; }
+  .nav-avatar-name { font-size:.78rem;color:var(--blanco); }
+  .nav-avatar-chevron { font-size:.6rem;color:var(--gris);transition:transform .2s; }
+  .nav-avatar-wrap.open .nav-avatar-chevron { transform:rotate(180deg); }
+  .nav-dropdown { position:absolute;top:calc(100% + 8px);right:0;background:var(--negro2);border:1px solid #2a2a2a;min-width:200px;display:none;flex-direction:column;z-index:300; }
+  .nav-dropdown.open { display:flex; }
+  .nav-dropdown-item { display:flex;align-items:center;gap:.6rem;padding:.75rem 1.1rem;color:var(--gris);text-decoration:none;font-size:.82rem;transition:all .15s;background:transparent;border:none;font-family:var(--font-body);cursor:none;text-align:left;width:100%; }
+  .nav-dropdown-item:hover { background:rgba(255,255,255,.04);color:var(--blanco); }
+  .nav-dropdown-divider { height:1px;background:#1c1c1c;margin:.3rem 0; }
+  .nav-logout:hover { color:var(--rojo) !important; }
+  .nav-badge { background:var(--neon);color:var(--negro);font-size:.55rem;font-weight:700;padding:.1rem .4rem;margin-left:auto; }
+  /* NAV LINKS FIX */
+  .nav-links { list-style:none !important; display:flex !important; gap:2rem !important; padding:0 !important; margin:0 !important; }
+  .nav-links li { list-style:none !important; }
+  .nav-link { color:var(--gris);text-decoration:none;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;transition:color .2s; }
+  .nav-link:hover { color:var(--blanco); }
+  .nav-link.active { color:var(--neon); }
+  /* NAV AVATAR NAME — truncate long usernames */
+  .nav-avatar-name { font-size:.78rem;color:var(--blanco);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+  /* NAV LINKS CLICKABLE FIX */
+  .nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap { pointer-events:auto !important; }
+  nav a, nav button { pointer-events:auto !important; }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">busc<span>ARTE</span></a>
+  <ul class="nav-links">
+    <li><a href="buscARTE_busqueda.html" class="nav-link">Músicos</a></li>
+    <li><a href="buscARTE_anuncios.html" class="nav-link">Anuncios</a></li>
+    <li><a href="#como-funciona" class="nav-link">Cómo funciona</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="nav-guest" id="nav-guest">
+      <a href="buscARTE_login.html" class="btn-ghost">Ingresar</a>
+      <a href="buscARTE_registro.html" class="btn-neon">Registrarse</a>
+    </div>
+    <div class="nav-user" id="nav-user" style="display:none">
+      <div class="nav-avatar-wrap" onclick="toggleUserMenu()" id="nav-avatar-btn">
+        <div class="nav-avatar-circle" id="nav-avatar-circle">?</div>
+        <span class="nav-avatar-name" id="nav-avatar-name">Mi perfil</span>
+        <span class="nav-avatar-chevron">▾</span>
+      </div>
+      <div class="nav-dropdown" id="nav-dropdown">
+        <a href="buscARTE_perfil_publico.html" class="nav-dropdown-item">👤 Mi perfil</a>
+        <a href="buscARTE_perfil.html" class="nav-dropdown-item">⚙️ Configurar perfil</a>
+        <a href="buscARTE_mensajes.html" class="nav-dropdown-item">💬 Mensajes <span class="nav-badge" id="nav-msg-badge" style="display:none"></span></a>
+        <a href="buscARTE_mis_anuncios.html" class="nav-dropdown-item">📋 Mis anuncios</a>
+        <a href="buscARTE_guardados.html" class="nav-dropdown-item">♡ Guardados</a>
+        <div class="nav-dropdown-divider"></div>
+        <button class="nav-dropdown-item nav-logout" onclick="logout()">↩ Cerrar sesión</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-text">ARTE</div>
+
+  <div class="hero-tag">Red de artistas argentinos</div>
+
+  <h1>
+    ENCONTRÁ<br>
+    TU <span class="accent">LUGAR</span><br>
+    EN LA <span class="rojo">ESCENA</span>
+  </h1>
+
+  <div class="hero-bottom">
+    <p class="hero-desc">
+      La plataforma para que <strong>músicos, artistas y creativos</strong> de toda Argentina se encuentren, conecten y construyan proyectos juntos.
+    </p>
+    <div class="hero-actions">
+      <a href="buscARTE_registro.html" class="btn-neon" style="font-size:0.95rem; padding: 0.9rem 2.2rem;">Crear perfil gratis</a>
+      <a href="#explorar" class="btn-ghost" style="font-size:0.95rem; padding: 0.9rem 2.2rem;">Explorar →</a>
+    </div>
+  </div>
+
+  <div class="hero-scroll">scroll</div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar reveal">
+  <div class="stat-item">
+    <div class="stat-num" id="stat-musicos">—<span>+</span></div>
+    <div class="stat-label">Músicos registrados</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">23<span></span></div>
+    <div class="stat-label">Provincias de Argentina</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num" id="stat-anuncios">—<span>+</span></div>
+    <div class="stat-label">Anuncios publicados</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">100<span>%</span></div>
+    <div class="stat-label">Gratis para empezar</div>
+  </div>
+</div>
+
+<!-- TICKER DE GÉNEROS -->
+<div class="ticker-wrap">
+  <div class="ticker">
+    <div class="ticker-item"><span class="ticker-text">Rock Nacional</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Folklore</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Jazz</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Tango</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Metal</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Cumbia</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Indie</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Electrónica</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Reggae</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Funk</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Hip Hop</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Pop</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Punk</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Tropical</span><span class="ticker-sep">✦</span></div>
+    <!-- duplicate for seamless loop -->
+    <div class="ticker-item"><span class="ticker-text">Rock Nacional</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Folklore</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Jazz</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Tango</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Metal</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Cumbia</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Indie</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Electrónica</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Reggae</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Funk</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Hip Hop</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Pop</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Punk</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Tropical</span><span class="ticker-sep">✦</span></div>
+  </div>
+</div>
+
+<!-- CÓMO FUNCIONA -->
+<section class="section" id="como-funciona">
+  <div class="section-header reveal">
+    <div>
+      <div class="section-label">¿Qué podés hacer?</div>
+      <div class="section-title">TODO EN<br>UN SOLO<br>LUGAR.</div>
+    </div>
+    <p class="section-sub">buscARTE es mucho más que un buscador de músicos. Es la plataforma completa para todo lo que necesita un artista.</p>
+  </div>
+
+  <div class="steps reveal">
+    <div class="step" data-num="01" onclick="irA('buscARTE_busqueda.html')" style="cursor:pointer">
+      <span class="step-icon">🎸</span>
+      <div class="step-title">ENCONTRÁ MÚSICOS</div>
+      <p class="step-desc">Buscá por instrumento, género, barrio y disponibilidad. El sistema de matching por afinidad musical te sugiere los músicos más afines a tu estilo y referentes.</p>
+    </div>
+    <div class="step" data-num="02" onclick="irA('buscARTE_anuncios.html')" style="cursor:pointer">
+      <span class="step-icon">📋</span>
+      <div class="step-title">PUBLICÁ ANUNCIOS</div>
+      <p class="step-desc">"Busco bajista para banda de rock", "me ofrezco para sesiones", "jam de jazz este sábado en Palermo". Cuatro tipos de anuncios para cubrir todas las situaciones.</p>
+    </div>
+    <div class="step" data-num="03" onclick="irA('buscARTE_anuncios.html?tipo=jam')" style="cursor:pointer">
+      <span class="step-icon">🥁</span>
+      <div class="step-title">ORGANIZÁ JAMS</div>
+      <p class="step-desc">Publicá eventos abiertos con fecha, lugar y precio de entrada. Desde zapadas en el parque hasta jam sessions en bares — conectá con músicos para tocar ya.</p>
+    </div>
+    <div class="step" data-num="04" onclick="irA('buscARTE_anuncios.html?tipo=vende')" style="cursor:pointer">
+      <span class="step-icon">🎛️</span>
+      <div class="step-title">COMPRÁ Y VENDÉ</div>
+      <p class="step-desc">Guitarra, amplificador, pedalera, sala de ensayo. El marketplace de instrumentos y equipos para músicos argentinos. Sin intermediarios, directo entre músicos.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PERFILES -->
+<section class="profiles-section" id="explorar">
+  <div class="section-header reveal">
+    <div>
+      <div class="section-label">Músicos en buscARTE</div>
+      <div class="section-title">CONOCÉ<br>LA COMUNIDAD</div>
+    </div>
+    <p class="section-sub">Miles de músicos de todo el país esperando conectar con alguien como vos.</p>
+  </div>
+
+  <div class="profiles-grid reveal">
+    <div class="profile-card">
+      <div class="profile-top">
+        <div class="avatar av-g">LM</div>
+        <div>
+          <div class="profile-name">Lucía Moreno</div>
+          <div class="profile-meta">Guitarrista · Buenos Aires</div>
+        </div>
+      </div>
+      <div class="profile-tags">
+        <span class="tag tag-neon">Jazz</span>
+        <span class="tag">Fusión</span>
+        <span class="tag">Bossanova</span>
+        <span class="tag">Funk</span>
+      </div>
+      <div class="profile-footer">
+        <div class="profile-looking">Busca <strong>banda estable</strong></div>
+        <span class="match">98% afinidad</span>
+      </div>
+    </div>
+
+    <div class="profile-card">
+      <div class="profile-top">
+        <div class="avatar av-r">RV</div>
+        <div>
+          <div class="profile-name">Rodrigo Valdés</div>
+          <div class="profile-meta">Bajista · Rosario</div>
+        </div>
+      </div>
+      <div class="profile-tags">
+        <span class="tag tag-neon">Rock</span>
+        <span class="tag">Metal</span>
+        <span class="tag">Prog</span>
+      </div>
+      <div class="profile-footer">
+        <div class="profile-looking">Busca <strong>proyecto serio</strong></div>
+        <span class="match">91% afinidad</span>
+      </div>
+    </div>
+
+    <div class="profile-card">
+      <div class="profile-top">
+        <div class="avatar av-b">SM</div>
+        <div>
+          <div class="profile-name">Sol Martínez</div>
+          <div class="profile-meta">Cantante · Córdoba</div>
+        </div>
+      </div>
+      <div class="profile-tags">
+        <span class="tag tag-neon">Folklore</span>
+        <span class="tag">Indie</span>
+        <span class="tag">Pop</span>
+      </div>
+      <div class="profile-footer">
+        <div class="profile-looking">Busca <strong>músicos y productor</strong></div>
+        <span class="match">87% afinidad</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BÚSQUEDA -->
+<section class="search-section reveal">
+  <div class="section-label">Buscador</div>
+  <div class="section-title" style="font-family: var(--font-display); font-size: clamp(2.8rem, 5vw, 4.5rem); line-height: 0.92; letter-spacing: -0.02em; margin-bottom: 0;">ENCONTRÁ<br>LO QUE BUSCÁS</div>
+
+  <div class="search-box">
+    <input class="search-input" id="index-search" type="text" placeholder="Ej: bajista de rock en Buenos Aires, baterista de jazz..." onkeydown="if(event.key==='Enter') buscarDesdeIndex()">
+    <button class="search-btn" onclick="buscarDesdeIndex()">BUSCAR</button>
+  </div>
+
+  <div class="filters">
+    <select class="filter-select" id="index-instrumento">
+      <option value="">Todos los instrumentos</option>
+      <option>Guitarra</option>
+      <option>Bajo</option>
+      <option>Batería</option>
+      <option>Teclado / Piano</option>
+      <option>Voz / Cantante</option>
+      <option>Violín</option>
+      <option>Saxo</option>
+      <option>Trompeta</option>
+      <option>Percusión</option>
+      <option>DJ / Productor</option>
+    </select>
+    <select class="filter-select" id="index-genero">
+      <option value="">Todos los géneros</option>
+      <option>Rock Nacional</option>
+      <option>Metal</option>
+      <option>Jazz</option>
+      <option>Folklore</option>
+      <option>Tango</option>
+      <option>Cumbia</option>
+      <option>Indie</option>
+      <option>Pop</option>
+      <option>Electrónica</option>
+      <option>Hip Hop</option>
+      <option>Funk</option>
+      <option>Reggae</option>
+    </select>
+    <select class="filter-select" id="index-provincia">
+      <option value="">Todo el país</option>
+      <option>Buenos Aires (CABA)</option>
+      <option>Gran Buenos Aires</option>
+      <option>Rosario</option>
+      <option>Córdoba</option>
+      <option>Mendoza</option>
+      <option>La Plata</option>
+      <option>Mar del Plata</option>
+      <option>Tucumán</option>
+      <option>Salta</option>
+    </select>
+    <select class="filter-select" id="index-objetivo">
+      <option value="">Cualquier objetivo</option>
+      <option>Banda estable</option>
+      <option>Proyecto propio</option>
+      <option>Sesiones / Shows</option>
+      <option>Zapada / Jam</option>
+      <option>Clases</option>
+    </select>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="cta-section reveal">
+  <div class="cta-bg"></div>
+  <span class="cta-label">¿Listo para empezar?</span>
+  <div class="cta-title">
+    SUMATE A<br>
+    LA <span class="accent">ESCENA</span>
+  </div>
+  <p class="cta-sub">Gratis para siempre en el plan base. Sin excusas para no encontrar a los músicos que buscás.</p>
+  <div class="cta-domain">www.<span>buscarte</span>.com.ar</div>
+  <br>
+  <a href="buscARTE_registro.html" class="btn-neon" style="font-size: 1rem; padding: 1rem 3rem;">Crear perfil gratis →</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">busc<span>ARTE</span></div>
+  <ul class="footer-links">
+    <li><a href="#">Términos</a></li>
+    <li><a href="#">Privacidad</a></li>
+    <li><a href="#">Contacto</a></li>
+    <li><a href="#">Instagram</a></li>
+  </ul>
+  <div class="footer-copy">© 2025 buscARTE · Hecho en Argentina 🇦🇷</div>
+</footer>
+
+<script>
+  // Cursor personalizado
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursor-ring');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  function animateCursor() {
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animateCursor);
+  }
+  animateCursor();
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+  // NAV SESSION
+  (function initNav(){
+    const l=localStorage.getItem('ba_logged')==='1';
+    const n=localStorage.getItem('ba_name')||'Mi perfil';
+    const uid=localStorage.getItem('ba_user_id')||'';
+    const i=n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    if(l){
+      const g=document.getElementById('nav-guest');
+      const u=document.getElementById('nav-user');
+      if(g)g.style.display='none';
+      if(u)u.style.display='flex';
+      const c=document.getElementById('nav-avatar-circle');
+      if(c)c.textContent=i;
+      const nm=document.getElementById('nav-avatar-name');
+      if(nm)nm.textContent=n.split(' ')[0];
+      const b=document.getElementById('nav-msg-badge');
+      if(b)b.style.display='inline';
+      // Fix Mi perfil link with real user ID
+      const miPerfilLink=document.querySelector('.nav-dropdown-item[href*="perfil_publico"]');
+      if(miPerfilLink && uid) miPerfilLink.href='buscARTE_perfil_publico.html?id='+uid;
+    }
+  })();
+  function toggleUserMenu(){const w=document.getElementById('nav-avatar-btn');const d=document.getElementById('nav-dropdown');if(w)w.classList.toggle('open');if(d)d.classList.toggle('open');}
+  document.addEventListener('click',e=>{if(!e.target.closest('#nav-user')){document.getElementById('nav-avatar-btn')?.classList.remove('open');document.getElementById('nav-dropdown')?.classList.remove('open');}});
+  function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');window.location.href='index.html';}
+
+  // BUSCADOR DEL INDEX
+  function buscarDesdeIndex() {
+    const logueado = localStorage.getItem('ba_logged') === '1'
+    if (!logueado) { window.location.href = 'buscARTE_registro.html'; return }
+    const q = document.getElementById('index-search')?.value?.trim()
+    const instr = document.getElementById('index-instrumento')?.value
+    const genero = document.getElementById('index-genero')?.value
+    const provincia = document.getElementById('index-provincia')?.value
+    const params = new URLSearchParams()
+    if (q) params.set('q', q)
+    if (instr) params.set('instrumento', instr)
+    if (genero) params.set('genero', genero)
+    if (provincia) params.set('provincia', provincia)
+    window.location.href = 'buscARTE_busqueda.html' + (params.toString() ? '?' + params.toString() : '')
+  }
+
+  function irA(url) {
+    if (localStorage.getItem('ba_logged') !== '1') {
+      window.location.href = 'buscARTE_registro.html'
+    } else {
+      window.location.href = url
+    }
+  }
+
+  // CARGAR STATS REALES
+  const SB_URL = 'https://xiaanchoanxmampegoay.supabase.co'
+  const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68'
+  const sbHdrs = { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Prefer': 'count=exact' }
+
+  async function cargarStatsIndex() {
+    try {
+      const [rm, ra] = await Promise.all([
+        fetch(`${SB_URL}/rest/v1/perfiles?select=id`, { headers: sbHdrs }),
+        fetch(`${SB_URL}/rest/v1/anuncios?estado=eq.activo&select=id`, { headers: sbHdrs })
+      ])
+      const totalMusicos = rm.headers.get('content-range')?.split('/')[1]
+      const totalAnuncios = ra.headers.get('content-range')?.split('/')[1]
+      const sm = document.getElementById('stat-musicos')
+      const sa = document.getElementById('stat-anuncios')
+      if (sm && totalMusicos) sm.innerHTML = `${totalMusicos}<span>+</span>`
+      if (sa && totalAnuncios) sa.innerHTML = `${totalAnuncios}<span>+</span>`
+    } catch(e) { console.error(e) }
+  }
+  cargarStatsIndex()
+</script>
+</body>
+</html>
