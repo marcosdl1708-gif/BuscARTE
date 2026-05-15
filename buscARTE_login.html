@@ -326,7 +326,9 @@
       if (user && user.id) {
         localStorage.setItem('ba_logged', '1')
         localStorage.setItem('ba_name', user.nombre || email.split('@')[0])
+        localStorage.setItem('ba_email', email || '');
         localStorage.setItem('ba_user_id', String(user.id))
+        localStorage.setItem('ba_msg_last_seen', new Date().toISOString())
         localStorage.setItem('ba_referentes', user.referentes||'')
         localStorage.setItem('ba_generos', user.generos||'')
         document.getElementById('success-bar').classList.add('show')
@@ -350,6 +352,7 @@
     setTimeout(() => {
       localStorage.setItem('ba_logged', '1')
       localStorage.setItem('ba_name', 'Usuario')
+      localStorage.setItem('ba_msg_last_seen', new Date().toISOString())
       document.getElementById('success-bar').classList.add('show')
       setTimeout(() => { window.location.href = 'buscARTE_busqueda.html' }, 1200)
     }, 1400)
