@@ -945,9 +945,14 @@
         </div>
         <div class="exp-slider-wrap">
           <div class="exp-labels"><span>Estoy arrancando</span><span>Toda la vida</span></div>
-          <input type="range" min="0" max="30" value="8" oninput="updateExp(this)">
+          <input type="range" id="exp-slider" min="0" max="30" value="0" oninput="updateExp(this); showSaveBar()">
           <div class="exp-value" id="exp-val">8 años</div>
         </div>
+      </div>
+      <div class="field" style="margin-top:1.5rem">
+        <label>Edad <span style="color:var(--gris2);font-size:.7rem;font-weight:300">(opcional — aparece en tu perfil público)</span></label>
+        <input type="number" id="edad-input" min="16" max="80" placeholder="Ej: 28" style="width:140px;background:var(--negro);border:1px solid var(--gris3);color:var(--blanco);padding:.75rem 1rem;font-family:'Archivo',sans-serif;font-size:.9rem;outline:none" oninput="showSaveBar()">
+        <span style="color:var(--gris);font-size:.82rem;margin-left:.75rem">años</span>
       </div>
     </div>
 
@@ -1324,6 +1329,16 @@
           if (gens.includes(c.textContent.trim())) c.classList.add('selected')
         })
       }
+      // Experiencia
+      const expSlider = document.getElementById('exp-slider')
+      if (expSlider && p.experiencia != null) {
+        expSlider.value = p.experiencia
+        updateExp(expSlider)
+      }
+      // Edad
+      const edadInput = document.getElementById('edad-input')
+      if (edadInput && p.edad) edadInput.value = p.edad
+
       // Videos
       if (p.videos) {
         const links = p.videos.split(',').map(s=>s.trim())
@@ -1415,7 +1430,14 @@
       const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${miIdActual}`, {
         method: 'PATCH',
         headers: { ...hdrs, 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ nombre, bio, instrumento, generos, disponibilidad, donde_ensaya, videos, redes: JSON.stringify(redesObj), celular: document.getElementById('celular-input')?.value?.trim() || null, referentes: perfReferentes.join(', ') })
+        body: JSON.stringify({
+            nombre, bio, instrumento, generos, disponibilidad, donde_ensaya, videos,
+            redes: JSON.stringify(redesObj),
+            celular: document.getElementById('celular-input')?.value?.trim() || null,
+            referentes: perfReferentes.join(', '),
+            experiencia: parseInt(document.getElementById('exp-slider')?.value || 0),
+            edad: parseInt(document.getElementById('edad-input')?.value || 0) || null
+          })
       })
 
       if (res.ok || res.status === 204) {
