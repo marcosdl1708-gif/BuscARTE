@@ -259,6 +259,43 @@
   /* NAV LINKS CLICKABLE FIX */
   .nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap { pointer-events:auto !important; }
   nav a, nav button { pointer-events:auto !important; }
+
+  /* ── MOBILE ── */
+  @media (max-width: 768px) {
+    .cursor, .cursor-ring { display: none !important; }
+    * { cursor: auto !important; }
+    nav { padding: .6rem 1rem; }
+    .nav-links { display: none !important; }
+    .btn-ghost { display: none !important; }
+    .btn-neon { padding: .4rem .75rem !important; font-size: .72rem !important; }
+    .top-spacer { height: 56px; }
+    .layout { grid-template-columns: 1fr !important; }
+    .filters-panel, .right-panel, .sidebar-left, .sidebar-right { display: none !important; }
+    .results-area, .main-area { padding: 1.25rem !important; }
+    .anuncios-grid { grid-template-columns: 1fr !important; gap: .75rem !important; }
+    .anuncio-card { padding: 1.1rem !important; }
+    .results-header { flex-wrap: wrap; gap: .6rem; }
+    .results-count { font-size: 1.4rem; }
+    /* modal */
+    .modal-content, .modal-wrap { 
+      width: 100% !important; 
+      max-width: 100% !important;
+      height: 100vh !important;
+      max-height: 100vh !important;
+      border-radius: 0 !important;
+      margin: 0 !important;
+      overflow-y: auto !important;
+    }
+    .modal-backdrop { align-items: flex-end !important; padding: 0 !important; }
+    .modal-tipo-selector { grid-template-columns: repeat(2,1fr) !important; }
+    .mrow { grid-template-columns: 1fr !important; }
+    .modal-body { padding: 1.25rem !important; }
+    .modal-footer { padding: 1rem 1.25rem !important; }
+    .precio-wrap { flex-direction: column !important; gap: .5rem !important; }
+    .price-range { grid-template-columns: 1fr 1fr !important; }
+    input, select, textarea { font-size: 1rem !important; }
+    .btn-publicar { width: 100%; padding: .9rem !important; }
+  }
 </style>
 </head>
 <body>

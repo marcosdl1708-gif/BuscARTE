@@ -280,8 +280,7 @@
   /* NAV LINKS CLICKABLE FIX */
   .nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap { pointer-events:auto !important; }
   nav a, nav button { pointer-events:auto !important; }
-  @media (max-width: 768px) {
-    .cursor, .cursor-ring { display: none; }
+  
     * { cursor: auto !important; }
     nav { padding: .75rem 1rem; }
     .nav-center { display: none; }
@@ -296,6 +295,36 @@
     .profile-sidebar { display: none; }
     .contact-form { padding: 1.5rem 1.25rem; }
     .match-big { font-size: 2.5rem; }
+  }
+
+  /* ── MOBILE ── */
+  @media (max-width: 768px) {
+    .cursor, .cursor-ring { display: none !important; }
+    * { cursor: auto !important; }
+    nav { padding: .6rem 1rem !important; }
+    .nav-links { display: none !important; }
+    .btn-ghost { display: none !important; }
+    .btn-neon { padding: .4rem .75rem !important; font-size: .72rem !important; }
+    .top-spacer, .hero-spacer { height: 56px !important; }
+    /* hero */
+    .hero { padding: 1.5rem 1.25rem 0 !important; }
+    .hero-content { grid-template-columns: auto 1fr !important; gap: 1rem !important; }
+    .hero-avatar { width: 64px !important; height: 64px !important; font-size: 1.4rem !important; }
+    .hero-actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: .5rem; }
+    .hero-actions a, .hero-actions button { flex: 1; min-width: 0; text-align: center; font-size: .72rem !important; padding: .55rem .5rem !important; }
+    .hero-name { font-size: 1.6rem !important; }
+    .hero-instrument { font-size: .85rem; }
+    /* stats */
+    .profile-stats { grid-template-columns: repeat(2,1fr) !important; gap: 1px !important; }
+    /* body */
+    .profile-body { grid-template-columns: 1fr !important; }
+    .profile-sidebar { order: -1; border-right: none !important; border-bottom: 1px solid #1c1c1c; }
+    .profile-main, .profile-sidebar { padding: 1.25rem !important; }
+    /* videos */
+    .videos-grid { grid-template-columns: 1fr !important; }
+    /* anuncios grid */
+    .anuncios-grid { grid-template-columns: 1fr !important; }
+    .section-title { font-size: 1.1rem; }
   }
 </style>
 </head>

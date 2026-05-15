@@ -26,7 +26,16 @@
     .msg.success { background:rgba(212,245,60,.1);border:1px solid var(--neon);color:var(--neon) }
     .volver { text-align:center;margin-top:1.5rem;font-size:.85rem;color:var(--gris) }
     .volver a { color:var(--neon);text-decoration:none }
-  </style>
+  
+  @media (max-width: 768px) {
+    .cursor, .cursor-ring { display: none !important; }
+    * { cursor: auto !important; }
+    body { padding: 1.25rem; justify-content: flex-start; padding-top: 2.5rem; }
+    .card { padding: 2rem 1.25rem; }
+    input { font-size: 1rem; }
+    .btn { font-size: .95rem; }
+  }
+</style>
 </head>
 <body>
 

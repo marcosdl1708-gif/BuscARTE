@@ -308,6 +308,52 @@
   /* NAV LINKS CLICKABLE FIX */
   .nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap { pointer-events:auto !important; }
   nav a, nav button { pointer-events:auto !important; }
+
+  /* ── MOBILE ── */
+  @media (max-width: 768px) {
+    .cursor, .cursor-ring { display: none !important; }
+    * { cursor: auto !important; }
+    nav { padding: .6rem 1rem; }
+    .nav-links { display: none !important; }
+    .btn-ghost { display: none !important; }
+    .btn-neon { padding: .4rem .75rem !important; font-size: .72rem !important; }
+    body { height: 100vh; overflow: hidden; }
+    .mensajes-layout { grid-template-columns: 1fr !important; }
+    .conv-panel { height: calc(100vh - 56px) !important; width: 100% !important; }
+    .chat-panel { 
+      position: fixed !important; 
+      inset: 56px 0 0 0 !important; 
+      z-index: 200 !important;
+      display: none !important;
+      flex-direction: column !important;
+      background: var(--negro) !important;
+      height: calc(100vh - 56px) !important;
+    }
+    .chat-panel.mobile-visible { display: flex !important; }
+    .chat-back-btn {
+      display: flex !important;
+      align-items: center;
+      gap: .5rem;
+      padding: .7rem 1.2rem;
+      background: none;
+      border: none;
+      border-bottom: 1px solid #1c1c1c;
+      color: var(--neon);
+      font-family: var(--font-body);
+      font-size: .82rem;
+      cursor: auto;
+      width: 100%;
+      text-align: left;
+    }
+    .chat-messages { padding: 1rem !important; }
+    .chat-input-area { padding: .75rem 1rem !important; }
+    .chat-header { padding: .75rem 1rem !important; }
+    .chat-header-actions { display: none; }
+    .chat-context-bar { padding: .5rem 1rem !important; }
+    .msg { max-width: 85% !important; }
+    .chat-action-btn { display: none; }
+  }
+  .chat-back-btn { display: none; }
 </style>
 </head>
 <body>
@@ -690,6 +736,43 @@
   function toggleUserMenu(){const w=document.getElementById('nav-avatar-btn');const d=document.getElementById('nav-dropdown');if(w)w.classList.toggle('open');if(d)d.classList.toggle('open');}
   document.addEventListener('click',e=>{if(!e.target.closest('#nav-user')){document.getElementById('nav-avatar-btn')?.classList.remove('open');document.getElementById('nav-dropdown')?.classList.remove('open');}});
   function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');window.location.href='index.html';}
+
+  // ── MOBILE CHAT TOGGLE ──
+  (function() {
+    if (window.innerWidth > 768) return;
+    const chatPanel = document.getElementById('chat-panel');
+    if (!chatPanel) return;
+    // Add back button at top of chat panel
+    const backBtn = document.createElement('button');
+    backBtn.className = 'chat-back-btn';
+    backBtn.innerHTML = '← Volver a conversaciones';
+    backBtn.onclick = function() {
+      chatPanel.classList.remove('mobile-visible');
+    };
+    chatPanel.insertBefore(backBtn, chatPanel.firstChild);
+  })();
+
+  // Override abrirConv to show chat panel on mobile
+  const _origAbrirConv = typeof abrirConv !== 'undefined' ? abrirConv : null;
+  document.addEventListener('DOMContentLoaded', function() {
+    if (window.innerWidth <= 768) {
+      // Patch conv item clicks to show chat panel
+      const observer = new MutationObserver(function() {
+        document.querySelectorAll('.conv-item').forEach(function(item) {
+          if (!item._mobilePatch) {
+            item._mobilePatch = true;
+            const orig = item.onclick;
+            item.onclick = function(e) {
+              if (orig) orig.call(item, e);
+              const chatPanel = document.getElementById('chat-panel');
+              if (chatPanel) chatPanel.classList.add('mobile-visible');
+            };
+          }
+        });
+      });
+      observer.observe(document.querySelector('.conv-list') || document.body, { childList: true, subtree: true });
+    }
+  });
 </script>
 </body>
 </html>

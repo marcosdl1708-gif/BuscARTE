@@ -152,6 +152,25 @@
   /* NAV LINKS CLICKABLE FIX */
   .nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap { pointer-events:auto !important; }
   nav a, nav button { pointer-events:auto !important; }
+
+  /* ── MOBILE ── */
+  @media (max-width: 768px) {
+    .cursor, .cursor-ring { display: none !important; }
+    * { cursor: auto !important; }
+    nav { padding: .6rem 1rem; }
+    .nav-links { display: none !important; }
+    .btn-ghost { display: none !important; }
+    .btn-neon { padding: .4rem .75rem !important; font-size: .72rem !important; }
+    .top-spacer { height: 56px; }
+    .layout { grid-template-columns: 1fr !important; }
+    .sidebar { display: none !important; }
+    .main-area { padding: 1.25rem !important; }
+    .anuncios-grid { grid-template-columns: 1fr !important; gap: .75rem !important; }
+    .anuncio-card { padding: 1.1rem !important; }
+    .page-title { font-size: 1.4rem; }
+    .btn-nuevo { width: 100%; text-align: center; padding: .9rem !important; }
+    .stats-row { flex-wrap: wrap; gap: .5rem; }
+  }
 </style>
 </head>
 <body>

@@ -157,8 +157,7 @@
   /* NAV LINKS CLICKABLE FIX */
   .nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap { pointer-events:auto !important; }
   nav a, nav button { pointer-events:auto !important; }
-  @media (max-width: 768px) {
-    .cursor, .cursor-ring { display: none; }
+  
     * { cursor: auto !important; }
     .login-layout { grid-template-columns: 1fr; min-height: 100vh; }
     .login-left { display: none; }
@@ -168,6 +167,22 @@
     .login-title { font-size: 1.6rem; }
     .field input { font-size: 1rem; }
     .btn-submit { font-size: 1rem; padding: 1rem; }
+  }
+
+  /* ── MOBILE ── */
+  @media (max-width: 768px) {
+    .cursor, .cursor-ring { display: none !important; }
+    * { cursor: auto !important; }
+    nav { padding: .75rem 1rem; }
+    .page { grid-template-columns: 1fr !important; min-height: 100vh; }
+    .left-panel { display: none !important; }
+    .right-panel { padding: 1.5rem 1.25rem; min-height: calc(100vh - 60px); }
+    .form-wrap { max-width: 100% !important; }
+    .form-title { font-size: 1.6rem; }
+    .form-sub { font-size: .85rem; }
+    .field input { font-size: 1rem; padding: .85rem; }
+    .btn-submit { font-size: 1rem; padding: 1rem; }
+    .btn-google { font-size: .85rem; }
   }
 </style>
 </head>

@@ -55,7 +55,18 @@
     .mail-directo a { color:var(--neon);text-decoration:none }
     footer { text-align:center;padding:2rem;color:var(--gris);font-size:.8rem;border-top:1px solid #1c1c1c;margin-top:4rem }
     footer a { color:var(--neon);text-decoration:none }
-  </style>
+  
+  @media (max-width: 768px) {
+    .wrap { padding: 2rem 1.25rem; }
+    h1 { font-size: 1.8rem; }
+    .motivos { grid-template-columns: 1fr 1fr; gap: .75rem; }
+    .motivo { padding: 1rem; }
+    .motivo-title { font-size: .82rem; }
+    .motivo-desc { font-size: .74rem; }
+    input, select, textarea { font-size: 1rem; }
+    .btn-send { font-size: .95rem; padding: .9rem; }
+  }
+</style>
 </head>
 <body>
 <nav>

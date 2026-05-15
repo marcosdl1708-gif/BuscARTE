@@ -500,6 +500,28 @@
   /* NAV LINKS CLICKABLE FIX */
   .nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap { pointer-events:auto !important; }
   nav a, nav button { pointer-events:auto !important; }
+
+  /* ── MOBILE ── */
+  @media (max-width: 768px) {
+    .cursor, .cursor-ring { display: none !important; }
+    * { cursor: auto !important; }
+    nav { padding: .6rem 1rem; }
+    .nav-links { display: none !important; }
+    .nav-search { display: none !important; }
+    .btn-ghost { display: none !important; }
+    .btn-neon { padding: .4rem .75rem !important; font-size: .72rem !important; }
+    .top-spacer { height: 56px; }
+    .layout { grid-template-columns: 1fr !important; }
+    .sidebar { display: none !important; }
+    .main { padding: 1.5rem 1.25rem !important; }
+    .section-title { font-size: 1.3rem; }
+    .field-row { grid-template-columns: 1fr !important; }
+    .generos-grid, .ref-grid { grid-template-columns: 1fr 1fr !important; }
+    .foto-preview { width: 80px !important; height: 80px !important; }
+    .avatar-section { flex-direction: column !important; align-items: flex-start !important; gap: 1rem !important; }
+    .btn-save { width: 100%; padding: 1rem; font-size: 1rem; }
+    input, select, textarea { font-size: 1rem !important; }
+  }
 </style>
 </head>
 <body>
