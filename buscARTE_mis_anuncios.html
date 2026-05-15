@@ -634,20 +634,48 @@
   async function confirmDelete() {
     if (!cardToDelete) return
     const id = cardToDelete.dataset.id
+    if (!id) { alert('Error: no se pudo obtener el ID del anuncio.'); return }
     try {
-      await fetch(`${SUPABASE_URL}/rest/v1/anuncios?id=eq.${id}`, {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/anuncios?id=eq.${id}`, {
         method: 'DELETE',
-        headers: hdrs
+        headers: { ...hdrs, 'Prefer': 'return=minimal' }
       })
+      if (!res.ok) {
+        const errText = await res.text()
+        console.error('Error Supabase DELETE:', res.status, errText)
+        alert(`Error al eliminar (${res.status}). Revisá la consola.`)
+        return
+      }
       cardToDelete.style.transition = 'opacity .3s, transform .3s'
       cardToDelete.style.opacity = '0'
       cardToDelete.style.transform = 'translateX(-20px)'
       setTimeout(() => { cardToDelete.remove(); closeDeleteModal() }, 300)
-    } catch(e) { alert('Error al eliminar.'); console.error(e) }
+    } catch(e) { alert('Error al eliminar: ' + e.message); console.error(e) }
   }
 
   // Cargar al iniciar
   cargarMisAnuncios();
+
+  async function cargarBadgeMensajes(uid) {
+    const badge = document.getElementById('nav-msg-badge');
+    if (!badge || !uid) return;
+    try {
+      const lastSeen = localStorage.getItem('ba_msg_last_seen') || new Date().toISOString();
+      const res = await fetch(
+        `https://xiaanchoanxmampegoay.supabase.co/rest/v1/mensajes?para_user_id=eq.${uid}&created_at=gt.${lastSeen}&select=id&limit=99`,
+        { headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68', 'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68` } }
+      );
+      const msgs = await res.json();
+      const count = Array.isArray(msgs) ? msgs.length : 0;
+      if (count > 0) {
+        badge.textContent = count > 99 ? '99+' : count;
+        badge.style.display = 'inline';
+      } else {
+        badge.style.display = 'none';
+      }
+    } catch(e) { if(badge) badge.style.display = 'none'; }
+  }
+
   // NAV SESSION
   (function initNav(){
     const l=localStorage.getItem('ba_logged')==='1';
@@ -784,15 +812,6 @@ function mbnLogout(){
   window.location.href='index.html';
 }
 
-  async function cargarBadgeMensajes(uid) {
-    const badge = document.getElementById('nav-msg-badge');
-    if (!badge || !uid) return;
-    try {
-      const lastSeen = localStorage.getItem('ba_msg_last_seen') ||
-        new Date().toISOString();
-      const res = await fetch(
-        `https://xiaanchoanxmampegoay.supabase.co/rest/v1/mensajes?para_user_id=eq.${uid}&created_at=gt.${lastSeen}&select=id&limit=99`,
-        { headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68', 'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68` } }
       );
       const msgs = await res.json();
       const count = Array.isArray(msgs) ? msgs.length : 0;

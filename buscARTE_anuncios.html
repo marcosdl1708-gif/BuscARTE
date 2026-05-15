@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- SEO -->
-  <meta name="description" content="Busco músico, me ofrezco, jams abiertas y venta de instrumentos. El tablón de la escena musical argentina.">
+  <meta name="keywords" content="busco músico argentina, busco guitarrista, busco baterista, jam session buenos aires, zapada palermo, vendo guitarra argentina, anuncios musicales">
+  <meta name="description" content="Publicá y encontrá anuncios musicales en Argentina. Busco músico para banda, me ofrezco para proyectos, jams y zapadas abiertas, vendo instrumentos. Todo gratis en buscARTE.">
   <meta name="robots" content="index, follow">
   <meta name="author" content="buscARTE">
   <link rel="canonical" href="https://buscarte.com.ar/buscARTE_anuncios.html">
@@ -12,8 +13,8 @@
   <!-- Open Graph (WhatsApp, Facebook, Instagram) -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://buscarte.com.ar/buscARTE_anuncios.html">
-  <meta property="og:title" content="Anuncios musicales — buscARTE">
-  <meta property="og:description" content="Busco músico, me ofrezco, jams abiertas y venta de instrumentos. El tablón de la escena musical argentina.">
+  <meta property="og:title" content="Anuncios musicales Argentina — Busco músico, jam sessions, vendo instrumentos | buscARTE">
+  <meta property="og:description" content="Publicá y encontrá anuncios musicales en Argentina. Busco músico para banda, me ofrezco para proyectos, jams y zapadas abiertas, vendo instrumentos. Todo gratis en buscARTE.">
   <meta property="og:image" content="https://buscarte.com.ar/og-image.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -22,10 +23,10 @@
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Anuncios musicales — buscARTE">
-  <meta name="twitter:description" content="Busco músico, me ofrezco, jams abiertas y venta de instrumentos. El tablón de la escena musical argentina.">
+  <meta name="twitter:title" content="Anuncios musicales Argentina — Busco músico, jam sessions, vendo instrumentos | buscARTE">
+  <meta name="twitter:description" content="Publicá y encontrá anuncios musicales en Argentina. Busco músico para banda, me ofrezco para proyectos, jams y zapadas abiertas, vendo instrumentos. Todo gratis en buscARTE.">
   <meta name="twitter:image" content="https://buscarte.com.ar/og-image.jpg">
-<title>Anuncios musicales — buscARTE</title>
+<title>Anuncios musicales Argentina — Busco músico, jam sessions, vendo instrumentos | buscARTE</title>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
@@ -1438,6 +1439,27 @@
     ta.value = '';
     setTimeout(()=>{ form.classList.remove('open'); btn.textContent='Enviar →'; btn.style.background=''; }, 1400);
   }
+
+  async function cargarBadgeMensajes(uid) {
+    const badge = document.getElementById('nav-msg-badge');
+    if (!badge || !uid) return;
+    try {
+      const lastSeen = localStorage.getItem('ba_msg_last_seen') || new Date().toISOString();
+      const res = await fetch(
+        `https://xiaanchoanxmampegoay.supabase.co/rest/v1/mensajes?para_user_id=eq.${uid}&created_at=gt.${lastSeen}&select=id&limit=99`,
+        { headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68', 'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68` } }
+      );
+      const msgs = await res.json();
+      const count = Array.isArray(msgs) ? msgs.length : 0;
+      if (count > 0) {
+        badge.textContent = count > 99 ? '99+' : count;
+        badge.style.display = 'inline';
+      } else {
+        badge.style.display = 'none';
+      }
+    } catch(e) { if(badge) badge.style.display = 'none'; }
+  }
+
   // NAV SESSION
   (function initNav(){
     const l=localStorage.getItem('ba_logged')==='1';
@@ -1531,15 +1553,6 @@ function mbnLogout(){
   window.location.href='index.html';
 }
 
-  async function cargarBadgeMensajes(uid) {
-    const badge = document.getElementById('nav-msg-badge');
-    if (!badge || !uid) return;
-    try {
-      const lastSeen = localStorage.getItem('ba_msg_last_seen') ||
-        new Date().toISOString();
-      const res = await fetch(
-        `https://xiaanchoanxmampegoay.supabase.co/rest/v1/mensajes?para_user_id=eq.${uid}&created_at=gt.${lastSeen}&select=id&limit=99`,
-        { headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68', 'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68` } }
       );
       const msgs = await res.json();
       const count = Array.isArray(msgs) ? msgs.length : 0;

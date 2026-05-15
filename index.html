@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- SEO -->
-  <meta name="description" content="Encontrá músicos por instrumento, género y zona. Publicá anuncios, organizá jams y conectá con otros artistas. Gratis para siempre.">
+  <meta name="keywords" content="músicos argentina, buscar músico, guitarrista buenos aires, baterista, bajista, cantante, banda de rock argentina, músicos por ciudad, red social músicos, jam session argentina">
+  <meta name="description" content="buscARTE es la red gratuita para músicos argentinos. Encontrá guitarristas, bateristas, bajistas, cantantes y más por ciudad, barrio y género musical. Buenos Aires, Córdoba, Rosario y todo el país.">
   <meta name="robots" content="index, follow">
   <meta name="author" content="buscARTE">
   <link rel="canonical" href="https://buscarte.com.ar/">
@@ -12,8 +13,8 @@
   <!-- Open Graph (WhatsApp, Facebook, Instagram) -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://buscarte.com.ar/">
-  <meta property="og:title" content="buscARTE — La red de músicos argentinos">
-  <meta property="og:description" content="Encontrá músicos por instrumento, género y zona. Publicá anuncios, organizá jams y conectá con otros artistas. Gratis para siempre.">
+  <meta property="og:title" content="buscARTE — Encontrá músicos en Argentina | Red de músicos argentinos">
+  <meta property="og:description" content="buscARTE es la red gratuita para músicos argentinos. Encontrá guitarristas, bateristas, bajistas, cantantes y más por ciudad, barrio y género musical. Buenos Aires, Córdoba, Rosario y todo el país.">
   <meta property="og:image" content="https://buscarte.com.ar/og-image.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -22,10 +23,10 @@
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="buscARTE — La red de músicos argentinos">
-  <meta name="twitter:description" content="Encontrá músicos por instrumento, género y zona. Publicá anuncios, organizá jams y conectá con otros artistas. Gratis para siempre.">
+  <meta name="twitter:title" content="buscARTE — Encontrá músicos en Argentina | Red de músicos argentinos">
+  <meta name="twitter:description" content="buscARTE es la red gratuita para músicos argentinos. Encontrá guitarristas, bateristas, bajistas, cantantes y más por ciudad, barrio y género musical. Buenos Aires, Córdoba, Rosario y todo el país.">
   <meta name="twitter:image" content="https://buscarte.com.ar/og-image.jpg">
-<title>buscARTE — La red de músicos argentinos</title>
+<title>buscARTE — Encontrá músicos en Argentina | Red de músicos argentinos</title>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -802,6 +803,35 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="buscARTE">
   <link rel="apple-touch-icon" href="/icons/icon-192.svg">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "name": "buscARTE",
+      "url": "https://buscarte.com.ar",
+      "logo": "https://buscarte.com.ar/icons/icon-512.png",
+      "description": "La red gratuita de músicos argentinos",
+      "foundingLocation": {
+        "@type": "Place",
+        "name": "Buenos Aires, Argentina"
+      },
+      "sameAs": []
+    },
+    {
+      "@type": "WebSite",
+      "name": "buscARTE",
+      "url": "https://buscarte.com.ar",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://buscarte.com.ar/buscARTE_busqueda.html?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body>
 
@@ -1167,6 +1197,27 @@
     });
   }, { threshold: 0.1 });
   reveals.forEach(el => observer.observe(el));
+
+  async function cargarBadgeMensajes(uid) {
+    const badge = document.getElementById('nav-msg-badge');
+    if (!badge || !uid) return;
+    try {
+      const lastSeen = localStorage.getItem('ba_msg_last_seen') || new Date().toISOString();
+      const res = await fetch(
+        `https://xiaanchoanxmampegoay.supabase.co/rest/v1/mensajes?para_user_id=eq.${uid}&created_at=gt.${lastSeen}&select=id&limit=99`,
+        { headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68', 'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68` } }
+      );
+      const msgs = await res.json();
+      const count = Array.isArray(msgs) ? msgs.length : 0;
+      if (count > 0) {
+        badge.textContent = count > 99 ? '99+' : count;
+        badge.style.display = 'inline';
+      } else {
+        badge.style.display = 'none';
+      }
+    } catch(e) { if(badge) badge.style.display = 'none'; }
+  }
+
   // NAV SESSION
   (function initNav(){
     const l=localStorage.getItem('ba_logged')==='1';
@@ -1246,15 +1297,6 @@
   }
   cargarStatsIndex()
 
-  async function cargarBadgeMensajes(uid) {
-    const badge = document.getElementById('nav-msg-badge');
-    if (!badge || !uid) return;
-    try {
-      const lastSeen = localStorage.getItem('ba_msg_last_seen') ||
-        new Date().toISOString();
-      const res = await fetch(
-        `https://xiaanchoanxmampegoay.supabase.co/rest/v1/mensajes?para_user_id=eq.${uid}&created_at=gt.${lastSeen}&select=id&limit=99`,
-        { headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68', 'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68` } }
       );
       const msgs = await res.json();
       const count = Array.isArray(msgs) ? msgs.length : 0;
