@@ -630,79 +630,97 @@
   nav a, nav button { pointer-events:auto !important; }
   /* ── MOBILE RESPONSIVE ── */
   @media (max-width: 768px) {
+    /* GLOBAL: prevenir scroll horizontal */
+    html, body { overflow-x: hidden !important; }
     .cursor, .cursor-ring { display: none !important; }
     body { cursor: auto !important; }
 
     /* NAV */
     nav { padding: .75rem 1rem !important; }
     .nav-links { display: none !important; }
-    .btn-ghost { 
+    .btn-ghost {
       display: inline-block !important;
-      padding: .45rem .9rem !important; 
+      padding: .45rem .9rem !important;
       font-size: .72rem !important;
       letter-spacing: .04em !important;
     }
-    .btn-neon { 
-      padding: .45rem .9rem !important; 
+    .btn-neon {
+      padding: .45rem .9rem !important;
       font-size: .72rem !important;
       letter-spacing: .04em !important;
     }
 
-    /* HERO */
-    .hero { 
-      min-height: 90vh !important; 
+    /* HERO — mantener overflow:hidden para que el bg-text no desborde */
+    .hero {
+      min-height: 90vh !important;
       padding: 5rem 1.25rem 3rem !important;
+      overflow: hidden !important;
     }
-    .hero-bg-text { 
-      font-size: 40vw !important; 
-      opacity: .03 !important;
-      top: 25% !important;
-    }
+    /* Ocultar texto decorativo de fondo — solo visual, no aporta en mobile */
+    .hero-bg-text { display: none !important; }
     .hero-tag { font-size: .68rem !important; }
-    /* Hero: evitar que overflow:hidden corte el título */
-    .hero { overflow: visible !important; }
+    /* h1 con tamaño reducido para que "EN LA ESCENA" entre sin cortarse */
     h1 {
       font-size: clamp(1.9rem, 7.5vw, 4rem) !important;
       line-height: .9 !important;
       letter-spacing: -.02em !important;
-      word-break: normal !important;
       white-space: normal !important;
     }
     .hero-bottom { flex-direction: column !important; align-items: flex-start !important; gap: 1rem !important; }
     .hero-desc { font-size: .85rem !important; max-width: 100% !important; }
-    .hero-actions { 
-      flex-direction: column !important; 
-      align-items: stretch !important; 
-      gap: .75rem !important; 
+    .hero-actions {
+      flex-direction: column !important;
+      align-items: stretch !important;
+      gap: .75rem !important;
       width: 100% !important;
     }
-    .hero-actions a, .hero-actions button { 
-      width: 100% !important; 
+    .hero-actions a, .hero-actions button {
+      width: 100% !important;
       text-align: center !important;
     }
     .hero-scroll { display: none !important; }
 
     /* STATS */
-    .stats-bar { 
-      grid-template-columns: 1fr 1fr !important; 
-      padding: 2rem 1.25rem !important; 
+    .stats-bar {
+      grid-template-columns: 1fr 1fr !important;
+      padding: 2rem 1.25rem !important;
     }
     .stat-num { font-size: 2rem !important; }
     .stat-label { font-size: .72rem !important; }
 
+    /* SECTION HEADERS — apilar vertical en mobile */
+    .section { padding: 3.5rem 1.25rem !important; }
+    .profiles-section { padding: 3.5rem 1.25rem !important; }
+    .section-header {
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 1rem !important;
+      margin-bottom: 2rem !important;
+    }
+    .section-title {
+      font-size: clamp(2rem, 9vw, 3.5rem) !important;
+    }
+    .section-sub {
+      max-width: 100% !important;
+      text-align: left !important;
+      font-size: .85rem !important;
+    }
+    /* Ocultar bg decorativos en secciones */
+    .section-bg-text { display: none !important; }
+
     /* STEPS */
     .steps { grid-template-columns: 1fr !important; }
-    .step { 
-      padding: 1.5rem 1.25rem !important; 
-      border-right: none !important; 
-      border-bottom: 1px solid #1c1c1c !important; 
+    .step {
+      padding: 1.5rem 1.25rem !important;
+      border-right: none !important;
+      border-bottom: 1px solid #1c1c1c !important;
     }
     .step::before { display: none !important; }
 
     /* SEARCH */
     .search-box { flex-direction: column !important; gap: .5rem !important; }
-    .search-input { 
-      font-size: .9rem !important; 
+    .search-input {
+      font-size: .9rem !important;
       border-right: 1px solid #1c1c1c !important;
     }
     .search-btn { width: 100% !important; }
@@ -713,15 +731,17 @@
     .profile-card { padding: 1.25rem !important; }
 
     /* CTA */
-    .cta-title { font-size: clamp(2.2rem, 11vw, 4rem) !important; }
+    .cta-section { padding: 4rem 1.25rem !important; overflow: hidden !important; }
+    .cta-title { font-size: clamp(2.2rem, 9vw, 4rem) !important; }
+    .cta-sub { font-size: .88rem !important; }
     .cta-domain { font-size: .78rem !important; word-break: break-all !important; }
 
     /* FOOTER */
-    footer { 
-      flex-direction: column !important; 
-      gap: 1rem !important; 
-      padding: 2rem 1.25rem !important; 
-      text-align: center !important; 
+    footer {
+      flex-direction: column !important;
+      gap: 1rem !important;
+      padding: 2rem 1.25rem !important;
+      text-align: center !important;
     }
     .footer-links { flex-wrap: wrap !important; justify-content: center !important; }
   }
