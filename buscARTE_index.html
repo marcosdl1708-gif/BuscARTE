@@ -616,7 +616,13 @@
   .nav-dropdown-item:hover { background:rgba(255,255,255,.04);color:var(--blanco); }
   .nav-dropdown-divider { height:1px;background:#1c1c1c;margin:.3rem 0; }
   .nav-logout:hover { color:var(--rojo) !important; }
-  .nav-badge { background:var(--neon);color:var(--negro);font-size:.55rem;font-weight:700;padding:.1rem .4rem;margin-left:auto; }
+  .nav-badge {
+    background:var(--neon);color:var(--negro);
+    font-size:.62rem;font-weight:700;
+    padding:.15rem .45rem;margin-left:.5rem;
+    border-radius:2px; min-width:1.2rem; text-align:center;
+    display:inline-block;
+  }
   /* NAV LINKS FIX */
   .nav-links { list-style:none !important; display:flex !important; gap:2rem !important; padding:0 !important; margin:0 !important; }
   .nav-links li { list-style:none !important; }
@@ -630,75 +636,97 @@
   nav a, nav button { pointer-events:auto !important; }
   /* ── MOBILE RESPONSIVE ── */
   @media (max-width: 768px) {
+    /* GLOBAL: prevenir scroll horizontal */
+    html, body { overflow-x: hidden !important; }
     .cursor, .cursor-ring { display: none !important; }
     body { cursor: auto !important; }
 
     /* NAV */
     nav { padding: .75rem 1rem !important; }
     .nav-links { display: none !important; }
-    .btn-ghost { 
+    .btn-ghost {
       display: inline-block !important;
-      padding: .45rem .9rem !important; 
+      padding: .45rem .9rem !important;
       font-size: .72rem !important;
       letter-spacing: .04em !important;
     }
-    .btn-neon { 
-      padding: .45rem .9rem !important; 
+    .btn-neon {
+      padding: .45rem .9rem !important;
       font-size: .72rem !important;
       letter-spacing: .04em !important;
     }
 
-    /* HERO */
-    .hero { 
-      min-height: 90vh !important; 
+    /* HERO — mantener overflow:hidden para que el bg-text no desborde */
+    .hero {
+      min-height: 90vh !important;
       padding: 5rem 1.25rem 3rem !important;
+      overflow: hidden !important;
     }
-    .hero-bg-text { 
-      font-size: 40vw !important; 
-      opacity: .03 !important;
-      top: 25% !important;
-    }
+    /* Ocultar texto decorativo de fondo — solo visual, no aporta en mobile */
+    .hero-bg-text { display: none !important; }
     .hero-tag { font-size: .68rem !important; }
-    .hero-title { 
-      font-size: clamp(1.9rem, 8vw, 4rem) !important; 
-      line-height: .92 !important;
-      word-break: keep-all !important;
+    /* h1 con tamaño reducido para que "EN LA ESCENA" entre sin cortarse */
+    h1 {
+      font-size: clamp(1.9rem, 7.5vw, 4rem) !important;
+      line-height: .9 !important;
+      letter-spacing: -.02em !important;
+      white-space: normal !important;
     }
     .hero-bottom { flex-direction: column !important; align-items: flex-start !important; gap: 1rem !important; }
     .hero-desc { font-size: .85rem !important; max-width: 100% !important; }
-    .hero-actions { 
-      flex-direction: column !important; 
-      align-items: stretch !important; 
-      gap: .75rem !important; 
+    .hero-actions {
+      flex-direction: column !important;
+      align-items: stretch !important;
+      gap: .75rem !important;
       width: 100% !important;
     }
-    .hero-actions a, .hero-actions button { 
-      width: 100% !important; 
+    .hero-actions a, .hero-actions button {
+      width: 100% !important;
       text-align: center !important;
     }
     .hero-scroll { display: none !important; }
 
     /* STATS */
-    .stats-bar { 
-      grid-template-columns: 1fr 1fr !important; 
-      padding: 2rem 1.25rem !important; 
+    .stats-bar {
+      grid-template-columns: 1fr 1fr !important;
+      padding: 2rem 1.25rem !important;
     }
     .stat-num { font-size: 2rem !important; }
     .stat-label { font-size: .72rem !important; }
 
+    /* SECTION HEADERS — apilar vertical en mobile */
+    .section { padding: 3.5rem 1.25rem !important; }
+    .profiles-section { padding: 3.5rem 1.25rem !important; }
+    .section-header {
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 1rem !important;
+      margin-bottom: 2rem !important;
+    }
+    .section-title {
+      font-size: clamp(2rem, 9vw, 3.5rem) !important;
+    }
+    .section-sub {
+      max-width: 100% !important;
+      text-align: left !important;
+      font-size: .85rem !important;
+    }
+    /* Ocultar bg decorativos en secciones */
+    .section-bg-text { display: none !important; }
+
     /* STEPS */
     .steps { grid-template-columns: 1fr !important; }
-    .step { 
-      padding: 1.5rem 1.25rem !important; 
-      border-right: none !important; 
-      border-bottom: 1px solid #1c1c1c !important; 
+    .step {
+      padding: 1.5rem 1.25rem !important;
+      border-right: none !important;
+      border-bottom: 1px solid #1c1c1c !important;
     }
     .step::before { display: none !important; }
 
     /* SEARCH */
     .search-box { flex-direction: column !important; gap: .5rem !important; }
-    .search-input { 
-      font-size: .9rem !important; 
+    .search-input {
+      font-size: .9rem !important;
       border-right: 1px solid #1c1c1c !important;
     }
     .search-btn { width: 100% !important; }
@@ -709,19 +737,60 @@
     .profile-card { padding: 1.25rem !important; }
 
     /* CTA */
-    .cta-title { font-size: clamp(2.2rem, 11vw, 4rem) !important; }
+    .cta-section { padding: 4rem 1.25rem !important; overflow: hidden !important; }
+    .cta-title { font-size: clamp(2.2rem, 9vw, 4rem) !important; }
+    .cta-sub { font-size: .88rem !important; }
     .cta-domain { font-size: .78rem !important; word-break: break-all !important; }
 
     /* FOOTER */
-    footer { 
-      flex-direction: column !important; 
-      gap: 1rem !important; 
-      padding: 2rem 1.25rem !important; 
-      text-align: center !important; 
+    footer {
+      flex-direction: column !important;
+      gap: 1rem !important;
+      padding: 2rem 1.25rem !important;
+      text-align: center !important;
     }
     .footer-links { flex-wrap: wrap !important; justify-content: center !important; }
   }
+
+  /* HERO QUICK NAV (logueado) */
+  .hero-quick-nav {
+    display: flex; gap: 1rem; flex-wrap: wrap;
+  }
+  .hqn-btn {
+    display: flex; align-items: center; gap: .6rem;
+    background: rgba(255,255,255,.05);
+    border: 1px solid #333;
+    color: var(--blanco); text-decoration: none;
+    padding: .9rem 1.6rem;
+    font-family: var(--font-body); font-size: .88rem;
+    letter-spacing: .06em; text-transform: uppercase;
+    transition: border-color .2s, background .2s, color .2s;
+    min-width: 140px;
+  }
+  .hqn-btn:hover { border-color: var(--neon); background: rgba(212,245,60,.06); color: var(--neon); }
+  .hqn-icon { font-size: 1.1rem; }
+  @media (max-width: 768px) {
+    .hero-quick-nav {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr !important;
+      gap: .6rem !important;
+      width: 100% !important;
+    }
+    .hqn-btn {
+      justify-content: center !important;
+      padding: .9rem !important;
+      font-size: .75rem !important;
+    }
+    #hero-logueado p { font-size: .8rem !important; }
+  }
+
 </style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="buscARTE">
+  <link rel="apple-touch-icon" href="/icons/icon-192.svg">
 </head>
 <body>
 
@@ -753,6 +822,7 @@
         <a href="buscARTE_mensajes.html" class="nav-dropdown-item">💬 Mensajes <span class="nav-badge" id="nav-msg-badge" style="display:none"></span></a>
         <a href="buscARTE_mis_anuncios.html" class="nav-dropdown-item">📋 Mis anuncios</a>
         <a href="buscARTE_guardados.html" class="nav-dropdown-item">♡ Guardados</a>
+        <a href="buscARTE_generador.html" class="nav-dropdown-item">🎲 Generador de nombres</a>
         <div class="nav-dropdown-divider"></div>
         <button class="nav-dropdown-item nav-logout" onclick="logout()">↩ Cerrar sesión</button>
       </div>
@@ -772,11 +842,37 @@
     EN LA <span class="rojo">ESCENA</span>
   </h1>
 
-  <div class="hero-bottom">
+  <!-- Estado: logueado — full width, fuera del flex row -->
+  <div id="hero-logueado" style="display:none; margin-bottom:2rem;">
+    <p style="color:var(--gris);font-size:.9rem;margin-bottom:1.4rem;letter-spacing:.02em;">
+      Bienvenido de vuelta, <span id="hero-nombre" style="color:var(--blanco);font-weight:500"></span> 👋
+    </p>
+    <div class="hero-quick-nav">
+      <a href="buscARTE_busqueda.html" class="hqn-btn">
+        <span class="hqn-icon">🎵</span>
+        <span class="hqn-label">Músicos</span>
+      </a>
+      <a href="buscARTE_anuncios.html" class="hqn-btn">
+        <span class="hqn-icon">📋</span>
+        <span class="hqn-label">Anuncios</span>
+      </a>
+      <a href="buscARTE_mensajes.html" class="hqn-btn">
+        <span class="hqn-icon">💬</span>
+        <span class="hqn-label">Mensajes</span>
+      </a>
+      <a href="#" class="hqn-btn" id="hero-mi-perfil">
+        <span class="hqn-icon">👤</span>
+        <span class="hqn-label">Mi perfil</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Estado: no logueado -->
+  <div class="hero-bottom" id="hero-invitado-wrap">
     <p class="hero-desc">
       La plataforma para que <strong>músicos, artistas y creativos</strong> de toda Argentina se encuentren, conecten y construyan proyectos juntos.
     </p>
-    <div class="hero-actions">
+    <div class="hero-actions" id="hero-invitado">
       <a href="buscARTE_registro.html" class="btn-neon" style="font-size:0.95rem; padding: 0.9rem 2.2rem;">Crear perfil gratis</a>
       <a href="#explorar" class="btn-ghost" style="font-size:0.95rem; padding: 0.9rem 2.2rem;">Explorar →</a>
     </div>
@@ -1075,11 +1171,19 @@
       if(c)c.textContent=i;
       const nm=document.getElementById('nav-avatar-name');
       if(nm)nm.textContent=n.split(' ')[0];
-      const b=document.getElementById('nav-msg-badge');
-      if(b)b.style.display='inline';
+      cargarBadgeMensajes(uid);
       // Fix Mi perfil link with real user ID
       const miPerfilLink=document.querySelector('.nav-dropdown-item[href*="perfil_publico"]');
       if(miPerfilLink && uid) miPerfilLink.href='buscARTE_perfil_publico.html?id='+uid;
+      // Hero logueado: mostrar accesos rápidos
+      const inv = document.getElementById('hero-invitado-wrap');
+      const log = document.getElementById('hero-logueado');
+      if(inv) inv.style.display = 'none';
+      if(log) log.style.display = 'block';
+      const hn = document.getElementById('hero-nombre');
+      if(hn) hn.textContent = n.split(' ')[0];
+      const hmp = document.getElementById('hero-mi-perfil');
+      if(hmp && uid) hmp.href = 'buscARTE_perfil_publico.html?id=' + uid;
     }
   })();
   function toggleUserMenu(){const w=document.getElementById('nav-avatar-btn');const d=document.getElementById('nav-dropdown');if(w)w.classList.toggle('open');if(d)d.classList.toggle('open');}
@@ -1130,6 +1234,34 @@
     } catch(e) { console.error(e) }
   }
   cargarStatsIndex()
+
+  async function cargarBadgeMensajes(uid) {
+    const badge = document.getElementById('nav-msg-badge');
+    if (!badge || !uid) return;
+    try {
+      const lastSeen = localStorage.getItem('ba_msg_last_seen') ||
+        new Date().toISOString();
+      const res = await fetch(
+        `https://xiaanchoanxmampegoay.supabase.co/rest/v1/mensajes?para_user_id=eq.${uid}&created_at=gt.${lastSeen}&select=id&limit=99`,
+        { headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68', 'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68` } }
+      );
+      const msgs = await res.json();
+      const count = Array.isArray(msgs) ? msgs.length : 0;
+      if (count > 0) {
+        badge.textContent = count > 99 ? '99+' : count;
+        badge.style.display = 'inline';
+      } else {
+        badge.style.display = 'none';
+      }
+    } catch(e) { badge.style.display = 'none'; }
+  }
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
 </script>
 </body>
 </html>

@@ -242,6 +242,12 @@
     .guardados-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:#181818; }
     
   </style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="buscARTE">
+  <link rel="apple-touch-icon" href="/icons/icon-192.svg">
 </head>
 <body>
 <div class="cursor" id="cursor"></div>
@@ -465,6 +471,13 @@ function mbnLogout(){
       }
     } catch(e) { badge.style.display = 'none'; }
   }
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
 </script>
 </body>
 </html>
