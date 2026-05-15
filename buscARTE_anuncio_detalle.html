@@ -998,7 +998,7 @@
       if(g)g.style.display='none';if(u)u.style.display='flex';
       const c=document.getElementById('nav-avatar-circle');if(c)c.textContent=i;
       const nm=document.getElementById('nav-avatar-name');if(nm)nm.textContent=n.split(' ')[0];
-      const b=document.getElementById('nav-msg-badge');if(b)b.style.display='inline';
+      cargarBadgeMensajes(uid);
       const miPerfilLink=document.querySelector('.nav-dropdown-item[href*="perfil_publico"]');
       if(miPerfilLink && uid) miPerfilLink.href='buscARTE_perfil_publico.html?id='+uid;
     }
@@ -1057,6 +1057,27 @@ function mbnLogout(){
   localStorage.removeItem('ba_user_id');
   window.location.href='index.html';
 }
+
+  async function cargarBadgeMensajes(uid) {
+    const badge = document.getElementById('nav-msg-badge');
+    if (!badge || !uid) return;
+    try {
+      const lastSeen = localStorage.getItem('ba_msg_last_seen') ||
+        new Date(Date.now() - 7*24*60*60*1000).toISOString();
+      const res = await fetch(
+        `https://xiaanchoanxmampegoay.supabase.co/rest/v1/mensajes?para_user_id=eq.${uid}&created_at=gt.${encodeURIComponent(lastSeen)}&select=id&limit=99`,
+        { headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68', 'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68` } }
+      );
+      const msgs = await res.json();
+      const count = Array.isArray(msgs) ? msgs.length : 0;
+      if (count > 0) {
+        badge.textContent = count > 99 ? '99+' : count;
+        badge.style.display = 'inline';
+      } else {
+        badge.style.display = 'none';
+      }
+    } catch(e) { badge.style.display = 'none'; }
+  }
 </script>
 </body>
 </html>

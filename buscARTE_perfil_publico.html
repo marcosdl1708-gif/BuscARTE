@@ -469,6 +469,60 @@
     .profile-hero { padding:1.25rem 1rem 0 !important; }
   }
 
+
+  /* ── MODAL REPORTE ── */
+  .report-modal-overlay {
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,.75); z-index:1000;
+    align-items:center; justify-content:center; padding:1.5rem;
+  }
+  .report-modal-overlay.open { display:flex; }
+  .report-modal {
+    background:#111; border:1px solid #2a2a2a;
+    width:100%; max-width:440px; padding:2rem;
+    border-radius:4px;
+  }
+  .report-modal-title { font-family:var(--font-display);font-size:1.3rem;margin-bottom:.4rem; }
+  .report-modal-sub { color:var(--gris);font-size:.82rem;margin-bottom:1.5rem;line-height:1.6; }
+  .report-options { display:flex;flex-direction:column;gap:.5rem;margin-bottom:1.2rem; }
+  .report-option {
+    display:flex; align-items:center; gap:.75rem;
+    padding:.7rem .9rem; border:1px solid #2a2a2a;
+    cursor:pointer; transition:border-color .15s;
+    font-size:.85rem; color:var(--blanco);
+    background:transparent; text-align:left; width:100%;
+    font-family:'Archivo',sans-serif;
+  }
+  .report-option:hover { border-color:#555; }
+  .report-option.selected { border-color:var(--neon);color:var(--neon); }
+  .report-detail {
+    width:100%; background:#0a0a0a; border:1px solid #2a2a2a;
+    color:var(--blanco); padding:.75rem; font-family:'Archivo',sans-serif;
+    font-size:.85rem; resize:vertical; min-height:80px; outline:none;
+    margin-bottom:1.2rem; display:none;
+    transition:border-color .2s;
+  }
+  .report-detail:focus { border-color:var(--neon); }
+  .report-detail.visible { display:block; }
+  .report-actions { display:flex;gap:.75rem;justify-content:flex-end; }
+  .btn-report-cancel {
+    background:transparent; border:1px solid #2a2a2a; color:var(--gris);
+    padding:.65rem 1.2rem; font-family:'Archivo',sans-serif; font-size:.82rem;
+    cursor:pointer; transition:border-color .2s;
+  }
+  .btn-report-cancel:hover { border-color:#555; }
+  .btn-report-send {
+    background:var(--neon); border:none; color:#000;
+    padding:.65rem 1.4rem; font-family:'Archivo Black',sans-serif; font-size:.82rem;
+    cursor:pointer; transition:opacity .2s;
+  }
+  .btn-report-send:hover { opacity:.85; }
+  .btn-report-send:disabled { opacity:.4; cursor:not-allowed; }
+  .report-success { text-align:center; padding:1rem 0; }
+  .report-success-icon { font-size:2.5rem; margin-bottom:.75rem; }
+  .report-success-title { font-family:var(--font-display);font-size:1.2rem;margin-bottom:.4rem; }
+  .report-success-sub { color:var(--gris);font-size:.82rem;line-height:1.6; }
+
 </style>
 </head>
 <body>
@@ -623,7 +677,7 @@
       </div>
     </div>
 
-    <a href="#" class="report-link" onclick="return false">⚑ Reportar perfil</a>
+    <a href="#" class="report-link" onclick="abrirReporte();return false">⚑ Reportar perfil</a>
 
   </div>
 </div>
@@ -982,8 +1036,7 @@
       if(c)c.textContent=i;
       const nm=document.getElementById('nav-avatar-name');
       if(nm)nm.textContent=n.split(' ')[0];
-      const b=document.getElementById('nav-msg-badge');
-      if(b)b.style.display='inline';
+      cargarBadgeMensajes(uid);
       // Fix Mi perfil link with real user ID
       const miPerfilLink=document.querySelector('.nav-dropdown-item[href*="perfil_publico"]');
       if(miPerfilLink && uid) miPerfilLink.href='buscARTE_perfil_publico.html?id='+uid;
@@ -1043,6 +1096,129 @@ function mbnLogout(){
   localStorage.removeItem('ba_user_id');
   window.location.href='index.html';
 }
+
+  async function cargarBadgeMensajes(uid) {
+    const badge = document.getElementById('nav-msg-badge');
+    if (!badge || !uid) return;
+    try {
+      const lastSeen = localStorage.getItem('ba_msg_last_seen') ||
+        new Date(Date.now() - 7*24*60*60*1000).toISOString();
+      const res = await fetch(
+        `https://xiaanchoanxmampegoay.supabase.co/rest/v1/mensajes?para_user_id=eq.${uid}&created_at=gt.${encodeURIComponent(lastSeen)}&select=id&limit=99`,
+        { headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68', 'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68` } }
+      );
+      const msgs = await res.json();
+      const count = Array.isArray(msgs) ? msgs.length : 0;
+      if (count > 0) {
+        badge.textContent = count > 99 ? '99+' : count;
+        badge.style.display = 'inline';
+      } else {
+        badge.style.display = 'none';
+      }
+    } catch(e) { badge.style.display = 'none'; }
+  }
+
+  // ── REPORTE DE PERFIL ──
+  let reporteMotivo = '';
+
+  function abrirReporte() {
+    document.getElementById('report-overlay').classList.add('open');
+    document.getElementById('report-form-content').style.display = 'block';
+    document.getElementById('report-success').style.display = 'none';
+    reporteMotivo = '';
+    document.querySelectorAll('.report-option').forEach(b => b.classList.remove('selected'));
+    document.getElementById('report-detail').classList.remove('visible');
+    document.getElementById('btn-send-report').disabled = true;
+    // Poner nombre del perfil en subtítulo
+    const nombre = document.getElementById('perfil-nombre')?.textContent;
+    if (nombre && nombre !== '—') {
+      document.getElementById('report-sub').textContent = `¿Por qué querés reportar a ${nombre}?`;
+    }
+  }
+
+  function cerrarReporte() {
+    document.getElementById('report-overlay').classList.remove('open');
+  }
+
+  function selectMotivo(btn, motivo) {
+    document.querySelectorAll('.report-option').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    reporteMotivo = motivo;
+    document.getElementById('btn-send-report').disabled = false;
+    // Mostrar textarea solo para "Otro"
+    const detail = document.getElementById('report-detail');
+    if (motivo === 'Otro') {
+      detail.classList.add('visible');
+      detail.focus();
+    } else {
+      detail.classList.remove('visible');
+    }
+  }
+
+  async function enviarReporte() {
+    if (!reporteMotivo) return;
+    const btn = document.getElementById('btn-send-report');
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+
+    const params = new URLSearchParams(window.location.search);
+    const perfilId = params.get('id') || '';
+    const perfilNombre = document.getElementById('perfil-nombre')?.textContent || 'Desconocido';
+    const reporterNombre = localStorage.getItem('ba_name') || 'Anónimo';
+    const reporterId = localStorage.getItem('ba_user_id') || '';
+    const detalle = document.getElementById('report-detail').value.trim();
+
+    try {
+      await fetch('/.netlify/functions/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tipo: 'reporte',
+          destinatario: 'BuscARTE.webmail@gmail.com',
+          datos: {
+            perfilId,
+            perfilNombre,
+            motivo: reporteMotivo,
+            detalle,
+            reporterNombre,
+            reporterId
+          }
+        })
+      });
+    } catch(e) { console.error('Error enviando reporte:', e); }
+
+    // Mostrar éxito siempre
+    document.getElementById('report-form-content').style.display = 'none';
+    document.getElementById('report-success').style.display = 'block';
+    setTimeout(cerrarReporte, 3000);
+  }
+
 </script>
+
+<div class="report-modal-overlay" id="report-overlay" onclick="if(event.target===this)cerrarReporte()">
+  <div class="report-modal">
+    <div id="report-form-content">
+      <div class="report-modal-title">Reportar perfil</div>
+      <div class="report-modal-sub" id="report-sub">¿Por qué querés reportar este perfil?</div>
+      <div class="report-options">
+        <button class="report-option" onclick="selectMotivo(this,'Contenido inapropiado')">🚫 Contenido inapropiado u ofensivo</button>
+        <button class="report-option" onclick="selectMotivo(this,'Spam o publicidad')">📢 Spam o publicidad no autorizada</button>
+        <button class="report-option" onclick="selectMotivo(this,'Perfil falso')">🎭 Perfil falso o identidad robada</button>
+        <button class="report-option" onclick="selectMotivo(this,'Comportamiento abusivo')">⚠️ Comportamiento abusivo o acoso</button>
+        <button class="report-option" onclick="selectMotivo(this,'Otro')">💬 Otro motivo</button>
+      </div>
+      <textarea class="report-detail" id="report-detail" placeholder="Contanos más detalles (opcional)..."></textarea>
+      <div class="report-actions">
+        <button class="btn-report-cancel" onclick="cerrarReporte()">Cancelar</button>
+        <button class="btn-report-send" id="btn-send-report" onclick="enviarReporte()" disabled>Enviar reporte</button>
+      </div>
+    </div>
+    <div class="report-success" id="report-success" style="display:none">
+      <div class="report-success-icon">✅</div>
+      <div class="report-success-title">Reporte enviado</div>
+      <div class="report-success-sub">Lo revisamos a la brevedad. Gracias por ayudarnos a mantener la comunidad sana.</div>
+    </div>
+  </div>
+</div>
 </body>
 </html>

@@ -428,6 +428,16 @@
           <button class="mchip" onclick="this.classList.toggle('on')">Flauta</button>
           <button class="mchip" onclick="this.classList.toggle('on')">Cello</button>
           <button class="mchip" onclick="this.classList.toggle('on')">Arpa</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Acordeón</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Contrabajo</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Clarinete</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Cajón</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Bombo leguero</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Quena / Zampoña</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Ukelele</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Controlador MIDI</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Técnico de sonido</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Compositor / Arreglador</button>
           <button class="mchip" onclick="this.classList.toggle('on')">Productor</button>
           <button class="mchip" onclick="this.classList.toggle('on')">Mix & Mastering</button>
           <button class="mchip" onclick="this.classList.toggle('on')">Manager</button>
@@ -493,6 +503,16 @@
           <button class="mchip" onclick="this.classList.toggle('on')">Flauta</button>
           <button class="mchip" onclick="this.classList.toggle('on')">Cello</button>
           <button class="mchip" onclick="this.classList.toggle('on')">Arpa</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Acordeón</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Contrabajo</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Clarinete</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Cajón</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Bombo leguero</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Quena / Zampoña</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Ukelele</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Controlador MIDI</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Técnico de sonido</button>
+          <button class="mchip" onclick="this.classList.toggle('on')">Compositor / Arreglador</button>
           <button class="mchip" onclick="this.classList.toggle('on')">Productor</button>
           <button class="mchip" onclick="this.classList.toggle('on')">Mix & Mastering</button>
           <button class="mchip" onclick="this.classList.toggle('on')">Manager</button>
@@ -691,6 +711,16 @@
           <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Flauta</button>
           <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Cello</button>
           <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Arpa</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Acordeón</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Contrabajo</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Clarinete</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Cajón</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Bombo leguero</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Quena / Zampoña</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Ukelele</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Controlador MIDI</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Técnico de sonido</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Compositor / Arreglador</button>
           <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Productor</button>
           <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Mix & Mastering</button>
           <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Manager</button>
@@ -1060,7 +1090,7 @@
       }).slice(0, 20).map(c=>c.textContent).join(', ')
       // Separar instrumentos y géneros
       const chips = [...form.querySelectorAll('.mchip.on')]
-      const instrLabels = ['Guitarra','Bajo','Batería','Teclado / Piano','Voz / Canto','Saxo','Violín','Trompeta','Flauta','Percusión','DJ / Productor','Bandoneón','Charango','Cello','Arpa','Productor','Mix & Mastering','Manager','Otro']
+      const instrLabels = ['Guitarra','Bajo','Batería','Teclado / Piano','Voz / Canto','Saxo','Violín','Trompeta','Flauta','Percusión','DJ / Productor','Bandoneón','Charango','Cello','Arpa','Acordeón','Contrabajo','Clarinete','Cajón','Bombo leguero','Quena / Zampoña','Ukelele','Controlador MIDI','Técnico de sonido','Compositor / Arreglador','Productor','Mix & Mastering','Manager','Outro']
       datos.instrumentos = chips.filter(c=>instrLabels.includes(c.textContent.trim())).map(c=>c.textContent.trim()).join(', ')
       datos.generos = chips.filter(c=>!instrLabels.includes(c.textContent.trim())).map(c=>c.textContent.trim()).join(', ')
       datos.zona = form.querySelector('input[placeholder*="barrio"], input[placeholder*="Barrio"], input[placeholder*="zona"]')?.value?.trim()
@@ -1370,8 +1400,7 @@
       if(c)c.textContent=i;
       const nm=document.getElementById('nav-avatar-name');
       if(nm)nm.textContent=n.split(' ')[0];
-      const b=document.getElementById('nav-msg-badge');
-      if(b)b.style.display='inline';
+      cargarBadgeMensajes(uid);
       // Fix Mi perfil link with real user ID
       const miPerfilLink=document.querySelector('.nav-dropdown-item[href*="perfil_publico"]');
       if(miPerfilLink && uid) miPerfilLink.href='buscARTE_perfil_publico.html?id='+uid;
@@ -1448,6 +1477,27 @@ function mbnLogout(){
   localStorage.removeItem('ba_user_id');
   window.location.href='index.html';
 }
+
+  async function cargarBadgeMensajes(uid) {
+    const badge = document.getElementById('nav-msg-badge');
+    if (!badge || !uid) return;
+    try {
+      const lastSeen = localStorage.getItem('ba_msg_last_seen') ||
+        new Date(Date.now() - 7*24*60*60*1000).toISOString();
+      const res = await fetch(
+        `https://xiaanchoanxmampegoay.supabase.co/rest/v1/mensajes?para_user_id=eq.${uid}&created_at=gt.${encodeURIComponent(lastSeen)}&select=id&limit=99`,
+        { headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68', 'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68` } }
+      );
+      const msgs = await res.json();
+      const count = Array.isArray(msgs) ? msgs.length : 0;
+      if (count > 0) {
+        badge.textContent = count > 99 ? '99+' : count;
+        badge.style.display = 'inline';
+      } else {
+        badge.style.display = 'none';
+      }
+    } catch(e) { badge.style.display = 'none'; }
+  }
 </script>
 </body>
 </html>
