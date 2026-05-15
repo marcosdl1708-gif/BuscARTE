@@ -181,7 +181,8 @@
   /* NAV LINKS CLICKABLE FIX */
   .nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap { pointer-events:auto !important; }
   nav a, nav button { pointer-events:auto !important; }
-  
+  @media (max-width: 768px) {
+    .cursor, .cursor-ring { display: none; }
     * { cursor: auto !important; }
     nav { padding: .75rem 1rem; }
     .nav-center { display: none; }
@@ -201,31 +202,88 @@
     .card-cta { padding: .5rem 1rem; font-size: .8rem; }
   }
 
-  /* ── MOBILE FIXES (override wrong existing rules) ── */
-  @media (max-width: 768px) {
-    .cursor, .cursor-ring { display: none !important; }
-    * { cursor: auto !important; }
-    nav { padding: .6rem 1rem; flex-wrap: wrap; gap: 0; }
-    .nav-logo { flex: 1; }
-    .nav-search { order: 3; width: 100%; max-width: 100% !important; margin: .45rem 0 0 !important; flex: none; display: flex !important; }
-    .nav-search input { font-size: .9rem; flex: 1; }
-    .nav-links { display: none !important; }
-    .btn-ghost { display: none !important; }
-    .btn-neon { padding: .4rem .75rem !important; font-size: .72rem !important; }
-    .top-spacer { height: 96px; }
-    .layout { grid-template-columns: 1fr !important; }
-    .filters-panel { display: none !important; }
-    .results-area { padding: 1rem !important; }
-    .musicians-grid { grid-template-columns: 1fr !important; background: transparent !important; gap: 0 !important; }
-    .musician-card { border-bottom: 1px solid #1a1a1a !important; }
-    .results-header { flex-wrap: wrap; gap: .6rem; }
-    .results-count { font-size: 1.4rem; }
-    .results-controls { gap: .5rem; }
-    .list-view .musician-card { flex-direction: column !important; }
-    .list-view .card-top { flex: none !important; width: 100%; }
-    .list-view .card-bio { padding: 0 !important; flex: none !important; }
-    .load-more { padding: 1.5rem; }
+  /* ── BOTTOM NAV MOBILE ── */
+  .mobile-bottom-nav { display:none; }
+  @media (max-width:900px) {
+    .mobile-bottom-nav {
+      display:flex; position:fixed; bottom:0; left:0; right:0;
+      background:#0f0f0f; border-top:1px solid #2a2a2a;
+      z-index:500; height:54px;
+    }
+    .mbn-item {
+      flex:1; display:flex; flex-direction:column; align-items:center;
+      justify-content:center; color:#666; text-decoration:none;
+      font-size:.55rem; letter-spacing:.05em; text-transform:uppercase;
+      font-family:'Archivo',sans-serif; gap:.18rem; transition:color .15s;
+    }
+    .mbn-item.active { color:#d4f53c; }
+    .mbn-icon { font-size:1.1rem; line-height:1; }
+    body { padding-bottom:54px !important; }
   }
+
+  @media (max-width:900px) {
+    .cursor, .cursor-ring { display:none !important; }
+    * { cursor:auto !important; }
+    nav { padding:.6rem 1rem !important; }
+    .nav-links, .nav-center { display:none !important; }
+    .btn-ghost { display:none !important; }
+    .btn-neon { padding:.4rem .75rem !important; font-size:.72rem !important; }
+  }
+
+  @media (max-width:900px) {
+    /* Nav search pasa a segunda fila */
+    nav {
+      flex-wrap:wrap !important;
+      padding:.6rem 1rem .6rem !important;
+      gap:0 !important;
+    }
+    .nav-logo { flex:1 !important; }
+    .nav-right { flex-shrink:0 !important; }
+    .nav-search {
+      order:3 !important; width:100% !important;
+      max-width:100% !important; margin:.45rem 0 0 !important;
+      flex:none !important; display:flex !important;
+    }
+    .nav-search input { font-size:.95rem !important; flex:1 !important; }
+    .top-spacer { height:96px !important; }
+    /* Layout: ocultar filtros, solo resultados */
+    .layout { grid-template-columns:1fr !important; }
+    .filters-panel { display:none !important; }
+    /* Botón para mostrar/ocultar filtros */
+    .mobile-filter-btn {
+      display:flex !important;
+      align-items:center; gap:.5rem;
+      background:transparent; border:1px solid #2a2a2a;
+      color:#888; padding:.45rem 1rem;
+      font-family:'Archivo',sans-serif; font-size:.75rem;
+      letter-spacing:.08em; text-transform:uppercase;
+      margin-bottom:1rem;
+    }
+    /* Cuando filtros están abiertos en mobile */
+    .filters-panel.mobile-open {
+      display:block !important;
+      position:fixed !important; inset:96px 0 54px !important;
+      z-index:200 !important; overflow-y:auto !important;
+      height:calc(100vh - 150px) !important;
+    }
+    .results-area { padding:1rem !important; }
+    .musicians-grid {
+      grid-template-columns:1fr !important;
+      background:transparent !important; gap:0 !important;
+    }
+    .musician-card { border-bottom:1px solid #1a1a1a !important; padding:1rem !important; }
+    .results-header { flex-wrap:wrap; gap:.6rem; }
+    .results-count { font-size:1.4rem; }
+    .results-controls { gap:.5rem; }
+    .load-more { padding:1.5rem; }
+    /* list view fix */
+    .list-view .musician-card { flex-direction:column !important; }
+    .list-view .card-top { flex:none !important; width:100%; }
+    .list-view .card-bio { padding:0 !important; flex:none !important; }
+  }
+  /* Desktop: no mostrar botón filtros ni bottom nav */
+  .mobile-filter-btn { display:none; }
+
 </style>
 </head>
 <body>
@@ -389,6 +447,7 @@
       </div>
     </div>
 
+    <button class="mobile-filter-btn" id="mobile-filter-btn" onclick="toggleMobileFilters()">⚙ Filtros</button>
     <div class="active-filters" id="active-filters"></div>
 
     <div class="musicians-grid" id="musicians-grid">
@@ -744,6 +803,45 @@
   function toggleUserMenu(){const w=document.getElementById('nav-avatar-btn');const d=document.getElementById('nav-dropdown');if(w)w.classList.toggle('open');if(d)d.classList.toggle('open');}
   document.addEventListener('click',e=>{if(!e.target.closest('#nav-user')){document.getElementById('nav-avatar-btn')?.classList.remove('open');document.getElementById('nav-dropdown')?.classList.remove('open');}});
   function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');window.location.href='index.html';}
+
+  function toggleMobileFilters() {
+    var panel = document.querySelector('.filters-panel');
+    var btn = document.getElementById('mobile-filter-btn');
+    if (!panel) return;
+    panel.classList.toggle('mobile-open');
+    btn.textContent = panel.classList.contains('mobile-open') ? '✕ Cerrar filtros' : '⚙ Filtros';
+  }
+  // Cerrar filtros al seleccionar uno en mobile
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('fchip') && window.innerWidth <= 900) {
+      setTimeout(function() {
+        document.querySelector('.filters-panel')?.classList.remove('mobile-open');
+        var btn = document.getElementById('mobile-filter-btn');
+        if(btn) btn.textContent = '⚙ Filtros';
+      }, 300);
+    }
+  });
+
+</script>
+<nav class="mobile-bottom-nav" id="mobile-bottom-nav">
+  <a href="buscARTE_busqueda.html" class="mbn-item" data-page="busqueda"><span class="mbn-icon">🎵</span><span>Músicos</span></a>
+  <a href="buscARTE_anuncios.html" class="mbn-item" data-page="anuncios"><span class="mbn-icon">📋</span><span>Anuncios</span></a>
+  <a href="buscARTE_mensajes.html" class="mbn-item" data-page="mensajes"><span class="mbn-icon">💬</span><span>Mensajes</span></a>
+  <a href="#" class="mbn-item" id="mbn-perfil" data-page="perfil"><span class="mbn-icon">👤</span><span>Mi perfil</span></a>
+</nav>
+<script>
+(function(){
+  var uid = localStorage.getItem('ba_user_id');
+  var el = document.getElementById('mbn-perfil');
+  if(el && uid) el.href = 'buscARTE_perfil_publico.html?id='+uid;
+  else if(el) el.href = 'buscARTE_login.html';
+  // Mark active
+  var path = window.location.pathname.split('/').pop();
+  document.querySelectorAll('.mbn-item').forEach(function(a){
+    var pg = a.dataset.page;
+    if(path.indexOf(pg) !== -1) a.classList.add('active');
+  });
+})();
 </script>
 </body>
 </html>

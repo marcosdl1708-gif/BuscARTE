@@ -159,6 +159,43 @@
   /* NAV LINKS CLICKABLE FIX */
   .nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap { pointer-events:auto !important; }
   nav a, nav button { pointer-events:auto !important; }
+
+  .mobile-bottom-nav { display:none; }
+  @media (max-width:900px) {
+    .mobile-bottom-nav {
+      display:flex; position:fixed; bottom:0; left:0; right:0;
+      background:#0f0f0f; border-top:1px solid #2a2a2a;
+      z-index:500; height:54px;
+    }
+    .mbn-item {
+      flex:1; display:flex; flex-direction:column; align-items:center;
+      justify-content:center; color:#666; text-decoration:none;
+      font-size:.55rem; letter-spacing:.05em; text-transform:uppercase;
+      font-family:'Archivo',sans-serif; gap:.18rem; transition:color .15s;
+    }
+    .mbn-item.active { color:#d4f53c; }
+    .mbn-icon { font-size:1.1rem; line-height:1; }
+    body { padding-bottom:54px !important; }
+  }
+
+  @media (max-width:900px) {
+    .cursor, .cursor-ring { display:none !important; }
+    * { cursor:auto !important; }
+    nav { padding:.6rem 1rem !important; }
+    .nav-links, .nav-center { display:none !important; }
+    .btn-ghost { display:none !important; }
+    .btn-neon { padding:.4rem .75rem !important; font-size:.72rem !important; }
+  }
+
+  @media (max-width:900px) {
+    .top-spacer { height:56px !important; }
+    .page-wrap { padding:1.5rem 1.25rem !important; }
+    .page-title { font-size:1.4rem !important; }
+    .guardados-grid { grid-template-columns:1fr !important; }
+    .saved-card { padding:1rem !important; }
+    .page-header { flex-direction:column !important; align-items:flex-start !important; gap:.75rem !important; }
+  }
+
 </style>
   <style>
     .guardados-wrap { max-width:1100px;margin:0 auto;padding:2.5rem 2rem; }
@@ -167,23 +204,8 @@
     .guardados-title span { color:var(--neon); }
     .guardados-sub { color:var(--gris);font-size:.85rem;margin-top:.3rem; }
     .guardados-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:#181818; }
-    @media(max-width:700px){ .guardados-grid{ grid-template-columns:1fr; } }
-  
-  /* ── MOBILE ADDITIONS ── */
-  @media (max-width: 768px) {
-    .cursor, .cursor-ring { display: none !important; }
-    * { cursor: auto !important; }
-    nav { padding: .6rem 1rem !important; }
-    .nav-links { display: none !important; }
-    .btn-ghost { display: none !important; }
-    .btn-neon { padding: .4rem .75rem !important; font-size: .72rem !important; }
-    .top-spacer { height: 56px !important; }
-    .page-wrap { padding: 1.5rem 1.25rem !important; }
-    .page-title { font-size: 1.4rem; }
-    .guardados-grid { grid-template-columns: 1fr !important; }
-    .saved-card { padding: 1rem !important; }
-  }
-</style>
+    
+  </style>
 </head>
 <body>
 <div class="cursor" id="cursor"></div>
@@ -335,6 +357,24 @@
   function toggleUserMenu(){const w=document.getElementById('nav-avatar-btn');const d=document.getElementById('nav-dropdown');if(w)w.classList.toggle('open');if(d)d.classList.toggle('open');}
   document.addEventListener('click',e=>{if(!e.target.closest('#nav-user')){document.getElementById('nav-avatar-btn')?.classList.remove('open');document.getElementById('nav-dropdown')?.classList.remove('open');}});
   function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');window.location.href='index.html';}
+</script>
+<nav class="mobile-bottom-nav" id="mobile-bottom-nav">
+  <a href="buscARTE_busqueda.html" class="mbn-item" data-page="busqueda"><span class="mbn-icon">🎵</span><span>Músicos</span></a>
+  <a href="buscARTE_anuncios.html" class="mbn-item" data-page="anuncios"><span class="mbn-icon">📋</span><span>Anuncios</span></a>
+  <a href="buscARTE_mensajes.html" class="mbn-item" data-page="mensajes"><span class="mbn-icon">💬</span><span>Mensajes</span></a>
+  <a href="#" class="mbn-item" id="mbn-perfil" data-page="perfil"><span class="mbn-icon">👤</span><span>Mi perfil</span></a>
+</nav>
+<script>
+(function(){
+  var uid = localStorage.getItem('ba_user_id');
+  var el = document.getElementById('mbn-perfil');
+  if(el && uid) el.href = 'buscARTE_perfil_publico.html?id='+uid;
+  else if(el) el.href = 'buscARTE_login.html';
+  var path = window.location.pathname.split('/').pop();
+  document.querySelectorAll('.mbn-item').forEach(function(a){
+    if(path.indexOf(a.dataset.page) !== -1) a.classList.add('active');
+  });
+})();
 </script>
 </body>
 </html>

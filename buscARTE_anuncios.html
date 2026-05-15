@@ -260,42 +260,66 @@
   .nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap { pointer-events:auto !important; }
   nav a, nav button { pointer-events:auto !important; }
 
-  /* ── MOBILE ── */
-  @media (max-width: 768px) {
-    .cursor, .cursor-ring { display: none !important; }
-    * { cursor: auto !important; }
-    nav { padding: .6rem 1rem; }
-    .nav-links { display: none !important; }
-    .btn-ghost { display: none !important; }
-    .btn-neon { padding: .4rem .75rem !important; font-size: .72rem !important; }
-    .top-spacer { height: 56px; }
-    .layout { grid-template-columns: 1fr !important; }
-    .filters-panel, .right-panel, .sidebar-left, .sidebar-right { display: none !important; }
-    .results-area, .main-area { padding: 1.25rem !important; }
-    .anuncios-grid { grid-template-columns: 1fr !important; gap: .75rem !important; }
-    .anuncio-card { padding: 1.1rem !important; }
-    .results-header { flex-wrap: wrap; gap: .6rem; }
-    .results-count { font-size: 1.4rem; }
-    /* modal */
-    .modal-content, .modal-wrap { 
-      width: 100% !important; 
-      max-width: 100% !important;
-      height: 100vh !important;
-      max-height: 100vh !important;
-      border-radius: 0 !important;
-      margin: 0 !important;
-      overflow-y: auto !important;
+  .mobile-bottom-nav { display:none; }
+  @media (max-width:900px) {
+    .mobile-bottom-nav {
+      display:flex; position:fixed; bottom:0; left:0; right:0;
+      background:#0f0f0f; border-top:1px solid #2a2a2a;
+      z-index:500; height:54px;
     }
-    .modal-backdrop { align-items: flex-end !important; padding: 0 !important; }
-    .modal-tipo-selector { grid-template-columns: repeat(2,1fr) !important; }
-    .mrow { grid-template-columns: 1fr !important; }
-    .modal-body { padding: 1.25rem !important; }
-    .modal-footer { padding: 1rem 1.25rem !important; }
-    .precio-wrap { flex-direction: column !important; gap: .5rem !important; }
-    .price-range { grid-template-columns: 1fr 1fr !important; }
-    input, select, textarea { font-size: 1rem !important; }
-    .btn-publicar { width: 100%; padding: .9rem !important; }
+    .mbn-item {
+      flex:1; display:flex; flex-direction:column; align-items:center;
+      justify-content:center; color:#666; text-decoration:none;
+      font-size:.55rem; letter-spacing:.05em; text-transform:uppercase;
+      font-family:'Archivo',sans-serif; gap:.18rem; transition:color .15s;
+    }
+    .mbn-item.active { color:#d4f53c; }
+    .mbn-icon { font-size:1.1rem; line-height:1; }
+    body { padding-bottom:54px !important; }
   }
+
+  @media (max-width:900px) {
+    .cursor, .cursor-ring { display:none !important; }
+    * { cursor:auto !important; }
+    nav { padding:.6rem 1rem !important; }
+    .nav-links, .nav-center { display:none !important; }
+    .btn-ghost { display:none !important; }
+    .btn-neon { padding:.4rem .75rem !important; font-size:.72rem !important; }
+  }
+
+  .mobile-filter-btn { display:none; }
+  @media (max-width:900px) {
+    .top-spacer { height:56px !important; }
+    .layout { grid-template-columns:1fr !important; }
+    .sidebar-left, .sidebar-right, .panel-izq, .panel-der,
+    aside:not(.mobile-bottom-nav) { display:none !important; }
+    /* Detectar por posición en grid: primer y tercer hijo de .layout */
+    .layout > *:first-child, .layout > *:last-child { display:none !important; }
+    .layout > *:nth-child(2) { display:block !important; }
+    .results-area, .main-area { padding:1.25rem !important; }
+    .anuncios-grid, .cards-grid { grid-template-columns:1fr !important; gap:.75rem !important; }
+    .anuncio-card { padding:1.1rem !important; }
+    .results-header { flex-wrap:wrap !important; gap:.6rem !important; }
+    .results-count { font-size:1.4rem !important; }
+    .page-header { flex-direction:column !important; gap:1rem !important; align-items:flex-start !important; }
+    .btn-publicar, .btn-nuevo { width:100% !important; text-align:center !important; }
+    /* Modal full screen */
+    .modal-overlay, .modal-backdrop { align-items:flex-end !important; padding:0 !important; }
+    .modal-content, .modal-wrap, .modal-box {
+      width:100% !important; max-width:100% !important;
+      max-height:90vh !important; border-radius:0 !important;
+      overflow-y:auto !important;
+    }
+    .modal-tipo-selector { grid-template-columns:repeat(2,1fr) !important; }
+    .mrow { grid-template-columns:1fr !important; }
+    .modal-body { padding:1.25rem !important; }
+    input, select, textarea { font-size:1rem !important; }
+    .mobile-filter-btn { display:flex !important; align-items:center; gap:.5rem;
+      background:transparent; border:1px solid #2a2a2a; color:#888;
+      padding:.45rem 1rem; font-size:.75rem; letter-spacing:.08em;
+      text-transform:uppercase; margin-bottom:1rem; font-family:'Archivo',sans-serif; }
+  }
+
 </style>
 </head>
 <body>
@@ -1275,6 +1299,24 @@
   function toggleUserMenu(){const w=document.getElementById('nav-avatar-btn');const d=document.getElementById('nav-dropdown');if(w)w.classList.toggle('open');if(d)d.classList.toggle('open');}
   document.addEventListener('click',e=>{if(!e.target.closest('#nav-user')){document.getElementById('nav-avatar-btn')?.classList.remove('open');document.getElementById('nav-dropdown')?.classList.remove('open');}});
   function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');window.location.href='index.html';}
+</script>
+<nav class="mobile-bottom-nav" id="mobile-bottom-nav">
+  <a href="buscARTE_busqueda.html" class="mbn-item" data-page="busqueda"><span class="mbn-icon">🎵</span><span>Músicos</span></a>
+  <a href="buscARTE_anuncios.html" class="mbn-item" data-page="anuncios"><span class="mbn-icon">📋</span><span>Anuncios</span></a>
+  <a href="buscARTE_mensajes.html" class="mbn-item" data-page="mensajes"><span class="mbn-icon">💬</span><span>Mensajes</span></a>
+  <a href="#" class="mbn-item" id="mbn-perfil" data-page="perfil"><span class="mbn-icon">👤</span><span>Mi perfil</span></a>
+</nav>
+<script>
+(function(){
+  var uid = localStorage.getItem('ba_user_id');
+  var el = document.getElementById('mbn-perfil');
+  if(el && uid) el.href = 'buscARTE_perfil_publico.html?id='+uid;
+  else if(el) el.href = 'buscARTE_login.html';
+  var path = window.location.pathname.split('/').pop();
+  document.querySelectorAll('.mbn-item').forEach(function(a){
+    if(path.indexOf(a.dataset.page) !== -1) a.classList.add('active');
+  });
+})();
 </script>
 </body>
 </html>

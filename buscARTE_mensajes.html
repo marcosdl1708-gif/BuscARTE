@@ -309,51 +309,64 @@
   .nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap { pointer-events:auto !important; }
   nav a, nav button { pointer-events:auto !important; }
 
-  /* ── MOBILE ── */
-  @media (max-width: 768px) {
-    .cursor, .cursor-ring { display: none !important; }
-    * { cursor: auto !important; }
-    nav { padding: .6rem 1rem; }
-    .nav-links { display: none !important; }
-    .btn-ghost { display: none !important; }
-    .btn-neon { padding: .4rem .75rem !important; font-size: .72rem !important; }
-    body { height: 100vh; overflow: hidden; }
-    .mensajes-layout { grid-template-columns: 1fr !important; }
-    .conv-panel { height: calc(100vh - 56px) !important; width: 100% !important; }
-    .chat-panel { 
-      position: fixed !important; 
-      inset: 56px 0 0 0 !important; 
-      z-index: 200 !important;
-      display: none !important;
-      flex-direction: column !important;
-      background: var(--negro) !important;
-      height: calc(100vh - 56px) !important;
+  /* ── BOTTOM NAV MOBILE ── */
+  .mobile-bottom-nav { display:none; }
+  @media (max-width:900px) {
+    .mobile-bottom-nav {
+      display:flex; position:fixed; bottom:0; left:0; right:0;
+      background:#0f0f0f; border-top:1px solid #2a2a2a;
+      z-index:500; height:54px;
     }
-    .chat-panel.mobile-visible { display: flex !important; }
-    .chat-back-btn {
-      display: flex !important;
-      align-items: center;
-      gap: .5rem;
-      padding: .7rem 1.2rem;
-      background: none;
-      border: none;
-      border-bottom: 1px solid #1c1c1c;
-      color: var(--neon);
-      font-family: var(--font-body);
-      font-size: .82rem;
-      cursor: auto;
-      width: 100%;
-      text-align: left;
+    .mbn-item {
+      flex:1; display:flex; flex-direction:column; align-items:center;
+      justify-content:center; color:#666; text-decoration:none;
+      font-size:.55rem; letter-spacing:.05em; text-transform:uppercase;
+      font-family:'Archivo',sans-serif; gap:.18rem; transition:color .15s;
     }
-    .chat-messages { padding: 1rem !important; }
-    .chat-input-area { padding: .75rem 1rem !important; }
-    .chat-header { padding: .75rem 1rem !important; }
-    .chat-header-actions { display: none; }
-    .chat-context-bar { padding: .5rem 1rem !important; }
-    .msg { max-width: 85% !important; }
-    .chat-action-btn { display: none; }
+    .mbn-item.active { color:#d4f53c; }
+    .mbn-icon { font-size:1.1rem; line-height:1; }
+    body { padding-bottom:54px !important; }
   }
-  .chat-back-btn { display: none; }
+
+  @media (max-width:900px) {
+    .cursor, .cursor-ring { display:none !important; }
+    * { cursor:auto !important; }
+    nav { padding:.6rem 1rem !important; }
+    .nav-links, .nav-center { display:none !important; }
+    .btn-ghost { display:none !important; }
+    .btn-neon { padding:.4rem .75rem !important; font-size:.72rem !important; }
+  }
+
+  @media (max-width:900px) {
+    body { height:100vh; overflow:hidden; padding-bottom:54px !important; }
+    .mensajes-layout { grid-template-columns:1fr !important; }
+    .conv-panel { height:calc(100vh - 56px - 54px) !important; width:100% !important; }
+    .chat-panel {
+      position:fixed !important;
+      top:56px; left:0; right:0; bottom:54px;
+      z-index:300 !important;
+      display:none !important;
+      flex-direction:column !important;
+      background:var(--negro) !important;
+    }
+    .chat-panel.mobile-visible { display:flex !important; }
+    .mobile-chat-back {
+      display:flex !important; align-items:center; gap:.5rem;
+      padding:.65rem 1.2rem; background:rgba(8,8,8,.98);
+      border-bottom:1px solid #1c1c1c;
+      color:var(--neon); font-family:var(--font-body);
+      font-size:.82rem; cursor:auto; width:100%;
+      text-align:left; border:none; flex-shrink:0;
+    }
+    .chat-messages { padding:1rem !important; }
+    .chat-input-area { padding:.65rem 1rem !important; flex-shrink:0; }
+    .chat-header { padding:.75rem 1rem !important; }
+    .chat-header-actions .chat-action-btn:not(:first-child) { display:none; }
+    .chat-context-bar { padding:.4rem 1rem !important; }
+    .msg { max-width:88% !important; }
+  }
+  .mobile-chat-back { display:none; }
+
 </style>
 </head>
 <body>
@@ -738,41 +751,60 @@
   function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');window.location.href='index.html';}
 
   // ── MOBILE CHAT TOGGLE ──
-  (function() {
-    if (window.innerWidth > 768) return;
-    const chatPanel = document.getElementById('chat-panel');
+  (function initMobileChat() {
+    if (window.innerWidth > 900) return;
+    var chatPanel = document.getElementById('chat-panel');
     if (!chatPanel) return;
-    // Add back button at top of chat panel
-    const backBtn = document.createElement('button');
-    backBtn.className = 'chat-back-btn';
-    backBtn.innerHTML = '← Volver a conversaciones';
+    // Botón volver
+    var backBtn = document.createElement('button');
+    backBtn.className = 'mobile-chat-back';
+    backBtn.innerHTML = '← Conversaciones';
     backBtn.onclick = function() {
       chatPanel.classList.remove('mobile-visible');
     };
     chatPanel.insertBefore(backBtn, chatPanel.firstChild);
   })();
 
-  // Override abrirConv to show chat panel on mobile
-  const _origAbrirConv = typeof abrirConv !== 'undefined' ? abrirConv : null;
+  // Parchar abrirConv para mostrar chat en mobile
   document.addEventListener('DOMContentLoaded', function() {
-    if (window.innerWidth <= 768) {
-      // Patch conv item clicks to show chat panel
-      const observer = new MutationObserver(function() {
-        document.querySelectorAll('.conv-item').forEach(function(item) {
-          if (!item._mobilePatch) {
-            item._mobilePatch = true;
-            const orig = item.onclick;
-            item.onclick = function(e) {
-              if (orig) orig.call(item, e);
-              const chatPanel = document.getElementById('chat-panel');
-              if (chatPanel) chatPanel.classList.add('mobile-visible');
-            };
-          }
-        });
+    if (window.innerWidth > 900) return;
+    var lista = document.querySelector('.conv-list');
+    if (!lista) return;
+    var observer = new MutationObserver(function() {
+      lista.querySelectorAll('.conv-item').forEach(function(item) {
+        if (item._mobilePatched) return;
+        item._mobilePatched = true;
+        var origClick = item.onclick;
+        item.onclick = function(e) {
+          if (origClick) origClick.call(item, e);
+          var p = document.getElementById('chat-panel');
+          if (p) p.classList.add('mobile-visible');
+        };
       });
-      observer.observe(document.querySelector('.conv-list') || document.body, { childList: true, subtree: true });
-    }
+    });
+    observer.observe(lista, { childList:true, subtree:true });
   });
+
+</script>
+<nav class="mobile-bottom-nav" id="mobile-bottom-nav">
+  <a href="buscARTE_busqueda.html" class="mbn-item" data-page="busqueda"><span class="mbn-icon">🎵</span><span>Músicos</span></a>
+  <a href="buscARTE_anuncios.html" class="mbn-item" data-page="anuncios"><span class="mbn-icon">📋</span><span>Anuncios</span></a>
+  <a href="buscARTE_mensajes.html" class="mbn-item" data-page="mensajes"><span class="mbn-icon">💬</span><span>Mensajes</span></a>
+  <a href="#" class="mbn-item" id="mbn-perfil" data-page="perfil"><span class="mbn-icon">👤</span><span>Mi perfil</span></a>
+</nav>
+<script>
+(function(){
+  var uid = localStorage.getItem('ba_user_id');
+  var el = document.getElementById('mbn-perfil');
+  if(el && uid) el.href = 'buscARTE_perfil_publico.html?id='+uid;
+  else if(el) el.href = 'buscARTE_login.html';
+  // Mark active
+  var path = window.location.pathname.split('/').pop();
+  document.querySelectorAll('.mbn-item').forEach(function(a){
+    var pg = a.dataset.page;
+    if(path.indexOf(pg) !== -1) a.classList.add('active');
+  });
+})();
 </script>
 </body>
 </html>

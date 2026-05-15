@@ -157,7 +157,8 @@
   /* NAV LINKS CLICKABLE FIX */
   .nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap { pointer-events:auto !important; }
   nav a, nav button { pointer-events:auto !important; }
-  
+  @media (max-width: 768px) {
+    .cursor, .cursor-ring { display: none; }
     * { cursor: auto !important; }
     .login-layout { grid-template-columns: 1fr; min-height: 100vh; }
     .login-left { display: none; }
@@ -169,21 +170,34 @@
     .btn-submit { font-size: 1rem; padding: 1rem; }
   }
 
-  /* ── MOBILE ── */
-  @media (max-width: 768px) {
-    .cursor, .cursor-ring { display: none !important; }
-    * { cursor: auto !important; }
-    nav { padding: .75rem 1rem; }
-    .page { grid-template-columns: 1fr !important; min-height: 100vh; }
-    .left-panel { display: none !important; }
-    .right-panel { padding: 1.5rem 1.25rem; min-height: calc(100vh - 60px); }
-    .form-wrap { max-width: 100% !important; }
-    .form-title { font-size: 1.6rem; }
-    .form-sub { font-size: .85rem; }
-    .field input { font-size: 1rem; padding: .85rem; }
-    .btn-submit { font-size: 1rem; padding: 1rem; }
-    .btn-google { font-size: .85rem; }
+  @media (max-width:900px) {
+    .cursor, .cursor-ring { display:none !important; }
+    * { cursor:auto !important; }
+    nav { padding:.6rem 1rem !important; }
+    .nav-links, .nav-center { display:none !important; }
+    .btn-ghost { display:none !important; }
+    .btn-neon { padding:.4rem .75rem !important; font-size:.72rem !important; }
   }
+
+  @media (max-width:900px) {
+    .page { grid-template-columns:1fr !important; }
+    .left-panel { display:none !important; }
+    .right-panel {
+      padding:2rem 1.5rem !important;
+      align-items:flex-start !important;
+      min-height:calc(100vh - 56px);
+    }
+    .form-wrap { max-width:100% !important; width:100% !important; }
+    .form-title { font-size:1.8rem !important; }
+    .form-sub { font-size:.9rem !important; }
+    .field { margin-bottom:1.2rem !important; }
+    .field input { font-size:1rem !important; padding:1rem !important; }
+    .btn-submit { font-size:1rem !important; padding:1rem !important; }
+    .btn-google { font-size:.9rem !important; padding:.9rem !important; }
+    .register-link { font-size:.88rem !important; }
+    .divider { margin:1rem 0 !important; }
+  }
+
 </style>
 </head>
 <body>

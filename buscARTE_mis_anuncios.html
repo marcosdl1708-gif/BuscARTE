@@ -153,24 +153,46 @@
   .nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap { pointer-events:auto !important; }
   nav a, nav button { pointer-events:auto !important; }
 
-  /* ── MOBILE ── */
-  @media (max-width: 768px) {
-    .cursor, .cursor-ring { display: none !important; }
-    * { cursor: auto !important; }
-    nav { padding: .6rem 1rem; }
-    .nav-links { display: none !important; }
-    .btn-ghost { display: none !important; }
-    .btn-neon { padding: .4rem .75rem !important; font-size: .72rem !important; }
-    .top-spacer { height: 56px; }
-    .layout { grid-template-columns: 1fr !important; }
-    .sidebar { display: none !important; }
-    .main-area { padding: 1.25rem !important; }
-    .anuncios-grid { grid-template-columns: 1fr !important; gap: .75rem !important; }
-    .anuncio-card { padding: 1.1rem !important; }
-    .page-title { font-size: 1.4rem; }
-    .btn-nuevo { width: 100%; text-align: center; padding: .9rem !important; }
-    .stats-row { flex-wrap: wrap; gap: .5rem; }
+  .mobile-bottom-nav { display:none; }
+  @media (max-width:900px) {
+    .mobile-bottom-nav {
+      display:flex; position:fixed; bottom:0; left:0; right:0;
+      background:#0f0f0f; border-top:1px solid #2a2a2a;
+      z-index:500; height:54px;
+    }
+    .mbn-item {
+      flex:1; display:flex; flex-direction:column; align-items:center;
+      justify-content:center; color:#666; text-decoration:none;
+      font-size:.55rem; letter-spacing:.05em; text-transform:uppercase;
+      font-family:'Archivo',sans-serif; gap:.18rem; transition:color .15s;
+    }
+    .mbn-item.active { color:#d4f53c; }
+    .mbn-icon { font-size:1.1rem; line-height:1; }
+    body { padding-bottom:54px !important; }
   }
+
+  @media (max-width:900px) {
+    .cursor, .cursor-ring { display:none !important; }
+    * { cursor:auto !important; }
+    nav { padding:.6rem 1rem !important; }
+    .nav-links, .nav-center { display:none !important; }
+    .btn-ghost { display:none !important; }
+    .btn-neon { padding:.4rem .75rem !important; font-size:.72rem !important; }
+  }
+
+  @media (max-width:900px) {
+    .top-spacer { height:56px !important; }
+    .layout { grid-template-columns:1fr !important; }
+    .sidebar { display:none !important; }
+    .main-area { padding:1.25rem !important; }
+    .anuncios-grid { grid-template-columns:1fr !important; gap:.75rem !important; }
+    .anuncio-card { padding:1.1rem !important; }
+    .page-title { font-size:1.4rem !important; }
+    .btn-nuevo { width:100% !important; text-align:center !important; padding:.9rem !important; }
+    .stats-row { flex-wrap:wrap !important; gap:.5rem !important; }
+    .page-header { flex-direction:column !important; align-items:flex-start !important; gap:1rem !important; }
+  }
+
 </style>
 </head>
 <body>
@@ -674,6 +696,24 @@
   }
   function closeDelete(e) { if(e.target===document.getElementById('modal-delete')) closeDeleteModal(); }
   document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeDeleteModal(); });
+</script>
+<nav class="mobile-bottom-nav" id="mobile-bottom-nav">
+  <a href="buscARTE_busqueda.html" class="mbn-item" data-page="busqueda"><span class="mbn-icon">🎵</span><span>Músicos</span></a>
+  <a href="buscARTE_anuncios.html" class="mbn-item" data-page="anuncios"><span class="mbn-icon">📋</span><span>Anuncios</span></a>
+  <a href="buscARTE_mensajes.html" class="mbn-item" data-page="mensajes"><span class="mbn-icon">💬</span><span>Mensajes</span></a>
+  <a href="#" class="mbn-item" id="mbn-perfil" data-page="perfil"><span class="mbn-icon">👤</span><span>Mi perfil</span></a>
+</nav>
+<script>
+(function(){
+  var uid = localStorage.getItem('ba_user_id');
+  var el = document.getElementById('mbn-perfil');
+  if(el && uid) el.href = 'buscARTE_perfil_publico.html?id='+uid;
+  else if(el) el.href = 'buscARTE_login.html';
+  var path = window.location.pathname.split('/').pop();
+  document.querySelectorAll('.mbn-item').forEach(function(a){
+    if(path.indexOf(a.dataset.page) !== -1) a.classList.add('active');
+  });
+})();
 </script>
 </body>
 </html>
