@@ -399,6 +399,9 @@
         <button class="fchip" onclick="toggleFilter(this)">Bandoneón</button>
         <button class="fchip" onclick="toggleFilter(this)">Charango</button>
         <button class="fchip" onclick="toggleFilter(this)">Arpa</button>
+        <button class="fchip" onclick="toggleFilter(this)">Productor</button>
+        <button class="fchip" onclick="toggleFilter(this)">Mix & Mastering</button>
+        <button class="fchip" onclick="toggleFilter(this)">Manager</button>
         <button class="fchip" onclick="toggleFilter(this)">Otro</button>
       </div>
     </div>
@@ -427,6 +430,13 @@
         <button class="fchip" onclick="toggleFilter(this)">Prog</button>
         <button class="fchip" onclick="toggleFilter(this)">Bossanova</button>
         <button class="fchip" onclick="toggleFilter(this)">Clásica</button>
+        <button class="fchip" onclick="toggleFilter(this)">House</button>
+        <button class="fchip" onclick="toggleFilter(this)">Tech House</button>
+        <button class="fchip" onclick="toggleFilter(this)">Techno</button>
+        <button class="fchip" onclick="toggleFilter(this)">Trance</button>
+        <button class="fchip" onclick="toggleFilter(this)">Melodic House & Techno</button>
+        <button class="fchip" onclick="toggleFilter(this)">Minimal Deep/Tech</button>
+        <button class="fchip" onclick="toggleFilter(this)">Indie Dance</button>
         <button class="fchip" onclick="toggleFilter(this)">Otro</button>
       </div>
     </div>
@@ -791,7 +801,7 @@
 
   function applyFilters() {
     const onChips = [...document.querySelectorAll('.fchip.on')].map(c=>c.textContent.trim())
-    const instrLabels = ['Guitarra','Bajo','Batería','Teclado','Voz','Saxo','Violín','Cello','Trompeta','Flauta','Percusión','DJ/Prod.','Bandoneón','Charango','Arpa','Otro']
+    const instrLabels = ['Guitarra','Bajo','Batería','Teclado','Voz','Saxo','Violín','Cello','Trompeta','Flauta','Percusión','DJ/Prod.','Bandoneón','Charango','Arpa','Productor','Mix & Mastering','Manager','Otro']
     const buscaLabels = ['Banda','Sesiones','Zapada','Proyecto','Clases']
     activeFilters.instrumentos = onChips.filter(c => instrLabels.includes(c))
     activeFilters.generos = onChips.filter(c => !instrLabels.includes(c) && !buscaLabels.includes(c))
