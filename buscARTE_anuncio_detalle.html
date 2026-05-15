@@ -185,6 +185,35 @@
   nav a, nav button { pointer-events:auto !important; }
 
   .mobile-bottom-nav { display:none; }
+
+  /* ── PERFIL PANEL MOBILE ── */
+  .mbn-overlay {
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,.6);
+    z-index:490; opacity:0; transition:opacity .2s;
+  }
+  .mbn-overlay.open { display:block; opacity:1; }
+  .mbn-panel {
+    position:fixed; bottom:-100%; left:0; right:0;
+    background:#111; border-top:1px solid #2a2a2a;
+    z-index:495; padding:1.5rem 1.25rem 4.5rem;
+    border-radius:12px 12px 0 0;
+    transition:bottom .25s cubic-bezier(.4,0,.2,1);
+  }
+  .mbn-panel.open { bottom:0; }
+  .mbn-panel-title {
+    font-size:.65rem; letter-spacing:.1em; text-transform:uppercase;
+    color:#555; margin-bottom:1rem; font-family:'Archivo',sans-serif;
+  }
+  .mbn-panel-item {
+    display:flex; align-items:center; gap:.9rem;
+    padding:.9rem 0; border-bottom:1px solid #1c1c1c;
+    text-decoration:none; color:#f2ede4;
+    font-family:'Archivo',sans-serif; font-size:.95rem;
+  }
+  .mbn-panel-item:last-child { border-bottom:none; }
+  .mbn-panel-item .mbn-pi-icon { font-size:1.1rem; width:1.5rem; text-align:center; }
+  .mbn-panel-item.danger { color:#ff5555; }
+
   @media (max-width:900px) {
     .mobile-bottom-nav {
       display:flex; position:fixed; bottom:0; left:0; right:0;
@@ -978,23 +1007,56 @@
   document.addEventListener('click',e=>{if(!e.target.closest('#nav-user')){document.getElementById('nav-avatar-btn')?.classList.remove('open');document.getElementById('nav-dropdown')?.classList.remove('open');}});
   function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');window.location.href='index.html';}
 </script>
+<div class="mbn-overlay" id="mbn-overlay" onclick="closeMbnPanel()"></div>
+<div class="mbn-panel" id="mbn-panel">
+  <div class="mbn-panel-title">Mi cuenta</div>
+  <a href="#" class="mbn-panel-item" id="mbnp-perfil">
+    <span class="mbn-pi-icon">👤</span> Ver mi perfil
+  </a>
+  <a href="buscARTE_perfil.html" class="mbn-panel-item">
+    <span class="mbn-pi-icon">⚙️</span> Configurar perfil
+  </a>
+  <a href="buscARTE_mis_anuncios.html" class="mbn-panel-item">
+    <span class="mbn-pi-icon">📋</span> Mis anuncios
+  </a>
+  <a href="buscARTE_guardados.html" class="mbn-panel-item">
+    <span class="mbn-pi-icon">🔖</span> Guardados / Favoritos
+  </a>
+  <a href="#" class="mbn-panel-item danger" onclick="mbnLogout()">
+    <span class="mbn-pi-icon">🚪</span> Cerrar sesión
+  </a>
+</div>
 <nav class="mobile-bottom-nav" id="mobile-bottom-nav">
   <a href="buscARTE_busqueda.html" class="mbn-item" data-page="busqueda"><span class="mbn-icon">🎵</span><span>Músicos</span></a>
   <a href="buscARTE_anuncios.html" class="mbn-item" data-page="anuncios"><span class="mbn-icon">📋</span><span>Anuncios</span></a>
   <a href="buscARTE_mensajes.html" class="mbn-item" data-page="mensajes"><span class="mbn-icon">💬</span><span>Mensajes</span></a>
-  <a href="#" class="mbn-item" id="mbn-perfil" data-page="perfil"><span class="mbn-icon">👤</span><span>Mi perfil</span></a>
+  <button class="mbn-item" onclick="toggleMbnPanel()" style="background:none;border:none;flex:1;padding:0;" data-page="perfil"><span class="mbn-icon">👤</span><span>Mi perfil</span></button>
 </nav>
 <script>
 (function(){
   var uid = localStorage.getItem('ba_user_id');
-  var el = document.getElementById('mbn-perfil');
+  var el = document.getElementById('mbnp-perfil');
   if(el && uid) el.href = 'buscARTE_perfil_publico.html?id='+uid;
   else if(el) el.href = 'buscARTE_login.html';
   var path = window.location.pathname.split('/').pop();
-  document.querySelectorAll('.mbn-item').forEach(function(a){
-    if(path.indexOf(a.dataset.page) !== -1) a.classList.add('active');
+  document.querySelectorAll('.mbn-item[data-page]').forEach(function(a){
+    if(path.indexOf(a.dataset.page) !== -1) a.style.color='#d4f53c';
   });
 })();
+function toggleMbnPanel(){
+  document.getElementById('mbn-panel').classList.toggle('open');
+  document.getElementById('mbn-overlay').classList.toggle('open');
+}
+function closeMbnPanel(){
+  document.getElementById('mbn-panel').classList.remove('open');
+  document.getElementById('mbn-overlay').classList.remove('open');
+}
+function mbnLogout(){
+  localStorage.removeItem('ba_logged');
+  localStorage.removeItem('ba_name');
+  localStorage.removeItem('ba_user_id');
+  window.location.href='index.html';
+}
 </script>
 </body>
 </html>
