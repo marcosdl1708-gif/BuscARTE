@@ -659,9 +659,14 @@
       top: 25% !important;
     }
     .hero-tag { font-size: .68rem !important; }
-    .hero-title { 
-      font-size: clamp(2.8rem, 13vw, 5rem) !important; 
-      line-height: .92 !important;
+    /* Hero: evitar que overflow:hidden corte el título */
+    .hero { overflow: visible !important; }
+    h1 {
+      font-size: clamp(1.9rem, 7.5vw, 4rem) !important;
+      line-height: .9 !important;
+      letter-spacing: -.02em !important;
+      word-break: normal !important;
+      white-space: normal !important;
     }
     .hero-bottom { flex-direction: column !important; align-items: flex-start !important; gap: 1rem !important; }
     .hero-desc { font-size: .85rem !important; max-width: 100% !important; }
