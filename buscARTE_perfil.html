@@ -1578,15 +1578,16 @@ function mbnLogout(){
     document.getElementById('delete-progress').style.display = 'block';
 
     try {
-      const h = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` };
-
-      // Borrar en orden para respetar foreign keys
-      await fetch(`${SUPABASE_URL}/rest/v1/mensajes?or=(de_user_id.eq.${uid},para_user_id.eq.${uid})`, { method:'DELETE', headers:h });
-      await fetch(`${SUPABASE_URL}/rest/v1/conversaciones?or=(user1_id.eq.${uid},user2_id.eq.${uid})`, { method:'DELETE', headers:h });
-      await fetch(`${SUPABASE_URL}/rest/v1/perfiles_guardados?or=(user_id.eq.${uid},perfil_id.eq.${uid})`, { method:'DELETE', headers:h });
-      await fetch(`${SUPABASE_URL}/rest/v1/anuncios?user_id=eq.${uid}`, { method:'DELETE', headers:h });
-      await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${uid}`, { method:'DELETE', headers:h });
-
+      const h = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' };
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/eliminar_cuenta`, {
+        method: 'POST',
+        headers: h,
+        body: JSON.stringify({ p_user_id: parseInt(uid) })
+      });
+      const result = await res.json();
+      if (!result.ok) {
+        console.error('Error eliminando cuenta:', result.error);
+      }
     } catch(e) {
       console.error('Error eliminando cuenta:', e);
     }
