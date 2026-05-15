@@ -488,7 +488,7 @@
   .nav-dropdown-item:hover { background:rgba(255,255,255,.04);color:var(--blanco); }
   .nav-dropdown-divider { height:1px;background:#1c1c1c;margin:.3rem 0; }
   .nav-logout:hover { color:var(--rojo) !important; }
-  .nav-badge { background:var(--neon);color:var(--negro);font-size:.55rem;font-weight:700;padding:.1rem .4rem;margin-left:auto; }
+  .nav-badge { background:var(--neon);color:var(--negro);font-size:.62rem;font-weight:700;padding:.15rem .45rem;margin-left:.5rem;border-radius:2px;min-width:1.2rem;text-align:center;display:inline-block; }
   /* NAV LINKS FIX */
   .nav-links { list-style:none !important; display:flex !important; gap:2rem !important; padding:0 !important; margin:0 !important; }
   .nav-links li { list-style:none !important; }
@@ -573,6 +573,64 @@
     .tab-btn { white-space:nowrap !important; }
   }
 
+
+  /* ── ZONA DE PELIGRO ── */
+  .danger-zone {
+    margin-top:3rem; padding:1.5rem;
+    border:1px solid #3a1111;
+    background:rgba(255,85,85,.03);
+  }
+  .danger-zone-title {
+    font-size:.7rem; letter-spacing:.15em; text-transform:uppercase;
+    color:#ff5555; margin-bottom:1rem;
+  }
+  .danger-zone-desc { color:var(--gris);font-size:.82rem;margin-bottom:1.2rem;line-height:1.6; }
+  .btn-danger {
+    background:transparent; border:1px solid #ff5555;
+    color:#ff5555; padding:.65rem 1.2rem;
+    font-family:'Archivo',sans-serif; font-size:.82rem;
+    letter-spacing:.06em; text-transform:uppercase;
+    cursor:pointer; transition:background .2s, color .2s;
+  }
+  .btn-danger:hover { background:#ff5555; color:#fff; }
+
+  /* Modal eliminar cuenta */
+  .delete-overlay {
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,.8); z-index:1000;
+    align-items:center; justify-content:center; padding:1.5rem;
+  }
+  .delete-overlay.open { display:flex; }
+  .delete-modal {
+    background:#111; border:1px solid #3a1111;
+    width:100%; max-width:440px; padding:2rem; border-radius:4px;
+  }
+  .delete-modal-icon { font-size:2rem; margin-bottom:1rem; }
+  .delete-modal-title { font-family:'Archivo Black',sans-serif;font-size:1.2rem;margin-bottom:.4rem; }
+  .delete-modal-sub { color:var(--gris);font-size:.82rem;line-height:1.6;margin-bottom:1.5rem; }
+  .delete-confirm-label { font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gris);margin-bottom:.5rem;display:block; }
+  .delete-confirm-input {
+    width:100%; background:#0a0a0a; border:1px solid #3a1111;
+    color:var(--blanco); padding:.85rem 1rem;
+    font-family:'Archivo',sans-serif; font-size:.9rem;
+    outline:none; margin-bottom:1.2rem; transition:border-color .2s;
+  }
+  .delete-confirm-input:focus { border-color:#ff5555; }
+  .delete-modal-actions { display:flex;gap:.75rem;justify-content:flex-end; }
+  .btn-delete-cancel {
+    background:transparent; border:1px solid #2a2a2a; color:var(--gris);
+    padding:.65rem 1.2rem; font-family:'Archivo',sans-serif; font-size:.82rem;
+    cursor:pointer;
+  }
+  .btn-delete-confirm {
+    background:#ff5555; border:none; color:#fff;
+    padding:.65rem 1.4rem; font-family:'Archivo Black',sans-serif; font-size:.82rem;
+    cursor:pointer; transition:opacity .2s;
+  }
+  .btn-delete-confirm:disabled { opacity:.35;cursor:not-allowed; }
+  .btn-delete-confirm:not(:disabled):hover { opacity:.85; }
+  .delete-progress { text-align:center;padding:1.5rem 0;color:var(--gris);font-size:.85rem; }
+
 </style>
 </head>
 <body>
@@ -642,7 +700,8 @@
       <div class="sidebar-label">Cuenta</div>
       <a href="#" class="sidebar-link"><span class="icon">⚙️</span> Configuración</a>
       <a href="#" class="sidebar-link"><span class="icon">💎</span> Plan Premium</a>
-      <a href="#" class="sidebar-link"><span class="icon">↩️</span> Cerrar sesión</a>
+      <a href="#" class="sidebar-link" onclick="logout()"><span class="icon">↩️</span> Cerrar sesión</a>
+      <a href="#peligro" class="sidebar-link" style="color:#ff5555;border-left-color:#3a1111" onclick="setActive(this)"><span class="icon">🗑️</span> Eliminar cuenta</a>
     </div>
   </aside>
 
@@ -957,6 +1016,17 @@
         </div>
       </div>
       <p class="hint">💡 Tip: los perfiles con al menos un video reciben 3 veces más mensajes. Vale la pena subir aunque sea uno.</p>
+    </div>
+
+
+    <!-- ZONA DE PELIGRO -->
+    <div class="danger-zone" id="peligro">
+      <div class="danger-zone-title">⚠ Zona de peligro</div>
+      <p class="danger-zone-desc">
+        Eliminar tu cuenta borra permanentemente tu perfil, mensajes, anuncios y guardados.
+        Esta acción <strong style="color:var(--blanco)">no se puede deshacer</strong>.
+      </p>
+      <button class="btn-danger" onclick="abrirEliminarCuenta()">Eliminar mi cuenta</button>
     </div>
 
   </main>
@@ -1357,9 +1427,9 @@ function mbnLogout(){
     if (!badge || !uid) return;
     try {
       const lastSeen = localStorage.getItem('ba_msg_last_seen') ||
-        new Date(Date.now() - 7*24*60*60*1000).toISOString();
+        new Date().toISOString();
       const res = await fetch(
-        `https://xiaanchoanxmampegoay.supabase.co/rest/v1/mensajes?para_user_id=eq.${uid}&created_at=gt.${encodeURIComponent(lastSeen)}&select=id&limit=99`,
+        `https://xiaanchoanxmampegoay.supabase.co/rest/v1/mensajes?para_user_id=eq.${uid}&created_at=gt.${lastSeen}&select=id&limit=99`,
         { headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68', 'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68` } }
       );
       const msgs = await res.json();
@@ -1372,6 +1442,85 @@ function mbnLogout(){
       }
     } catch(e) { badge.style.display = 'none'; }
   }
+
+  // ── ELIMINAR CUENTA ──
+  function abrirEliminarCuenta() {
+    document.getElementById('delete-overlay').classList.add('open');
+    document.getElementById('delete-form').style.display = 'block';
+    document.getElementById('delete-progress').style.display = 'none';
+    document.getElementById('delete-email-input').value = '';
+    document.getElementById('btn-delete-confirm').disabled = true;
+  }
+  function cerrarEliminar() {
+    document.getElementById('delete-overlay').classList.remove('open');
+  }
+  function validarDeleteInput() {
+    const emailGuardado = localStorage.getItem('ba_email') || '';
+    const input = document.getElementById('delete-email-input').value.trim().toLowerCase();
+    // Validar que coincida con el email registrado, o que sea un email válido si no tenemos el guardado
+    const valido = emailGuardado
+      ? input === emailGuardado.toLowerCase()
+      : input.includes('@') && input.length > 4;
+    document.getElementById('btn-delete-confirm').disabled = !valido;
+  }
+  async function eliminarCuenta() {
+    const uid = localStorage.getItem('ba_user_id');
+    if (!uid) return;
+    const btn = document.getElementById('btn-delete-confirm');
+    btn.disabled = true;
+    document.getElementById('delete-form').style.display = 'none';
+    document.getElementById('delete-progress').style.display = 'block';
+
+    try {
+      const h = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` };
+
+      // Borrar en orden para respetar foreign keys
+      await fetch(`${SUPABASE_URL}/rest/v1/mensajes?or=(de_user_id.eq.${uid},para_user_id.eq.${uid})`, { method:'DELETE', headers:h });
+      await fetch(`${SUPABASE_URL}/rest/v1/conversaciones?or=(user1_id.eq.${uid},user2_id.eq.${uid})`, { method:'DELETE', headers:h });
+      await fetch(`${SUPABASE_URL}/rest/v1/perfiles_guardados?or=(user_id.eq.${uid},perfil_id.eq.${uid})`, { method:'DELETE', headers:h });
+      await fetch(`${SUPABASE_URL}/rest/v1/anuncios?user_id=eq.${uid}`, { method:'DELETE', headers:h });
+      await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${uid}`, { method:'DELETE', headers:h });
+
+    } catch(e) {
+      console.error('Error eliminando cuenta:', e);
+    }
+
+    // Limpiar sesión y redirigir
+    localStorage.removeItem('ba_logged');
+    localStorage.removeItem('ba_name');
+    localStorage.removeItem('ba_user_id');
+    localStorage.removeItem('ba_email');
+    localStorage.removeItem('ba_msg_last_seen');
+    window.location.href = 'index.html?cuenta_eliminada=1';
+  }
+
 </script>
+
+<div class="delete-overlay" id="delete-overlay" onclick="if(event.target===this)cerrarEliminar()">
+  <div class="delete-modal">
+    <div id="delete-form">
+      <div class="delete-modal-icon">🗑️</div>
+      <div class="delete-modal-title">Eliminar cuenta</div>
+      <div class="delete-modal-sub">
+        Esta acción es <strong>irreversible</strong>. Se borrarán tu perfil, mensajes, anuncios y favoritos.<br><br>
+        Para confirmar, escribí tu email:
+      </div>
+      <label class="delete-confirm-label">Tu email</label>
+      <input type="email" class="delete-confirm-input" id="delete-email-input"
+             placeholder="tu@email.com"
+             oninput="validarDeleteInput()">
+      <div class="delete-modal-actions">
+        <button class="btn-delete-cancel" onclick="cerrarEliminar()">Cancelar</button>
+        <button class="btn-delete-confirm" id="btn-delete-confirm"
+                onclick="eliminarCuenta()" disabled>
+          Eliminar para siempre
+        </button>
+      </div>
+    </div>
+    <div class="delete-progress" id="delete-progress" style="display:none">
+      ⏳ Eliminando tu cuenta...
+    </div>
+  </div>
+</div>
 </body>
 </html>

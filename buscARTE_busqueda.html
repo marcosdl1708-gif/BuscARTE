@@ -99,7 +99,7 @@
   .nav-dropdown-item:hover { background:rgba(255,255,255,.04);color:var(--blanco); }
   .nav-dropdown-divider { height:1px;background:#1c1c1c;margin:.3rem 0; }
   .nav-logout:hover { color:var(--rojo) !important; }
-  .nav-badge { background:var(--neon);color:var(--negro);font-size:.55rem;font-weight:700;padding:.1rem .4rem;margin-left:auto; }
+  .nav-badge { background:var(--neon);color:var(--negro);font-size:.62rem;font-weight:700;padding:.15rem .45rem;margin-left:.5rem;border-radius:2px;min-width:1.2rem;text-align:center;display:inline-block; }
   .view-btn { background:transparent;border:none;color:var(--gris);padding:.38rem .6rem;font-size:.85rem;cursor:none;transition:all .15s; }
   .view-btn.active { background:var(--negro3);color:var(--neon); }
 
@@ -974,9 +974,9 @@ function mbnLogout(){
     if (!badge || !uid) return;
     try {
       const lastSeen = localStorage.getItem('ba_msg_last_seen') ||
-        new Date(Date.now() - 7*24*60*60*1000).toISOString();
+        new Date().toISOString();
       const res = await fetch(
-        `https://xiaanchoanxmampegoay.supabase.co/rest/v1/mensajes?para_user_id=eq.${uid}&created_at=gt.${encodeURIComponent(lastSeen)}&select=id&limit=99`,
+        `https://xiaanchoanxmampegoay.supabase.co/rest/v1/mensajes?para_user_id=eq.${uid}&created_at=gt.${lastSeen}&select=id&limit=99`,
         { headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68', 'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68` } }
       );
       const msgs = await res.json();
