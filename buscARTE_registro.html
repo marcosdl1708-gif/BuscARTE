@@ -884,6 +884,21 @@
   ];
 
   function goStep(n) {
+    // Validación antes de avanzar
+    if (n === 2) {
+      const nombre = document.getElementById('reg-nombre').value.trim()
+      const email = document.getElementById('reg-email').value.trim()
+      const pass = document.getElementById('reg-password').value
+      const prov = document.getElementById('sel-provincia').value
+      if (!nombre) { alert('Por favor ingresá tu nombre.'); return }
+      if (!email || !email.includes('@')) { alert('Por favor ingresá un email válido.'); return }
+      if (pass.length < 8) { alert('La contraseña debe tener al menos 8 caracteres.'); return }
+      if (!prov || prov === '') { alert('Por favor seleccioná tu provincia.'); return }
+    }
+    if (n === 3) {
+      const instrumento = [...document.querySelectorAll('#chips-instrumentos .chip.selected')]
+      if (instrumento.length === 0) { alert('Por favor seleccioná al menos un instrumento.'); return }
+    }
     document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
     document.getElementById('step-' + n).classList.add('active');
 
