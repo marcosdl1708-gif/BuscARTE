@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generador de nombres — buscARTE</title>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0a0a0a">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root { --neon:#d4f53c;--negro:#0a0a0a;--blanco:#f2ede4;--gris:#888;--gris2:#555;--gris3:#2a2a2a; }
+    * { margin:0;padding:0;box-sizing:border-box; }
+    body { background:var(--negro);color:var(--blanco);font-family:'Archivo',sans-serif;min-height:100vh; }
+    nav { position:sticky;top:0;z-index:100;display:flex;align-items:center;padding:1rem 2rem;border-bottom:1px solid #1c1c1c;background:rgba(8,8,8,.96);backdrop-filter:blur(12px); }
+    .nav-logo { font-family:'Archivo Black',sans-serif;font-size:1.4rem;text-decoration:none;color:var(--blanco) }
+    .nav-logo span { color:var(--neon) }
+    .nav-back { margin-left:auto;color:var(--gris);font-size:.82rem;text-decoration:none;transition:color .15s; }
+    .nav-back:hover { color:var(--blanco); }
+    .wrap { max-width:700px;margin:0 auto;padding:3rem 1.5rem 5rem; }
+    .page-label { font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--neon);margin-bottom:.6rem; }
+    .page-title { font-family:'Archivo Black',sans-serif;font-size:2.5rem;line-height:.92;margin-bottom:.6rem; }
+    .page-sub { color:var(--gris);font-size:.9rem;margin-bottom:2.5rem;line-height:1.7; }
+
+    /* MODO SELECTOR */
+    .mode-tabs { display:flex;gap:.5rem;margin-bottom:2rem; }
+    .mode-tab {
+      flex:1;padding:.8rem;border:1px solid var(--gris3);background:transparent;
+      color:var(--gris);font-family:'Archivo',sans-serif;font-size:.82rem;
+      letter-spacing:.06em;text-transform:uppercase;cursor:pointer;
+      transition:all .15s; text-align:center;
+    }
+    .mode-tab.active { border-color:var(--neon);color:var(--neon);background:rgba(212,245,60,.05); }
+
+    /* BOTÓN GENERAR */
+    .btn-generar {
+      width:100%;background:var(--neon);border:none;color:#000;
+      padding:1.1rem;font-family:'Archivo Black',sans-serif;font-size:1.1rem;
+      letter-spacing:.04em;cursor:pointer;transition:opacity .2s;margin-bottom:2rem;
+    }
+    .btn-generar:hover { opacity:.85; }
+    .btn-generar:active { opacity:.7; }
+
+    /* RESULTADOS */
+    .results { display:flex;flex-direction:column;gap:.75rem; }
+    .result-item {
+      display:flex;align-items:center;justify-content:space-between;
+      background:#0f0f0f;border:1px solid #1c1c1c;padding:1.1rem 1.25rem;
+      transition:border-color .15s;
+    }
+    .result-item:hover { border-color:#333; }
+    .result-name { font-family:'Archivo Black',sans-serif;font-size:1.15rem;letter-spacing:-.01em; }
+    .result-actions { display:flex;gap:.5rem;flex-shrink:0; }
+    .btn-save {
+      background:transparent;border:1px solid var(--gris3);color:var(--gris);
+      padding:.4rem .75rem;font-family:'Archivo',sans-serif;font-size:.72rem;
+      letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;
+    }
+    .btn-save:hover { border-color:var(--neon);color:var(--neon); }
+    .btn-save.saved { border-color:var(--neon);color:var(--neon);background:rgba(212,245,60,.07); }
+    .btn-copy {
+      background:transparent;border:1px solid var(--gris3);color:var(--gris);
+      padding:.4rem .75rem;font-family:'Archivo',sans-serif;font-size:.72rem;
+      letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;
+    }
+    .btn-copy:hover { border-color:#555;color:var(--blanco); }
+    .btn-copy.copied { color:var(--neon); }
+
+    /* GUARDADOS */
+    .saved-section { margin-top:3rem;border-top:1px solid #1c1c1c;padding-top:2rem; }
+    .saved-title { font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gris);margin-bottom:1rem; }
+    .saved-list { display:flex;flex-wrap:wrap;gap:.5rem; }
+    .saved-chip {
+      display:flex;align-items:center;gap:.5rem;
+      background:#111;border:1px solid #2a2a2a;
+      padding:.4rem .85rem;font-size:.85rem;
+    }
+    .saved-chip-remove { background:none;border:none;color:var(--gris);cursor:pointer;font-size:.9rem;padding:0;line-height:1; }
+    .saved-chip-remove:hover { color:#ff5555; }
+    .empty-state { color:var(--gris);font-size:.82rem;font-style:italic; }
+
+    /* MOBILE */
+    @media (max-width:768px) {
+      .wrap { padding:2rem 1.25rem 6rem; }
+      .page-title { font-size:1.8rem; }
+      .result-name { font-size:1rem; }
+      body { padding-bottom:54px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">busc<span>ARTE</span></a>
+  <a href="javascript:history.back()" class="nav-back">← Volver</a>
+</nav>
+
+<div class="wrap">
+  <div class="page-label">Herramienta</div>
+  <h1 class="page-title">Generador de<br><span style="color:var(--neon)">nombres</span></h1>
+  <p class="page-sub">Para bandas y artistas solistas. Generá opciones al instante, guardá las que te gustan y copialas con un click.</p>
+
+  <div class="mode-tabs">
+    <button class="mode-tab active" onclick="setMode('banda', this)">🎸 Nombre de banda</button>
+    <button class="mode-tab" onclick="setMode('solista', this)">🎤 Nombre artístico</button>
+  </div>
+
+  <button class="btn-generar" onclick="generar()">🎲 Generar nombres</button>
+
+  <div class="results" id="results">
+    <div class="empty-state" style="padding:2rem;text-align:center">Apretá el botón para generar opciones →</div>
+  </div>
+
+  <div class="saved-section" id="saved-section" style="display:none">
+    <div class="saved-title">♡ Guardados</div>
+    <div class="saved-list" id="saved-list"></div>
+  </div>
+</div>
+
+<script>
+  let modo = 'banda';
+  let guardados = JSON.parse(localStorage.getItem('ba_nombres_guardados') || '[]');
+  let usados = new Set();
+
+  // ══════════════════════════════════════════════
+  // BASE DE PALABRAS
+  // ══════════════════════════════════════════════
+
+  const BANDA = {
+    prefijos: ['Los','Las','La','El','Los','Las','Proyecto','Colectivo','Banda','Trío','Cuarteto','La Orquesta','El Conjunto','Gran'],
+    adj_masc: ['Roto','Perdido','Oscuro','Vacío','Libre','Eterno','Salvaje','Quieto','Profundo','Amargo','Bravo','Loco','Nuevo','Viejo','Largo','Intenso','Urgente','Maldito','Olvidado','Encendido','Turbio','Fiero','Extraño','Secreto','Latente'],
+    adj_fem: ['Rota','Perdida','Oscura','Vacía','Libre','Eterna','Salvaje','Quieta','Profunda','Amarga','Brava','Loca','Nueva','Vieja','Larga','Intensa','Urgente','Maldita','Olvidada','Encendida','Turbia','Fiera','Extraña','Secreta','Latente'],
+    sust_masc: ['Ruido','Tiempo','Abismo','Fuego','Viento','Silencio','Camino','Pulso','Ritmo','Eco','Lazo','Filo','Nudo','Rastro','Vuelo','Sueño','Humo','Trance','Salto','Grito','Tono','Surco','Caos','Alba','Umbral'],
+    sust_fem: ['Llama','Sombra','Niebla','Marea','Grieta','Raíz','Orilla','Chispa','Cuerda','Fuga','Ola','Herida','Voz','Tarde','Noche','Cumbre','Hendija','Pólvora','Resaca','Quimera','Tormenta','Espiral','Ceniza','Brasa','Estela'],
+    lugares: ['del Sur','del Norte','del Bajo','del Caos','del Abismo','del Margen','del Río','de la Orilla','de la Noche','del Último Piso','de Palermo','del Conurbano','del Fin del Mundo','de Boedo','de la Villa','del Puerto'],
+  };
+
+  const SOLISTA = {
+    articulos: ['El','La',''],
+    nombres: ['Luca','Manu','Sol','Nico','Luna','Bruno','Caro','Dante','Vera','Axel','Mora','Omar','Lena','Fede','Zoe','Blas','Noa','Iara','Enzo','Mia','Teo','Kika','Seba','Vale','Ian','Luz','Dex','Alba','Kai','Nara'],
+    apellidos_inv: ['Niebla','Caos','Furia','Viento','Sombra','Fuego','Llanura','Marea','Abismo','Pulso','Eco','Grieta','Raíz','Trance','Umbral','Chispa','Llama','Estela','Ceniza','Brasa','Resaca','Espiral','Quimera','Lazo','Rastro'],
+    apodos: ['El Zurdo','La Maga','El Viejo','La Furia','El Flaco','La Negra','El Mono','La Rubia','El Ruso','La China','El Chino','El Toro','La Pantera','El Lobo','La Cobra'],
+    artisticos: ['Vértice','Hendrix Jr','Noir','Zénit','Coda','Fuzz','Riff','Loop','Scat','Vamp','Fade','Drop','Warp','Flux','Glitch','Drone','Bass','Kraut','Dub','Shoal'],
+  };
+
+  function rand(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  function generarNombreBanda() {
+    const tipo = Math.floor(Math.random() * 5);
+    let nombre = '';
+    switch(tipo) {
+      case 0: // "Los [Adj Masc Plural]" → simplificado como "Los [Sust Masc]"
+        nombre = `${rand(['Los','Las'])} ${rand(BANDA.sust_masc)}${rand(['','s'])}`;
+        break;
+      case 1: // "[Prefijo] [Sust] [Lugar]"
+        nombre = `${rand(BANDA.prefijos)} ${rand([...BANDA.sust_masc,...BANDA.sust_fem])} ${rand(BANDA.lugares)}`;
+        break;
+      case 2: // "El/La [Sust] [Adj]"
+        const useFem2 = Math.random() > 0.5;
+        nombre = `${useFem2 ? 'La' : 'El'} ${rand(useFem2 ? BANDA.sust_fem : BANDA.sust_masc)} ${rand(useFem2 ? BANDA.adj_fem : BANDA.adj_masc)}`;
+        break;
+      case 3: // Solo sustantivo fuerte
+        nombre = rand([...BANDA.sust_masc,...BANDA.sust_fem,...BANDA.adj_masc,...BANDA.adj_fem].filter(w=>w.length > 4));
+        break;
+      case 4: // "[Sust] y [Sust]"
+        const w1 = rand([...BANDA.sust_masc,...BANDA.sust_fem]);
+        let w2 = rand([...BANDA.sust_masc,...BANDA.sust_fem]);
+        while(w2 === w1) w2 = rand([...BANDA.sust_masc,...BANDA.sust_fem]);
+        nombre = `${w1} y ${w2}`;
+        break;
+    }
+    return nombre;
+  }
+
+  function generarNombreSolista() {
+    const tipo = Math.floor(Math.random() * 4);
+    let nombre = '';
+    switch(tipo) {
+      case 0: // Nombre + apellido inventado
+        nombre = `${rand(SOLISTA.nombres)} ${rand(SOLISTA.apellidos_inv)}`;
+        break;
+      case 1: // Apodo
+        nombre = rand(SOLISTA.apodos);
+        break;
+      case 2: // Nombre artístico simple
+        nombre = rand(SOLISTA.artisticos);
+        break;
+      case 3: // Artículo + nombre artístico
+        const art = rand(['El','La','']);
+        nombre = art ? `${art} ${rand([...SOLISTA.artisticos,...SOLISTA.apellidos_inv])}` : rand(SOLISTA.artisticos);
+        break;
+    }
+    return nombre;
+  }
+
+  function generar() {
+    const generador = modo === 'banda' ? generarNombreBanda : generarNombreSolista;
+    const nuevos = [];
+    let intentos = 0;
+    while (nuevos.length < 6 && intentos < 200) {
+      const n = generador();
+      if (!usados.has(n)) {
+        nuevos.push(n);
+        usados.add(n);
+      }
+      intentos++;
+    }
+    renderResultados(nuevos);
+  }
+
+  function renderResultados(nombres) {
+    const container = document.getElementById('results');
+    container.innerHTML = nombres.map(n => {
+      const guardado = guardados.includes(n);
+      return `<div class="result-item" id="item-${CSS.escape(n)}">
+        <div class="result-name">${n}</div>
+        <div class="result-actions">
+          <button class="btn-save ${guardado ? 'saved' : ''}" onclick="toggleGuardar('${n.replace(/'/g,"\\'")}', this)">
+            ${guardado ? '♥ Guardado' : '♡ Guardar'}
+          </button>
+          <button class="btn-copy" onclick="copiar('${n.replace(/'/g,"\\'")}', this)">Copiar</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function toggleGuardar(nombre, btn) {
+    if (guardados.includes(nombre)) {
+      guardados = guardados.filter(g => g !== nombre);
+      btn.textContent = '♡ Guardar';
+      btn.classList.remove('saved');
+    } else {
+      guardados.push(nombre);
+      btn.textContent = '♥ Guardado';
+      btn.classList.add('saved');
+    }
+    localStorage.setItem('ba_nombres_guardados', JSON.stringify(guardados));
+    renderGuardados();
+  }
+
+  function copiar(nombre, btn) {
+    navigator.clipboard.writeText(nombre).then(() => {
+      const orig = btn.textContent;
+      btn.textContent = '✓ Copiado';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1500);
+    });
+  }
+
+  function renderGuardados() {
+    const section = document.getElementById('saved-section');
+    const list = document.getElementById('saved-list');
+    if (!guardados.length) { section.style.display = 'none'; return; }
+    section.style.display = 'block';
+    list.innerHTML = guardados.map(n =>
+      `<span class="saved-chip">${n}<button class="saved-chip-remove" onclick="quitarGuardado('${n.replace(/'/g,"\\'")}')">×</button></span>`
+    ).join('');
+  }
+
+  function quitarGuardado(nombre) {
+    guardados = guardados.filter(g => g !== nombre);
+    localStorage.setItem('ba_nombres_guardados', JSON.stringify(guardados));
+    renderGuardados();
+    // Actualizar botón si está visible
+    document.querySelectorAll('.result-item').forEach(item => {
+      const nameEl = item.querySelector('.result-name');
+      if (nameEl && nameEl.textContent === nombre) {
+        const btn = item.querySelector('.btn-save');
+        if (btn) { btn.textContent = '♡ Guardar'; btn.classList.remove('saved'); }
+      }
+    });
+  }
+
+  function setMode(m, btn) {
+    modo = m;
+    usados.clear();
+    document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('results').innerHTML = '<div class="empty-state" style="padding:2rem;text-align:center">Apretá el botón para generar opciones →</div>';
+  }
+
+  // Inicializar guardados
+  renderGuardados();
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(()=>{}); });
+}
+</script>
+</body>
+</html>
