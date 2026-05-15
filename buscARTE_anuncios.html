@@ -385,6 +385,21 @@
     .layout > *:nth-child(2) { display:block !important; }
   }
 
+
+  /* Fecha evento en card */
+  .anuncio-fecha {
+    display: inline-flex; align-items: center; gap: .4rem;
+    background: rgba(212,245,60,.08); border: 1px solid rgba(212,245,60,.2);
+    color: var(--neon); font-size: .75rem; font-weight: 600;
+    letter-spacing: .04em; padding: .3rem .75rem;
+    margin-bottom: .6rem; margin-top: .2rem;
+  }
+  .anuncio-fecha-icon { font-size: .85rem; }
+  .anuncio-pasado { 
+    background: rgba(136,136,136,.08); border-color: #333; 
+    color: var(--gris); text-decoration: line-through;
+  }
+
 </style>
 </head>
 <body>
@@ -1228,6 +1243,21 @@
     return `Hace ${Math.floor(diff/1440)} días`
   }
 
+
+  function formatFecha(iso) {
+    if (!iso) return null;
+    const d = new Date(iso);
+    if (isNaN(d)) return null;
+    const dias = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+    const dia = dias[d.getDay()];
+    const num = d.getDate();
+    const mes = meses[d.getMonth()];
+    const hora = d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+    const pasado = d < new Date();
+    return { str: `${dia} ${num} ${mes} · ${hora}hs`, pasado };
+  }
+
   function buildAnuncioCard(a, autorNombre) {
     const badge = BADGES[a.tipo] || 'badge-busco'
     const label = LABELS[a.tipo] || a.tipo
@@ -1237,8 +1267,14 @@
     const precio = a.precio ? (a.precio.startsWith('$') ? a.precio : `$${a.precio}`) : ''
     const tagsHTML = [...tags, precio].filter(Boolean).map(t=>`<span class="anuncio-tag">${t}</span>`).join('')
 
+    const fechaInfo = (a.tipo === 'jam' && a.fecha_evento) ? formatFecha(a.fecha_evento) : null;
+    const fechaHTML = fechaInfo
+      ? `<div class="anuncio-fecha${fechaInfo.pasado ? ' anuncio-pasado' : ''}"><span class="anuncio-fecha-icon">📅</span>${fechaInfo.str}</div>`
+      : '';
+
     return `<div class="anuncio" data-tipo="${a.tipo}" data-id="${a.id}" style="animation:fadeUp .3s ease both">
       <span class="anuncio-tipo-badge ${badge}">${label}</span>
+      ${fechaHTML}
       <div class="anuncio-titulo"><a href="buscARTE_anuncio_detalle.html?id=${a.id}" style="color:inherit;text-decoration:none">${a.titulo||'Sin título'}</a></div>
       <div class="anuncio-desc">${a.descripcion||''}</div>
       <div class="anuncio-meta">
@@ -1269,7 +1305,8 @@
       anunciosOffset = 0
     }
 
-    let query = `${SUPABASE_URL}/rest/v1/anuncios?estado=eq.activo&order=created_at.desc&limit=${ANUNCIOS_PER_PAGE}&offset=${anunciosOffset}`
+    const ordenJam = tipoFiltro === 'jam';
+    let query = `${SUPABASE_URL}/rest/v1/anuncios?estado=eq.activo&order=${ordenJam ? 'fecha_evento.asc.nullslast,created_at.desc' : 'created_at.desc'}&limit=${ANUNCIOS_PER_PAGE}&offset=${anunciosOffset}`
     if (tipoFiltro !== 'todos') query += `&tipo=eq.${tipoFiltro}`
 
     // Leer chips activos del panel visible
