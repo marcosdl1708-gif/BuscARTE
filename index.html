@@ -745,6 +745,38 @@
     }
     .footer-links { flex-wrap: wrap !important; justify-content: center !important; }
   }
+
+  /* HERO QUICK NAV (logueado) */
+  .hero-quick-nav {
+    display: flex; gap: .75rem; flex-wrap: wrap;
+  }
+  .hqn-btn {
+    display: flex; align-items: center; gap: .5rem;
+    background: rgba(255,255,255,.06);
+    border: 1px solid #2a2a2a;
+    color: var(--blanco); text-decoration: none;
+    padding: .65rem 1.1rem;
+    font-family: var(--font-body); font-size: .82rem;
+    letter-spacing: .04em; text-transform: uppercase;
+    transition: border-color .2s, background .2s;
+  }
+  .hqn-btn:hover { border-color: var(--neon); background: rgba(212,245,60,.05); }
+  .hqn-icon { font-size: 1rem; }
+  @media (max-width: 768px) {
+    .hero-quick-nav {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr !important;
+      gap: .6rem !important;
+      width: 100% !important;
+    }
+    .hqn-btn {
+      justify-content: center !important;
+      padding: .9rem !important;
+      font-size: .75rem !important;
+    }
+    #hero-logueado p { font-size: .8rem !important; }
+  }
+
 </style>
 </head>
 <body>
@@ -800,9 +832,32 @@
     <p class="hero-desc">
       La plataforma para que <strong>músicos, artistas y creativos</strong> de toda Argentina se encuentren, conecten y construyan proyectos juntos.
     </p>
-    <div class="hero-actions">
+    <!-- Estado: no logueado -->
+    <div class="hero-actions" id="hero-invitado">
       <a href="buscARTE_registro.html" class="btn-neon" style="font-size:0.95rem; padding: 0.9rem 2.2rem;">Crear perfil gratis</a>
       <a href="#explorar" class="btn-ghost" style="font-size:0.95rem; padding: 0.9rem 2.2rem;">Explorar →</a>
+    </div>
+    <!-- Estado: logueado — accesos rápidos -->
+    <div id="hero-logueado" style="display:none; width:100%;">
+      <p style="color:var(--gris);font-size:.85rem;margin-bottom:1.2rem;">Bienvenido de vuelta, <span id="hero-nombre" style="color:var(--blanco)"></span> 👋</p>
+      <div class="hero-quick-nav">
+        <a href="buscARTE_busqueda.html" class="hqn-btn">
+          <span class="hqn-icon">🎵</span>
+          <span class="hqn-label">Músicos</span>
+        </a>
+        <a href="buscARTE_anuncios.html" class="hqn-btn">
+          <span class="hqn-icon">📋</span>
+          <span class="hqn-label">Anuncios</span>
+        </a>
+        <a href="buscARTE_mensajes.html" class="hqn-btn">
+          <span class="hqn-icon">💬</span>
+          <span class="hqn-label">Mensajes</span>
+        </a>
+        <a href="#" class="hqn-btn" id="hero-mi-perfil">
+          <span class="hqn-icon">👤</span>
+          <span class="hqn-label">Mi perfil</span>
+        </a>
+      </div>
     </div>
   </div>
 
@@ -1104,6 +1159,15 @@
       // Fix Mi perfil link with real user ID
       const miPerfilLink=document.querySelector('.nav-dropdown-item[href*="perfil_publico"]');
       if(miPerfilLink && uid) miPerfilLink.href='buscARTE_perfil_publico.html?id='+uid;
+      // Hero logueado: mostrar accesos rápidos
+      const inv = document.getElementById('hero-invitado');
+      const log = document.getElementById('hero-logueado');
+      if(inv) inv.style.display = 'none';
+      if(log) log.style.display = 'block';
+      const hn = document.getElementById('hero-nombre');
+      if(hn) hn.textContent = n.split(' ')[0];
+      const hmp = document.getElementById('hero-mi-perfil');
+      if(hmp && uid) hmp.href = 'buscARTE_perfil_publico.html?id=' + uid;
     }
   })();
   function toggleUserMenu(){const w=document.getElementById('nav-avatar-btn');const d=document.getElementById('nav-dropdown');if(w)w.classList.toggle('open');if(d)d.classList.toggle('open');}
