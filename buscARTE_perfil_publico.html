@@ -530,7 +530,28 @@
     .profile-sidebar .section-title { font-size:1rem !important; }
   }
 
+
+  /* Playlist embed */
+  .playlist-section { margin-top:1.5rem; }
+  .playlist-link {
+    display:flex; align-items:center; gap:.75rem;
+    background:#0d0d0d; border:1px solid #2a2a2a;
+    padding:1rem 1.2rem; text-decoration:none;
+    color:var(--blanco); transition:border-color .2s;
+  }
+  .playlist-link:hover { border-color:var(--neon); }
+  .playlist-icon { font-size:1.4rem; flex-shrink:0; }
+  .playlist-info { flex:1; min-width:0; }
+  .playlist-label { font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--neon);margin-bottom:.2rem; }
+  .playlist-url { font-size:.78rem;color:var(--gris);overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+
 </style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="buscARTE">
+  <link rel="apple-touch-icon" href="/icons/icon-192.svg">
 </head>
 <body>
 
@@ -771,6 +792,17 @@
       const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${id}&select=*`, { headers: hdrs })
       const [p] = await res.json()
       if (!p) return
+      if (p.baneado) {
+        document.querySelector('.profile-hero').innerHTML = `
+          <div style="text-align:center;padding:4rem 2rem;color:var(--gris)">
+            <div style="font-size:3rem;margin-bottom:1rem">🚫</div>
+            <div style="font-family:var(--font-display);font-size:1.5rem;color:var(--blanco);margin-bottom:.5rem">Perfil suspendido</div>
+            <p>Esta cuenta fue suspendida por violar las normas de la comunidad.</p>
+          </div>`
+        document.querySelector('.profile-stats').style.display = 'none'
+        document.querySelector('.profile-body').style.display = 'none'
+        return
+      }
 
       const initials = p.nombre ? p.nombre.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) : '?'
       const generos = (p.generos||'').split(',').map(g=>g.trim()).filter(Boolean)
@@ -1226,5 +1258,12 @@ function mbnLogout(){
     </div>
   </div>
 </div>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+</script>
 </body>
 </html>

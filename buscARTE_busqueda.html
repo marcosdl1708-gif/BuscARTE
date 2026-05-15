@@ -612,7 +612,7 @@
     }
 
     // Construir query con filtros
-    let query = `${SUPABASE_URL}/rest/v1/perfiles?select=id,nombre,instrumento,generos,ciudad,barrio,bio,referentes,disponibilidad,foto_url&order=created_at.desc&limit=${PER_PAGE}&offset=${offset}`
+    let query = `${SUPABASE_URL}/rest/v1/perfiles?select=id,nombre,instrumento,generos,ciudad,barrio,bio,referentes,disponibilidad,foto_url&baneado=eq.false&order=created_at.desc&limit=${PER_PAGE}&offset=${offset}`
 
     // Filtro de búsqueda por texto — diccionario de sinónimos
     const searchVal = document.getElementById('main-search')?.value?.trim()
@@ -705,7 +705,7 @@
 
       // Si no hay resultados con zona exacta, intentar solo instrumento/género
       if (!perfiles.length && zona && (instrDetected || genDetected)) {
-        let q2 = `${SUPABASE_URL}/rest/v1/perfiles?select=id,nombre,instrumento,generos,ciudad,barrio,bio,referentes,disponibilidad,foto_url&order=created_at.desc`
+        let q2 = `${SUPABASE_URL}/rest/v1/perfiles?select=id,nombre,instrumento,generos,ciudad,barrio,bio,referentes,disponibilidad,foto_url&baneado=eq.false&order=created_at.desc`
         if (instrDetected) q2 += `&instrumento=ilike.*${encodeURIComponent(instrDetected)}*`
         if (genDetected) q2 += `&generos=ilike.*${encodeURIComponent(genDetected)}*`
         const sbRes2 = await fetch(q2, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } })

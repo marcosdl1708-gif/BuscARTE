@@ -324,6 +324,13 @@
       const user = await res.json()
 
       if (user && user.id) {
+        // Chequear si el usuario está baneado
+        if (user.baneado === true) {
+          document.getElementById('field-pass').classList.add('error')
+          document.querySelector('#field-pass .field-error').textContent = 'Tu cuenta fue suspendida. Contactanos si creés que es un error.'
+          btn.classList.remove('loading')
+          return
+        }
         localStorage.setItem('ba_logged', '1')
         localStorage.setItem('ba_name', user.nombre || email.split('@')[0])
         localStorage.setItem('ba_email', email || '');

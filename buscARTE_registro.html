@@ -568,6 +568,12 @@
   }
 </style>
   <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="buscARTE">
+  <link rel="apple-touch-icon" href="/icons/icon-192.svg">
 </head>
 <body>
 
@@ -808,6 +814,55 @@
         <button class="chip" onclick="addArtistByName('Spinetta', this)">Spinetta</button>
         <button class="chip" onclick="addArtistByName('Tool', this)">Tool</button>
         <button class="chip" onclick="addArtistByName('Pink Floyd', this)">Pink Floyd</button>
+        <button class="chip" onclick="addArtistByName('Boris Brejcha', this)">Boris Brejcha</button>
+        <button class="chip" onclick="addArtistByName('Charlotte de Witte', this)">Charlotte de Witte</button>
+        <button class="chip" onclick="addArtistByName('Anyma', this)">Anyma</button>
+        <button class="chip" onclick="addArtistByName('Sara Landry', this)">Sara Landry</button>
+        <button class="chip" onclick="addArtistByName('Amelie Lens', this)">Amelie Lens</button>
+        <button class="chip" onclick="addArtistByName('Indira Paganotto', this)">Indira Paganotto</button>
+        <button class="chip" onclick="addArtistByName('Reinier Zonneveld', this)">Reinier Zonneveld</button>
+        <button class="chip" onclick="addArtistByName('ARTBAT', this)">ARTBAT</button>
+        <button class="chip" onclick="addArtistByName('Marcel Dettmann', this)">Marcel Dettmann</button>
+        <button class="chip" onclick="addArtistByName('Nina Kraviz', this)">Nina Kraviz</button>
+        <button class="chip" onclick="addArtistByName('Adam Beyer', this)">Adam Beyer</button>
+        <button class="chip" onclick="addArtistByName('Richie Hawtin', this)">Richie Hawtin</button>
+        <button class="chip" onclick="addArtistByName('I Hate Models', this)">I Hate Models</button>
+        <button class="chip" onclick="addArtistByName('Nico Moreno', this)">Nico Moreno</button>
+        <button class="chip" onclick="addArtistByName('Miss Monique', this)">Miss Monique</button>
+        <button class="chip" onclick="addArtistByName('Chris Liebing', this)">Chris Liebing</button>
+        <button class="chip" onclick="addArtistByName('Solomun', this)">Solomun</button>
+        <button class="chip" onclick="addArtistByName('Peggy Gou', this)">Peggy Gou</button>
+        <button class="chip" onclick="addArtistByName('FISHER', this)">FISHER</button>
+        <button class="chip" onclick="addArtistByName('Michael Bibi', this)">Michael Bibi</button>
+        <button class="chip" onclick="addArtistByName('Chris Stussy', this)">Chris Stussy</button>
+        <button class="chip" onclick="addArtistByName('Honey Dijon', this)">Honey Dijon</button>
+        <button class="chip" onclick="addArtistByName('Black Coffee', this)">Black Coffee</button>
+        <button class="chip" onclick="addArtistByName('Keinemusik', this)">Keinemusik</button>
+        <button class="chip" onclick="addArtistByName('Job Jobse', this)">Job Jobse</button>
+        <button class="chip" onclick="addArtistByName('Pawsa', this)">Pawsa</button>
+        <button class="chip" onclick="addArtistByName('Tale Of Us', this)">Tale Of Us</button>
+        <button class="chip" onclick="addArtistByName('BICEP', this)">BICEP</button>
+        <button class="chip" onclick="addArtistByName('Ben Böhm', this)">Ben Böhm</button>
+        <button class="chip" onclick="addArtistByName('Nils Hoffmann', this)">Nils Hoffmann</button>
+        <button class="chip" onclick="addArtistByName('Innellea', this)">Innellea</button>
+        <button class="chip" onclick="addArtistByName('Armin van Buuren', this)">Armin van Buuren</button>
+        <button class="chip" onclick="addArtistByName('Martin Garrix', this)">Martin Garrix</button>
+        <button class="chip" onclick="addArtistByName('David Guetta', this)">David Guetta</button>
+        <button class="chip" onclick="addArtistByName('Alok', this)">Alok</button>
+        <button class="chip" onclick="addArtistByName('Tiësto', this)">Tiësto</button>
+        <button class="chip" onclick="addArtistByName('Calvin Harris', this)">Calvin Harris</button>
+        <button class="chip" onclick="addArtistByName('Afrojack', this)">Afrojack</button>
+        <button class="chip" onclick="addArtistByName('Hardwell', this)">Hardwell</button>
+        <button class="chip" onclick="addArtistByName('Dimitri Vegas & Like Mike', this)">Dimitri Vegas & Like Mike</button>
+        <button class="chip" onclick="addArtistByName('Ricardo Villalobos', this)">Ricardo Villalobos</button>
+        <button class="chip" onclick="addArtistByName('Four Tet', this)">Four Tet</button>
+        <button class="chip" onclick="addArtistByName('Floating Points', this)">Floating Points</button>
+        <button class="chip" onclick="addArtistByName('Jon Hopkins', this)">Jon Hopkins</button>
+        <button class="chip" onclick="addArtistByName('Caribou', this)">Caribou</button>
+        <button class="chip" onclick="addArtistByName('Jamie XX', this)">Jamie XX</button>
+        <button class="chip" onclick="addArtistByName('Modeselektor', this)">Modeselektor</button>
+        <button class="chip" onclick="addArtistByName('Hernán Cattaneo', this)">Hernán Cattaneo</button>
+        <button class="chip" onclick="addArtistByName('Nicola Cruz', this)">Nicola Cruz</button>
       </div>
 
       <div class="form-actions">
@@ -1325,6 +1380,13 @@
       btn.disabled = false
     }
   }
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
 </script>
 </body>
 </html>

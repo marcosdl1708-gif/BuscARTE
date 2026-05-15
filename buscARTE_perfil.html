@@ -632,6 +632,12 @@
   .delete-progress { text-align:center;padding:1.5rem 0;color:var(--gris);font-size:.85rem; }
 
 </style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="buscARTE">
+  <link rel="apple-touch-icon" href="/icons/icon-192.svg">
 </head>
 <body>
 
@@ -969,6 +975,10 @@
         <div class="red-field">
           <div class="red-prefix"><span class="red-icon">🐦</span> x.com/</div>
           <input class="red-input" type="text" placeholder="tu_usuario" oninput="showSaveBar()">
+        </div>
+        <div class="red-field" style="grid-column:1/-1">
+          <div class="red-prefix"><span class="red-icon">🎧</span> Mi playlist favorita</div>
+          <input class="red-input" id="playlist-url" type="url" placeholder="spotify.com/playlist/... o youtube.com/playlist?list=..." oninput="showSaveBar()">
         </div>
         <div class="red-field">
           <div class="red-prefix"><span class="red-icon">🌐</span> Web propia</div>
@@ -1522,5 +1532,12 @@ function mbnLogout(){
     </div>
   </div>
 </div>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+</script>
 </body>
 </html>
