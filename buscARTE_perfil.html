@@ -676,6 +676,15 @@
   .ref-suger-chip:hover { border-color:#555; color:var(--blanco); }
   .ref-suger-chip.on { border-color:var(--neon); color:var(--neon); background:rgba(212,245,60,.05); }
 
+
+  /* Chips largos — permitir wrap en lugar de ensanchar */
+  .fchip, .chip, .mchip, .ref-suger-chip {
+    white-space: normal !important;
+    line-height: 1.3 !important;
+    text-align: center !important;
+    max-width: 160px !important;
+  }
+
 </style>
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0a0a0a">
@@ -712,8 +721,8 @@
         <a href="buscARTE_perfil.html" class="nav-dropdown-item">⚙️ Configurar perfil</a>
         <a href="buscARTE_mensajes.html" class="nav-dropdown-item">💬 Mensajes <span class="nav-badge" id="nav-msg-badge" style="display:none"></span></a>
         <a href="buscARTE_mis_anuncios.html" class="nav-dropdown-item">📋 Mis anuncios</a>
-        <a href="buscARTE_guardados.html" class="nav-dropdown-item">♡ Guardados</a>
         <a href="buscARTE_generador.html" class="nav-dropdown-item">🎲 Generador de nombres</a>
+        <a href="buscARTE_guardados.html" class="nav-dropdown-item">♡ Guardados</a>
         <div class="nav-dropdown-divider"></div>
         <button class="nav-dropdown-item nav-logout" onclick="logout()">↩ Cerrar sesión</button>
       </div>
@@ -752,7 +761,6 @@
     <div class="sidebar-section">
       <div class="sidebar-label">Cuenta</div>
       <a href="#" class="sidebar-link"><span class="icon">⚙️</span> Configuración</a>
-      <a href="#" class="sidebar-link"><span class="icon">💎</span> Plan Premium</a>
       <a href="#" class="sidebar-link" onclick="logout()"><span class="icon">↩️</span> Cerrar sesión</a>
       <a href="#peligro" class="sidebar-link" style="color:#ff5555;border-left-color:#3a1111" onclick="setActive(this)"><span class="icon">🗑️</span> Eliminar cuenta</a>
     </div>

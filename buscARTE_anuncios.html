@@ -400,6 +400,15 @@
     color: var(--gris); text-decoration: line-through;
   }
 
+
+  /* Chips largos — permitir wrap en lugar de ensanchar */
+  .fchip, .chip, .mchip, .ref-suger-chip {
+    white-space: normal !important;
+    line-height: 1.3 !important;
+    text-align: center !important;
+    max-width: 160px !important;
+  }
+
 </style>
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0a0a0a">
@@ -722,7 +731,7 @@
           <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Bajo</button>
           <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Batería</button>
           <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Teclado</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Voz</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Voz / Canto</button>
           <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Saxo</button>
           <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Violín</button>
           <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Trompeta</button>

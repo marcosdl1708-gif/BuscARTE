@@ -566,6 +566,15 @@
     /* hCaptcha */
     #hcaptcha-box { transform: scale(0.9); transform-origin: left center; }
   }
+
+  /* Chips largos — permitir wrap en lugar de ensanchar */
+  .fchip, .chip, .mchip, .ref-suger-chip {
+    white-space: normal !important;
+    line-height: 1.3 !important;
+    text-align: center !important;
+    max-width: 160px !important;
+  }
+
 </style>
   <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
   <link rel="manifest" href="/manifest.json">
