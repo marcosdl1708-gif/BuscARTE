@@ -633,24 +633,24 @@
 
   <div class="profile-stats">
     <div class="pstat">
+      <div class="pstat-num" id="stat-instrumento" style="font-size:.9rem">—</div>
+      <div class="pstat-label">Instrumento</div>
+    </div>
+    <div class="pstat">
+      <div class="pstat-num" id="stat-genero" style="font-size:.9rem">—</div>
+      <div class="pstat-label">Género</div>
+    </div>
+    <div class="pstat">
       <div class="pstat-num" id="stat-exp">—</div>
-      <div class="pstat-label">Experiencia</div>
+      <div class="pstat-label">Años de exp.</div>
     </div>
     <div class="pstat">
-      <div class="pstat-num" id="stat-videos">—</div>
-      <div class="pstat-label">Tocando</div>
+      <div class="pstat-num" id="stat-busca" style="font-size:.9rem;color:var(--neon)">—</div>
+      <div class="pstat-label">Busca</div>
     </div>
     <div class="pstat">
-      <div class="pstat-num">🎵<span></span></div>
-      <div class="pstat-label">—</div>
-    </div>
-    <div class="pstat">
-      <div class="pstat-num" style="color:var(--neon)">—</div>
-      <div class="pstat-label">Ahora mismo</div>
-    </div>
-    <div class="pstat">
-      <div class="pstat-num">—<span></span></div>
-      <div class="pstat-label">Zona de actividad</div>
+      <div class="pstat-num" id="stat-zona" style="font-size:.88rem">—</div>
+      <div class="pstat-label">Zona</div>
     </div>
   </div>
 </div>
@@ -902,18 +902,39 @@
         redesEl.innerHTML = redesHtml || '—'
       }
 
-      // Stats
-      const statExp = document.getElementById('stat-exp')
-      if (statExp) statExp.innerHTML = p.disponibilidad ? `${p.disponibilidad.split(',').length}<span> items</span>` : '—'
-      const statVideos = document.getElementById('stat-videos')
-      if (statVideos) {
-        const videoCount = p.videos ? p.videos.split(',').filter(v=>v.trim()).length : 0
-        statVideos.innerHTML = videoCount ? `${videoCount}<span> videos</span>` : '—'
+      // Stats — datos útiles
+      // Instrumento principal
+      const statInstr = document.getElementById('stat-instrumento')
+      if (statInstr) {
+        const instrList = (p.instrumento||'').split(',').map(s=>s.trim()).filter(Boolean)
+        statInstr.textContent = instrList[0] || '—'
       }
-
-      // Zona de actividad
-      const pstats = document.querySelectorAll('.pstat-num')
-      if (pstats[4]) pstats[4].textContent = p.ciudad || '—'
+      // Género principal
+      const statGen = document.getElementById('stat-genero')
+      if (statGen) {
+        const genList = (p.generos||'').split(',').map(s=>s.trim()).filter(Boolean)
+        statGen.textContent = genList[0] || '—'
+      }
+      // Años de experiencia
+      const statExp = document.getElementById('stat-exp')
+      if (statExp) {
+        if (p.experiencia && p.experiencia > 0) {
+          statExp.innerHTML = `${p.experiencia}<span style="font-size:.75rem"> año${p.experiencia !== 1 ? 's' : ''}</span>`
+        } else {
+          statExp.textContent = '—'
+        }
+      }
+      // Disponibilidad (qué busca)
+      const statBusca = document.getElementById('stat-busca')
+      if (statBusca) {
+        const dispList = (p.disponibilidad||'').split(',').map(s=>s.trim()).filter(Boolean)
+        statBusca.textContent = dispList[0] || '—'
+      }
+      // Zona
+      const statZona = document.getElementById('stat-zona')
+      if (statZona) {
+        statZona.textContent = p.barrio ? `${p.barrio}, ${p.ciudad||''}`.trim().replace(/,\s*$/, '') : (p.ciudad || '—')
+      }
 
       // % Afinidad basado en artistas favoritos compartidos
       let miReferentes = localStorage.getItem('ba_referentes') || ''
