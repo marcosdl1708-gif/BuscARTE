@@ -284,6 +284,24 @@
   /* Desktop: no mostrar botón filtros ni bottom nav */
   .mobile-filter-btn { display:none; }
 
+
+  .mobile-show-results-wrap { display:none; }
+  @media (max-width:900px) {
+    .mobile-show-results-wrap {
+      display:block !important;
+      padding:1rem 1.5rem !important;
+      position:sticky; bottom:0;
+      background:var(--negro2);
+      border-top:1px solid #2a2a2a;
+    }
+    .mobile-show-results {
+      width:100%; background:var(--neon); color:#000;
+      border:none; padding:.9rem;
+      font-family:'Archivo Black',sans-serif; font-size:.95rem;
+      letter-spacing:.04em; cursor:auto;
+    }
+  }
+
 </style>
 </head>
 <body>
@@ -425,6 +443,9 @@
         <button class="fchip" onclick="toggleFilter(this)">Online ahora</button>
         <button class="fchip" onclick="toggleFilter(this)">Con local</button>
       </div>
+    </div>
+      <div class="filter-group mobile-show-results-wrap">
+      <button class="mobile-show-results" onclick="closeMobileFilters()">Ver resultados →</button>
     </div>
   </aside>
 
@@ -804,21 +825,23 @@
   document.addEventListener('click',e=>{if(!e.target.closest('#nav-user')){document.getElementById('nav-avatar-btn')?.classList.remove('open');document.getElementById('nav-dropdown')?.classList.remove('open');}});
   function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');window.location.href='index.html';}
 
+  function closeMobileFilters() {
+    var panel = document.querySelector('.filters-panel');
+    var btn = document.getElementById('mobile-filter-btn');
+    if (panel) panel.classList.remove('mobile-open');
+    if (btn) btn.textContent = '⚙ Filtros';
+  }
   function toggleMobileFilters() {
     var panel = document.querySelector('.filters-panel');
     var btn = document.getElementById('mobile-filter-btn');
     if (!panel) return;
     panel.classList.toggle('mobile-open');
-    btn.textContent = panel.classList.contains('mobile-open') ? '✕ Cerrar filtros' : '⚙ Filtros';
+    btn.textContent = panel.classList.contains('mobile-open') ? '✕ Cerrar' : '⚙ Filtros';
   }
-  // Cerrar filtros al seleccionar uno en mobile
+  // Cerrar al tocar chip (no al escribir en input)
   document.addEventListener('click', function(e) {
     if (e.target.classList.contains('fchip') && window.innerWidth <= 900) {
-      setTimeout(function() {
-        document.querySelector('.filters-panel')?.classList.remove('mobile-open');
-        var btn = document.getElementById('mobile-filter-btn');
-        if(btn) btn.textContent = '⚙ Filtros';
-      }, 300);
+      setTimeout(closeMobileFilters, 300);
     }
   });
 
