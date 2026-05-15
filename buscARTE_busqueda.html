@@ -404,7 +404,7 @@
     <div class="filter-divider"></div>
     <div class="filter-group">
       <span class="filter-group-label">Ubicación</span>
-      <select style="margin-bottom:.6rem">
+      <select id="ciudad-select" style="margin-bottom:.6rem" onchange="setCiudad(this.value)">
         <option>Todo el país</option>
         <option selected>Buenos Aires (CABA)</option>
         <option>Gran Buenos Aires</option>
@@ -416,7 +416,7 @@
         <option>Tucumán</option>
         <option>Salta</option>
       </select>
-      <input type="text" placeholder="Barrio / zona (ej: Almagro)">
+      <input type="text" id="barrio-input" placeholder="Barrio / zona (ej: Almagro)" oninput="setBarrio(this.value)">
     </div>
     <div class="filter-divider"></div>
     <div class="filter-group">
@@ -687,9 +687,17 @@
     if (!searchVal && activeFilters.generos.length) {
       query += `&generos=ilike.*${encodeURIComponent(activeFilters.generos[0])}*`
     }
-    // Filtro ciudad siempre aplica
+    // Filtro ciudad
     if (activeFilters.ciudad) {
       query += `&ciudad=ilike.*${encodeURIComponent(activeFilters.ciudad)}*`
+    }
+    // Filtro barrio
+    if (activeFilters.barrio) {
+      query += `&barrio=ilike.*${encodeURIComponent(activeFilters.barrio)}*`
+    }
+    // Filtro busca (disponibilidad)
+    if (!searchVal && activeFilters.busca && activeFilters.busca.length) {
+      query += `&disponibilidad=ilike.*${encodeURIComponent(activeFilters.busca[0])}*`
     }
     // Filtro artista referente
     const refVal = document.getElementById('referente-input')?.value?.trim()
@@ -755,15 +763,31 @@
   function applyFilters() {
     const onChips = [...document.querySelectorAll('.fchip.on')].map(c=>c.textContent.trim())
     const instrLabels = ['Guitarra','Bajo','Batería','Teclado','Voz','Saxo','Violín','Cello','Trompeta','Flauta','Percusión','DJ/Prod.','Bandoneón','Charango','Arpa','Otro']
+    const buscaLabels = ['Banda','Sesiones','Zapada','Proyecto','Clases']
     activeFilters.instrumentos = onChips.filter(c => instrLabels.includes(c))
-    activeFilters.generos = onChips.filter(c => !instrLabels.includes(c))
+    activeFilters.generos = onChips.filter(c => !instrLabels.includes(c) && !buscaLabels.includes(c))
+    activeFilters.busca = onChips.filter(c => buscaLabels.includes(c))
+    cargarMusicos(false)
+  }
+  function setCiudad(val) {
+    activeFilters.ciudad = (val === 'Todo el país') ? '' : val
+    cargarMusicos(false)
+  }
+  function setBarrio(val) {
+    activeFilters.barrio = val.trim()
     cargarMusicos(false)
   }
 
   function clearFilters() {
     document.querySelectorAll('.fchip.on').forEach(c=>c.classList.remove('on'))
     document.getElementById('active-filters').innerHTML = ''
-    activeFilters = { instrumentos:[], generos:[], ciudad:'', busca:[], referente:'' }
+    const sel = document.getElementById('ciudad-select')
+    if (sel) sel.selectedIndex = 1  // Buenos Aires por defecto
+    const bar = document.getElementById('barrio-input')
+    if (bar) bar.value = ''
+    const ref = document.getElementById('referente-input')
+    if (ref) ref.value = ''
+    activeFilters = { instrumentos:[], generos:[], ciudad:'', barrio:'', busca:[], referente:'' }
     cargarMusicos(false)
   }
 
