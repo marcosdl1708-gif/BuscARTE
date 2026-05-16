@@ -808,12 +808,12 @@
       <div class="field-row">
         <div class="field">
           <label>Edad <span class="optional">opcional</span></label>
-          <input type="number" placeholder="Ej: 26" min="15" max="80" oninput="showSaveBar()">
+          <input type="number" id="edad-input" placeholder="Ej: 26" min="15" max="80" oninput="showSaveBar()">
         </div>
         <div class="field">
           <label>Género musical principal</label>
-          <select oninput="showSaveBar()">
-            <option disabled selected>Seleccioná uno</option>
+          <select id="genero-principal" oninput="showSaveBar()">
+            <option value="">Seleccioná uno</option>
             <option>Rock Nacional</option>
             <option>Jazz</option>
             <option>Metal</option>
@@ -823,6 +823,21 @@
             <option>Pop</option>
             <option>Cumbia</option>
             <option>Electrónica</option>
+            <option>House</option>
+            <option>Tech House</option>
+            <option>Techno</option>
+            <option>Trance</option>
+            <option>Melodic House</option>
+            <option>Blues</option>
+            <option>Funk</option>
+            <option>Soul</option>
+            <option>R&amp;B</option>
+            <option>Reggae</option>
+            <option>Hip Hop</option>
+            <option>Clásica</option>
+            <option>Fusión</option>
+            <option>Bossanova</option>
+            <option>Variado</option>
             <option>Otro</option>
           </select>
         </div>
@@ -948,11 +963,6 @@
           <input type="range" id="exp-slider" min="0" max="30" value="0" oninput="updateExp(this); showSaveBar()">
           <div class="exp-value" id="exp-val">8 años</div>
         </div>
-      </div>
-      <div class="field" style="margin-top:1.5rem">
-        <label>Edad <span style="color:var(--gris2);font-size:.7rem;font-weight:300">(opcional — aparece en tu perfil público)</span></label>
-        <input type="number" id="edad-input" min="16" max="80" placeholder="Ej: 28" style="width:140px;background:var(--negro);border:1px solid var(--gris3);color:var(--blanco);padding:.75rem 1rem;font-family:'Archivo',sans-serif;font-size:.9rem;outline:none" oninput="showSaveBar()">
-        <span style="color:var(--gris);font-size:.82rem;margin-left:.75rem">años</span>
       </div>
     </div>
 
@@ -1338,6 +1348,9 @@
       // Edad
       const edadInput = document.getElementById('edad-input')
       if (edadInput && p.edad) edadInput.value = p.edad
+      // Género principal
+      const genSel = document.getElementById('genero-principal')
+      if (genSel && p.genero_principal) genSel.value = p.genero_principal
 
       // Videos
       if (p.videos) {
@@ -1436,7 +1449,8 @@
             celular: document.getElementById('celular-input')?.value?.trim() || null,
             referentes: perfReferentes.join(', '),
             experiencia: parseInt(document.getElementById('exp-slider')?.value || 0),
-            edad: parseInt(document.getElementById('edad-input')?.value || 0) || null
+            edad: parseInt(document.getElementById('edad-input')?.value || 0) || null,
+            genero_principal: document.getElementById('genero-principal')?.value || null
           })
       })
 

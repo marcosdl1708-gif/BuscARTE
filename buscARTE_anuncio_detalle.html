@@ -253,6 +253,23 @@
     .detail-meta { flex-wrap:wrap !important; gap:.5rem !important; }
   }
 
+
+  /* Lightbox */
+  .foto-main { cursor: zoom-in !important; }
+  .lightbox-overlay {
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,.92);
+    z-index:2000; align-items:center; justify-content:center; padding:1rem;
+  }
+  .lightbox-overlay.open { display:flex; }
+  .lightbox-overlay img {
+    max-width:95vw; max-height:95vh; object-fit:contain;
+    cursor:zoom-out;
+  }
+  .lightbox-close {
+    position:fixed; top:1rem; right:1.5rem; font-size:2rem;
+    color:#fff; cursor:pointer; line-height:1; background:none; border:none;
+  }
+
 </style>
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0a0a0a">
@@ -844,7 +861,7 @@
         especial = `
           ${a.foto_url ? `<div class="foto-section"><div class="foto-main"><img src="${a.foto_url}" style="width:100%;height:100%;object-fit:cover"></div></div>` : ''}
           <div class="ficha">
-          ${a.precio ? `<div class="ficha-row"><span class="ficha-key">Precio</span><span class="ficha-val price">$${a.precio}</span></div>` : ''}
+          ${a.precio ? `<div class="ficha-row"><span class="ficha-key">Precio</span><span class="ficha-val price">${String(a.precio).startsWith('$') ? a.precio : '$'+a.precio}</span></div>` : ''}
           ${a.categoria_producto ? `<div class="ficha-row"><span class="ficha-key">Categoría</span><span class="ficha-val">${a.categoria_producto}</span></div>` : ''}
           ${a.marca ? `<div class="ficha-row"><span class="ficha-key">Marca</span><span class="ficha-val">${a.marca}</span></div>` : ''}
           ${a.condicion ? `<div class="ficha-row"><span class="ficha-key">Condición</span><span class="ficha-val">${a.condicion}</span></div>` : ''}
@@ -1127,6 +1144,22 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
   });
 }
+
+  function openLightbox(src) {
+    document.getElementById('lightbox-img').src = src;
+    document.getElementById('lightbox').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  document.addEventListener('keydown', e => { if(e.key === 'Escape') closeLightbox(); });
+
 </script>
+<div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">×</button>
+  <img id="lightbox-img" src="" alt="Foto ampliada">
+</div>
 </body>
 </html>
