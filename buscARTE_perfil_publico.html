@@ -554,6 +554,12 @@
     .nav-dropdown-item { padding: .85rem 1.2rem !important; font-size: .88rem !important; }
   }
 
+
+  /* ── MOBILE: avatar abre el panel del bottom nav ── */
+  @media (max-width: 900px) {
+    .nav-dropdown { display: none !important; }
+  }
+
 </style>
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0a0a0a">
@@ -1108,49 +1114,7 @@
       const res = await fetch(
         `https://xiaanchoanxmampegoay.supabase.co/rest/v1/mensajes?para_user_id=eq.${uid}&created_at=gt.${lastSeen}&select=id&limit=99`,
         { headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68', 'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68` } }
-      );
-      const msgs = await res.json();
-      const count = Array.isArray(msgs) ? msgs.length : 0;
-      if (count > 0) {
-        badge.textContent = count > 99 ? '99+' : count;
-        badge.style.display = 'inline';
-      } else {
-        badge.style.display = 'none';
-      }
-    } catch(e) { if(badge) badge.style.display = 'none'; }
-  }
 
-  // NAV SESSION
-  (function initNav(){
-    const l=localStorage.getItem('ba_logged')==='1';
-    const n=localStorage.getItem('ba_name')||'Mi perfil';
-    const uid=localStorage.getItem('ba_user_id')||'';
-    const i=n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-    if(l){
-      const g=document.getElementById('nav-guest');
-      const u=document.getElementById('nav-user');
-      if(g)g.style.display='none';
-      if(u)u.style.display='flex';
-      const c=document.getElementById('nav-avatar-circle');
-      if(c)c.textContent=i;
-      const nm=document.getElementById('nav-avatar-name');
-      if(nm)nm.textContent=n.split(' ')[0];
-      cargarBadgeMensajes(uid);
-      // Fix Mi perfil link with real user ID
-      const miPerfilLink=document.querySelector('.nav-dropdown-item[href*="perfil_publico"]');
-      if(miPerfilLink && uid) miPerfilLink.href='buscARTE_perfil_publico.html?id='+uid;
-    }
-  })();
-  function toggleUserMenu(e){if(e)e.stopPropagation();const w=document.getElementById('nav-avatar-btn');const d=document.getElementById('nav-dropdown');if(w)w.classList.toggle('open');if(d)d.classList.toggle('open');}
-  // Close dropdown when tapping outside
-  document.addEventListener('click', function(e){
-    if(!e.target.closest('#nav-avatar-btn') && !e.target.closest('#nav-dropdown')){
-      const d=document.getElementById('nav-dropdown');const w=document.getElementById('nav-avatar-btn');
-      if(d)d.classList.remove('open');if(w)w.classList.remove('open');
-    }
-  });
-  document.addEventListener('click',e=>{if(!e.target.closest('#nav-user')){document.getElementById('nav-avatar-btn')?.classList.remove('open');document.getElementById('nav-dropdown')?.classList.remove('open');}});
-  function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');window.location.href='index.html';}
 </script>
 <div class="mbn-overlay" id="mbn-overlay" onclick="closeMbnPanel()"></div>
 <div class="mbn-panel" id="mbn-panel">
@@ -1202,94 +1166,6 @@ function mbnLogout(){
   localStorage.removeItem('ba_user_id');
   window.location.href='index.html';
 }
-
-      );
-      const msgs = await res.json();
-      const count = Array.isArray(msgs) ? msgs.length : 0;
-      if (count > 0) {
-        badge.textContent = count > 99 ? '99+' : count;
-        badge.style.display = 'inline';
-      } else {
-        badge.style.display = 'none';
-      }
-    } catch(e) { badge.style.display = 'none'; }
-  }
-
-  // ── REPORTE DE PERFIL ──
-  let reporteMotivo = '';
-
-  function abrirReporte() {
-    document.getElementById('report-overlay').classList.add('open');
-    document.getElementById('report-form-content').style.display = 'block';
-    document.getElementById('report-success').style.display = 'none';
-    reporteMotivo = '';
-    document.querySelectorAll('.report-option').forEach(b => b.classList.remove('selected'));
-    document.getElementById('report-detail').classList.remove('visible');
-    document.getElementById('btn-send-report').disabled = true;
-    // Poner nombre del perfil en subtítulo
-    const nombre = document.getElementById('perfil-nombre')?.textContent;
-    if (nombre && nombre !== '—') {
-      document.getElementById('report-sub').textContent = `¿Por qué querés reportar a ${nombre}?`;
-    }
-  }
-
-  function cerrarReporte() {
-    document.getElementById('report-overlay').classList.remove('open');
-  }
-
-  function selectMotivo(btn, motivo) {
-    document.querySelectorAll('.report-option').forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-    reporteMotivo = motivo;
-    document.getElementById('btn-send-report').disabled = false;
-    // Mostrar textarea solo para "Otro"
-    const detail = document.getElementById('report-detail');
-    if (motivo === 'Otro') {
-      detail.classList.add('visible');
-      detail.focus();
-    } else {
-      detail.classList.remove('visible');
-    }
-  }
-
-  async function enviarReporte() {
-    if (!reporteMotivo) return;
-    const btn = document.getElementById('btn-send-report');
-    btn.disabled = true;
-    btn.textContent = 'Enviando...';
-
-    const params = new URLSearchParams(window.location.search);
-    const perfilId = params.get('id') || '';
-    const perfilNombre = document.getElementById('perfil-nombre')?.textContent || 'Desconocido';
-    const reporterNombre = localStorage.getItem('ba_name') || 'Anónimo';
-    const reporterId = localStorage.getItem('ba_user_id') || '';
-    const detalle = document.getElementById('report-detail').value.trim();
-
-    try {
-      await fetch('/.netlify/functions/send-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          tipo: 'reporte',
-          destinatario: 'BuscARTE.webmail@gmail.com',
-          datos: {
-            perfilId,
-            perfilNombre,
-            motivo: reporteMotivo,
-            detalle,
-            reporterNombre,
-            reporterId
-          }
-        })
-      });
-    } catch(e) { console.error('Error enviando reporte:', e); }
-
-    // Mostrar éxito siempre
-    document.getElementById('report-form-content').style.display = 'none';
-    document.getElementById('report-success').style.display = 'block';
-    setTimeout(cerrarReporte, 3000);
-  }
-
 </script>
 
 <div class="report-modal-overlay" id="report-overlay" onclick="if(event.target===this)cerrarReporte()">
@@ -1323,6 +1199,25 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
   });
 }
+
+  // En mobile, el avatar del nav abre el panel del bottom nav
+  (function() {
+    if (window.innerWidth > 900) return;
+    const btn = document.getElementById('nav-avatar-btn');
+    if (!btn) return;
+    // Remover onclick original y poner el del panel
+    btn.removeAttribute('onclick');
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (typeof toggleMbnPanel === 'function') {
+        toggleMbnPanel();
+      }
+    });
+    // También quitar el chevron en mobile que confunde
+    const chevron = btn.querySelector('.nav-avatar-chevron');
+    if (chevron) chevron.style.display = 'none';
+  })();
+
 </script>
 </body>
 </html>

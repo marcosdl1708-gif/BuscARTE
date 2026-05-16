@@ -694,6 +694,12 @@
     .nav-dropdown-item { padding: .85rem 1.2rem !important; font-size: .88rem !important; }
   }
 
+
+  /* ── MOBILE: avatar abre el panel del bottom nav ── */
+  @media (max-width: 900px) {
+    .nav-dropdown { display: none !important; }
+  }
+
 </style>
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0a0a0a">
@@ -1506,49 +1512,7 @@
       const res = await fetch(
         `https://xiaanchoanxmampegoay.supabase.co/rest/v1/mensajes?para_user_id=eq.${uid}&created_at=gt.${lastSeen}&select=id&limit=99`,
         { headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68', 'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68` } }
-      );
-      const msgs = await res.json();
-      const count = Array.isArray(msgs) ? msgs.length : 0;
-      if (count > 0) {
-        badge.textContent = count > 99 ? '99+' : count;
-        badge.style.display = 'inline';
-      } else {
-        badge.style.display = 'none';
-      }
-    } catch(e) { if(badge) badge.style.display = 'none'; }
-  }
 
-  // NAV SESSION
-  (function initNav(){
-    const l=localStorage.getItem('ba_logged')==='1';
-    const n=localStorage.getItem('ba_name')||'Mi perfil';
-    const uid=localStorage.getItem('ba_user_id')||'';
-    const i=n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-    if(l){
-      const g=document.getElementById('nav-guest');
-      const u=document.getElementById('nav-user');
-      if(g)g.style.display='none';
-      if(u)u.style.display='flex';
-      const c=document.getElementById('nav-avatar-circle');
-      if(c)c.textContent=i;
-      const nm=document.getElementById('nav-avatar-name');
-      if(nm)nm.textContent=n.split(' ')[0];
-      cargarBadgeMensajes(uid);
-      // Fix Mi perfil link with real user ID
-      const miPerfilLink=document.querySelector('.nav-dropdown-item[href*="perfil_publico"]');
-      if(miPerfilLink && uid) miPerfilLink.href='buscARTE_perfil_publico.html?id='+uid;
-    }
-  })();
-  function toggleUserMenu(e){if(e)e.stopPropagation();const w=document.getElementById('nav-avatar-btn');const d=document.getElementById('nav-dropdown');if(w)w.classList.toggle('open');if(d)d.classList.toggle('open');}
-  // Close dropdown when tapping outside
-  document.addEventListener('click', function(e){
-    if(!e.target.closest('#nav-avatar-btn') && !e.target.closest('#nav-dropdown')){
-      const d=document.getElementById('nav-dropdown');const w=document.getElementById('nav-avatar-btn');
-      if(d)d.classList.remove('open');if(w)w.classList.remove('open');
-    }
-  });
-  document.addEventListener('click',e=>{if(!e.target.closest('#nav-user')){document.getElementById('nav-avatar-btn')?.classList.remove('open');document.getElementById('nav-dropdown')?.classList.remove('open');}});
-  function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');window.location.href='index.html';}
 </script>
 <div class="mbn-overlay" id="mbn-overlay" onclick="closeMbnPanel()"></div>
 <div class="mbn-panel" id="mbn-panel">
@@ -1600,71 +1564,6 @@ function mbnLogout(){
   localStorage.removeItem('ba_user_id');
   window.location.href='index.html';
 }
-
-      );
-      const msgs = await res.json();
-      const count = Array.isArray(msgs) ? msgs.length : 0;
-      if (count > 0) {
-        badge.textContent = count > 99 ? '99+' : count;
-        badge.style.display = 'inline';
-      } else {
-        badge.style.display = 'none';
-      }
-    } catch(e) { badge.style.display = 'none'; }
-  }
-
-  // ── ELIMINAR CUENTA ──
-  function abrirEliminarCuenta() {
-    document.getElementById('delete-overlay').classList.add('open');
-    document.getElementById('delete-form').style.display = 'block';
-    document.getElementById('delete-progress').style.display = 'none';
-    document.getElementById('delete-email-input').value = '';
-    document.getElementById('btn-delete-confirm').disabled = true;
-  }
-  function cerrarEliminar() {
-    document.getElementById('delete-overlay').classList.remove('open');
-  }
-  function validarDeleteInput() {
-    const emailGuardado = localStorage.getItem('ba_email') || '';
-    const input = document.getElementById('delete-email-input').value.trim().toLowerCase();
-    // Validar que coincida con el email registrado, o que sea un email válido si no tenemos el guardado
-    const valido = emailGuardado
-      ? input === emailGuardado.toLowerCase()
-      : input.includes('@') && input.length > 4;
-    document.getElementById('btn-delete-confirm').disabled = !valido;
-  }
-  async function eliminarCuenta() {
-    const uid = localStorage.getItem('ba_user_id');
-    if (!uid) return;
-    const btn = document.getElementById('btn-delete-confirm');
-    btn.disabled = true;
-    document.getElementById('delete-form').style.display = 'none';
-    document.getElementById('delete-progress').style.display = 'block';
-
-    try {
-      const h = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' };
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/eliminar_cuenta`, {
-        method: 'POST',
-        headers: h,
-        body: JSON.stringify({ p_user_id: parseInt(uid) })
-      });
-      const result = await res.json();
-      if (!result.ok) {
-        console.error('Error eliminando cuenta:', result.error);
-      }
-    } catch(e) {
-      console.error('Error eliminando cuenta:', e);
-    }
-
-    // Limpiar sesión y redirigir
-    localStorage.removeItem('ba_logged');
-    localStorage.removeItem('ba_name');
-    localStorage.removeItem('ba_user_id');
-    localStorage.removeItem('ba_email');
-    localStorage.removeItem('ba_msg_last_seen');
-    window.location.href = 'index.html?cuenta_eliminada=1';
-  }
-
 </script>
 
 <div class="delete-overlay" id="delete-overlay" onclick="if(event.target===this)cerrarEliminar()">
@@ -1768,6 +1667,25 @@ if ('serviceWorker' in navigator) {
     if (!e.target.closest('.ref-input-wrap'))
       document.getElementById('perf-artist-dropdown').style.display = 'none';
   });
+
+
+  // En mobile, el avatar del nav abre el panel del bottom nav
+  (function() {
+    if (window.innerWidth > 900) return;
+    const btn = document.getElementById('nav-avatar-btn');
+    if (!btn) return;
+    // Remover onclick original y poner el del panel
+    btn.removeAttribute('onclick');
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (typeof toggleMbnPanel === 'function') {
+        toggleMbnPanel();
+      }
+    });
+    // También quitar el chevron en mobile que confunde
+    const chevron = btn.querySelector('.nav-avatar-chevron');
+    if (chevron) chevron.style.display = 'none';
+  })();
 
 </script>
 </body>

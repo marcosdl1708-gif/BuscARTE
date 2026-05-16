@@ -1760,17 +1760,6 @@ function mbnLogout(){
   window.location.href='index.html';
 }
 
-      );
-      const msgs = await res.json();
-      const count = Array.isArray(msgs) ? msgs.length : 0;
-      if (count > 0) {
-        badge.textContent = count > 99 ? '99+' : count;
-        badge.style.display = 'inline';
-      } else {
-        badge.style.display = 'none';
-      }
-    } catch(e) { badge.style.display = 'none'; }
-  }
 </script>
 <script>
 if ('serviceWorker' in navigator) {

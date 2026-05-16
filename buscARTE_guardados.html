@@ -241,6 +241,12 @@
     .nav-dropdown-item { padding: .85rem 1.2rem !important; font-size: .88rem !important; }
   }
 
+
+  /* ── MOBILE: avatar abre el panel del bottom nav ── */
+  @media (max-width: 900px) {
+    .nav-dropdown { display: none !important; }
+  }
+
 </style>
   <style>
     .guardados-wrap { max-width:1100px;margin:0 auto;padding:2.5rem 2rem; }
@@ -488,17 +494,6 @@ function mbnLogout(){
   window.location.href='index.html';
 }
 
-      );
-      const msgs = await res.json();
-      const count = Array.isArray(msgs) ? msgs.length : 0;
-      if (count > 0) {
-        badge.textContent = count > 99 ? '99+' : count;
-        badge.style.display = 'inline';
-      } else {
-        badge.style.display = 'none';
-      }
-    } catch(e) { badge.style.display = 'none'; }
-  }
 </script>
 <script>
 if ('serviceWorker' in navigator) {
@@ -506,6 +501,25 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
   });
 }
+
+  // En mobile, el avatar del nav abre el panel del bottom nav
+  (function() {
+    if (window.innerWidth > 900) return;
+    const btn = document.getElementById('nav-avatar-btn');
+    if (!btn) return;
+    // Remover onclick original y poner el del panel
+    btn.removeAttribute('onclick');
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (typeof toggleMbnPanel === 'function') {
+        toggleMbnPanel();
+      }
+    });
+    // También quitar el chevron en mobile que confunde
+    const chevron = btn.querySelector('.nav-avatar-chevron');
+    if (chevron) chevron.style.display = 'none';
+  })();
+
 </script>
 </body>
 </html>
