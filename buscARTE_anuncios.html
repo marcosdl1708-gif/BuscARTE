@@ -1199,11 +1199,13 @@
       datos.precio = datos.precio_num ? `$${Math.round(datos.precio_num).toLocaleString('es-AR')}` : ''
       datos.zona = form.querySelector('input[placeholder*="Caballito"]')?.value?.trim()
       datos.descripcion = form.querySelector('textarea')?.value?.trim()
-      datos.foto_url = tipo === 'jam' ? (fotoJamUrl || null) : (fotoVentaUrl || null)
       if (datos.categoria_producto) {
         datos.titulo = `Vendo ${datos.categoria_producto}${datos.marca ? ' ' + datos.marca : ''}`
       }
     }
+
+    // Foto URL — aplica a todos los tipos
+    datos.foto_url = tipo === 'jam' ? (fotoJamUrl || null) : (fotoVentaUrl || null)
 
     // Si es jam o vende sin título, generar automáticamente
     if (!datos.titulo && tipo === 'jam') datos.titulo = datos.lugar ? `Jam en ${datos.lugar}` : 'Jam / Zapada'

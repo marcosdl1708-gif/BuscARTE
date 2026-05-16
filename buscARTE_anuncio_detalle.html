@@ -103,11 +103,12 @@
   .ficha-val.condicion-usado { color:#f5a623; }
 
   /* ══ JAM: INFO DEL EVENTO ══ */
-  .evento-hero { background:var(--negro2);border:1px solid #1c1c1c;padding:1.8rem;margin-bottom:1.8rem; }
-  .evento-fecha-grande { font-family:var(--font-display);font-size:2.2rem;letter-spacing:-.02em;color:var(--neon);line-height:1;margin-bottom:.2rem; }
-  .evento-hora { font-size:1rem;color:var(--gris);margin-bottom:1rem; }
-  .evento-lugar { font-size:.9rem;color:var(--blanco);display:flex;align-items:center;gap:.5rem; }
-  .evento-precio { display:inline-flex;align-items:center;gap:.4rem;margin-top:1rem;padding:.3rem .8rem;border:1px solid rgba(212,245,60,.2);background:rgba(212,245,60,.06);color:var(--neon);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase; }
+  .evento-hero { background:var(--negro2);border:1px solid #1c1c1c;padding:1.4rem 1.6rem;margin-bottom:1.5rem;display:flex;flex-direction:column;gap:.6rem; }
+  .evento-fecha-row { display:flex;align-items:baseline;gap:.75rem;flex-wrap:wrap; }
+  .evento-fecha-grande { font-family:var(--font-display);font-size:1.6rem;letter-spacing:-.02em;color:var(--neon);line-height:1; }
+  .evento-hora { font-size:.95rem;color:var(--gris);font-family:var(--font-body); }
+  .evento-lugar { font-size:.88rem;color:var(--blanco);display:flex;align-items:center;gap:.4rem; }
+  .evento-precio { display:inline-flex;align-items:center;gap:.4rem;padding:.3rem .8rem;border:1px solid rgba(212,245,60,.2);background:rgba(212,245,60,.06);color:var(--neon);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;align-self:flex-start; }
 
   /* SIMILAR ANUNCIOS */
   .similar-section { margin-top:2.5rem;padding-top:2rem;border-top:1px solid #1c1c1c; }
@@ -569,8 +570,10 @@
 
         <!-- INFO DEL EVENTO -->
         <div class="evento-hero">
-          <div class="evento-fecha-grande">Sábado 17 de mayo</div>
-          <div class="evento-hora">18:00 hs</div>
+          <div class="evento-fecha-row">
+            <span class="evento-fecha-grande">Sábado 17 de mayo</span>
+            <span class="evento-hora">18:00 hs</span>
+          </div>
           <div class="evento-lugar">📍 Parque Centenario — Av. Díaz Vélez y Rojas, CABA</div>
           <div class="evento-precio">🎟 Entrada libre y gratuita</div>
         </div>
@@ -871,8 +874,10 @@
         const fechaBlock = a.fecha_evento ? (() => {
           const fecha = new Date(a.fecha_evento)
           return `<div class="evento-hero">
-            <div class="evento-fecha-grande">${fecha.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'})}</div>
-            <div class="evento-hora">${fecha.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})} hs</div>
+            <div class="evento-fecha-row">
+              <span class="evento-fecha-grande">${fecha.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'})}</span>
+              <span class="evento-hora">${fecha.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})} hs</span>
+            </div>
             ${a.lugar ? `<div class="evento-lugar">📍 ${a.lugar}</div>` : ''}
             ${a.precio_entrada ? `<div class="evento-precio">🎟 ${a.precio_entrada}</div>` : ''}
           </div>`
