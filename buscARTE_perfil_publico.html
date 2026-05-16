@@ -825,7 +825,16 @@
       }
 
       const nom = document.getElementById('perfil-nombre')
-      if (nom) nom.textContent = p.nombre || 'Sin nombre'
+      if (nom) {
+        nom.textContent = p.nombre || 'Sin nombre'
+        // Agregar edad al lado del nombre
+        if (p.edad) {
+          const edadTag = document.createElement('span')
+          edadTag.style.cssText = 'font-size:.75rem;color:var(--gris);font-family:\'Archivo\',sans-serif;font-weight:400;margin-left:.75rem;letter-spacing:0;vertical-align:middle'
+          edadTag.textContent = p.edad + ' años'
+          nom.appendChild(edadTag)
+        }
+      }
 
       const inst = document.getElementById('perfil-instrumento')
       if (inst) inst.textContent = instrumento.join(' · ') || 'Músico'

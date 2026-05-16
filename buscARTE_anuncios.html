@@ -1335,10 +1335,10 @@
       ? `<div class="anuncio-fecha${fechaInfo.pasado ? ' anuncio-pasado' : ''}"><span class="anuncio-fecha-icon">📅</span>${fechaInfo.str}</div>`
       : '';
 
-    const flyerHTML = a.foto_url ? `<img class="anuncio-flyer" src="${a.foto_url}" alt="Flyer" onclick="abrirDetalle(${a.id})" style="cursor:pointer">` : ''
+    const flyerThumb = a.foto_url ? `<img src="${a.foto_url}" style="width:64px;height:64px;object-fit:cover;border-radius:2px;flex-shrink:0;cursor:pointer" onclick="abrirDetalle(${a.id})" alt="Foto">` : ''
     return `<div class="anuncio" data-tipo="${a.tipo}" data-id="${a.id}" style="animation:fadeUp .3s ease both">
       <span class="anuncio-tipo-badge ${badge}">${label}</span>
-      ${fechaHTML}${flyerHTML}
+      ${fechaHTML}
       <div class="anuncio-titulo"><a href="buscARTE_anuncio_detalle.html?id=${a.id}" style="color:inherit;text-decoration:none">${a.titulo||'Sin título'}</a></div>
       <div class="anuncio-desc">${a.descripcion||''}</div>
       <div class="anuncio-meta">

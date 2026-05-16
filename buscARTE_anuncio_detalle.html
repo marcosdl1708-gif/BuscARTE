@@ -87,7 +87,7 @@
 
   /* ══ VENDO: FOTO ══ */
   .foto-section { margin-bottom:2rem; }
-  .foto-main { width:100%;aspect-ratio:4/3;background:var(--negro2);border:1px solid #1c1c1c;display:flex;align-items:center;justify-content:center;font-size:4rem;margin-bottom:.5rem;position:relative;overflow:hidden; }
+  .foto-main { width:100%;max-height:260px;background:var(--negro2);border:1px solid #1c1c1c;display:flex;align-items:center;justify-content:center;font-size:4rem;margin-bottom:.5rem;position:relative;overflow:hidden; }
   .foto-main img { width:100%;height:100%;object-fit:cover; }
   .foto-placeholder { display:flex;flex-direction:column;align-items:center;gap:.5rem; }
   .foto-placeholder-text { font-size:.75rem;color:var(--gris2); }
@@ -104,7 +104,7 @@
 
   /* ══ JAM: INFO DEL EVENTO ══ */
   .evento-hero { background:var(--negro2);border:1px solid #1c1c1c;padding:1.8rem;margin-bottom:1.8rem; }
-  .evento-fecha-grande { font-family:var(--font-display);font-size:3rem;letter-spacing:-.02em;color:var(--neon);line-height:1;margin-bottom:.2rem; }
+  .evento-fecha-grande { font-family:var(--font-display);font-size:2.2rem;letter-spacing:-.02em;color:var(--neon);line-height:1;margin-bottom:.2rem; }
   .evento-hora { font-size:1rem;color:var(--gris);margin-bottom:1rem; }
   .evento-lugar { font-size:.9rem;color:var(--blanco);display:flex;align-items:center;gap:.5rem; }
   .evento-precio { display:inline-flex;align-items:center;gap:.4rem;margin-top:1rem;padding:.3rem .8rem;border:1px solid rgba(212,245,60,.2);background:rgba(212,245,60,.06);color:var(--neon);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase; }
@@ -859,7 +859,7 @@
       let especial = ''
       if (a.tipo === 'vende') {
         especial = `
-          ${a.foto_url ? `<div class="foto-section"><div class="foto-main"><img src="${a.foto_url}" style="width:100%;height:100%;object-fit:cover"></div></div>` : ''}
+          ${a.foto_url ? `<div class="foto-section"><div class="foto-main" style="cursor:zoom-in" onclick="openLightbox('${a.foto_url}')"><img src="${a.foto_url}" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in"></div></div>` : ''}
           <div class="ficha">
           ${a.precio ? `<div class="ficha-row"><span class="ficha-key">Precio</span><span class="ficha-val price">${String(a.precio).startsWith('$') ? a.precio : '$'+a.precio}</span></div>` : ''}
           ${a.categoria_producto ? `<div class="ficha-row"><span class="ficha-key">Categoría</span><span class="ficha-val">${a.categoria_producto}</span></div>` : ''}
@@ -867,14 +867,30 @@
           ${a.condicion ? `<div class="ficha-row"><span class="ficha-key">Condición</span><span class="ficha-val">${a.condicion}</span></div>` : ''}
           ${a.zona ? `<div class="ficha-row"><span class="ficha-key">Zona</span><span class="ficha-val">${a.zona}</span></div>` : ''}
         </div>`
-      } else if (a.tipo === 'jam' && a.fecha_evento) {
-        const fecha = new Date(a.fecha_evento)
-        especial = `<div class="evento-hero">
-          <div class="evento-fecha-grande">${fecha.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'})}</div>
-          <div class="evento-hora">${fecha.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})} hs</div>
-          ${a.lugar ? `<div class="evento-lugar">📍 ${a.lugar}</div>` : ''}
-          ${a.precio_entrada ? `<div class="evento-precio">🎟 ${a.precio_entrada}</div>` : ''}
-        </div>`
+      } else if (a.tipo === 'jam') {
+        const fechaBlock = a.fecha_evento ? (() => {
+          const fecha = new Date(a.fecha_evento)
+          return `<div class="evento-hero">
+            <div class="evento-fecha-grande">${fecha.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'})}</div>
+            <div class="evento-hora">${fecha.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})} hs</div>
+            ${a.lugar ? `<div class="evento-lugar">📍 ${a.lugar}</div>` : ''}
+            ${a.precio_entrada ? `<div class="evento-precio">🎟 ${a.precio_entrada}</div>` : ''}
+          </div>`
+        })() : ''
+        const flyerBlock = a.foto_url
+          ? `<div class="foto-section" style="margin-bottom:1.5rem">
+              <div class="foto-main" style="cursor:zoom-in;max-height:320px" onclick="openLightbox('${a.foto_url}')">
+                <img src="${a.foto_url}" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in" alt="Flyer">
+              </div>
+             </div>`
+          : ''
+        const linksBlock = (a.link_evento || a.contacto_evento)
+          ? `<div class="ficha" style="margin-top:1rem">
+              ${a.link_evento ? `<div class="ficha-row"><span class="ficha-key">Entradas / Info</span><span class="ficha-val"><a href="${a.link_evento}" target="_blank" rel="noopener" style="color:var(--neon);word-break:break-all">${a.link_evento}</a></span></div>` : ''}
+              ${a.contacto_evento ? `<div class="ficha-row"><span class="ficha-key">Contacto</span><span class="ficha-val">${a.contacto_evento}</span></div>` : ''}
+             </div>`
+          : ''
+        especial = flyerBlock + fechaBlock + linksBlock
       }
 
       wrap.innerHTML = `
