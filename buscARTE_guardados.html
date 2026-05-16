@@ -232,6 +232,15 @@
     .guardados-title { font-size:1.5rem !important; }
   }
 
+
+  /* ── MOBILE: dropdown del avatar accesible ── */
+  @media (max-width: 900px) {
+    .nav-avatar-wrap { cursor: auto !important; -webkit-tap-highlight-color: transparent; }
+    .nav-dropdown { z-index: 450 !important; min-width: 220px !important; }
+    .nav-dropdown.open { display: flex !important; }
+    .nav-dropdown-item { padding: .85rem 1.2rem !important; font-size: .88rem !important; }
+  }
+
 </style>
   <style>
     .guardados-wrap { max-width:1100px;margin:0 auto;padding:2.5rem 2rem; }
@@ -417,7 +426,14 @@
       if(miPerfilLink && uid) miPerfilLink.href='buscARTE_perfil_publico.html?id='+uid;
     }
   })();
-  function toggleUserMenu(){const w=document.getElementById('nav-avatar-btn');const d=document.getElementById('nav-dropdown');if(w)w.classList.toggle('open');if(d)d.classList.toggle('open');}
+  function toggleUserMenu(e){if(e)e.stopPropagation();const w=document.getElementById('nav-avatar-btn');const d=document.getElementById('nav-dropdown');if(w)w.classList.toggle('open');if(d)d.classList.toggle('open');}
+  // Close dropdown when tapping outside
+  document.addEventListener('click', function(e){
+    if(!e.target.closest('#nav-avatar-btn') && !e.target.closest('#nav-dropdown')){
+      const d=document.getElementById('nav-dropdown');const w=document.getElementById('nav-avatar-btn');
+      if(d)d.classList.remove('open');if(w)w.classList.remove('open');
+    }
+  });
   document.addEventListener('click',e=>{if(!e.target.closest('#nav-user')){document.getElementById('nav-avatar-btn')?.classList.remove('open');document.getElementById('nav-dropdown')?.classList.remove('open');}});
   function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');window.location.href='index.html';}
 </script>

@@ -116,6 +116,7 @@
   .badge-ofrezco { background:rgba(46,204,113,.1);color:#2ecc71;border:1px solid rgba(46,204,113,.2); }
   .badge-vendo { background:rgba(245,166,35,.1);color:#f5a623;border:1px solid rgba(245,166,35,.2); }
   .badge-jam { background:rgba(212,245,60,.08);color:var(--neon);border:1px solid rgba(212,245,60,.18); }
+  .badge-clases { background:rgba(0,210,200,.1);color:#00d4c8;border:1px solid rgba(0,210,200,.2); }
   .badge-pro { background:var(--neon);color:var(--negro);font-size:.55rem;padding:.1rem .38rem;font-weight:700; }
   .pin-label { position:absolute;top:.75rem;right:.75rem;font-size:.58rem;color:var(--neon);letter-spacing:.08em;text-transform:uppercase; }
   .anuncio-titulo { font-family:var(--font-display);font-size:1rem;letter-spacing:-.01em;margin-bottom:.32rem;line-height:1.25;padding-right:4rem; }
@@ -180,7 +181,7 @@
   .modal-close { background:none;border:none;color:var(--gris);font-size:1.3rem;cursor:none;font-family:var(--font-body);padding:0;line-height:1;transition:color .15s; }
   .modal-close:hover { color:var(--blanco); }
 
-  .modal-tipo-selector { padding:1.1rem 1.8rem;border-bottom:1px solid #1c1c1c;display:grid;grid-template-columns:repeat(4,1fr);gap:.45rem; }
+  .modal-tipo-selector { padding:1.1rem 1.8rem;border-bottom:1px solid #1c1c1c;display:grid;grid-template-columns:repeat(5,1fr);gap:.45rem; }
   .modal-tipo-btn { border:1px solid var(--gris3);padding:.65rem .3rem;cursor:none;transition:all .15s;background:transparent;color:var(--blanco);font-family:var(--font-body);text-align:center; }
   .modal-tipo-btn:hover { border-color:#444;background:rgba(255,255,255,.02); }
   .modal-tipo-btn.selected { border-color:var(--neon);background:rgba(212,245,60,.05); }
@@ -413,6 +414,15 @@
 
   .anuncio-flyer { width:100%;max-height:180px;object-fit:cover;margin-bottom:.75rem;display:block; }
 
+
+  /* ── MOBILE: dropdown del avatar accesible ── */
+  @media (max-width: 900px) {
+    .nav-avatar-wrap { cursor: auto !important; -webkit-tap-highlight-color: transparent; }
+    .nav-dropdown { z-index: 450 !important; min-width: 220px !important; }
+    .nav-dropdown.open { display: flex !important; }
+    .nav-dropdown-item { padding: .85rem 1.2rem !important; font-size: .88rem !important; }
+  }
+
 </style>
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0a0a0a">
@@ -438,6 +448,7 @@
       <button class="modal-tipo-btn" onclick="selectTipo('ofrezco',this)"><span class="modal-tipo-icon">🎸</span><span class="modal-tipo-label">Me ofrezco</span></button>
       <button class="modal-tipo-btn" onclick="selectTipo('jam',this)"><span class="modal-tipo-icon">🥁</span><span class="modal-tipo-label">Jam / Zapada</span></button>
       <button class="modal-tipo-btn" onclick="selectTipo('vende',this)"><span class="modal-tipo-icon">🎛️</span><span class="modal-tipo-label">Vendo / Alquilo</span></button>
+      <button class="modal-tipo-btn" onclick="selectTipo('clases',this)"><span class="modal-tipo-icon">🎓</span><span class="modal-tipo-label">Doy clases</span></button>
     </div>
 
     <!-- BUSCO MÚSICO -->
@@ -627,6 +638,65 @@
           <img id="foto-jam-preview" style="display:none;width:100%;max-height:200px;object-fit:cover">
           <p class="foto-upload-text" id="foto-jam-text"><strong>📸 Subir flyer del evento</strong><br>JPG, PNG o WebP · Máx. 2MB</p>
         </div>
+      </div>
+    </div>
+
+
+    <!-- DOY CLASES -->
+    <div class="modal-form" id="form-clases">
+      <div class="mfield"><label>Título <span class="opt">— opcional, se genera automático</span></label><input type="text" id="clases-titulo" placeholder="Ej: Clases de guitarra para principiantes — Palermo"></div>
+      <div class="mrow">
+        <div class="mfield">
+          <label>Instrumento que enseñás</label>
+          <div class="mchips">
+            <button class="mchip on" onclick="this.classList.toggle('on')">Guitarra</button>
+            <button class="mchip" onclick="this.classList.toggle('on')">Bajo</button>
+            <button class="mchip" onclick="this.classList.toggle('on')">Batería</button>
+            <button class="mchip" onclick="this.classList.toggle('on')">Teclado / Piano</button>
+            <button class="mchip" onclick="this.classList.toggle('on')">Voz / Canto</button>
+            <button class="mchip" onclick="this.classList.toggle('on')">Saxo</button>
+            <button class="mchip" onclick="this.classList.toggle('on')">Violín</button>
+            <button class="mchip" onclick="this.classList.toggle('on')">Trompeta</button>
+            <button class="mchip" onclick="this.classList.toggle('on')">Percusión</button>
+            <button class="mchip" onclick="this.classList.toggle('on')">DJ / Productor</button>
+            <button class="mchip" onclick="this.classList.toggle('on')">Bandoneón</button>
+            <button class="mchip" onclick="this.classList.toggle('on')">Flauta</button>
+            <button class="mchip" onclick="this.classList.toggle('on')">Acordeón</button>
+            <button class="mchip" onclick="this.classList.toggle('on')">Ukelele</button>
+            <button class="mchip" onclick="this.classList.toggle('on')">Contrabajo</button>
+          </div>
+        </div>
+        <div class="mfield">
+          <label>Nivel que enseñás</label>
+          <div class="mchips">
+            <button class="mchip nivel-chip on" onclick="selectNivel(this)">Principiante</button>
+            <button class="mchip nivel-chip" onclick="selectNivel(this)">Intermedio</button>
+            <button class="mchip nivel-chip" onclick="selectNivel(this)">Avanzado</button>
+            <button class="mchip nivel-chip" onclick="selectNivel(this)">Todos los niveles</button>
+          </div>
+        </div>
+      </div>
+      <div class="mrow">
+        <div class="mfield">
+          <label>Modalidad</label>
+          <div class="mchips">
+            <button class="mchip modalidad-chip on" onclick="selectModalidad(this)">Presencial</button>
+            <button class="mchip modalidad-chip" onclick="selectModalidad(this)">Online</button>
+            <button class="mchip modalidad-chip" onclick="selectModalidad(this)">Presencial y online</button>
+          </div>
+        </div>
+        <div class="mfield">
+          <label>Precio por hora <span class="opt">— opcional</span></label>
+          <div style="display:flex;align-items:center;gap:.5rem">
+            <span style="color:var(--gris);font-size:.9rem">$</span>
+            <input type="text" id="clases-precio" placeholder="Ej: 5000" style="flex:1">
+            <span style="color:var(--gris);font-size:.75rem">/hora</span>
+          </div>
+        </div>
+      </div>
+      <div class="mfield"><label>Descripción</label><textarea id="clases-desc" placeholder="Tu experiencia como profe, metodología, duración de clases, si hacés diagnóstico gratuito..."></textarea></div>
+      <div class="mrow">
+        <div class="mfield"><label>Barrio / Zona <span class="opt">— opcional</span></label><input type="text" id="clases-zona" placeholder="Ej: Caballito, CABA"></div>
       </div>
     </div>
 
@@ -927,6 +997,7 @@
       <button class="tipo-tab" onclick="setTab(this,'ofrezco')">Me ofrezco</button>
       <button class="tipo-tab" onclick="setTab(this,'jam')">Jam / Zapada</button>
       <button class="tipo-tab" onclick="setTab(this,'vende')">Vendo / Alquilo</button>
+      <button class="tipo-tab" onclick="setTab(this,'clases')">Doy clases</button>
     </div>
 
     <div class="anuncios-lista" id="anuncios-lista">
@@ -947,6 +1018,7 @@
         <button class="publish-type" onclick="selectPublishType(this,'ofrezco')"><span class="ptype-icon">🎸</span><div><span class="ptype-label">Me ofrezco</span><span class="ptype-desc">Estoy disponible para proyectos</span></div></button>
         <button class="publish-type" onclick="selectPublishType(this,'jam')"><span class="ptype-icon">🥁</span><div><span class="ptype-label">Jam / Zapada</span><span class="ptype-desc">Organizá una jam abierta</span></div></button>
         <button class="publish-type" onclick="selectPublishType(this,'vende')"><span class="ptype-icon">🎛️</span><div><span class="ptype-label">Vendo / Alquilo</span><span class="ptype-desc">Instrumentos, equipos, sala</span></div></button>
+        <button class="publish-type" onclick="selectPublishType(this,'clases')"><span class="ptype-icon">🎓</span><div><span class="ptype-label">Doy clases</span><span class="ptype-desc">Enseñá tu instrumento</span></div></button>
       </div>
       <button class="btn-publish-full" onclick="openModalFromSidebar()">Publicar gratis →</button>
     </div>
@@ -999,13 +1071,14 @@
     musico: 'fp-musico',
     ofrezco: 'fp-musico',
     jam: 'fp-jam',
-    vende: 'fp-vende'
+    vende: 'fp-vende',
+    clases: 'fp-clases'
   };
 
   function setTab(el, tipo) {
     document.querySelectorAll('.tipo-tab').forEach(t=>t.classList.remove('active'));
     el.classList.add('active');
-    tipoFiltro = tipo === 'musico' ? 'busco' : tipo === 'ofrezco' ? 'ofrezco' : tipo;
+    tipoFiltro = tipo === 'musico' ? 'busco' : tipo === 'ofrezco' ? 'ofrezco' : tipo === 'clases' ? 'clases' : tipo;
     document.querySelectorAll('.filter-panel').forEach(p=>p.classList.remove('active'));
     document.getElementById(filterPanels[tipo] || 'fp-musico').classList.add('active');
     document.getElementById('filter-category-label').textContent = filterLabels[tipo] || '';
@@ -1143,6 +1216,16 @@
     document.getElementById('form-'+tipo).classList.add('active')
   }
 
+
+  function selectNivel(btn) {
+    btn.closest('.mchips').querySelectorAll('.nivel-chip').forEach(b=>b.classList.remove('on'))
+    btn.classList.add('on')
+  }
+  function selectModalidad(btn) {
+    btn.closest('.mchips').querySelectorAll('.modalidad-chip').forEach(b=>b.classList.remove('on'))
+    btn.classList.add('on')
+  }
+
   function selectRadio(el) {
     el.closest('.radio-group').querySelectorAll('.radio-btn').forEach(b=>b.classList.remove('selected'))
     el.classList.add('selected')
@@ -1172,6 +1255,18 @@
       datos.instrumentos = chips.filter(c=>instrLabels.includes(c.textContent.trim())).map(c=>c.textContent.trim()).join(', ')
       datos.generos = chips.filter(c=>!instrLabels.includes(c.textContent.trim())).map(c=>c.textContent.trim()).join(', ')
       datos.zona = form.querySelector('input[placeholder*="barrio"], input[placeholder*="Barrio"], input[placeholder*="zona"]')?.value?.trim()
+
+    } else if (tipo === 'clases') {
+      const form = document.getElementById('form-clases')
+      datos.titulo = document.getElementById('clases-titulo')?.value?.trim()
+      datos.descripcion = document.getElementById('clases-desc')?.value?.trim()
+      datos.precio = document.getElementById('clases-precio')?.value?.trim()
+      datos.zona = document.getElementById('clases-zona')?.value?.trim()
+      const instrChips = [...form.querySelectorAll('.mchip.on:not(.nivel-chip):not(.modalidad-chip)')]
+      datos.instrumento = instrChips.map(c=>c.textContent.trim()).join(', ')
+      datos.nivel = form.querySelector('.nivel-chip.on')?.textContent?.trim() || null
+      datos.modalidad = form.querySelector('.modalidad-chip.on')?.textContent?.trim() || null
+      if (!datos.titulo) datos.titulo = datos.instrumento ? `Clases de ${datos.instrumento.split(',')[0].trim()}` : 'Doy clases'
 
     } else if (tipo === 'jam') {
       const form = document.getElementById('form-jam')
@@ -1295,9 +1390,9 @@
 
   // ── CARGAR ANUNCIOS DESDE SUPABASE ──
 
-  const BADGES = { busco:'badge-busco', ofrezco:'badge-ofrezco', jam:'badge-jam', vende:'badge-vendo' }
-  const LABELS = { busco:'🔍 Busco músico', ofrezco:'🎸 Me ofrezco', jam:'🥁 Jam / Zapada', vende:'🎛️ Vendo' }
-  const RESPOND_TEXT = { busco:'Responder →', ofrezco:'Responder →', jam:'Me apunto →', vende:'Consultar →' }
+  const BADGES = { busco:'badge-busco', ofrezco:'badge-ofrezco', jam:'badge-jam', vende:'badge-vendo', clases:'badge-clases' }
+  const LABELS = { busco:'🔍 Busco músico', ofrezco:'🎸 Me ofrezco', jam:'🥁 Jam / Zapada', vende:'🎛️ Vendo', clases:'🎓 Doy clases' }
+  const RESPOND_TEXT = { busco:'Responder →', ofrezco:'Responder →', jam:'Me apunto →', vende:'Consultar →', clases:'Consultar →' }
 
   function timeAgo(iso) {
     if (!iso) return ''
@@ -1404,6 +1499,15 @@
       if (generosActivos.length) query += `&generos=ilike.*${encodeURIComponent(generosActivos[0])}*`
       if (catActiva && tipoFiltro === 'vende') query += `&categoria_producto=ilike.*${encodeURIComponent(catActiva)}*`
       if (condActiva && tipoFiltro === 'vende') query += `&condicion=ilike.*${encodeURIComponent(condActiva)}*`
+      // Filtros de clases
+      if (tipoFiltro === 'clases') {
+        const instrActivo = [...document.querySelectorAll('#fp-clases .fchip.on')].find(c => ['Guitarra','Bajo','Batería','Teclado / Piano','Voz / Canto','Saxo','Violín','Trompeta','Percusión','Bandoneón','Acordeón','Flauta'].includes(c.textContent))
+        const nivelActivo = [...document.querySelectorAll('#fp-clases .fchip.on')].find(c => ['Principiante','Intermedio','Avanzado','Todos los niveles'].includes(c.textContent))
+        const modalActivo = [...document.querySelectorAll('#fp-clases .fchip.on')].find(c => ['Presencial','Online','Presencial y online'].includes(c.textContent))
+        if (instrActivo) query += `&instrumento=ilike.*${encodeURIComponent(instrActivo.textContent)}*`
+        if (nivelActivo) query += `&nivel=eq.${encodeURIComponent(nivelActivo.textContent)}`
+        if (modalActivo) query += `&modalidad=eq.${encodeURIComponent(modalActivo.textContent)}`
+      }
       // Filtros de jam por fecha
       const hoy = new Date(); hoy.setHours(0,0,0,0)
       const manana = new Date(hoy); manana.setDate(manana.getDate()+1)
@@ -1547,7 +1651,14 @@
   }
   cargarStatsSidebar();
 
-  function toggleUserMenu(){const w=document.getElementById('nav-avatar-btn');const d=document.getElementById('nav-dropdown');if(w)w.classList.toggle('open');if(d)d.classList.toggle('open');}
+  function toggleUserMenu(e){if(e)e.stopPropagation();const w=document.getElementById('nav-avatar-btn');const d=document.getElementById('nav-dropdown');if(w)w.classList.toggle('open');if(d)d.classList.toggle('open');}
+  // Close dropdown when tapping outside
+  document.addEventListener('click', function(e){
+    if(!e.target.closest('#nav-avatar-btn') && !e.target.closest('#nav-dropdown')){
+      const d=document.getElementById('nav-dropdown');const w=document.getElementById('nav-avatar-btn');
+      if(d)d.classList.remove('open');if(w)w.classList.remove('open');
+    }
+  });
   document.addEventListener('click',e=>{if(!e.target.closest('#nav-user')){document.getElementById('nav-avatar-btn')?.classList.remove('open');document.getElementById('nav-dropdown')?.classList.remove('open');}});
   function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');window.location.href='index.html';}
 </script>

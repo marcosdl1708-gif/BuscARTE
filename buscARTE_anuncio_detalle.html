@@ -271,6 +271,15 @@
     color:#fff; cursor:pointer; line-height:1; background:none; border:none;
   }
 
+
+  /* ── MOBILE: dropdown del avatar accesible ── */
+  @media (max-width: 900px) {
+    .nav-avatar-wrap { cursor: auto !important; -webkit-tap-highlight-color: transparent; }
+    .nav-dropdown { z-index: 450 !important; min-width: 220px !important; }
+    .nav-dropdown.open { display: flex !important; }
+    .nav-dropdown-item { padding: .85rem 1.2rem !important; font-size: .88rem !important; }
+  }
+
 </style>
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0a0a0a">
@@ -870,6 +879,16 @@
           ${a.condicion ? `<div class="ficha-row"><span class="ficha-key">Condición</span><span class="ficha-val">${a.condicion}</span></div>` : ''}
           ${a.zona ? `<div class="ficha-row"><span class="ficha-key">Zona</span><span class="ficha-val">${a.zona}</span></div>` : ''}
         </div>`
+      } else if (a.tipo === 'clases') {
+        const precioHora = a.precio ? `$${String(a.precio).replace(/^\$/,'')} / hora` : null
+        especial = `<div class="evento-hero" style="border-color:rgba(0,210,200,.2)">
+          <div class="evento-fecha-row">
+            ${a.instrumento ? `<span class="evento-fecha-grande" style="color:#00d4c8">🎓 Clases de ${a.instrumento.split(',')[0]}</span>` : ''}
+          </div>
+          ${a.nivel ? `<div class="evento-lugar">📊 Nivel: <strong>${a.nivel}</strong></div>` : ''}
+          ${a.modalidad ? `<div class="evento-lugar">📍 Modalidad: <strong>${a.modalidad}</strong></div>` : ''}
+          ${precioHora ? `<div class="evento-precio" style="border-color:rgba(0,210,200,.3);color:#00d4c8">💰 ${precioHora}</div>` : ''}
+        </div>`
       } else if (a.tipo === 'jam') {
         const fechaBlock = a.fecha_evento ? (() => {
           const fecha = new Date(a.fecha_evento)
@@ -1092,7 +1111,14 @@
       if(miPerfilLink && uid) miPerfilLink.href='buscARTE_perfil_publico.html?id='+uid;
     }
   })();
-  function toggleUserMenu(){const w=document.getElementById('nav-avatar-btn');const d=document.getElementById('nav-dropdown');if(w)w.classList.toggle('open');if(d)d.classList.toggle('open');}
+  function toggleUserMenu(e){if(e)e.stopPropagation();const w=document.getElementById('nav-avatar-btn');const d=document.getElementById('nav-dropdown');if(w)w.classList.toggle('open');if(d)d.classList.toggle('open');}
+  // Close dropdown when tapping outside
+  document.addEventListener('click', function(e){
+    if(!e.target.closest('#nav-avatar-btn') && !e.target.closest('#nav-dropdown')){
+      const d=document.getElementById('nav-dropdown');const w=document.getElementById('nav-avatar-btn');
+      if(d)d.classList.remove('open');if(w)w.classList.remove('open');
+    }
+  });
   document.addEventListener('click',e=>{if(!e.target.closest('#nav-user')){document.getElementById('nav-avatar-btn')?.classList.remove('open');document.getElementById('nav-dropdown')?.classList.remove('open');}});
   function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');window.location.href='index.html';}
 </script>
