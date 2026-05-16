@@ -423,6 +423,12 @@
     .nav-dropdown-item { padding: .85rem 1.2rem !important; font-size: .88rem !important; }
   }
 
+
+  /* ── MOBILE: avatar abre el panel del bottom nav ── */
+  @media (max-width: 900px) {
+    .nav-dropdown { display: none !important; }
+  }
+
 </style>
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0a0a0a">
@@ -976,6 +982,46 @@
         <div style="margin-top:.5rem"><input type="text" id="zona-vende" placeholder="Barrio (ej: Caballito)" oninput="anunciosOffset=0;cargarAnuncios(false)"></div>
       </div>
     </div>
+
+    <!-- FILTROS: DOY CLASES -->
+    <div class="filter-panel" id="fp-clases">
+      <div class="filter-group">
+        <span class="filter-group-label">Instrumento</span>
+        <div class="filter-chips">
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Guitarra</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Bajo</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Batería</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Teclado / Piano</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Voz / Canto</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Saxo</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Violín</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Percusión</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Bandoneón</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Acordeón</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Flauta</button>
+        </div>
+      </div>
+      <div class="filter-divider"></div>
+      <div class="filter-group">
+        <span class="filter-group-label">Nivel</span>
+        <div class="filter-chips">
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Principiante</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Intermedio</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Avanzado</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Todos los niveles</button>
+        </div>
+      </div>
+      <div class="filter-divider"></div>
+      <div class="filter-group">
+        <span class="filter-group-label">Modalidad</span>
+        <div class="filter-chips">
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Presencial</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Online</button>
+          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Presencial y online</button>
+        </div>
+      </div>
+    </div>
+
       <div class="mobile-show-results-wrap-an">
       <button class="mobile-show-results-an" onclick="closeMobileFiltersAn()">Ver resultados →</button>
     </div>
@@ -1064,7 +1110,8 @@
     musico: 'Busco músico',
     ofrezco: 'Me ofrezco',
     jam: 'Jam / Zapada',
-    vende: 'Vendo / Alquilo'
+    vende: 'Vendo / Alquilo',
+    clases: 'Doy clases'
   };
   const filterPanels = {
     todos: 'fp-musico',   // default: muestra filtros musico
@@ -1731,6 +1778,25 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
   });
 }
+
+  // En mobile, el avatar del nav abre el panel del bottom nav
+  (function() {
+    if (window.innerWidth > 900) return;
+    const btn = document.getElementById('nav-avatar-btn');
+    if (!btn) return;
+    // Remover onclick original y poner el del panel
+    btn.removeAttribute('onclick');
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (typeof toggleMbnPanel === 'function') {
+        toggleMbnPanel();
+      }
+    });
+    // También quitar el chevron en mobile que confunde
+    const chevron = btn.querySelector('.nav-avatar-chevron');
+    if (chevron) chevron.style.display = 'none';
+  })();
+
 </script>
 </body>
 </html>
