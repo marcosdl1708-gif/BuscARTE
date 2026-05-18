@@ -1,0 +1,11 @@
+# Redirects para URLs rotas que Google encontró
+/login/                 /buscARTE_login.html            301
+/login                  /buscARTE_login.html            301
+/contacto/              /buscARTE_contacto.html         301
+/contacto               /buscARTE_contacto.html         301
+/buscarte_login         /buscARTE_login.html            301
+/buscarte_contacto      /buscARTE_contacto.html         301
+/registro/              /buscARTE_registro.html         301
+/registro               /buscARTE_registro.html         301
+/musicos                /buscARTE_busqueda.html         301
+/anuncios               /buscARTE_anuncios.html         301
