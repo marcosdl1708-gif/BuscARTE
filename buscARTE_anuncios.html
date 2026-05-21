@@ -1081,14 +1081,7 @@
 </div>
 
 <script>
-  // PROTECCIÓN: redirigir si no está logueado
-  (function() {
-    try {
-      if (localStorage.getItem('ba_logged') !== '1') {
-        window.location.replace('index.html');
-      }
-    } catch(e) {}
-  })();
+  // Página pública — sin protección de login
 
   // VARIABLES GLOBALES — deben estar primero
   const SUPABASE_URL = 'https://xiaanchoanxmampegoay.supabase.co'

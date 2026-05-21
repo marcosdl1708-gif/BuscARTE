@@ -565,14 +565,7 @@
 </div>
 
 <script>
-  // PROTECCIÓN: redirigir si no está logueado
-  (function() {
-    try {
-      if (localStorage.getItem('ba_logged') !== '1') {
-        window.location.replace('index.html');
-      }
-    } catch(e) {}
-  })();
+  // Página pública — sin protección de login
   // CURSOR - esperar DOM
   window.addEventListener('DOMContentLoaded', function() {
     const cursor=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
