@@ -1304,6 +1304,10 @@
     if (tipo === 'musico') return 'busco'
     return tipo || 'todos'
   }
+  function getHiddenAnuncioIds() {
+    try { return JSON.parse(localStorage.getItem('ba_hidden_anuncios') || '[]').map(String) }
+    catch(e) { return [] }
+  }
   function isLogged() { return localStorage.getItem('ba_logged') === '1' && !!localStorage.getItem('ba_user_id') }
   function requireLogin(action) {
     if (isLogged()) return true
@@ -1753,6 +1757,7 @@
   }
 
   function anuncioVisibleCliente(a) {
+    if (getHiddenAnuncioIds().includes(String(a.id))) return false
     const estado = String(a.estado || '').toLowerCase().trim()
     // Si no hay estado, no bloqueamos: preferimos mostrar antes que dejar el tablón vacío.
     if (estado && !['activo','activa','publicado','publicada'].includes(estado)) return false

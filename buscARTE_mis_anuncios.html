@@ -637,15 +637,19 @@
     return Array.isArray(data) ? data : [];
   }
 
+  function estadoNorm(v) {
+    return String(v || '').toLowerCase().trim();
+  }
+
   function visibleForStats(a) {
-    return a.estado !== 'eliminado' && !getHiddenIds().includes(String(a.id));
+    return estadoNorm(a.estado) !== 'eliminado' && !getHiddenIds().includes(String(a.id));
   }
 
   function applyVisibleFilter(anuncios) {
     const f = currentFilter.tipo;
     return anuncios.filter(visibleForStats).filter(a => {
       if (!f || f === 'todos') return true;
-      if (['activo','pausado','vencido'].includes(f)) return a.estado === f;
+      if (['activo','pausado','vencido'].includes(f)) return estadoNorm(a.estado) === f;
       return normalizeTipo(a.tipo) === normalizeTipo(f);
     });
   }
@@ -653,9 +657,9 @@
   function updateStats(anuncios) {
     const visibles = anuncios.filter(visibleForStats);
     const total = visibles.length;
-    const activos = visibles.filter(a => a.estado === 'activo').length;
-    const pausados = visibles.filter(a => a.estado === 'pausado').length;
-    const vencidos = visibles.filter(a => a.estado === 'vencido').length;
+    const activos = visibles.filter(a => estadoNorm(a.estado) === 'activo').length;
+    const pausados = visibles.filter(a => estadoNorm(a.estado) === 'pausado').length;
+    const vencidos = visibles.filter(a => estadoNorm(a.estado) === 'vencido').length;
     const vistasTotal = visibles.reduce((sum, a) => sum + Number(a.vistas || 0), 0);
 
     const sub = document.querySelector('.page-sub');
@@ -685,6 +689,7 @@
 
     try {
       const anuncios = await fetchAllMisAnuncios();
+      await syncHiddenDeletes(anuncios);
       updateStats(anuncios);
       const visibles = applyVisibleFilter(anuncios);
 
@@ -734,6 +739,54 @@
     }
   }
 
+  async function patchEstadoVerificado(id, estado) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/anuncios?id=eq.${enc(id)}&select=id,user_id,estado`, {
+      method: 'PATCH',
+      headers: { ...hdrs, 'Prefer': 'return=representation' },
+      body: JSON.stringify({ estado })
+    });
+    if (!res.ok) {
+      const txt = await res.text();
+      throw new Error(`Supabase ${res.status}: ${txt}`);
+    }
+    const data = await res.json().catch(() => []);
+    if (!Array.isArray(data) || !data.length) {
+      throw new Error('Supabase no devolvió filas actualizadas. El anuncio puede no existir o no tener permisos.');
+    }
+    const row = data[0];
+    if (String(row.user_id) !== String(miId)) {
+      throw new Error('El anuncio no pertenece al usuario actual.');
+    }
+    return row;
+  }
+
+  async function softDeleteAnuncioVerificado(id) {
+    // Primero probamos un estado explícito de oculto. Si la base no acepta ese valor,
+    // usamos pausado, que el tablón público filtra como no visible.
+    try {
+      return await patchEstadoVerificado(id, 'eliminado');
+    } catch(firstErr) {
+      console.warn('estado=eliminado no disponible o no aplicado. Fallback a pausado:', firstErr);
+      return await patchEstadoVerificado(id, 'pausado');
+    }
+  }
+
+  async function syncHiddenDeletes(anuncios) {
+    // Si en el hotfix anterior se ocultó localmente antes de confirmar Supabase,
+    // este paso sincroniza esos ocultos contra la base al volver a abrir Mis anuncios.
+    const hidden = getHiddenIds();
+    if (!hidden.length) return;
+    const propiosOcultosActivos = anuncios.filter(a => hidden.includes(String(a.id)) && estadoNorm(a.estado) === 'activo');
+    for (const a of propiosOcultosActivos) {
+      try {
+        const row = await softDeleteAnuncioVerificado(a.id);
+        a.estado = row.estado || 'pausado';
+      } catch(e) {
+        console.warn('No se pudo sincronizar anuncio oculto localmente:', a.id, e);
+      }
+    }
+  }
+
   async function confirmDelete() {
     if (!cardToDelete || !miId) return;
     const id = cardToDelete.dataset.id;
@@ -743,38 +796,23 @@
     const oldText = btn ? btn.textContent : '';
     if (btn) { btn.textContent = 'Eliminando...'; btn.disabled = true; }
 
-    // Hotfix: eliminación segura sin DELETE real. Primero lo ocultamos del panel local
-    // y lo pausamos en Supabase para que deje de aparecer en el tablón público.
-    hideIdLocally(id);
     const cardEl = cardToDelete;
-    if (cardEl) {
-      cardEl.style.transition = 'opacity .22s, transform .22s';
-      cardEl.style.opacity = '0';
-      cardEl.style.transform = 'translateX(-14px)';
-    }
 
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/anuncios?id=eq.${enc(id)}&user_id=eq.${enc(miId)}`, {
-        method: 'PATCH',
-        headers: { ...hdrs, 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ estado: 'pausado' })
-      });
+      await softDeleteAnuncioVerificado(id);
+      hideIdLocally(id);
 
-      if (!res.ok) {
-        const txt = await res.text();
-        throw new Error(`Supabase ${res.status}: ${txt}`);
+      if (cardEl) {
+        cardEl.style.transition = 'opacity .22s, transform .22s';
+        cardEl.style.opacity = '0';
+        cardEl.style.transform = 'translateX(-14px)';
       }
 
       showToast('Anuncio eliminado del tablón.');
       setTimeout(() => { closeDeleteModal(); cargarMisAnuncios(); }, 240);
     } catch(e) {
       console.error(e);
-      unhideIdLocally(id);
-      showToast('No se pudo eliminar el anuncio. Intentá de nuevo.', 'err');
-      if (cardEl) {
-        cardEl.style.opacity = '1';
-        cardEl.style.transform = '';
-      }
+      showToast('No se pudo eliminar en Supabase. No lo oculté para evitar falsos positivos.', 'err');
       if (btn) { btn.textContent = oldText || 'Sí, eliminar'; btn.disabled = false; }
     }
   }
