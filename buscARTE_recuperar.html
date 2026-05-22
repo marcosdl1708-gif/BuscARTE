@@ -1,100 +1,198 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>buscARTE — Recuperar contraseña</title>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@300;400;500&display=swap" rel="stylesheet">
-  <style>
-    :root { --neon:#d4f53c;--negro:#0a0a0a;--blanco:#f2ede4;--gris:#888;--gris3:#2a2a2a; }
-    * { margin:0;padding:0;box-sizing:border-box; }
-    body { background:var(--negro);color:var(--blanco);font-family:'Archivo',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem; }
-    .card { background:#111;border:1px solid var(--gris3);padding:2.5rem;width:100%;max-width:440px;border-radius:4px; }
-    .logo { font-family:'Archivo Black',sans-serif;font-size:1.8rem;text-align:center;margin-bottom:2rem }
-    .logo span { color:var(--neon) }
-    h2 { font-size:1.3rem;margin-bottom:.4rem }
-    .sub { color:var(--gris);font-size:.85rem;margin-bottom:2rem;line-height:1.6 }
-    .field { margin-bottom:1.2rem }
-    label { display:block;font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gris);margin-bottom:.5rem }
-    input { width:100%;background:#0a0a0a;border:1px solid var(--gris3);color:var(--blanco);padding:.85rem 1rem;font-family:'Archivo',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s }
-    input:focus { border-color:var(--neon) }
-    .btn { width:100%;background:var(--neon);color:#000;border:none;padding:1rem;font-family:'Archivo Black',sans-serif;font-size:1rem;cursor:pointer;margin-top:.5rem;transition:opacity .2s }
-    .btn:hover { opacity:.85 }
-    .btn:disabled { opacity:.5;cursor:not-allowed }
-    .msg { padding:1rem;text-align:center;border-radius:4px;margin-bottom:1rem;font-size:.88rem }
-    .msg.error { background:rgba(255,85,85,.1);border:1px solid #ff5555;color:#ff5555 }
-    .msg.success { background:rgba(212,245,60,.1);border:1px solid var(--neon);color:var(--neon) }
-    .volver { text-align:center;margin-top:1.5rem;font-size:.85rem;color:var(--gris) }
-    .volver a { color:var(--neon);text-decoration:none }
-  
-  @media (max-width: 768px) {
-    .cursor, .cursor-ring { display: none !important; }
-    * { cursor: auto !important; }
-    body { padding: 1.25rem; justify-content: flex-start; padding-top: 2.5rem; }
-    .card { padding: 2rem 1.25rem; }
-    input { font-size: 1rem; }
-    .btn { font-size: .95rem; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Recuperá el acceso a tu cuenta de buscARTE.">
+<meta name="robots" content="noindex, follow">
+<meta name="author" content="buscARTE">
+<link rel="canonical" href="https://buscarte.com.ar/buscARTE_recuperar.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://buscarte.com.ar/buscARTE_recuperar.html">
+<meta property="og:title" content="Recuperar contraseña — buscARTE">
+<meta property="og:description" content="Pedí un link para recuperar el acceso a tu cuenta de buscARTE.">
+<meta property="og:image" content="https://buscarte.com.ar/og-image.jpg">
+<title>Recuperar contraseña — buscARTE</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --negro:#080808; --negro2:#111; --negro3:#1a1a1a;
+    --blanco:#f2ede4; --neon:#d4f53c; --rojo:#e8311a;
+    --gris:#888; --gris2:#444; --gris3:#2a2a2a;
+    --font-display:'Archivo Black',sans-serif;
+    --font-body:'Archivo',sans-serif;
+  }
+  body { background:var(--negro); color:var(--blanco); font-family:var(--font-body); font-weight:300; min-height:100vh; overflow-x:hidden; cursor:none; display:flex; flex-direction:column; }
+  .cursor { width:10px;height:10px;background:var(--neon);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%); }
+  .cursor-ring { width:36px;height:36px;border:1px solid rgba(212,245,60,0.35);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .15s ease; }
+  body::before { content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");opacity:.03;pointer-events:none;z-index:0; }
+  nav { display:flex;align-items:center;justify-content:space-between;padding:1.4rem 3rem;border-bottom:1px solid #1c1c1c;position:relative;z-index:2; }
+  .nav-logo { font-family:var(--font-display);font-size:1.5rem;color:var(--blanco);text-decoration:none; }
+  .nav-logo span { color:var(--neon); }
+  .nav-back { color:var(--gris);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;transition:color .2s; }
+  .nav-back:hover { color:var(--blanco); }
+  .page { flex:1;display:grid;grid-template-columns:1fr 1fr;position:relative;z-index:1; }
+  .left-panel { background:var(--negro2);border-right:1px solid #1c1c1c;padding:3rem;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden; }
+  .left-bg { position:absolute;bottom:-2rem;left:-1rem;font-family:var(--font-display);font-size:16rem;color:transparent;-webkit-text-stroke:1px #1e1e1e;line-height:1;pointer-events:none;user-select:none;letter-spacing:-.04em; }
+  .left-content { position:relative;z-index:1; }
+  .left-label { font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--neon);margin-bottom:1rem; }
+  .left-title { font-family:var(--font-display);font-size:clamp(3rem,5vw,4.5rem);line-height:.92;letter-spacing:-.02em;margin-bottom:1.2rem; }
+  .left-desc { color:var(--gris);font-size:.92rem;line-height:1.7;max-width:360px; }
+  .right-panel { display:flex;align-items:center;justify-content:center;padding:3rem; }
+  .card { width:100%;max-width:420px;background:transparent;border:0;padding:0; }
+  h1 { font-family:var(--font-display);font-size:2rem;letter-spacing:-.02em;margin-bottom:.5rem;line-height:1.1; }
+  .sub { color:var(--gris);font-size:.88rem;margin-bottom:1.7rem;line-height:1.65; }
+  .field { margin-bottom:1.1rem; }
+  label { display:block;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gris);margin-bottom:.45rem; }
+  input { width:100%;background:var(--negro2);border:1px solid var(--gris3);color:var(--blanco);padding:.95rem 1rem;font-family:var(--font-body);font-size:.95rem;font-weight:300;outline:none;transition:border-color .2s; }
+  input:focus { border-color:var(--neon); }
+  input::placeholder { color:var(--gris2); }
+  .btn { width:100%;background:var(--neon);color:#000;border:none;padding:1rem;font-family:var(--font-display);font-size:.95rem;letter-spacing:.04em;cursor:none;margin-top:.25rem;transition:opacity .2s; }
+  .btn:hover { opacity:.85; }
+  .btn:disabled { opacity:.55;cursor:not-allowed; }
+  .msg { padding:.85rem 1rem;margin-bottom:1rem;font-size:.82rem;line-height:1.5;border:1px solid var(--gris3);background:var(--negro2);color:var(--gris); }
+  .msg.error { background:rgba(232,49,26,.08);border-color:rgba(232,49,26,.35);color:#ff7a6a; }
+  .msg.success { background:rgba(212,245,60,.08);border-color:rgba(212,245,60,.24);color:var(--neon); }
+  .success-card { display:none;text-align:center;border:1px solid rgba(212,245,60,.18);background:rgba(212,245,60,.04);padding:2rem 1.4rem; }
+  .success-card.show { display:block; }
+  .success-icon { font-size:3rem;margin-bottom:1rem; }
+  .volver { text-align:center;margin-top:1.5rem;font-size:.85rem;color:var(--gris);display:flex;gap:.9rem;justify-content:center;flex-wrap:wrap; }
+  .volver a { color:var(--neon);text-decoration:none; }
+  .hint { font-size:.76rem;color:var(--gris2);line-height:1.6;margin-top:.8rem; }
+  @media (max-width:900px) {
+    .cursor,.cursor-ring{display:none!important}
+    *{cursor:auto!important}
+    nav{padding:.8rem 1rem!important}
+    .nav-back{font-size:.72rem}
+    .page{grid-template-columns:1fr}
+    .left-panel{display:none}
+    .right-panel{padding:2rem 1.25rem;align-items:flex-start}
+    .card{max-width:100%}
+    h1{font-size:1.75rem}
+    input{font-size:1rem;padding:1rem}
+    .btn{font-size:1rem}
   }
 </style>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0a0a0a">
 </head>
 <body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
 
-<div class="card">
-  <div class="logo">busc<span>ARTE</span></div>
+<nav>
+  <a href="index.html" class="nav-logo">busc<span>ARTE</span></a>
+  <a href="buscARTE_login.html" class="nav-back">← Volver al login</a>
+</nav>
 
-  <div id="estado-form">
-    <h2>Recuperar contraseña 🔑</h2>
-    <p class="sub">Ingresá tu email y te mandamos un link para crear una nueva contraseña.</p>
-
-    <div id="msg-box"></div>
-
-    <div class="field">
-      <label>Tu email</label>
-      <input type="email" id="email-input" placeholder="tu@email.com" onkeydown="if(event.key==='Enter') solicitar()">
+<div class="page">
+  <section class="left-panel">
+    <div class="left-bg">?</div>
+    <div class="left-content">
+      <div class="left-label">Recuperar acceso</div>
+      <div class="left-title">VOLVÉ<br>A TU<br>CUENTA</div>
+      <p class="left-desc">Te mandamos un link para crear una contraseña nueva. Si el email existe en buscARTE, el mensaje llega a esa casilla.</p>
     </div>
-    <button class="btn" id="btn-solicitar" onclick="solicitar()">Enviar link →</button>
-  </div>
+  </section>
 
-  <div id="estado-exito" style="display:none;text-align:center">
-    <div style="font-size:3rem;margin-bottom:1rem">📧</div>
-    <h2 style="margin-bottom:.5rem">¡Revisá tu email!</h2>
-    <p style="color:var(--gris);line-height:1.7">Si ese email está registrado, te mandamos un link para recuperar tu contraseña.<br><br>
-    <span style="font-size:.8rem">Revisá también la carpeta de spam.</span></p>
-  </div>
+  <main class="right-panel">
+    <div class="card">
+      <div id="estado-form">
+        <h1>Recuperar contraseña 🔑</h1>
+        <p class="sub">Ingresá el email con el que te registraste. Por seguridad, siempre mostramos el mismo mensaje aunque el email no exista.</p>
 
-  <div class="volver">
-    <a href="buscARTE_login.html">← Volver al login</a>
-  </div>
+        <div id="msg-box"></div>
+
+        <div class="field">
+          <label for="email-input">Tu email</label>
+          <input type="email" id="email-input" placeholder="tu@email.com" autocomplete="email" oninput="clearMsg()" onkeydown="if(event.key==='Enter') solicitar()">
+        </div>
+        <button type="button" class="btn" id="btn-solicitar" onclick="solicitar()">Enviar link →</button>
+        <p class="hint">Revisá spam/promociones. El link puede tardar unos minutos.</p>
+      </div>
+
+      <div id="estado-exito" class="success-card">
+        <div class="success-icon">📧</div>
+        <h1 style="font-size:1.55rem;margin-bottom:.5rem">Revisá tu email</h1>
+        <p style="color:var(--gris);line-height:1.7;font-size:.9rem">Si ese email está registrado, vas a recibir un link para crear una nueva contraseña.</p>
+      </div>
+
+      <div class="volver">
+        <a href="buscARTE_login.html">← Volver al login</a>
+        <a href="buscARTE_registro.html">Crear cuenta gratis</a>
+      </div>
+    </div>
+  </main>
 </div>
 
 <script>
-  async function solicitar() {
-    const email = document.getElementById('email-input').value.trim()
-    const btn = document.getElementById('btn-solicitar')
-    const msgBox = document.getElementById('msg-box')
+  window.addEventListener('DOMContentLoaded', function() {
+    const cursor=document.getElementById('cursor'), ring=document.getElementById('cursor-ring');
+    if (cursor && ring && window.matchMedia('(pointer:fine)').matches) {
+      let mx=0,my=0,rx=0,ry=0;
+      document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+      (function tick(){cursor.style.left=mx+'px';cursor.style.top=my+'px';rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(tick);})();
+    }
+    const params = new URLSearchParams(window.location.search);
+    const email = params.get('email');
+    const input = document.getElementById('email-input');
+    if (email && input) input.value = email;
+    input?.focus();
+  });
 
-    if (!email || !email.includes('@')) {
-      msgBox.innerHTML = '<div class="msg error">Por favor ingresá un email válido.</div>'
-      return
+  function clearMsg() {
+    const msgBox = document.getElementById('msg-box');
+    if (msgBox) msgBox.innerHTML = '';
+  }
+
+  function showMsg(text, type='error') {
+    const msgBox = document.getElementById('msg-box');
+    if (!msgBox) return;
+    msgBox.innerHTML = `<div class="msg ${type}">${text}</div>`;
+  }
+
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  async function solicitar() {
+    const email = document.getElementById('email-input').value.trim().toLowerCase();
+    const btn = document.getElementById('btn-solicitar');
+
+    if (!isValidEmail(email)) {
+      showMsg('Por favor ingresá un email válido.');
+      return;
     }
 
-    btn.disabled = true
-    btn.textContent = 'Enviando...'
-    msgBox.innerHTML = ''
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+    clearMsg();
 
     try {
-      await fetch('/.netlify/functions/reset-password', {
+      const res = await fetch('/.netlify/functions/reset-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ accion: 'solicitar', email })
-      })
-      // Siempre mostrar éxito para no revelar si el email existe
-      document.getElementById('estado-form').style.display = 'none'
-      document.getElementById('estado-exito').style.display = 'block'
+      });
+
+      if (!res.ok) {
+        const txt = await res.text().catch(() => '');
+        console.error('reset-password error:', res.status, txt);
+        showMsg('No pudimos enviar el link ahora. Intentá de nuevo en unos minutos.');
+        btn.disabled = false;
+        btn.textContent = 'Enviar link →';
+        return;
+      }
+
+      // Siempre mostrar éxito para no revelar si el email existe.
+      document.getElementById('estado-form').style.display = 'none';
+      document.getElementById('estado-exito').classList.add('show');
     } catch(e) {
-      msgBox.innerHTML = '<div class="msg error">No se pudo conectar. Verificá tu conexión.</div>'
-      btn.disabled = false
-      btn.textContent = 'Enviar link →'
+      console.error(e);
+      showMsg('No se pudo conectar. Verificá tu conexión.');
+      btn.disabled = false;
+      btn.textContent = 'Enviar link →';
     }
   }
 </script>

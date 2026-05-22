@@ -3,184 +3,261 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>buscARTE — Nueva contraseña</title>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@300;400;500&display=swap" rel="stylesheet">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="author" content="buscARTE">
+  <meta name="description" content="Creá una nueva contraseña para tu cuenta de buscARTE.">
+  <title>Nueva contraseña — buscARTE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
-    :root { --neon:#d4f53c;--negro:#0a0a0a;--blanco:#f2ede4;--gris:#888;--gris3:#2a2a2a; }
-    * { margin:0;padding:0;box-sizing:border-box; }
-    body { background:var(--negro);color:var(--blanco);font-family:'Archivo',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem; }
-    .card { background:#111;border:1px solid var(--gris3);padding:2.5rem;width:100%;max-width:440px;border-radius:4px; }
-    .logo { font-family:'Archivo Black',sans-serif;font-size:1.8rem;text-align:center;margin-bottom:2rem }
-    .logo span { color:var(--neon) }
-    h2 { font-size:1.3rem;margin-bottom:.4rem }
-    .sub { color:var(--gris);font-size:.85rem;margin-bottom:2rem }
-    .field { margin-bottom:1.2rem }
-    label { display:block;font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gris);margin-bottom:.5rem }
-    input { width:100%;background:#0a0a0a;border:1px solid var(--gris3);color:var(--blanco);padding:.85rem 1rem;font-family:'Archivo',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s }
-    input:focus { border-color:var(--neon) }
-    .pass-feedback { font-size:.75rem;margin-top:.4rem;height:1rem }
-    .btn { width:100%;background:var(--neon);color:#000;border:none;padding:1rem;font-family:'Archivo Black',sans-serif;font-size:1rem;cursor:pointer;margin-top:.5rem;transition:opacity .2s }
-    .btn:hover { opacity:.85 }
-    .btn:disabled { opacity:.5;cursor:not-allowed }
-    .msg { padding:1rem;text-align:center;border-radius:4px;margin-bottom:1rem;font-size:.88rem }
-    .msg.error { background:rgba(255,85,85,.1);border:1px solid #ff5555;color:#ff5555 }
-    .msg.success { background:rgba(212,245,60,.1);border:1px solid var(--neon);color:var(--neon) }
-    .loading { display:none;text-align:center;color:var(--gris);font-size:.85rem;margin-bottom:1rem }
-    a { color:var(--neon);text-decoration:none }
-  
-  @media (max-width: 768px) {
-    .cursor, .cursor-ring { display: none !important; }
-    * { cursor: auto !important; }
-    body { padding: 1.25rem; justify-content: flex-start; padding-top: 2.5rem; }
-    .card { padding: 2rem 1.25rem; }
-    input { font-size: 1rem; }
-    .btn { font-size: .95rem; }
-  }
-</style>
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    :root {
+      --neon:#d4f53c; --negro:#0a0a0a; --negro2:#111; --negro3:#171717;
+      --blanco:#f2ede4; --gris:#888; --gris2:#555; --gris3:#2a2a2a; --rojo:#ff5555;
+      --font-display:'Archivo Black',sans-serif; --font-body:'Archivo',sans-serif;
+    }
+    body {
+      background:var(--negro); color:var(--blanco); font-family:var(--font-body);
+      min-height:100vh; display:flex; flex-direction:column; cursor:none; overflow-x:hidden;
+    }
+    .cursor { width:10px;height:10px;background:var(--neon);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%); }
+    .cursor-ring { width:36px;height:36px;border:1px solid rgba(212,245,60,.35);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .15s ease; }
+    body::before { content:'';position:fixed;inset:-50%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");opacity:.03;pointer-events:none;z-index:0; }
+    nav { position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:1.2rem 2.5rem;border-bottom:1px solid #1c1c1c;background:rgba(10,10,10,.96); }
+    .nav-logo { font-family:var(--font-display);font-size:1.45rem;color:var(--blanco);text-decoration:none; }
+    .nav-logo span { color:var(--neon); }
+    .nav-back { color:var(--gris);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;transition:color .2s; }
+    .nav-back:hover { color:var(--blanco); }
+    main { position:relative;z-index:1;flex:1;display:grid;grid-template-columns:minmax(280px,.9fr) minmax(340px,1.1fr);min-height:calc(100vh - 65px); }
+    .brand-panel { background:var(--negro2);border-right:1px solid #1c1c1c;padding:3rem;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden; }
+    .brand-bg { position:absolute;left:-1rem;bottom:-2rem;font-family:var(--font-display);font-size:16rem;line-height:.8;color:transparent;-webkit-text-stroke:1px #222;pointer-events:none;user-select:none; }
+    .brand-kicker { position:relative;z-index:1;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--neon);margin-bottom:1rem; }
+    .brand-title { position:relative;z-index:1;font-family:var(--font-display);font-size:clamp(2.8rem,5vw,4.8rem);line-height:.9;letter-spacing:-.03em;margin-bottom:1.1rem; }
+    .brand-copy { position:relative;z-index:1;color:var(--gris);font-size:.92rem;line-height:1.7;max-width:370px; }
+    .tips { position:relative;z-index:1;border-left:2px solid var(--neon);padding-left:1rem;color:var(--gris);font-size:.82rem;line-height:1.7; }
+    .form-panel { display:flex;align-items:center;justify-content:center;padding:3rem 2rem; }
+    .card { width:100%;max-width:440px;background:rgba(17,17,17,.85);border:1px solid #242424;padding:2rem;box-shadow:0 24px 80px rgba(0,0,0,.24); }
+    .status-icon { font-size:2.4rem;margin-bottom:1rem;display:block; }
+    h1, h2 { font-family:var(--font-display);letter-spacing:-.02em;line-height:1.05; }
+    h1 { font-size:1.75rem;margin-bottom:.5rem; }
+    h2 { font-size:1.45rem;margin-bottom:.5rem; }
+    .sub { color:var(--gris);font-size:.88rem;line-height:1.65;margin-bottom:1.6rem; }
+    .field { margin-bottom:1rem; }
+    label { display:flex;justify-content:space-between;align-items:center;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gris);margin-bottom:.45rem; }
+    .pass-wrap { position:relative; }
+    input { width:100%;background:var(--negro);border:1px solid var(--gris3);color:var(--blanco);padding:.9rem 1rem;font-family:var(--font-body);font-size:.95rem;outline:none;transition:border-color .2s; }
+    input:focus { border-color:var(--neon); }
+    input::placeholder { color:#444; }
+    .pass-wrap input { padding-right:3rem; }
+    .pass-toggle { position:absolute;right:.9rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--gris);cursor:none;font-size:.9rem; }
+    .feedback { min-height:1rem;font-size:.74rem;margin-top:.35rem;color:var(--gris2); }
+    .feedback.ok { color:var(--neon); }
+    .feedback.error { color:var(--rojo); }
+    .msg { display:none;padding:.9rem 1rem;border:1px solid var(--gris3);font-size:.82rem;line-height:1.55;margin-bottom:1rem; }
+    .msg.show { display:block; }
+    .msg.error { background:rgba(255,85,85,.08);border-color:rgba(255,85,85,.4);color:var(--rojo); }
+    .msg.success { background:rgba(212,245,60,.08);border-color:rgba(212,245,60,.35);color:var(--neon); }
+    .btn { width:100%;background:var(--neon);color:#000;border:none;padding:1rem;font-family:var(--font-display);font-size:.95rem;letter-spacing:.04em;cursor:none;transition:opacity .2s;display:flex;align-items:center;justify-content:center;gap:.5rem; }
+    .btn:hover { opacity:.86; }
+    .btn:disabled { opacity:.45;cursor:none; }
+    .spinner { width:16px;height:16px;border:2px solid rgba(0,0,0,.25);border-top-color:#000;border-radius:50%;animation:spin .65s linear infinite;display:none; }
+    .btn.loading .spinner { display:block; }
+    .btn.loading .btn-text { display:none; }
+    .links { margin-top:1.4rem;text-align:center;color:var(--gris);font-size:.84rem;line-height:1.7; }
+    a { color:var(--neon);text-decoration:none; }
+    a:hover { opacity:.8; }
+    .state { display:none; }
+    .state.active { display:block;animation:fadeUp .25s ease both; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    @media (max-width:900px) {
+      .cursor,.cursor-ring{display:none!important} *{cursor:auto!important}
+      nav{padding:.8rem 1rem}.nav-back{font-size:.7rem}
+      main{grid-template-columns:1fr}.brand-panel{display:none}.form-panel{align-items:flex-start;padding:2rem 1.25rem}.card{max-width:100%;padding:1.6rem 1.25rem}
+      input,.btn{font-size:1rem}.pass-toggle{cursor:auto}
+    }
+  </style>
 </head>
 <body>
-
-<div class="card">
-  <div class="logo">busc<span>ARTE</span></div>
-
-  <!-- Estado: verificando token -->
-  <div id="estado-verificando">
-    <p style="text-align:center;color:var(--gris)">Verificando link...</p>
-  </div>
-
-  <!-- Estado: formulario nueva contraseña -->
-  <div id="estado-formulario" style="display:none">
-    <h2>Nueva contraseña 🔑</h2>
-    <p class="sub" id="saludo">Ingresá tu nueva contraseña.</p>
-    <div id="msg-box"></div>
-    <div class="field">
-      <label>Nueva contraseña</label>
-      <input type="password" id="pass1" placeholder="Mínimo 8 caracteres" oninput="validar()">
-      <div class="pass-feedback" id="feedback1"></div>
+<div class="cursor" id="cursor"></div><div class="cursor-ring" id="cursor-ring"></div>
+<nav>
+  <a href="index.html" class="nav-logo">busc<span>ARTE</span></a>
+  <a href="buscARTE_login.html" class="nav-back">← Volver al login</a>
+</nav>
+<main>
+  <section class="brand-panel">
+    <div class="brand-bg">🔑</div>
+    <div>
+      <div class="brand-kicker">Recuperación segura</div>
+      <div class="brand-title">NUEVA<br>CONTRA<br>SEÑA</div>
+      <p class="brand-copy">Creá una clave nueva para volver a entrar a tu perfil, tus anuncios y tus mensajes.</p>
     </div>
-    <div class="field">
-      <label>Repetir contraseña</label>
-      <input type="password" id="pass2" placeholder="Repetí la contraseña" oninput="validar()">
-      <div class="pass-feedback" id="feedback2"></div>
+    <div class="tips">Usá al menos 8 caracteres. Mejor si combinás letras, números y algún símbolo. No uses la misma contraseña que en otros sitios.</div>
+  </section>
+  <section class="form-panel">
+    <div class="card">
+      <div class="state active" id="estado-verificando">
+        <span class="status-icon">⏳</span>
+        <h1>Verificando link</h1>
+        <p class="sub">Estamos chequeando que el enlace de recuperación sea válido.</p>
+      </div>
+
+      <div class="state" id="estado-formulario">
+        <span class="status-icon">🔑</span>
+        <h1>Nueva contraseña</h1>
+        <p class="sub" id="saludo">Ingresá tu nueva contraseña para recuperar el acceso.</p>
+        <div class="msg error" id="msg-box" role="alert"></div>
+        <div class="field">
+          <label for="pass1">Nueva contraseña</label>
+          <div class="pass-wrap">
+            <input type="password" id="pass1" placeholder="Mínimo 8 caracteres" autocomplete="new-password" oninput="validar()">
+            <button type="button" class="pass-toggle" onclick="togglePass('pass1', this)">👁</button>
+          </div>
+          <div class="feedback" id="feedback1"></div>
+        </div>
+        <div class="field">
+          <label for="pass2">Repetir contraseña</label>
+          <div class="pass-wrap">
+            <input type="password" id="pass2" placeholder="Repetí la contraseña" autocomplete="new-password" oninput="validar()" onkeydown="if(event.key==='Enter' && !document.getElementById('btn-cambiar').disabled) cambiarPassword()">
+            <button type="button" class="pass-toggle" onclick="togglePass('pass2', this)">👁</button>
+          </div>
+          <div class="feedback" id="feedback2"></div>
+        </div>
+        <button class="btn" id="btn-cambiar" onclick="cambiarPassword()" disabled>
+          <span class="btn-text">Guardar contraseña →</span><span class="spinner"></span>
+        </button>
+      </div>
+
+      <div class="state" id="estado-exito">
+        <span class="status-icon">✅</span>
+        <h2>Contraseña actualizada</h2>
+        <p class="sub">Listo. Ya podés ingresar con tu nueva contraseña.</p>
+        <a class="btn" href="buscARTE_login.html">Ingresar →</a>
+      </div>
+
+      <div class="state" id="estado-error">
+        <span class="status-icon">❌</span>
+        <h2>Link inválido o vencido</h2>
+        <p class="sub" id="error-msg">Este enlace no es válido o ya expiró.</p>
+        <a class="btn" href="buscARTE_recuperar.html">Pedir otro link →</a>
+        <div class="links"><a href="buscARTE_login.html">Volver al login</a></div>
+      </div>
     </div>
-    <button class="btn" id="btn-cambiar" onclick="cambiarPassword()" disabled>Guardar contraseña</button>
-  </div>
-
-  <!-- Estado: éxito -->
-  <div id="estado-exito" style="display:none;text-align:center">
-    <div style="font-size:3rem;margin-bottom:1rem">✅</div>
-    <h2 style="margin-bottom:.5rem">¡Listo!</h2>
-    <p style="color:var(--gris);margin-bottom:2rem">Tu contraseña fue cambiada exitosamente.</p>
-    <a href="buscARTE_login.html" style="background:var(--neon);color:#000;padding:1rem 2rem;display:inline-block;font-family:'Archivo Black',sans-serif">Ingresar →</a>
-  </div>
-
-  <!-- Estado: token inválido -->
-  <div id="estado-error" style="display:none;text-align:center">
-    <div style="font-size:3rem;margin-bottom:1rem">❌</div>
-    <h2 style="margin-bottom:.5rem">Link inválido</h2>
-    <p style="color:var(--gris);margin-bottom:2rem" id="error-msg">Este link expiró o no es válido.</p>
-    <a href="buscARTE_login.html" style="color:var(--neon)">Volver al login →</a>
-  </div>
-</div>
-
+  </section>
+</main>
 <script>
-  const token = new URLSearchParams(window.location.search).get('token')
+  window.addEventListener('DOMContentLoaded', function() {
+    const cursor=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+    if (!cursor || !ring) return;
+    let mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+    (function tick(){cursor.style.left=mx+'px';cursor.style.top=my+'px';rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(tick);})();
+  });
+
+  const token = new URLSearchParams(window.location.search).get('token') || '';
+
+  function setState(id) {
+    document.querySelectorAll('.state').forEach(el => el.classList.remove('active'));
+    const target = document.getElementById(id);
+    if (target) target.classList.add('active');
+  }
+
+  function setError(message) {
+    const err = document.getElementById('error-msg');
+    if (err) err.textContent = message || 'Este enlace no es válido o ya expiró.';
+    setState('estado-error');
+  }
+
+  function showInlineError(message) {
+    const box = document.getElementById('msg-box');
+    box.textContent = message || 'No se pudo completar la acción.';
+    box.classList.add('show');
+  }
+
+  async function parseResponse(res) {
+    const text = await res.text();
+    if (!text) return {};
+    try { return JSON.parse(text); }
+    catch(e) { return { error: text }; }
+  }
 
   async function verificarToken() {
     if (!token) {
-      mostrar('error', 'No se encontró el token de recuperación.')
-      return
+      setError('No se encontró el token de recuperación. Pedí un nuevo link.');
+      return;
     }
     try {
       const res = await fetch('/.netlify/functions/reset-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ accion: 'verificar', token })
-      })
-      const data = await res.json()
+      });
+      const data = await parseResponse(res);
+      if (!res.ok) throw new Error(data.error || 'No se pudo verificar el link.');
       if (data.valido) {
-        document.getElementById('estado-verificando').style.display = 'none'
-        document.getElementById('estado-formulario').style.display = 'block'
-        if (data.nombre) document.getElementById('saludo').textContent = `Hola ${data.nombre}, ingresá tu nueva contraseña.`
+        setState('estado-formulario');
+        if (data.nombre) document.getElementById('saludo').textContent = `Hola ${data.nombre}, ingresá tu nueva contraseña.`;
       } else {
-        mostrar('error', data.error || 'Link inválido o expirado.')
+        setError(data.error || 'Link inválido o expirado.');
       }
     } catch(e) {
-      mostrar('error', 'Error de conexión. Intentá de nuevo.')
+      setError(e.message || 'Error de conexión. Intentá pedir un nuevo link.');
     }
   }
 
-  function mostrar(estado, mensaje) {
-    document.getElementById('estado-verificando').style.display = 'none'
-    document.getElementById('estado-formulario').style.display = 'none'
-    if (estado === 'error') {
-      document.getElementById('estado-error').style.display = 'block'
-      document.getElementById('error-msg').textContent = mensaje
-    } else if (estado === 'exito') {
-      document.getElementById('estado-exito').style.display = 'block'
-    }
+  function togglePass(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    input.type = input.type === 'password' ? 'text' : 'password';
+    btn.textContent = input.type === 'password' ? '👁' : '🙈';
+    input.focus();
   }
 
   function validar() {
-    const p1 = document.getElementById('pass1').value
-    const p2 = document.getElementById('pass2').value
-    const fb1 = document.getElementById('feedback1')
-    const fb2 = document.getElementById('feedback2')
-    const btn = document.getElementById('btn-cambiar')
+    const p1 = document.getElementById('pass1').value;
+    const p2 = document.getElementById('pass2').value;
+    const fb1 = document.getElementById('feedback1');
+    const fb2 = document.getElementById('feedback2');
+    const btn = document.getElementById('btn-cambiar');
+    document.getElementById('msg-box').classList.remove('show');
 
-    if (p1.length > 0 && p1.length < 8) {
-      fb1.textContent = `✗ Faltan ${8 - p1.length} caracteres`
-      fb1.style.color = '#ff5555'
-    } else if (p1.length >= 8) {
-      fb1.textContent = '✓ OK'
-      fb1.style.color = 'var(--neon)'
-    } else {
-      fb1.textContent = ''
-    }
+    fb1.className = 'feedback';
+    fb2.className = 'feedback';
 
-    if (p2.length > 0) {
-      if (p1 !== p2) {
-        fb2.textContent = '✗ Las contraseñas no coinciden'
-        fb2.style.color = '#ff5555'
-      } else {
-        fb2.textContent = '✓ Coinciden'
-        fb2.style.color = 'var(--neon)'
-      }
-    } else {
-      fb2.textContent = ''
-    }
+    if (!p1) fb1.textContent = '';
+    else if (p1.length < 8) { fb1.textContent = `✗ Faltan ${8 - p1.length} caracteres`; fb1.classList.add('error'); }
+    else { fb1.textContent = '✓ Longitud suficiente'; fb1.classList.add('ok'); }
 
-    btn.disabled = !(p1.length >= 8 && p1 === p2)
+    if (!p2) fb2.textContent = '';
+    else if (p1 !== p2) { fb2.textContent = '✗ Las contraseñas no coinciden'; fb2.classList.add('error'); }
+    else { fb2.textContent = '✓ Coinciden'; fb2.classList.add('ok'); }
+
+    btn.disabled = !(p1.length >= 8 && p1 === p2);
   }
 
   async function cambiarPassword() {
-    const btn = document.getElementById('btn-cambiar')
-    const nueva = document.getElementById('pass1').value
-    btn.disabled = true
-    btn.textContent = 'Guardando...'
+    const btn = document.getElementById('btn-cambiar');
+    const nueva = document.getElementById('pass1').value;
+    if (btn.disabled) return;
+    btn.disabled = true;
+    btn.classList.add('loading');
 
     try {
       const res = await fetch('/.netlify/functions/reset-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ accion: 'cambiar', token, nueva_password: nueva })
-      })
-      const data = await res.json()
-      if (data.ok) {
-        mostrar('exito')
-      } else {
-        const msgBox = document.getElementById('msg-box')
-        msgBox.innerHTML = `<div class="msg error">${data.error}</div>`
-        btn.disabled = false
-        btn.textContent = 'Guardar contraseña'
-      }
+      });
+      const data = await parseResponse(res);
+      if (!res.ok || !data.ok) throw new Error(data.error || 'No se pudo guardar la nueva contraseña.');
+      setState('estado-exito');
     } catch(e) {
-      btn.disabled = false
-      btn.textContent = 'Guardar contraseña'
+      showInlineError(e.message || 'Error de conexión. Intentá de nuevo.');
+      btn.disabled = false;
+      btn.classList.remove('loading');
     }
   }
 
-  verificarToken()
+  verificarToken();
 </script>
 </body>
 </html>

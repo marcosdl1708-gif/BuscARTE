@@ -1,11 +1,37 @@
-# Redirects para URLs rotas que Google encontró
-/login/                 /buscARTE_login.html            301
-/login                  /buscARTE_login.html            301
-/contacto/              /buscARTE_contacto.html         301
-/contacto               /buscARTE_contacto.html         301
-/buscarte_login         /buscARTE_login.html            301
-/buscarte_contacto      /buscARTE_contacto.html         301
-/registro/              /buscARTE_registro.html         301
-/registro               /buscARTE_registro.html         301
-/musicos                /buscARTE_busqueda.html         301
-/anuncios               /buscARTE_anuncios.html         301
+# busCARTE — Netlify redirects
+# Clean URLs publicas
+/                         /index.html                         200
+/home                     /index.html                         301
+/home/                    /index.html                         301
+/inicio                   /index.html                         301
+/inicio/                  /index.html                         301
+
+/musicos                  /buscARTE_busqueda.html             301
+/musicos/                 /buscARTE_busqueda.html             301
+/anuncios                 /buscARTE_anuncios.html             301
+/anuncios/                /buscARTE_anuncios.html             301
+/generador                /buscARTE_generador.html            301
+/generador/               /buscARTE_generador.html            301
+/contacto                 /buscARTE_contacto.html             301
+/contacto/                /buscARTE_contacto.html             301
+/registro                 /buscARTE_registro.html             301
+/registro/                /buscARTE_registro.html             301
+/login                    /buscARTE_login.html                301
+/login/                   /buscARTE_login.html                301
+/terminos                 /buscARTE_terminos.html             301
+/terminos/                /buscARTE_terminos.html             301
+/privacidad               /buscARTE_privacidad.html           301
+/privacidad/              /buscARTE_privacidad.html           301
+
+# Alias viejos / errores de casing
+/buscarte_login           /buscARTE_login.html                301
+/buscarte_contacto        /buscARTE_contacto.html             301
+/buscarte_registro        /buscARTE_registro.html             301
+/buscarte_busqueda        /buscARTE_busqueda.html             301
+/buscarte_anuncios        /buscARTE_anuncios.html             301
+/buscarte_generador       /buscARTE_generador.html            301
+
+# PWA / SEO: que estos archivos se sirvan directo
+/manifest.json            /manifest.json                      200
+/sitemap.xml              /sitemap.xml                        200
+/robots.txt               /robots.txt                         200

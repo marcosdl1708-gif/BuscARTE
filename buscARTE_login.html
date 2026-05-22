@@ -149,6 +149,10 @@
   /* SUCCESS STATE */
   .success-bar { background:rgba(212,245,60,.08);border:1px solid rgba(212,245,60,.2);padding:.8rem 1rem;display:none;align-items:center;gap:.6rem;margin-bottom:1rem;font-size:.82rem;color:var(--neon); }
   .success-bar.show { display:flex; }
+  .global-msg { display:none;border:1px solid var(--gris3);background:var(--negro2);padding:.8rem 1rem;margin-bottom:1rem;font-size:.82rem;line-height:1.5;color:var(--gris); }
+  .global-msg.show { display:block; }
+  .global-msg.error { border-color:rgba(232,49,26,.35);background:rgba(232,49,26,.08);color:#ff7a6a; }
+  .global-msg.info { border-color:rgba(212,245,60,.22);background:rgba(212,245,60,.06);color:var(--neon); }
 
   @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
   @keyframes spin { to{transform:rotate(360deg)} }
@@ -236,13 +240,15 @@
   <div class="right-panel">
     <div class="form-wrap">
       <div class="form-title">Ingresá 👋</div>
-      <p class="form-sub">¿No tenés cuenta? <a href="buscARTE_registro.html" style="color:var(--neon);text-decoration:none;">Registrate gratis</a></p>
+      <p class="form-sub">Entrá para publicar, responder mensajes, guardar perfiles y gestionar tus anuncios. ¿No tenés cuenta? <a href="buscARTE_registro.html" style="color:var(--neon);text-decoration:none;">Registrate gratis</a></p>
 
       <div class="divider">con tu email</div>
 
       <div class="success-bar" id="success-bar">
         ✓ Ingreso exitoso — redirigiendo...
       </div>
+      <div class="global-msg" id="global-msg"></div>
+      <div class="global-msg info" id="return-note" style="display:none"></div>
 
       <div class="field" id="field-email">
         <label>Email</label>
@@ -257,12 +263,12 @@
         </label>
         <div class="pass-wrap">
           <input type="password" id="password" placeholder="Tu contraseña" oninput="clearError('field-pass')" onkeydown="if(event.key==='Enter') login()">
-          <button class="pass-toggle" onclick="togglePass()" id="pass-toggle-btn">👁</button>
+          <button type="button" class="pass-toggle" onclick="togglePass()" id="pass-toggle-btn" aria-label="Mostrar u ocultar contraseña">👁</button>
         </div>
         <div class="field-error">Contraseña incorrecta</div>
       </div>
 
-      <button class="btn-submit" id="btn-submit" onclick="login()">
+      <button type="button" class="btn-submit" id="btn-submit" onclick="login()">
         <span class="btn-text">Ingresar →</span>
         <div class="spinner"></div>
       </button>
@@ -273,43 +279,155 @@
 </div>
 
 <script>
-  // CURSOR
+  // CURSOR + ESTADO INICIAL
   window.addEventListener('DOMContentLoaded', function() {
-    const cursor=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
-    if (!cursor || !ring) return;
-    let mx=0,my=0,rx=0,ry=0;
-    document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
-    (function tick(){cursor.style.left=mx+'px';cursor.style.top=my+'px';rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(tick);})();
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursor-ring');
+
+    if (cursor && ring && window.matchMedia('(pointer:fine)').matches) {
+      let mx=0,my=0,rx=0,ry=0;
+      document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
+      (function tick(){
+        cursor.style.left = mx + 'px';
+        cursor.style.top = my + 'px';
+        rx += (mx-rx) * .12;
+        ry += (my-ry) * .12;
+        ring.style.left = rx + 'px';
+        ring.style.top = ry + 'px';
+        requestAnimationFrame(tick);
+      })();
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const emailParam = params.get('email');
+    const emailInput = document.getElementById('email');
+
+    if (emailParam && emailInput) emailInput.value = emailParam;
+
+    const redirect = getRedirectUrl();
+    const returnNote = document.getElementById('return-note');
+    if (returnNote && redirect && redirect !== 'buscARTE_busqueda.html') {
+      returnNote.textContent = 'Después de ingresar volvés a la página que estabas intentando abrir.';
+      returnNote.style.display = 'block';
+    }
+
+    if (emailInput && !emailInput.value) emailInput.focus();
+    else document.getElementById('password')?.focus();
+
   });
 
-  // TOGGLE CONTRASEÑA
+  // SUPABASE
+  const SUPABASE_URL = 'https://xiaanchoanxmampegoay.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68';
+
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  function safeLocalRedirect(raw) {
+    if (!raw) return '';
+    try {
+      const decoded = decodeURIComponent(raw);
+      if (/^(https?:)?\/\//i.test(decoded) || /^javascript:/i.test(decoded)) return '';
+      if (decoded.includes('://')) return '';
+      return decoded.replace(/^\/+/, '');
+    } catch(e) {
+      return '';
+    }
+  }
+
+  function getRedirectUrl() {
+    const params = new URLSearchParams(window.location.search);
+    return safeLocalRedirect(params.get('redirect') || params.get('next') || localStorage.getItem('ba_after_login') || '') || 'buscARTE_busqueda.html';
+  }
+
+  function showGlobal(message, type = 'error') {
+    const box = document.getElementById('global-msg');
+    if (!box) return;
+    box.className = `global-msg show ${type}`;
+    box.textContent = message;
+  }
+
+  function hideGlobal() {
+    const box = document.getElementById('global-msg');
+    if (!box) return;
+    box.className = 'global-msg';
+    box.textContent = '';
+  }
+
+  function setFieldError(fieldId, message) {
+    const field = document.getElementById(fieldId);
+    if (!field) return;
+    field.classList.add('error');
+    const msg = field.querySelector('.field-error');
+    if (msg && message) msg.textContent = message;
+  }
+
+  function clearError(fieldId) {
+    document.getElementById(fieldId)?.classList.remove('error');
+    hideGlobal();
+  }
+
   function togglePass() {
     const input = document.getElementById('password');
     const btn = document.getElementById('pass-toggle-btn');
-    if (input.type === 'password') { input.type = 'text'; btn.textContent = '🙈'; }
-    else { input.type = 'password'; btn.textContent = '👁'; }
+    if (!input || !btn) return;
+
+    if (input.type === 'password') {
+      input.type = 'text';
+      btn.textContent = '🙈';
+    } else {
+      input.type = 'password';
+      btn.textContent = '👁';
+    }
   }
 
-  // LIMPIAR ERROR
-  function clearError(fieldId) {
-    document.getElementById(fieldId).classList.remove('error');
+  async function parseJsonSafe(res) {
+    const text = await res.text();
+    if (!text) return null;
+    try {
+      return JSON.parse(text);
+    } catch(e) {
+      return { error: text };
+    }
   }
 
-  // SUPABASE
-  const SUPABASE_URL = 'https://xiaanchoanxmampegoay.supabase.co'
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68'
+  function normalizeUser(payload) {
+    if (Array.isArray(payload)) return payload[0] || null;
+    return payload || null;
+  }
+
+  function resetButton() {
+    const btn = document.getElementById('btn-submit');
+    if (!btn) return;
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }
 
   async function login() {
-    const email = document.getElementById('email').value.trim()
-    const pass = document.getElementById('password').value
-    let valid = true
+    const emailInput = document.getElementById('email');
+    const passInput = document.getElementById('password');
+    const email = emailInput.value.trim().toLowerCase();
+    const pass = passInput.value;
+    let valid = true;
 
-    if (!email || !email.includes('@')) { document.getElementById('field-email').classList.add('error'); valid = false; }
-    if (!pass) { document.getElementById('field-pass').classList.add('error'); valid = false; }
-    if (!valid) return
+    hideGlobal();
+    document.getElementById('field-email')?.classList.remove('error');
+    document.getElementById('field-pass')?.classList.remove('error');
 
-    const btn = document.getElementById('btn-submit')
-    btn.classList.add('loading')
+    if (!isValidEmail(email)) {
+      setFieldError('field-email', 'Ingresá un email válido.');
+      valid = false;
+    }
+    if (!pass) {
+      setFieldError('field-pass', 'Ingresá tu contraseña.');
+      valid = false;
+    }
+    if (!valid) return;
+
+    const btn = document.getElementById('btn-submit');
+    btn.classList.add('loading');
+    btn.disabled = true;
 
     try {
       const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/login_usuario`, {
@@ -320,49 +438,49 @@
           'Authorization': `Bearer ${SUPABASE_KEY}`
         },
         body: JSON.stringify({ p_email: email, p_password: pass })
-      })
-      const user = await res.json()
+      });
 
-      if (user && user.id) {
-        // Chequear si el usuario está baneado
+      const payload = await parseJsonSafe(res);
+      const user = normalizeUser(payload);
+
+      if (!res.ok) {
+        console.error('Error login_usuario:', res.status, payload);
+        setFieldError('field-pass', 'Email o contraseña incorrectos.');
+        showGlobal('No pudimos iniciar sesión. Revisá tus datos e intentá de nuevo.');
+        resetButton();
+        return;
+      }
+
+      if (user && user.id && !user.error) {
         if (user.baneado === true) {
-          document.getElementById('field-pass').classList.add('error')
-          document.querySelector('#field-pass .field-error').textContent = 'Tu cuenta fue suspendida. Contactanos si creés que es un error.'
-          btn.classList.remove('loading')
-          return
+          setFieldError('field-pass', 'Tu cuenta fue suspendida. Contactanos si creés que es un error.');
+          resetButton();
+          return;
         }
-        localStorage.setItem('ba_logged', '1')
-        localStorage.setItem('ba_name', user.nombre || email.split('@')[0])
-        localStorage.setItem('ba_email', email || '');
-        localStorage.setItem('ba_user_id', String(user.id))
-        if (!localStorage.getItem('ba_msg_last_seen')) localStorage.setItem('ba_msg_last_seen', new Date().toISOString())
-        localStorage.setItem('ba_referentes', user.referentes||'')
-        localStorage.setItem('ba_generos', user.generos||'')
-        document.getElementById('success-bar').classList.add('show')
-        setTimeout(() => { window.location.href = 'buscARTE_busqueda.html' }, 1200)
+
+        localStorage.setItem('ba_logged', '1');
+        localStorage.setItem('ba_name', user.nombre || email.split('@')[0]);
+        localStorage.setItem('ba_email', email);
+        localStorage.setItem('ba_user_id', String(user.id));
+        if (!localStorage.getItem('ba_msg_last_seen')) {
+          localStorage.setItem('ba_msg_last_seen', new Date().toISOString());
+        }
+        localStorage.setItem('ba_referentes', user.referentes || '');
+        localStorage.setItem('ba_generos', user.generos || '');
+
+        document.getElementById('success-bar')?.classList.add('show');
+        localStorage.removeItem('ba_after_login');
+
+        setTimeout(() => { window.location.href = getRedirectUrl(); }, 850);
       } else {
-        document.getElementById('field-pass').classList.add('error')
-        document.querySelector('#field-pass .field-error').textContent = user.error || 'Email o contraseña incorrectos'
-        btn.classList.remove('loading')
+        setFieldError('field-pass', user?.error || 'Email o contraseña incorrectos.');
+        resetButton();
       }
     } catch (e) {
-      alert('No se pudo conectar. Verificá tu conexión.')
-      console.error(e)
-      btn.classList.remove('loading')
+      console.error(e);
+      showGlobal('No se pudo conectar. Verificá tu conexión e intentá de nuevo.');
+      resetButton();
     }
-  }
-
-  function loginGoogle() {
-    const btn = document.querySelector('.btn-google')
-    btn.textContent = 'Conectando con Google...'
-    btn.style.color = 'var(--gris)'
-    setTimeout(() => {
-      localStorage.setItem('ba_logged', '1')
-      localStorage.setItem('ba_name', 'Usuario')
-      if (!localStorage.getItem('ba_msg_last_seen')) localStorage.setItem('ba_msg_last_seen', new Date().toISOString())
-      document.getElementById('success-bar').classList.add('show')
-      setTimeout(() => { window.location.href = 'buscARTE_busqueda.html' }, 1200)
-    }, 1400)
   }
 </script>
 </body>

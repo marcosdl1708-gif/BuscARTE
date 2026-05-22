@@ -187,6 +187,25 @@
   }
   .page-sub { color: var(--gris); font-size: 0.9rem; line-height: 1.6; }
 
+
+  /* PERFIL — ayuda visual */
+  .profile-coach {
+    margin-top:1.5rem;
+    border:1px solid rgba(212,245,60,.18);
+    background:linear-gradient(135deg, rgba(212,245,60,.055), rgba(255,255,255,.018));
+    padding:1.1rem;
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:1rem;
+    align-items:center;
+  }
+  .coach-kicker { font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--neon);margin-bottom:.35rem; }
+  .coach-text { color:var(--gris);font-size:.82rem;line-height:1.6; }
+  .coach-actions { display:flex;gap:.6rem;flex-wrap:wrap;justify-content:flex-end; }
+  .coach-link { border:1px solid var(--gris3);color:var(--gris);text-decoration:none;padding:.55rem .9rem;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;transition:all .2s;white-space:nowrap; }
+  .coach-link:hover { border-color:var(--neon);color:var(--neon); }
+  .coach-link.primary { border-color:var(--neon);color:var(--neon);background:rgba(212,245,60,.04); }
+
   /* SECCIONES */
   .config-section {
     margin-bottom: 3rem;
@@ -574,6 +593,13 @@
   }
 
 
+
+  @media (max-width:900px) {
+    .profile-coach { grid-template-columns:1fr !important;padding:1rem !important; }
+    .coach-actions { justify-content:stretch !important; }
+    .coach-link { flex:1;text-align:center; }
+  }
+
   /* ── ZONA DE PELIGRO ── */
   .danger-zone {
     margin-top:3rem; padding:1.5rem;
@@ -633,6 +659,11 @@
 
 
   /* ── REFERENTES EDIT ── */
+  .ref-panel-note {
+    border:1px solid rgba(212,245,60,.16); background:rgba(212,245,60,.035);
+    color:var(--gris); font-size:.78rem; line-height:1.55; padding:.85rem 1rem;
+    margin-bottom:1rem;
+  }
   .ref-input-wrap { position:relative; display:flex; gap:.5rem; }
   .ref-input-wrap input {
     flex:1; background:var(--negro); border:1px solid var(--gris3);
@@ -698,6 +729,44 @@
   /* ── MOBILE: avatar abre el panel del bottom nav ── */
   @media (max-width: 900px) {
     .nav-dropdown { display: none !important; }
+  }
+
+  /* CODEO perfil fixes */
+  .form-status {
+    display:none;
+    border:1px solid rgba(212,245,60,.22);
+    background:rgba(212,245,60,.07);
+    color:var(--neon);
+    padding:.85rem 1rem;
+    font-size:.82rem;
+    line-height:1.5;
+    margin-bottom:1rem;
+  }
+  .form-status.error {
+    border-color:rgba(232,49,26,.35);
+    background:rgba(232,49,26,.08);
+    color:#ff6b5b;
+  }
+  .form-status.show { display:block; }
+  .photo-upload-zone.dragover {
+    border-color:var(--neon);
+    background:rgba(212,245,60,.05);
+  }
+  .save-bar.saving .save-bar-text strong { color:var(--gris); }
+  .btn-neon:disabled, .btn-ghost:disabled { opacity:.45; pointer-events:none; }
+  @media (max-width:900px) {
+    .photo-area { flex-direction:column !important; gap:1rem !important; }
+    .photo-upload-zone { width:100% !important; }
+    .redes-grid { grid-template-columns:1fr !important; }
+    .disponibilidad-grid { grid-template-columns:1fr !important; }
+    .save-bar {
+      bottom:54px !important;
+      padding:.85rem 1rem !important;
+      flex-direction:column !important;
+      align-items:stretch !important;
+      gap:.75rem !important;
+    }
+    .save-actions { display:grid !important; grid-template-columns:1fr 1fr !important; gap:.6rem !important; }
   }
 
 </style>
@@ -775,7 +844,7 @@
 
     <div class="sidebar-section">
       <div class="sidebar-label">Cuenta</div>
-      <a href="#" class="sidebar-link"><span class="icon">⚙️</span> Configuración</a>
+      <a href="buscARTE_perfil_publico.html" class="sidebar-link" id="sidebar-public-link"><span class="icon">👁️</span> Ver perfil público</a>
       <a href="#" class="sidebar-link" onclick="logout()"><span class="icon">↩️</span> Cerrar sesión</a>
       <a href="#peligro" class="sidebar-link" style="color:#ff5555;border-left-color:#3a1111" onclick="setActive(this)"><span class="icon">🗑️</span> Eliminar cuenta</a>
     </div>
@@ -788,6 +857,17 @@
       <div class="page-label">Tu espacio en buscARTE</div>
       <div class="page-title">CONFIGURAR<br>PERFIL</div>
       <p class="page-sub">Completá tu perfil para aparecer en más búsquedas y conectar con músicos afines. Cuanto más completo, mejor el matching.</p>
+      <div class="profile-coach">
+        <div>
+          <div class="coach-kicker">Prioridad buscARTE</div>
+          <div class="coach-text">Foto, bio, instrumentos, géneros, referentes y al menos un video hacen que tu perfil sea mucho más fácil de entender y contactar.</div>
+        </div>
+        <div class="coach-actions">
+          <a href="buscARTE_perfil_publico.html" class="coach-link primary" id="quick-public-link">Ver perfil público</a>
+          <a href="#videos" class="coach-link">Sumar videos</a>
+        </div>
+      </div>
+      <div class="form-status" id="profile-status"></div>
     </div>
 
     <!-- FOTO Y BIO -->
@@ -801,9 +881,9 @@
           <span id="avatar-initials">?</span>
         </div>
         <div class="photo-upload-zone" id="upload-zone">
-          <input type="file" id="foto-input" accept="image/jpeg,image/png,image/webp" onchange="subirFoto(this)">
+          <input type="file" id="foto-input" accept="image/*" onchange="subirFoto(this)">
           <span class="upload-icon" id="upload-icon">📸</span>
-          <p class="upload-text" id="upload-text"><strong>Hacé click o arrastrá una foto</strong><br>JPG, PNG o WebP · Máximo 2MB</p>
+          <p class="upload-text" id="upload-text"><strong>Hacé click o arrastrá una foto</strong><br>JPG, PNG, WebP o foto de celular · se optimiza automáticamente</p>
         </div>
       </div>
 
@@ -868,7 +948,7 @@
         <label>Instrumento/s principal/es</label>
       </div>
       <div class="chips" id="chips-inst">
-        <button class="chip selected" onclick="toggleChip(this)">Guitarra</button>
+        <button class="chip" onclick="toggleChip(this)">Guitarra</button>
         <button class="chip" onclick="toggleChip(this)">Bajo</button>
         <button class="chip" onclick="toggleChip(this)">Batería</button>
         <button class="chip" onclick="toggleChip(this)">Teclado / Piano</button>
@@ -896,8 +976,6 @@
         <button class="chip" onclick="toggleChip(this)">Productor</button>
         <button class="chip" onclick="toggleChip(this)">Mix & Mastering</button>
         <button class="chip" onclick="toggleChip(this)">Manager</button>
-        <button class="chip" onclick="toggleChip(this)">Técnico de sonido</button>
-        <button class="chip" onclick="toggleChip(this)">Compositor / Arreglador</button>
         <button class="chip" onclick="toggleChip(this)">Otro</button>
       </div>
 
@@ -905,8 +983,8 @@
         <label>Géneros musicales</label>
       </div>
       <div class="chips" id="chips-gen">
-        <button class="chip selected" onclick="toggleChip(this)">Jazz</button>
-        <button class="chip selected" onclick="toggleChip(this)">Fusión</button>
+        <button class="chip" onclick="toggleChip(this)">Jazz</button>
+        <button class="chip" onclick="toggleChip(this)">Fusión</button>
         <button class="chip" onclick="toggleChip(this)">Rock</button>
         <button class="chip" onclick="toggleChip(this)">Rock Nacional</button>
         <button class="chip" onclick="toggleChip(this)">Metal</button>
@@ -938,7 +1016,26 @@
       </div>
 
 
-      <div class="field" style="margin-top:2rem" id="referentes-section">
+      <div style="margin-top: 1.8rem;">
+        <div class="field">
+          <label>Años de experiencia tocando</label>
+        </div>
+        <div class="exp-slider-wrap">
+          <div class="exp-labels"><span>Estoy arrancando</span><span>Toda la vida</span></div>
+          <input type="range" id="exp-slider" min="0" max="30" value="0" oninput="updateExp(this); showSaveBar()">
+          <div class="exp-value" id="exp-val">Estoy arrancando</div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- REFERENTES MUSICALES -->
+    <div class="config-section" id="referentes-section">
+      <div class="section-title"><span class="s-icon">🎵</span> Mis referentes</div>
+      <p class="section-desc">Elegí artistas o bandas que ayuden a otros músicos a entender tu universo musical. Mostramos estos referentes de forma compacta en tu perfil público.</p>
+      <div class="ref-panel-note">Tip: con 5 a 8 referentes alcanza. Si cargás demasiados, después se muestran resumidos para no llenar la página.</div>
+      <div class="field">
         <label style="font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gris);display:block;margin-bottom:.75rem">
           Artistas referentes <span style="color:var(--gris2);font-size:.7rem;font-weight:300">— los que más influyen en tu música</span>
         </label>
@@ -969,16 +1066,6 @@
         </div>
       </div>
 
-      <div style="margin-top: 1.8rem;">
-        <div class="field">
-          <label>Años de experiencia tocando</label>
-        </div>
-        <div class="exp-slider-wrap">
-          <div class="exp-labels"><span>Estoy arrancando</span><span>Toda la vida</span></div>
-          <input type="range" id="exp-slider" min="0" max="30" value="0" oninput="updateExp(this); showSaveBar()">
-          <div class="exp-value" id="exp-val">8 años</div>
-        </div>
-      </div>
     </div>
 
     <!-- DISPONIBILIDAD -->
@@ -987,7 +1074,7 @@
       <p class="section-desc">¿Para qué estás disponible? Podés elegir varias opciones.</p>
 
       <div class="disponibilidad-grid">
-        <button class="disp-card selected" onclick="toggleDisp(this)">
+        <button class="disp-card" onclick="toggleDisp(this)">
           <span class="disp-icon">🎸</span>
           <span class="disp-title">Banda estable</span>
           <span class="disp-desc">Busco o me sumo a una banda con proyección</span>
@@ -1002,7 +1089,7 @@
           <span class="disp-title">Sesiones</span>
           <span class="disp-desc">Disponible para grabar o tocar en shows</span>
         </button>
-        <button class="disp-card selected" onclick="toggleDisp(this)">
+        <button class="disp-card" onclick="toggleDisp(this)">
           <span class="disp-icon">🥁</span>
           <span class="disp-title">Zapada / Jam</span>
           <span class="disp-desc">Sin compromiso, tocar y pasarla bien</span>
@@ -1031,7 +1118,7 @@
           <span class="disp-title">En casa</span>
           <span class="disp-desc">Tengo espacio en casa para ensayar</span>
         </button>
-        <button class="disp-card selected" onclick="selectEnsayo(this)">
+        <button class="disp-card" onclick="selectEnsayo(this)">
           <span class="disp-icon">🎵</span>
           <span class="disp-title">Sala propia</span>
           <span class="disp-desc">Tengo una sala de ensayo propia</span>
@@ -1150,8 +1237,7 @@
     <div class="danger-zone" id="peligro">
       <div class="danger-zone-title">⚠ Zona de peligro</div>
       <p class="danger-zone-desc">
-        Eliminar tu cuenta borra permanentemente tu perfil, mensajes, anuncios y guardados.
-        Esta acción <strong style="color:var(--blanco)">no se puede deshacer</strong>.
+        Eliminar tu cuenta borra tu perfil y los datos asociados mediante la función segura de buscARTE. Esta acción <strong style="color:var(--blanco)">no se puede deshacer</strong>.
       </p>
       <button class="btn-danger" onclick="abrirEliminarCuenta()">Eliminar mi cuenta</button>
     </div>
@@ -1182,6 +1268,89 @@
   const SUPABASE_URL = 'https://xiaanchoanxmampegoay.supabase.co'
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68'
   const hdrs = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }
+
+  let isLoadingProfile = true;
+
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  }
+
+  function jsString(value) {
+    return String(value ?? '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, ' ');
+  }
+
+  function showStatus(message, type = 'ok') {
+    const el = document.getElementById('profile-status');
+    if (!el) return;
+    el.textContent = message;
+    el.className = 'form-status show' + (type === 'error' ? ' error' : '');
+  }
+
+  function clearStatus() {
+    const el = document.getElementById('profile-status');
+    if (!el) return;
+    el.textContent = '';
+    el.className = 'form-status';
+  }
+
+  function normalizeUrl(value) {
+    const v = String(value || '').trim();
+    if (!v) return '';
+    if (/^https?:\/\//i.test(v)) return v;
+    return 'https://' + v.replace(/^\/+/, '');
+  }
+
+  function resetFormSelections() {
+    document.querySelectorAll('.chip.selected, .disp-card.selected').forEach(el => el.classList.remove('selected'));
+  }
+
+  async function optimizeProfileImage(file) {
+    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
+    if (file.type && !file.type.startsWith('image/')) throw new Error('El archivo elegido no parece ser una imagen.');
+
+    const needsCompression = file.size > 850 * 1024 || !['image/jpeg', 'image/png', 'image/webp'].includes(file.type);
+    if (!needsCompression) return file;
+
+    const dataUrl = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(new Error('No se pudo leer la imagen.'));
+      reader.readAsDataURL(file);
+    });
+
+    const img = await new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = () => reject(new Error('No se pudo procesar esta imagen. Probá exportarla como JPG o PNG.'));
+      image.src = dataUrl;
+    });
+
+    const maxSide = 1200;
+    const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(img.width * scale));
+    canvas.height = Math.max(1, Math.round(img.height * scale));
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#0a0a0a';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.82));
+    if (!blob) throw new Error('No se pudo comprimir la imagen.');
+    return new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' });
+  }
+
+  function setUploadState(icon, text) {
+    const iconEl = document.getElementById('upload-icon');
+    const textEl = document.getElementById('upload-text');
+    if (iconEl) iconEl.textContent = icon;
+    if (textEl) textEl.innerHTML = text;
+  }
   // CURSOR
   const cursor = document.getElementById('cursor');
   const ring = document.getElementById('cursor-ring');
@@ -1208,92 +1377,101 @@
   function toggleDisp(el) { el.classList.toggle('selected'); showSaveBar(); }
 
   // BIO COUNT
-  function countBio() {
-    const len = document.getElementById('bio-text').value.length;
-    document.getElementById('bio-count').textContent = len;
-    showSaveBar();
+  function countBio(markDirty = true) {
+    const el = document.getElementById('bio-text');
+    const len = el ? el.value.length : 0;
+    const count = document.getElementById('bio-count');
+    if (count) {
+      count.textContent = len;
+      count.style.color = len > 300 ? 'var(--rojo)' : 'var(--gris2)';
+    }
+    if (markDirty) showSaveBar();
   }
 
   // EXP SLIDER
-  function updateExp(el) {
-    const v = parseInt(el.value);
+  function updateExp(el, markDirty = true) {
+    const v = parseInt(el.value || '0', 10);
     document.getElementById('exp-val').textContent = v === 0 ? 'Estoy arrancando' : v === 30 ? '30+ años' : v + (v === 1 ? ' año' : ' años');
-    showSaveBar();
+    if (markDirty) showSaveBar();
   }
 
   // SUBIR FOTO DE PERFIL
   async function subirFoto(input) {
-    if (!input.files || !input.files[0]) return
-    const file = input.files[0]
+    if (!input.files || !input.files[0]) return;
+    const originalFile = input.files[0];
 
-    // Validar tamaño
-    if (file.size > 2 * 1024 * 1024) {
-      alert('La foto no puede superar 2MB. Comprimila un poco y volvé a intentar.')
-      return
-    }
-
-    // Preview inmediato
-    const reader = new FileReader()
+    // Preview inmediato con archivo original
+    const reader = new FileReader();
     reader.onload = e => {
-      const img = document.getElementById('preview-img')
-      img.src = e.target.result
-      img.style.display = 'block'
-      document.getElementById('avatar-initials').style.display = 'none'
-    }
-    reader.readAsDataURL(file)
+      const img = document.getElementById('preview-img');
+      if (img) {
+        img.src = e.target.result;
+        img.style.display = 'block';
+      }
+      const initials = document.getElementById('avatar-initials');
+      if (initials) initials.style.display = 'none';
+    };
+    reader.readAsDataURL(originalFile);
 
-    // Subir a Supabase Storage
-    document.getElementById('upload-text').innerHTML = '<strong>Subiendo foto...</strong>'
-    document.getElementById('upload-icon').textContent = '⏳'
+    setUploadState('⏳', '<strong>Optimizando foto...</strong><br>Esto ayuda especialmente en imágenes de celular.');
 
     try {
-      const miId = localStorage.getItem('ba_user_id')
-      const ext = file.name.split('.').pop()
-      const fileName = `${miId}-${Date.now()}.${ext}`
+      const miId = localStorage.getItem('ba_user_id');
+      if (!miId) throw new Error('No se encontró tu sesión. Volvé a ingresar.');
+
+      const file = await optimizeProfileImage(originalFile);
+      if (file.size > 4 * 1024 * 1024) {
+        throw new Error('La imagen sigue siendo demasiado pesada. Probá con otra foto.');
+      }
+
+      setUploadState('⏳', '<strong>Subiendo foto...</strong>');
+
+      const safeExt = (file.type.split('/')[1] || 'jpg').replace('jpeg', 'jpg');
+      const fileName = `${miId}-${Date.now()}.${safeExt}`;
 
       const res = await fetch(
-        `${SUPABASE_URL}/storage/v1/object/fotos-perfil/${fileName}`,
+        `${SUPABASE_URL}/storage/v1/object/fotos-perfil/${encodeURIComponent(fileName)}`,
         {
           method: 'POST',
           headers: {
             'apikey': SUPABASE_KEY,
             'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Content-Type': file.type,
+            'Content-Type': file.type || 'image/jpeg',
             'x-upsert': 'true'
           },
           body: file
         }
-      )
+      );
 
-      if (res.ok || res.status === 400) {
-        // 400 puede ocurrir con x-upsert si ya existe — la foto igual se sube
-        const fotoUrl = `${SUPABASE_URL}/storage/v1/object/public/fotos-perfil/${fileName}`
-
-        // Guardar URL en el perfil
-        const miIdActual = localStorage.getItem('ba_user_id')
-        if (miIdActual) {
-          await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${miIdActual}`, {
-            method: 'PATCH',
-            headers: { ...hdrs, 'Prefer': 'return=minimal' },
-            body: JSON.stringify({ foto_url: fotoUrl })
-          })
-        }
-
-        document.getElementById('upload-text').innerHTML = '<strong>✓ Foto guardada</strong>'
-        document.getElementById('upload-icon').textContent = '✅'
-        setTimeout(() => {
-          document.getElementById('upload-text').innerHTML = '<strong>Cambiá tu foto</strong>'
-          document.getElementById('upload-icon').textContent = '📸'
-        }, 2000)
-      } else {
-        throw new Error('Error al subir: ' + res.status)
+      if (!res.ok) {
+        const errText = await res.text().catch(() => '');
+        throw new Error(`Storage respondió ${res.status}. ${errText}`);
       }
+
+      const fotoUrl = `${SUPABASE_URL}/storage/v1/object/public/fotos-perfil/${encodeURIComponent(fileName)}`;
+
+      const patchRes = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${encodeURIComponent(miId)}`, {
+        method: 'PATCH',
+        headers: { ...hdrs, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ foto_url: fotoUrl })
+      });
+
+      if (!patchRes.ok && patchRes.status !== 204) {
+        const errText = await patchRes.text().catch(() => '');
+        throw new Error(`No se pudo guardar la foto en tu perfil. ${errText}`);
+      }
+
+      setUploadState('✅', '<strong>✓ Foto guardada</strong>');
+      showStatus('Foto de perfil actualizada.');
+      setTimeout(() => {
+        setUploadState('📸', '<strong>Cambiá tu foto</strong><br>JPG, PNG, WebP o foto de celular · se optimiza automáticamente');
+      }, 2200);
     } catch(e) {
-      document.getElementById('upload-text').innerHTML = '<strong>Error al subir. Intentá de nuevo.</strong>'
-      document.getElementById('upload-icon').textContent = '❌'
-      console.error(e)
+      setUploadState('❌', `<strong>Error al subir.</strong><br>${escapeHtml(e.message || 'Intentá de nuevo.')}`);
+      showStatus('No pudimos subir la foto. Probá con otra imagen o intentá desde Chrome.', 'error');
+      console.error(e);
     }
-    showSaveBar()
+    showSaveBar();
   }
 
   // VIDEO INPUT
@@ -1306,11 +1484,13 @@
   // SAVE BAR
   let saveBarVisible = false;
   function showSaveBar() {
-    document.getElementById('save-bar').classList.add('visible');
+    if (isLoadingProfile) return;
+    document.getElementById('save-bar')?.classList.add('visible');
     saveBarVisible = true;
+    clearStatus();
   }
   function hideSaveBar() {
-    document.getElementById('save-bar').classList.remove('visible');
+    document.getElementById('save-bar')?.classList.remove('visible');
     saveBarVisible = false;
   }
 
@@ -1326,173 +1506,289 @@
 
   // CARGAR PERFIL AL ENTRAR
   async function cargarPerfil() {
-    if (!miId) return
+    if (!miId) { isLoadingProfile = false; return; }
+    isLoadingProfile = true;
+    resetFormSelections();
+
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${miId}&select=*`, { headers: hdrs })
-      const [p] = await res.json()
-      if (!p) return
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${encodeURIComponent(miId)}&select=*`, { headers: hdrs });
+      if (!res.ok) {
+        const errText = await res.text().catch(() => '');
+        throw new Error(`Supabase respondió ${res.status}. ${errText}`);
+      }
+
+      const data = await res.json();
+      const p = Array.isArray(data) ? data[0] : null;
+      if (!p) {
+        showStatus('No encontramos tu perfil. Probá volver a ingresar.', 'error');
+        return;
+      }
 
       // Llenar campos de texto
-      const nombreInput = document.getElementById('reg-nombre-perfil') || document.querySelector('#foto input[type=text]')
-      if (nombreInput) nombreInput.value = p.nombre || ''
-      const celularInput = document.getElementById('celular-input')
-      if (celularInput && p.celular) celularInput.value = p.celular
-      const bioInput = document.getElementById('bio-text')
-      if (bioInput) { bioInput.value = p.bio || ''; countBio() }
+      const nombreInput = document.getElementById('reg-nombre-perfil') || document.querySelector('#foto input[type=text]');
+      if (nombreInput) nombreInput.value = p.nombre || '';
+
+      const celularInput = document.getElementById('celular-input');
+      if (celularInput) celularInput.value = p.celular || '';
+
+      const bioInput = document.getElementById('bio-text');
+      if (bioInput) {
+        bioInput.value = p.bio || '';
+        countBio(false);
+      }
 
       // Marcar chips de instrumentos
       if (p.instrumento) {
-        const insts = p.instrumento.split(',').map(s=>s.trim())
+        const insts = p.instrumento.split(',').map(s => s.trim()).filter(Boolean);
         document.querySelectorAll('#chips-inst .chip').forEach(c => {
-          if (insts.includes(c.textContent.trim())) c.classList.add('selected')
-        })
+          if (insts.includes(c.textContent.trim())) c.classList.add('selected');
+        });
       }
+
       // Marcar chips de géneros
       if (p.generos) {
-        const gens = p.generos.split(',').map(s=>s.trim())
+        const gens = p.generos.split(',').map(s => s.trim()).filter(Boolean);
         document.querySelectorAll('#chips-gen .chip').forEach(c => {
-          if (gens.includes(c.textContent.trim())) c.classList.add('selected')
-        })
+          if (gens.includes(c.textContent.trim())) c.classList.add('selected');
+        });
       }
+
       // Experiencia
-      const expSlider = document.getElementById('exp-slider')
-      if (expSlider && p.experiencia != null) {
-        expSlider.value = p.experiencia
-        updateExp(expSlider)
+      const expSlider = document.getElementById('exp-slider');
+      if (expSlider) {
+        expSlider.value = p.experiencia != null ? p.experiencia : 0;
+        updateExp(expSlider, false);
       }
+
       // Edad
-      const edadInput = document.getElementById('edad-input')
-      if (edadInput && p.edad) edadInput.value = p.edad
+      const edadInput = document.getElementById('edad-input');
+      if (edadInput) edadInput.value = p.edad || '';
+
       // Género principal
-      const genSel = document.getElementById('genero-principal')
-      if (genSel && p.genero_principal) genSel.value = p.genero_principal
+      const genSel = document.getElementById('genero-principal');
+      if (genSel) genSel.value = p.genero_principal || '';
 
       // Videos
       if (p.videos) {
-        const links = p.videos.split(',').map(s=>s.trim())
+        const links = p.videos.split(',').map(s => s.trim()).filter(Boolean);
         document.querySelectorAll('.video-link-input').forEach((input, i) => {
-          if (links[i]) { input.value = links[i]; input.classList.add('has-link') }
-        })
+          input.value = links[i] || '';
+          input.classList.toggle('has-link', !!links[i]);
+        });
       }
+
       // Redes
       if (p.redes) {
         try {
-          const redes = JSON.parse(p.redes)
+          const redes = JSON.parse(p.redes);
           document.querySelectorAll('.red-input').forEach(input => {
-            const plat = input.closest('.red-field')?.querySelector('.red-prefix')?.textContent?.trim()
-            if (plat && redes[plat]) input.value = redes[plat]
-          })
+            const plat = input.closest('.red-field')?.querySelector('.red-prefix')?.textContent?.trim();
+            if (plat && redes[plat]) input.value = redes[plat];
+          });
         } catch(e) {}
       }
+
       // Donde ensaya
       if (p.donde_ensaya) {
         document.querySelectorAll('#ensayo .disp-card').forEach(c => {
-          if (c.querySelector('.disp-title')?.textContent?.trim() === p.donde_ensaya) {
-            c.classList.add('selected')
-          }
-        })
-      }
-      // Disponibilidad
-      if (p.disponibilidad) {
-        const disps = p.disponibilidad.split(',').map(s=>s.trim())
-        document.querySelectorAll('#disponibilidad .disp-card').forEach(c => {
-          if (disps.includes(c.querySelector('.disp-title')?.textContent?.trim())) {
-            c.classList.add('selected')
-          }
-        })
-      }
-      // Referentes
-      if (p.referentes) {
-        perfReferentes = p.referentes.split(',').map(s=>s.trim()).filter(Boolean);
-        perfRenderTags();
-        // Marcar chips de sugerencias si coinciden
-        document.querySelectorAll('#perf-chips-suger .ref-suger-chip').forEach(btn => {
-          if (perfReferentes.includes(btn.textContent.trim())) btn.classList.add('on');
+          if (c.querySelector('.disp-title')?.textContent?.trim() === p.donde_ensaya) c.classList.add('selected');
         });
       }
-      // Preview avatar
-      if (p.foto_url) {
-        const img = document.getElementById('preview-img')
-        img.src = p.foto_url
-        img.style.display = 'block'
-        document.getElementById('avatar-initials').style.display = 'none'
-      } else {
-        document.getElementById('avatar-initials').textContent = (p.nombre||'?')[0].toUpperCase()
-      }
-      const sideAvatar = document.getElementById('sidebar-avatar')
-      const sideNombre = document.getElementById('sidebar-nombre')
-      const sideMeta = document.getElementById('sidebar-meta')
-      if (sideAvatar) sideAvatar.textContent = (p.nombre||'?')[0].toUpperCase()
-      if (sideNombre) sideNombre.textContent = p.nombre || 'Tu nombre'
-      if (sideMeta) sideMeta.textContent = `${p.instrumento?.split(',')[0]||'Músico'} · ${p.ciudad||'—'}`
 
-    } catch(e) { console.error('Error cargando perfil:', e) }
+      // Disponibilidad
+      if (p.disponibilidad) {
+        const disps = p.disponibilidad.split(',').map(s => s.trim()).filter(Boolean);
+        document.querySelectorAll('#disponibilidad .disp-card').forEach(c => {
+          if (disps.includes(c.querySelector('.disp-title')?.textContent?.trim())) c.classList.add('selected');
+        });
+      }
+
+      // Referentes
+      perfReferentes = p.referentes ? p.referentes.split(',').map(s => s.trim()).filter(Boolean) : [];
+      perfRenderTags(false);
+      document.querySelectorAll('#perf-chips-suger .ref-suger-chip').forEach(btn => {
+        btn.classList.toggle('on', perfReferentes.includes(btn.textContent.trim()));
+      });
+
+      // Preview avatar
+      const img = document.getElementById('preview-img');
+      const initials = document.getElementById('avatar-initials');
+      if (p.foto_url && img) {
+        img.src = p.foto_url;
+        img.style.display = 'block';
+        if (initials) initials.style.display = 'none';
+      } else if (initials) {
+        initials.textContent = (p.nombre || '?').slice(0,1).toUpperCase();
+        initials.style.display = 'inline';
+      }
+
+      const sideAvatar = document.getElementById('sidebar-avatar');
+      const sideNombre = document.getElementById('sidebar-nombre');
+      const sideMeta = document.getElementById('sidebar-meta');
+      if (sideAvatar) sideAvatar.textContent = (p.nombre || '?').slice(0,1).toUpperCase();
+      if (sideNombre) sideNombre.textContent = p.nombre || 'Tu nombre';
+      if (sideMeta) sideMeta.textContent = `${(p.instrumento || 'Músico').split(',')[0]} · ${p.ciudad || '—'}`;
+
+      actualizarCompletitud(p);
+      hideSaveBar();
+    } catch(e) {
+      showStatus('Error cargando tu perfil. Revisá la conexión e intentá de nuevo.', 'error');
+      console.error('Error cargando perfil:', e);
+    } finally {
+      isLoadingProfile = false;
+    }
+  }
+
+  function actualizarCompletitud(p = {}) {
+    const checks = [
+      !!p.nombre,
+      !!p.foto_url,
+      !!p.bio,
+      !!p.instrumento,
+      !!p.generos,
+      !!p.disponibilidad,
+      !!p.referentes,
+      !!p.videos,
+      !!p.redes
+    ];
+    const pct = Math.round((checks.filter(Boolean).length / checks.length) * 100);
+    const fill = document.getElementById('complete-fill');
+    const text = document.querySelector('.preview-complete span:first-child');
+    if (fill) fill.style.width = pct + '%';
+    if (text) text.textContent = pct + '%';
   }
 
   // GUARDAR PERFIL
   async function saveProfile() {
-    const miIdActual = localStorage.getItem('ba_user_id')
-    if (!miIdActual) { alert('Necesitás estar logueado para guardar.'); return }
-    const btn = document.querySelector('.save-bar .btn-neon')
-    btn.textContent = 'Guardando...'
-    btn.disabled = true
+    const miIdActual = localStorage.getItem('ba_user_id');
+    if (!miIdActual) { showStatus('Necesitás estar logueado para guardar.', 'error'); return; }
+
+    const btn = document.querySelector('.save-bar .btn-neon');
+    const saveBar = document.getElementById('save-bar');
+    if (btn) {
+      btn.textContent = 'Guardando...';
+      btn.disabled = true;
+    }
+    saveBar?.classList.add('saving');
 
     // Recolectar datos
-    const nombre = (document.getElementById('reg-nombre-perfil') || document.querySelector('#foto input[type=text]'))?.value?.trim()
-    const bio = document.getElementById('bio-text')?.value?.trim()
-    const instrumento = [...document.querySelectorAll('#chips-inst .chip.selected')].map(c=>c.textContent.trim()).join(', ')
-    const generos = [...document.querySelectorAll('#chips-gen .chip.selected')].map(c=>c.textContent.trim()).join(', ')
-    const disponibilidad = [...document.querySelectorAll('#disponibilidad .disp-card.selected')].map(c=>c.querySelector('.disp-title')?.textContent?.trim()).join(', ')
-    const donde_ensaya = document.querySelector('#ensayo .disp-card.selected .disp-title')?.textContent?.trim() || ''
-    const videos = [...document.querySelectorAll('.video-link-input')].map(i=>i.value.trim()).filter(Boolean).join(', ')
+    const nombre = (document.getElementById('reg-nombre-perfil') || document.querySelector('#foto input[type=text]'))?.value?.trim() || '';
+    const bio = document.getElementById('bio-text')?.value?.trim() || '';
+    const instrumento = [...document.querySelectorAll('#chips-inst .chip.selected')].map(c => c.textContent.trim()).join(', ');
+    const generos = [...document.querySelectorAll('#chips-gen .chip.selected')].map(c => c.textContent.trim()).join(', ');
+    const disponibilidad = [...document.querySelectorAll('#disponibilidad .disp-card.selected')].map(c => c.querySelector('.disp-title')?.textContent?.trim()).filter(Boolean).join(', ');
+    const donde_ensaya = document.querySelector('#ensayo .disp-card.selected .disp-title')?.textContent?.trim() || '';
+    const videos = [...document.querySelectorAll('.video-link-input')].map(i => normalizeUrl(i.value)).filter(Boolean).join(', ');
+
+    if (!nombre) {
+      showStatus('El nombre no puede quedar vacío.', 'error');
+      if (btn) { btn.textContent = 'Guardar cambios'; btn.disabled = false; }
+      saveBar?.classList.remove('saving');
+      return;
+    }
+
+    if (bio.length > 300) {
+      showStatus('La bio supera los 300 caracteres. Recortala un poco antes de guardar.', 'error');
+      if (btn) { btn.textContent = 'Guardar cambios'; btn.disabled = false; }
+      saveBar?.classList.remove('saving');
+      return;
+    }
 
     // Redes como JSON
-    const redesObj = {}
+    const redesObj = {};
     document.querySelectorAll('.red-field').forEach(field => {
-      const plat = field.querySelector('.red-prefix')?.textContent?.trim()
-      const val = field.querySelector('.red-input')?.value?.trim()
-      if (plat && val) redesObj[plat] = val
-    })
+      const plat = field.querySelector('.red-prefix')?.textContent?.trim();
+      const input = field.querySelector('.red-input');
+      const val = input?.type === 'url' || input?.placeholder?.includes('http') || input?.placeholder?.includes('spotify')
+        ? normalizeUrl(input?.value)
+        : input?.value?.trim();
+      if (plat && val) redesObj[plat] = val;
+    });
 
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${miIdActual}`, {
+      const payload = {
+        nombre,
+        bio,
+        instrumento,
+        generos,
+        disponibilidad,
+        donde_ensaya,
+        videos,
+        redes: JSON.stringify(redesObj),
+        celular: document.getElementById('celular-input')?.value?.trim() || null,
+        referentes: perfReferentes.join(', '),
+        experiencia: parseInt(document.getElementById('exp-slider')?.value || 0, 10),
+        edad: parseInt(document.getElementById('edad-input')?.value || 0, 10) || null,
+        genero_principal: document.getElementById('genero-principal')?.value || null
+      };
+
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${encodeURIComponent(miIdActual)}`, {
         method: 'PATCH',
         headers: { ...hdrs, 'Prefer': 'return=minimal' },
-        body: JSON.stringify({
-            nombre, bio, instrumento, generos, disponibilidad, donde_ensaya, videos,
-            redes: JSON.stringify(redesObj),
-            celular: document.getElementById('celular-input')?.value?.trim() || null,
-            referentes: perfReferentes.join(', '),
-            experiencia: parseInt(document.getElementById('exp-slider')?.value || 0),
-            edad: parseInt(document.getElementById('edad-input')?.value || 0) || null,
-            genero_principal: document.getElementById('genero-principal')?.value || null
-          })
-      })
+        body: JSON.stringify(payload)
+      });
 
       if (res.ok || res.status === 204) {
-        if (nombre) localStorage.setItem('ba_name', nombre)
-        btn.textContent = '✓ Guardado'
-        btn.style.background = '#a8c832'
-        setTimeout(() => { btn.textContent = 'Guardar cambios'; btn.style.background = ''; btn.disabled = false; hideSaveBar() }, 1800)
+        localStorage.setItem('ba_name', nombre);
+        localStorage.setItem('ba_referentes', payload.referentes || '');
+        localStorage.setItem('ba_generos', generos || '');
+        showStatus('Perfil guardado correctamente.');
+        actualizarCompletitud({ ...payload, redes: payload.redes });
+        if (btn) {
+          btn.textContent = '✓ Guardado';
+          btn.style.background = '#a8c832';
+        }
+        setTimeout(() => {
+          if (btn) {
+            btn.textContent = 'Guardar cambios';
+            btn.style.background = '';
+            btn.disabled = false;
+          }
+          saveBar?.classList.remove('saving');
+          hideSaveBar();
+        }, 1400);
       } else {
-        const errText = await res.text()
-        console.error('Save error:', res.status, errText)
-        alert('Error al guardar. Intentá de nuevo.')
-        btn.textContent = 'Guardar cambios'
-        btn.disabled = false
+        const errText = await res.text().catch(() => '');
+        console.error('Save error:', res.status, errText);
+        showStatus('Error al guardar. Intentá de nuevo.', 'error');
+        if (btn) { btn.textContent = 'Guardar cambios'; btn.disabled = false; }
+        saveBar?.classList.remove('saving');
       }
     } catch(e) {
-      alert('No se pudo conectar. Verificá tu conexión.')
-      console.error(e)
-      btn.textContent = 'Guardar cambios'
-      btn.disabled = false
+      showStatus('No se pudo conectar. Verificá tu conexión.', 'error');
+      console.error(e);
+      if (btn) { btn.textContent = 'Guardar cambios'; btn.disabled = false; }
+      saveBar?.classList.remove('saving');
     }
   }
 
   // Cargar al entrar
-  cargarPerfil()
+  cargarPerfil();
+
+  // Drag & drop de foto en desktop
+  (function setupPhotoDrop(){
+    const zone = document.getElementById('upload-zone');
+    const input = document.getElementById('foto-input');
+    if (!zone || !input) return;
+    ['dragenter','dragover'].forEach(evt => zone.addEventListener(evt, e => {
+      e.preventDefault();
+      zone.classList.add('dragover');
+    }));
+    ['dragleave','drop'].forEach(evt => zone.addEventListener(evt, e => {
+      e.preventDefault();
+      zone.classList.remove('dragover');
+    }));
+    zone.addEventListener('drop', e => {
+      const file = e.dataTransfer?.files?.[0];
+      if (!file) return;
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      input.files = dt.files;
+      subirFoto(input);
+    });
+  })();
   window.addEventListener('scroll', () => {
-    const sections = ['foto','musica','disponibilidad','ensayo','redes','videos'];
+    const sections = ['foto','musica','referentes-section','disponibilidad','ensayo','redes','videos','peligro'];
     let current = 'foto';
     sections.forEach(id => {
       const el = document.getElementById(id);
@@ -1542,6 +1838,10 @@
       cargarBadgeMensajes(uid);
       const miPerfilLink=document.querySelector('.nav-dropdown-item[href*="perfil_publico"]');
       if(miPerfilLink && uid) miPerfilLink.href='buscARTE_perfil_publico.html?id='+uid;
+      const quickPublicLink=document.getElementById('quick-public-link');
+      if(quickPublicLink && uid) quickPublicLink.href='buscARTE_perfil_publico.html?id='+uid;
+      const sidebarPublicLink=document.getElementById('sidebar-public-link');
+      if(sidebarPublicLink && uid) sidebarPublicLink.href='buscARTE_perfil_publico.html?id='+uid;
     }
   })();
   function toggleUserMenu(e){if(e)e.stopPropagation();const w=document.getElementById('nav-avatar-btn');const d=document.getElementById('nav-dropdown');if(w)w.classList.toggle('open');if(d)d.classList.toggle('open');}
@@ -1551,7 +1851,7 @@
       if(d)d.classList.remove('open');if(w)w.classList.remove('open');
     }
   });
-  function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');window.location.href='index.html';}
+  function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');localStorage.removeItem('ba_email');window.location.href='index.html';}
 
 </script>
 <div class="mbn-overlay" id="mbn-overlay" onclick="closeMbnPanel()"></div>
@@ -1602,6 +1902,7 @@ function mbnLogout(){
   localStorage.removeItem('ba_logged');
   localStorage.removeItem('ba_name');
   localStorage.removeItem('ba_user_id');
+  localStorage.removeItem('ba_email');
   window.location.href='index.html';
 }
 </script>
@@ -1612,8 +1913,8 @@ function mbnLogout(){
       <div class="delete-modal-icon">🗑️</div>
       <div class="delete-modal-title">Eliminar cuenta</div>
       <div class="delete-modal-sub">
-        Esta acción es <strong>irreversible</strong>. Se borrarán tu perfil, mensajes, anuncios y favoritos.<br><br>
-        Para confirmar, escribí tu email:
+        Esta acción es <strong>irreversible</strong>. Se ejecutará la función segura <code style="color:var(--neon)">eliminar_cuenta</code> y se cerrará tu sesión.<br><br>
+        Para confirmar, escribí el email de tu cuenta:
       </div>
       <label class="delete-confirm-label">Tu email</label>
       <input type="email" class="delete-confirm-input" id="delete-email-input"
@@ -1639,16 +1940,98 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+  // ── ELIMINACIÓN DE CUENTA: RPC segura en Supabase ──
+  function abrirEliminarCuenta() {
+    const overlay = document.getElementById('delete-overlay');
+    if (!overlay) return;
+    const email = localStorage.getItem('ba_email') || '';
+    const input = document.getElementById('delete-email-input');
+    if (input) input.value = email;
+    overlay.classList.add('open');
+    validarDeleteInput();
+    setTimeout(() => input?.focus(), 80);
+  }
+
+  function cerrarEliminar() {
+    const overlay = document.getElementById('delete-overlay');
+    if (overlay) overlay.classList.remove('open');
+    const form = document.getElementById('delete-form');
+    const progress = document.getElementById('delete-progress');
+    const btn = document.getElementById('btn-delete-confirm');
+    if (form) form.style.display = 'block';
+    if (progress) {
+      progress.style.display = 'none';
+      progress.textContent = '⏳ Eliminando tu cuenta...';
+    }
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Eliminar para siempre';
+    }
+  }
+
+  function validarDeleteInput() {
+    const expected = (localStorage.getItem('ba_email') || '').trim().toLowerCase();
+    const value = (document.getElementById('delete-email-input')?.value || '').trim().toLowerCase();
+    const btn = document.getElementById('btn-delete-confirm');
+    if (!btn) return;
+    // Si tenemos email guardado, exigimos coincidencia exacta. Si no, exigimos al menos formato de email.
+    btn.disabled = expected ? value !== expected : !/^\S+@\S+\.\S+$/.test(value);
+  }
+
+  async function eliminarCuenta() {
+    const miIdActual = localStorage.getItem('ba_user_id');
+    if (!miIdActual || Number.isNaN(Number(miIdActual))) {
+      alert('No se pudo identificar tu usuario. Volvé a iniciar sesión.');
+      return;
+    }
+
+    const form = document.getElementById('delete-form');
+    const progress = document.getElementById('delete-progress');
+    const btn = document.getElementById('btn-delete-confirm');
+    if (btn) btn.disabled = true;
+    if (form) form.style.display = 'none';
+    if (progress) {
+      progress.style.display = 'block';
+      progress.textContent = '⏳ Eliminando tu cuenta...';
+    }
+
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/eliminar_cuenta`, {
+        method: 'POST',
+        headers: { ...hdrs, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ p_user_id: parseInt(miIdActual, 10) })
+      });
+
+      if (!res.ok) {
+        const errText = await res.text().catch(() => '');
+        console.error('Error RPC eliminar_cuenta:', res.status, errText);
+        throw new Error('No se pudo eliminar la cuenta.');
+      }
+
+      if (progress) progress.textContent = '✓ Cuenta eliminada. Cerrando sesión...';
+
+      ['ba_logged','ba_name','ba_email','ba_user_id','ba_referentes','ba_generos','ba_msg_last_seen'].forEach(k => localStorage.removeItem(k));
+      setTimeout(() => { window.location.href = 'index.html'; }, 1200);
+    } catch(e) {
+      console.error(e);
+      if (progress) {
+        progress.innerHTML = 'No se pudo eliminar automáticamente. Intentá de nuevo o escribinos desde Contacto.';
+      }
+      if (form) setTimeout(() => { form.style.display = 'block'; if(progress) progress.style.display = 'none'; }, 2200);
+      if (btn) btn.disabled = false;
+    }
+  }
+
   // ── REFERENTES EN PERFIL ──
   let perfReferentes = [];
 
-  function perfRenderTags() {
+  function perfRenderTags(markDirty = true) {
     const container = document.getElementById('perf-artist-tags');
     if (!container) return;
     container.innerHTML = perfReferentes.map(a =>
-      `<span class="ref-tag">${a}<button class="ref-tag-remove" onclick="perfRemove('${a.replace(/'/g,"\\'")}')">×</button></span>`
+      `<span class="ref-tag">${escapeHtml(a)}<button class="ref-tag-remove" onclick="perfRemove('${jsString(a)}')">×</button></span>`
     ).join('');
-    showSaveBar();
+    if (markDirty) showSaveBar();
   }
 
   function perfAddArtist() {
@@ -1683,19 +2066,24 @@ if ('serviceWorker' in navigator) {
 
   async function perfBuscarArtistas(q) {
     const dropdown = document.getElementById('perf-artist-dropdown');
-    if (!q || q.length < 2) { dropdown.style.display = 'none'; return; }
+    if (!dropdown) return;
+    const clean = q.trim();
+    if (!clean || clean.length < 2) { dropdown.style.display = 'none'; return; }
     try {
       const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/artistas_sugeridos?nombre=ilike.*${encodeURIComponent(q)}*&order=veces.desc&limit=8`,
+        `${SUPABASE_URL}/rest/v1/artistas_sugeridos?nombre=ilike.*${encodeURIComponent(clean)}*&order=veces.desc&limit=8`,
         { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
       );
+      if (!res.ok) throw new Error('No se pudieron cargar sugerencias.');
       const suger = await res.json();
-      if (!suger.length) { dropdown.style.display = 'none'; return; }
+      if (!Array.isArray(suger) || !suger.length) { dropdown.style.display = 'none'; return; }
       dropdown.innerHTML = suger.map(s =>
-        `<div class="ref-dropdown-item" data-nombre="${s.nombre}" onclick="perfAddByName('${s.nombre.replace(/'/g,"\\'")}',null);document.getElementById('perf-artist-input').value='';document.getElementById('perf-artist-dropdown').style.display='none'">${s.nombre}</div>`
+        `<div class="ref-dropdown-item" onclick="perfAddByName('${jsString(s.nombre)}',null);document.getElementById('perf-artist-input').value='';document.getElementById('perf-artist-dropdown').style.display='none'">${escapeHtml(s.nombre)}</div>`
       ).join('');
       dropdown.style.display = 'block';
-    } catch(e) { dropdown.style.display = 'none'; }
+    } catch(e) {
+      dropdown.style.display = 'none';
+    }
   }
 
   function perfHandleKey(e) {

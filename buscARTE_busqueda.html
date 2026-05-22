@@ -342,6 +342,198 @@
   }
 
 
+
+
+
+
+  /* CODEO VISUAL V2: menos ruido, más mapa mental de la plataforma */
+  .search-intro {
+    border:1px solid #1c1c1c;
+    background:linear-gradient(135deg, rgba(212,245,60,.055), rgba(255,255,255,.018) 38%, rgba(8,8,8,.65));
+    padding:1.35rem 1.45rem 1.2rem;
+    margin-bottom:1.3rem;
+    position:relative;
+    overflow:hidden;
+  }
+  .search-intro::after {
+    content:'MUSICOS';
+    position:absolute;
+    right:-.35rem;
+    bottom:-1.1rem;
+    font-family:var(--font-display);
+    font-size:4.7rem;
+    line-height:1;
+    color:transparent;
+    -webkit-text-stroke:1px rgba(255,255,255,.045);
+    pointer-events:none;
+  }
+  .intro-kicker {
+    color:var(--neon);
+    font-size:.64rem;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    margin-bottom:.55rem;
+  }
+  .intro-row { display:flex;align-items:flex-end;justify-content:space-between;gap:1.2rem;position:relative;z-index:1; }
+  .intro-title {
+    font-family:var(--font-display);
+    font-size:clamp(1.75rem, 3vw, 3.15rem);
+    letter-spacing:-.03em;
+    line-height:.92;
+    margin-bottom:.55rem;
+  }
+  .intro-title span { color:var(--neon); }
+  .intro-copy {
+    color:var(--gris);
+    font-size:.88rem;
+    line-height:1.6;
+    max-width:680px;
+  }
+  .intro-copy strong { color:var(--blanco);font-weight:400; }
+  .intro-cta {
+    border:1px solid rgba(212,245,60,.5);
+    color:var(--neon);
+    text-decoration:none;
+    padding:.72rem 1rem;
+    font-size:.72rem;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    white-space:nowrap;
+    transition:background .18s,border-color .18s;
+  }
+  .intro-cta:hover { background:rgba(212,245,60,.07);border-color:var(--neon); }
+  .section-switcher {
+    display:grid;
+    grid-template-columns:repeat(5, minmax(0,1fr));
+    gap:1px;
+    background:#222;
+    border:1px solid #222;
+    margin-top:1.1rem;
+    position:relative;
+    z-index:1;
+  }
+  .section-tab {
+    background:rgba(0,0,0,.48);
+    color:var(--gris);
+    text-decoration:none;
+    padding:.75rem .65rem;
+    font-size:.69rem;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:.42rem;
+    transition:background .18s,color .18s;
+    text-align:center;
+  }
+  .section-tab:hover { color:var(--blanco);background:#151515; }
+  .section-tab.active { background:var(--neon);color:var(--negro);font-weight:700; }
+  .section-tab small { display:block;font-size:.56rem;opacity:.72;letter-spacing:.05em;text-transform:none;font-weight:400; }
+  .results-header.compact {
+    margin-bottom:.95rem;
+    padding-bottom:1rem;
+  }
+  .results-label {
+    font-size:.62rem;
+    color:var(--gris2);
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    margin-bottom:.25rem;
+  }
+  .filter-hint {
+    display:block;
+    font-size:.66rem;
+    color:var(--gris2);
+    line-height:1.45;
+    margin-top:.55rem;
+  }
+  .filter-group.long-filter .filter-chips {
+    max-height:148px;
+    overflow-y:auto;
+    padding-right:.25rem;
+  }
+  .filter-group.long-filter .filter-chips::-webkit-scrollbar { width:3px; }
+  .filter-group.long-filter .filter-chips::-webkit-scrollbar-thumb { background:#333; }
+  .ad-bridge-card {
+    grid-column:1/-1;
+    border:1px solid rgba(212,245,60,.22);
+    background:linear-gradient(120deg, rgba(212,245,60,.09), rgba(255,255,255,.025));
+    padding:1.25rem 1.35rem;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:1rem;
+    min-width:0;
+  }
+  .ad-bridge-kicker {
+    color:var(--neon);
+    font-size:.62rem;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    margin-bottom:.35rem;
+  }
+  .ad-bridge-title {
+    font-family:var(--font-display);
+    font-size:1.25rem;
+    letter-spacing:-.02em;
+    margin-bottom:.25rem;
+  }
+  .ad-bridge-copy { color:var(--gris);font-size:.82rem;line-height:1.55; }
+  .ad-bridge-actions { display:flex;gap:.55rem;flex-shrink:0; }
+  .ad-bridge-btn {
+    text-decoration:none;
+    border:1px solid var(--gris3);
+    color:var(--blanco);
+    padding:.55rem .9rem;
+    font-size:.68rem;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    white-space:nowrap;
+  }
+  .ad-bridge-btn.primary { background:var(--neon);border-color:var(--neon);color:var(--negro);font-weight:700; }
+  .empty-actions {
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:.7rem;
+    margin-top:1.35rem;
+  }
+  .empty-action {
+    border:1px solid var(--gris3);
+    background:transparent;
+    color:var(--blanco);
+    text-decoration:none;
+    padding:.68rem 1rem;
+    font-family:var(--font-body);
+    font-size:.72rem;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    cursor:none;
+  }
+  .empty-action.primary { background:var(--neon);border-color:var(--neon);color:var(--negro);font-weight:700; }
+  .list-view .ad-bridge-card { display:flex !important; }
+  @media (max-width:900px) {
+    .search-intro { padding:1rem;margin-bottom:1rem; }
+    .search-intro::after { display:none; }
+    .intro-row { flex-direction:column;align-items:flex-start;gap:.9rem; }
+    .intro-title { font-size:1.65rem; }
+    .intro-copy { font-size:.82rem; }
+    .intro-cta { width:100%;text-align:center; }
+    .section-switcher { grid-template-columns:1fr 1fr; }
+    .section-tab { justify-content:flex-start;font-size:.66rem;padding:.7rem .72rem; }
+    .section-tab.active { grid-column:1/-1; }
+    .ad-bridge-card { flex-direction:column;align-items:flex-start;padding:1rem; }
+    .ad-bridge-actions { width:100%;display:grid;grid-template-columns:1fr; }
+    .ad-bridge-btn { text-align:center; }
+    .empty-action { cursor:auto; }
+  }
+
+  /* CODEO: mejoras buscador */
+  .filters-panel { scroll-behavior:smooth; }
+  .card-cta:focus-visible, .fchip:focus-visible, .filter-clear:focus-visible, .mobile-filter-btn:focus-visible, .btn-load:focus-visible { outline:2px solid var(--neon); outline-offset:2px; }
+  .musician-card img { display:block; }
+
   /* ── MOBILE: dropdown del avatar accesible ── */
   @media (max-width: 900px) {
     .nav-avatar-wrap { cursor: auto !important; -webkit-tap-highlight-color: transparent; }
@@ -413,7 +605,7 @@
       <div class="filter-title">Filtros</div>
       <button class="filter-clear" onclick="clearFilters()">Limpiar</button>
     </div>
-    <div class="filter-group">
+    <div class="filter-group long-filter">
       <span class="filter-group-label">Instrumento</span>
       <div class="filter-chips">
         <button class="fchip" onclick="toggleFilter(this)">Guitarra</button>
@@ -446,9 +638,10 @@
         <button class="fchip" onclick="toggleFilter(this)">Manager</button>
         <button class="fchip" onclick="toggleFilter(this)">Otro</button>
       </div>
+      <span class="filter-hint">Elegí uno o varios. La lista queda compacta para no tapar todo el buscador.</span>
     </div>
     <div class="filter-divider"></div>
-    <div class="filter-group">
+    <div class="filter-group long-filter">
       <span class="filter-group-label">Género</span>
       <div class="filter-chips">
         <button class="fchip" onclick="toggleFilter(this)">Rock</button>
@@ -481,13 +674,14 @@
         <button class="fchip" onclick="toggleFilter(this)">Indie Dance</button>
         <button class="fchip" onclick="toggleFilter(this)">Otro</button>
       </div>
+      <span class="filter-hint">También podés escribir directo arriba: “baterista jazz palermo”.</span>
     </div>
     <div class="filter-divider"></div>
     <div class="filter-group">
       <span class="filter-group-label">Ubicación</span>
       <select id="ciudad-select" style="margin-bottom:.6rem" onchange="setCiudad(this.value)">
-        <option>Todo el país</option>
-        <option selected>Buenos Aires (CABA)</option>
+        <option selected>Todo el país</option>
+        <option>Buenos Aires (CABA)</option>
         <option>Gran Buenos Aires</option>
         <option>Rosario</option>
         <option>Córdoba</option>
@@ -513,17 +707,8 @@
     <div class="filter-divider"></div>
     <div class="filter-group">
       <span class="filter-group-label">Artista referente</span>
-      <input type="text" id="referente-input" placeholder="Ej: Linkin Park, Soda..." oninput="musicosOffset=0;cargarMusicos(false)">
+      <input type="text" id="referente-input" placeholder="Ej: Linkin Park, Soda..." oninput="setReferente(this.value)">
       <div style="font-size:.67rem;color:var(--gris2);margin-top:.4rem;line-height:1.5;">Músicos que escuchan lo mismo que vos</div>
-    </div>
-    <div class="filter-divider"></div>
-    <div class="filter-group">
-      <span class="filter-group-label">Extras</span>
-      <div class="filter-chips">
-        <button class="fchip" onclick="toggleFilter(this)">Con videos</button>
-        <button class="fchip" onclick="toggleFilter(this)">Online ahora</button>
-        <button class="fchip" onclick="toggleFilter(this)">Con local</button>
-      </div>
     </div>
       <div class="filter-group mobile-show-results-wrap">
       <button class="mobile-show-results" onclick="closeMobileFilters()">Ver resultados →</button>
@@ -531,16 +716,35 @@
   </aside>
 
   <div class="results-area">
-    <div class="results-header">
+    <section class="search-intro" aria-label="Explorar buscARTE">
+      <div class="intro-kicker">Explorá sin registrarte</div>
+      <div class="intro-row">
+        <div>
+          <h1 class="intro-title">Encontrá <span>músicos</span><br>y movete por la escena.</h1>
+          <p class="intro-copy">Buscá perfiles por instrumento, género, zona o referentes. Y si no aparece lo que necesitás, también podés ir directo a <strong>anuncios, jams, compra/venta o clases</strong>.</p>
+        </div>
+        <a class="intro-cta" href="buscARTE_anuncios.html">Ver anuncios →</a>
+      </div>
+      <div class="section-switcher">
+        <a class="section-tab active" href="buscARTE_busqueda.html">🎵 <span>Músicos</span></a>
+        <a class="section-tab" href="buscARTE_anuncios.html">📋 <span>Anuncios</span></a>
+        <a class="section-tab" href="buscARTE_anuncios.html?tipo=jam">🥁 <span>Jams</span></a>
+        <a class="section-tab" href="buscARTE_anuncios.html?tipo=vendo">🎛️ <span>Compra/Venta</span></a>
+        <a class="section-tab" href="buscARTE_anuncios.html?tipo=clases">🎓 <span>Clases</span></a>
+      </div>
+    </section>
+
+    <div class="results-header compact">
       <div>
-        <div class="results-count"><span id="result-num">247</span> músicos</div>
+        <div class="results-label">Resultados</div>
+        <div class="results-count"><span id="result-num">—</span> músicos</div>
         <div class="results-sub" id="result-sub">todos los músicos</div>
       </div>
       <div class="results-controls">
-        <select class="sort-select">
-          <option>Mayor afinidad</option>
-          <option>Más recientes</option>
-          <option>Más activos</option>
+        <select class="sort-select" id="sort-select">
+          <option value="afinidad">Mayor afinidad</option>
+          <option value="recientes">Más recientes</option>
+          <option value="nombre">Nombre A-Z</option>
         </select>
         <div class="view-toggle">
           <button class="view-btn active" id="btn-grid" onclick="setView('grid')" title="Grilla">⊞</button>
@@ -568,336 +772,526 @@
   // Página pública — sin protección de login
   // CURSOR - esperar DOM
   window.addEventListener('DOMContentLoaded', function() {
-    const cursor=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursor-ring');
     if (!cursor || !ring) return;
-    let mx=0,my=0,rx=0,ry=0;
-    document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
-    (function tick(){cursor.style.left=mx+'px';cursor.style.top=my+'px';rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(tick);})();
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    (function tick() {
+      cursor.style.left = mx + 'px';
+      cursor.style.top = my + 'px';
+      rx += (mx - rx) * .12;
+      ry += (my - ry) * .12;
+      ring.style.left = rx + 'px';
+      ring.style.top = ry + 'px';
+      requestAnimationFrame(tick);
+    })();
   });
 
   // SUPABASE
-  const SUPABASE_URL = 'https://xiaanchoanxmampegoay.supabase.co'
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68'
+  const SUPABASE_URL = 'https://xiaanchoanxmampegoay.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68';
+  const SB_HEADERS = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` };
 
-  const COLORES = ['#0d2010','#2a0a05','#050d2a','#1a0d2a','#2a1a05','#0d1a2a']
-  const TEXTO = ['var(--neon)','#ff6b5b','#5b9fff','#c45bff','#ffaa5b','#5bd4ff']
+  const COLORES = ['#0d2010', '#2a0a05', '#050d2a', '#1a0d2a', '#2a1a05', '#0d1a2a'];
+  const TEXTO = ['var(--neon)', '#ff6b5b', '#5b9fff', '#c45bff', '#ffaa5b', '#5bd4ff'];
 
-  let offset = 0
-  const PER_PAGE = 9
-  let activeFilters = { instrumentos: [], generos: [], ciudad: '', busca: [], referente: '' }
+  const PER_PAGE = 9;
+  const MAX_FETCH = 500;
+  let offset = 0;
+  let perfilesCache = null;
+  let activeFilters = { instrumentos: [], generos: [], ciudad: '', barrio: '', busca: [], referente: '' };
+
+  const INSTR_LABELS = ['Guitarra', 'Bajo', 'Batería', 'Teclado', 'Voz / Canto', 'Saxo', 'Violín', 'Cello', 'Trompeta', 'Flauta', 'Percusión', 'DJ/Prod.', 'Bandoneón', 'Charango', 'Arpa', 'Acordeón', 'Contrabajo', 'Clarinete', 'Cajón', 'Bombo leguero', 'Quena / Zampoña', 'Ukelele', 'Controlador MIDI', 'Técnico de sonido', 'Compositor / Arreglador', 'Productor', 'Mix & Mastering', 'Manager', 'Otro'];
+  const BUSCA_LABELS = ['Banda', 'Sesiones', 'Zapada', 'Proyecto', 'Clases'];
+
+  const INSTR_MAP = {
+    'guitarra': 'Guitarra', 'guitarrista': 'Guitarra', 'guitarrero': 'Guitarra',
+    'bajo': 'Bajo', 'bajista': 'Bajo',
+    'bateria': 'Batería', 'baterista': 'Batería', 'drums': 'Batería',
+    'teclado': 'Teclado / Piano', 'piano': 'Teclado / Piano', 'pianista': 'Teclado / Piano', 'tecladista': 'Teclado / Piano',
+    'voz': 'Voz / Canto', 'canto': 'Voz / Canto', 'cantante': 'Voz / Canto', 'vocalista': 'Voz / Canto', 'cantor': 'Voz / Canto',
+    'violin': 'Violín', 'violinista': 'Violín',
+    'saxo': 'Saxo', 'saxofon': 'Saxo', 'saxofonista': 'Saxo',
+    'trompeta': 'Trompeta', 'trompetista': 'Trompeta',
+    'percusion': 'Percusión', 'percusionista': 'Percusión',
+    'dj': 'DJ / Productor', 'productor': 'DJ / Productor', 'produccion': 'DJ / Productor',
+    'bandoneon': 'Bandoneón', 'bandoneonista': 'Bandoneón',
+    'flauta': 'Flauta', 'flautista': 'Flauta',
+    'cello': 'Cello', 'chelista': 'Cello',
+    'charango': 'Charango', 'charanguista': 'Charango',
+    'arpa': 'Arpa', 'harpista': 'Arpa'
+  };
+
+  const GEN_MAP = {
+    'rock': 'Rock', 'rockero': 'Rock', 'rocker': 'Rock',
+    'jazz': 'Jazz', 'jazzero': 'Jazz',
+    'folklore': 'Folklore', 'folclore': 'Folklore', 'folclorista': 'Folklore', 'folklorista': 'Folklore',
+    'tango': 'Tango', 'tanguero': 'Tango',
+    'cumbia': 'Cumbia', 'cumbiero': 'Cumbia',
+    'metal': 'Metal', 'metalero': 'Metal',
+    'pop': 'Pop', 'indie': 'Indie',
+    'funk': 'Funk', 'funkero': 'Funk',
+    'blues': 'Blues', 'reggae': 'Reggae',
+    'electronica': 'Electrónica', 'electronico': 'Electrónica',
+    'punk': 'Punk',
+    'rap': 'Rap / Hip Hop', 'hiphop': 'Rap / Hip Hop', 'hip': 'Rap / Hip Hop',
+    'clasica': 'Clásica', 'clasico': 'Clásica',
+    'bossanova': 'Bossanova', 'bossa': 'Bossanova',
+    'progresivo': 'Prog', 'prog': 'Prog', 'fusion': 'Fusión'
+  };
+
+  const INSTR_VALUE_MAP = {
+    'Teclado': 'Teclado / Piano',
+    'DJ/Prod.': 'DJ / Productor'
+  };
+
+  const STOP_WORDS = new Set(['en', 'de', 'del', 'la', 'el', 'un', 'una', 'para', 'con', 'por', 'y', 'o', 'que', 'a']);
+
+  function normalizeText(value) {
+    return String(value || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  }
+
+  function safeUrl(value) {
+    const raw = String(value || '').trim();
+    if (!raw) return '';
+    try {
+      const parsed = new URL(raw, window.location.origin);
+      if (!['http:', 'https:'].includes(parsed.protocol)) return '';
+      return parsed.href;
+    } catch (_) {
+      return '';
+    }
+  }
 
   function getInitials(nombre) {
-    if (!nombre) return '??'
-    return nombre.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)
+    if (!nombre) return '??';
+    return String(nombre).split(' ').filter(Boolean).map(w => w[0]).join('').toUpperCase().slice(0, 2) || '??';
   }
+
   function colorIdx(nombre) {
-    let h = 0
-    for (let c of (nombre||'')) h = (h * 31 + c.charCodeAt(0)) % COLORES.length
-    return h
+    let h = 0;
+    for (const c of String(nombre || '')) h = (h * 31 + c.charCodeAt(0)) % COLORES.length;
+    return h;
+  }
+
+  function splitList(value) {
+    return String(value || '').split(',').map(v => v.trim()).filter(Boolean);
+  }
+
+  function includesLoose(haystack, needle) {
+    const h = normalizeText(haystack);
+    const n = normalizeText(needle);
+    return !n || h.includes(n);
   }
 
   function buildCard(p) {
-    const idx = colorIdx(p.nombre)
-    const initials = getInitials(p.nombre)
-    const generos = (p.generos||'').split(',').map(g=>g.trim()).filter(Boolean).slice(0,3)
-    const location = [p.barrio, p.ciudad].filter(Boolean).join(', ')
-    const tags = generos.map(g=>`<span class="ctag">${g}</span>`).join('')
-    const refs = p.referentes ? `🎵 <em>${p.referentes.split(',').slice(0,3).join(', ')}</em>` : ''
-    const bio = p.bio || (p.instrumento ? `Toca ${p.instrumento}` : 'Músico en buscARTE')
+    const idx = colorIdx(p.nombre);
+    const initials = escapeHtml(getInitials(p.nombre));
+    const generos = splitList(p.generos).slice(0, 3);
+    const location = [p.barrio, p.ciudad].filter(Boolean).join(', ');
+    const tags = generos.map(g => `<span class="ctag">${escapeHtml(g)}</span>`).join('');
+    const refsList = splitList(p.referentes).slice(0, 3).map(escapeHtml).join(', ');
+    const refs = refsList ? `🎵 <em>${refsList}</em>` : '';
+    const bio = p.bio || (p.instrumento ? `Toca ${p.instrumento}` : 'Músico en buscARTE');
+    const foto = safeUrl(p.foto_url);
+    const id = encodeURIComponent(String(p.id || ''));
 
-    const avatarHTML = p.foto_url
-      ? `<div class="card-avatar" style="background:#000;overflow:hidden"><img src="${p.foto_url}" style="width:100%;height:100%;object-fit:cover"></div>`
-      : `<div class="card-avatar" style="background:${COLORES[idx]};color:${TEXTO[idx]}">${initials}</div>`
+    const avatarHTML = foto
+      ? `<div class="card-avatar" style="background:#000;overflow:hidden"><img src="${escapeHtml(foto)}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover"></div>`
+      : `<div class="card-avatar" style="background:${COLORES[idx]};color:${TEXTO[idx]}">${initials}</div>`;
 
-    return `<div class="musician-card" data-id="${p.id}">
+    return `<div class="musician-card" data-id="${escapeHtml(String(p.id || ''))}">
       <div class="card-top">
         ${avatarHTML}
         <div class="card-info">
-          <div class="card-name">${p.nombre||'Sin nombre'}</div>
-          <div class="card-instrument">${p.instrumento||'Músico'}</div>
-          <div class="card-location">${location ? '📍 '+location : ''}</div>
+          <div class="card-name">${escapeHtml(p.nombre || 'Sin nombre')}</div>
+          <div class="card-instrument">${escapeHtml(p.instrumento || 'Músico')}</div>
+          <div class="card-location">${location ? '📍 ' + escapeHtml(location) : ''}</div>
         </div>
       </div>
       ${tags ? `<div class="card-tags">${tags}</div>` : ''}
-      <div class="card-bio">${bio}</div>
+      <div class="card-bio">${escapeHtml(bio)}</div>
       <div class="card-footer">
         <div class="card-refs">${refs}</div>
-        <a href="buscARTE_perfil_publico.html?id=${p.id}" class="card-cta">Ver perfil →</a>
+        <a href="buscARTE_perfil_publico.html?id=${id}" class="card-cta">Ver perfil →</a>
       </div>
-    </div>`
+    </div>`;
+  }
+
+  function buildAdBridgeCard() {
+    return `<article class="ad-bridge-card" aria-label="Atajo a anuncios de buscARTE">
+      <div>
+        <div class="ad-bridge-kicker">Atajo útil</div>
+        <div class="ad-bridge-title">¿No encontrás al músico justo?</div>
+        <div class="ad-bridge-copy">Revisá anuncios activos o publicá gratis: búsqueda de banda, jams, clases, compra/venta y más.</div>
+      </div>
+      <div class="ad-bridge-actions">
+        <a class="ad-bridge-btn" href="buscARTE_anuncios.html">Ver anuncios</a>
+        <a class="ad-bridge-btn primary" href="buscARTE_anuncios.html">Publicar</a>
+      </div>
+    </article>`;
+  }
+
+  async function fetchProfiles(force = false) {
+    if (perfilesCache && !force) return perfilesCache;
+
+    const fields = 'id,nombre,instrumento,generos,ciudad,barrio,bio,referentes,disponibilidad,foto_url,created_at,baneado';
+    const base = `${SUPABASE_URL}/rest/v1/perfiles?select=${fields}&baneado=eq.false&order=created_at.desc&limit=${MAX_FETCH}`;
+    let res = await fetch(base, { headers: SB_HEADERS });
+
+    // Fallback conservador: si el filtro baneado llega a fallar, cargamos sin ese filtro en vez de dejar la página rota.
+    if (!res.ok) {
+      console.warn('Primer intento de perfiles falló:', res.status, await res.text());
+      res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?select=${fields}&order=created_at.desc&limit=${MAX_FETCH}`, { headers: SB_HEADERS });
+    }
+
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(`Supabase perfiles ${res.status}: ${errText}`);
+    }
+
+    const data = await res.json();
+    perfilesCache = Array.isArray(data) ? data.filter(p => p.baneado !== true) : [];
+    return perfilesCache;
+  }
+
+  function detectSearchParts(searchVal) {
+    const sv = normalizeText(searchVal);
+    const words = sv.split(/\s+/).filter(Boolean);
+    let instrDetected = '';
+    let genDetected = '';
+    const zonaWords = [];
+
+    for (let i = 0; i < words.length; i++) {
+      const w = words[i];
+      const two = `${w} ${words[i + 1] || ''}`.trim();
+      if (GEN_MAP[two]) { genDetected = GEN_MAP[two]; i++; continue; }
+      if (INSTR_MAP[w]) { instrDetected = INSTR_MAP[w]; continue; }
+      if (GEN_MAP[w]) { genDetected = GEN_MAP[w]; continue; }
+      if (!STOP_WORDS.has(w)) zonaWords.push(w);
+    }
+
+    return { instrDetected, genDetected, zona: zonaWords.join(' ').trim(), normalized: sv };
+  }
+
+  function matchesSearch(p, searchVal) {
+    const q = String(searchVal || '').trim();
+    if (!q) return true;
+
+    const { instrDetected, genDetected, zona, normalized } = detectSearchParts(q);
+    const directBlob = normalizeText([
+      p.nombre, p.instrumento, p.generos, p.ciudad, p.barrio, p.bio, p.referentes, p.disponibilidad
+    ].filter(Boolean).join(' '));
+
+    if (directBlob.includes(normalized)) return true;
+
+    if (instrDetected && !includesLoose(p.instrumento, instrDetected)) return false;
+    if (genDetected && !includesLoose(p.generos, genDetected)) return false;
+    if (zona && !includesLoose(`${p.ciudad || ''} ${p.barrio || ''}`, zona)) return false;
+
+    return Boolean(instrDetected || genDetected || zona);
+  }
+
+  function matchesArrayField(fieldValue, selectedValues, mapper = {}) {
+    if (!selectedValues || !selectedValues.length) return true;
+    return selectedValues.some(v => includesLoose(fieldValue, mapper[v] || v));
+  }
+
+  function matchesCiudad(p, ciudad) {
+    if (!ciudad) return true;
+    const profileCity = normalizeText(`${p.ciudad || ''} ${p.barrio || ''}`);
+    const selected = normalizeText(ciudad);
+    if (selected === 'buenos aires (caba)') return profileCity.includes('caba') || profileCity.includes('buenos aires');
+    if (selected === 'gran buenos aires') return profileCity.includes('gba') || profileCity.includes('gran buenos aires');
+    return profileCity.includes(selected);
+  }
+
+  function getAffinityScore(p) {
+    const myGeneros = splitList(localStorage.getItem('ba_generos')).map(normalizeText);
+    const myRefs = splitList(localStorage.getItem('ba_referentes')).map(normalizeText);
+    const pGeneros = normalizeText(p.generos);
+    const pRefs = normalizeText(p.referentes);
+    let score = 0;
+    myGeneros.forEach(g => { if (g && pGeneros.includes(g)) score += 3; });
+    myRefs.forEach(r => { if (r && pRefs.includes(r)) score += 5; });
+    return score;
+  }
+
+  function sortProfiles(list) {
+    const sortValue = document.getElementById('sort-select')?.value || 'afinidad';
+    const copy = [...list];
+    if (sortValue === 'nombre') {
+      copy.sort((a, b) => String(a.nombre || '').localeCompare(String(b.nombre || ''), 'es'));
+    } else if (sortValue === 'recientes') {
+      copy.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+    } else {
+      copy.sort((a, b) => {
+        const scoreDiff = getAffinityScore(b) - getAffinityScore(a);
+        if (scoreDiff) return scoreDiff;
+        return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+      });
+    }
+    return copy;
+  }
+
+  function getFilteredProfiles(perfiles) {
+    const searchVal = document.getElementById('main-search')?.value?.trim() || '';
+    const refVal = document.getElementById('referente-input')?.value?.trim() || activeFilters.referente || '';
+
+    const filtered = perfiles.filter(p => {
+      if (!matchesSearch(p, searchVal)) return false;
+      if (!matchesArrayField(p.instrumento, activeFilters.instrumentos, INSTR_VALUE_MAP)) return false;
+      if (!matchesArrayField(p.generos, activeFilters.generos)) return false;
+      if (!matchesArrayField(p.disponibilidad, activeFilters.busca)) return false;
+      if (!matchesCiudad(p, activeFilters.ciudad)) return false;
+      if (activeFilters.barrio && !includesLoose(p.barrio || p.ciudad, activeFilters.barrio)) return false;
+      if (refVal && !includesLoose(p.referentes, refVal)) return false;
+      return true;
+    });
+
+    return sortProfiles(filtered);
+  }
+
+  function emptyStateHtml(hasFilters) {
+    return `<div style="grid-column:1/-1;padding:4rem 1.5rem;text-align:center">
+      <div style="font-size:2rem;margin-bottom:1rem">🎸</div>
+      <div style="font-family:var(--font-display);font-size:1.4rem;margin-bottom:.5rem">Sin resultados</div>
+      <div style="color:var(--gris);font-size:.88rem;line-height:1.65;max-width:520px;margin:0 auto">
+        ${hasFilters ? 'Probá limpiando filtros o usando una búsqueda más amplia.' : 'Todavía no hay músicos para mostrar con esta búsqueda.'}<br>
+        También podés mirar anuncios o publicar lo que estás buscando.
+      </div>
+      <div class="empty-actions">
+        ${hasFilters ? '<button class="empty-action" onclick="clearFilters()">Limpiar filtros</button>' : ''}
+        <a class="empty-action" href="buscARTE_anuncios.html">Ver anuncios</a>
+        <a class="empty-action primary" href="buscARTE_anuncios.html">Publicar gratis</a>
+      </div>
+    </div>`;
+  }
+
+  function updateResultText(total) {
+    const searchVal = document.getElementById('main-search')?.value?.trim();
+    const activeCount = document.querySelectorAll('.fchip.on').length;
+    const refVal = document.getElementById('referente-input')?.value?.trim();
+    const barrioVal = document.getElementById('barrio-input')?.value?.trim();
+    const resultNum = document.getElementById('result-num');
+    const sub = document.getElementById('result-sub');
+    if (resultNum) resultNum.textContent = String(total);
+    if (sub) {
+      if (searchVal) sub.textContent = `resultados para “${searchVal}”`;
+      else if (activeCount || refVal || barrioVal || activeFilters.ciudad) sub.textContent = 'resultados filtrados';
+      else sub.textContent = 'todos los músicos';
+    }
   }
 
   async function cargarMusicos(append = false) {
-    const grid = document.getElementById('musicians-grid')
-    const loading = document.getElementById('loading-state')
+    const grid = document.getElementById('musicians-grid');
+    const btnLoad = document.getElementById('btn-load-more');
+    if (!grid) return;
 
     if (!append) {
-      grid.innerHTML = '<div style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--gris);font-size:.88rem" id="loading-state">Cargando músicos...</div>'
-      offset = 0
-    }
-
-    // Construir query con filtros
-    let query = `${SUPABASE_URL}/rest/v1/perfiles?select=id,nombre,instrumento,generos,ciudad,barrio,bio,referentes,disponibilidad,foto_url&baneado=eq.false&order=created_at.desc&limit=${PER_PAGE}&offset=${offset}`
-
-    // Filtro de búsqueda por texto — diccionario de sinónimos
-    const searchVal = document.getElementById('main-search')?.value?.trim()
-
-    if (searchVal) {
-      const sv = searchVal.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-
-      // Diccionario: palabras clave → campos de Supabase
-      const instrMap = {
-        'guitarra':'Guitarra','guitarrista':'Guitarra','guitarrero':'Guitarra',
-        'bajo':'Bajo','bajista':'Bajo',
-        'bateria':'Batería','baterista':'Batería','drums':'Batería',
-        'teclado':'Teclado / Piano','piano':'Teclado / Piano','pianista':'Teclado / Piano','tecladista':'Teclado / Piano',
-        'voz':'Voz / Canto','canto':'Voz / Canto','cantante':'Voz / Canto','vocalista':'Voz / Canto','cantor':'Voz / Canto',
-        'violin':'Violín','violinista':'Violín',
-        'saxo':'Saxo','saxofonista':'Saxo','saxofon':'Saxo',
-        'trompeta':'Trompeta','trompetista':'Trompeta',
-        'percusion':'Percusión','percusionista':'Percusión',
-        'dj':'DJ / Productor','productor':'DJ / Productor',
-        'bandoneon':'Bandoneón','bandeonista':'Bandoneón',
-        'flauta':'Flauta','flautista':'Flauta',
-        'cello':'Cello','celos':'Cello','chelista':'Cello',
-        'charango':'Charango',
-        'arpa':'Arpa','harpista':'Arpa'
-      }
-      const genMap = {
-        'rock':'Rock','rockero':'Rock','rocker':'Rock',
-        'jazz':'Jazz','jazzero':'Jazz',
-        'folklore':'Folklore','folclorista':'Folklore','folklorista':'Folklore','folclore':'Folklore',
-        'tango':'Tango','tanguero':'Tango',
-        'cumbia':'Cumbia','cumbiero':'Cumbia',
-        'metal':'Metal','metalero':'Metal',
-        'pop':'Pop',
-        'indie':'Indie',
-        'funk':'Funk','funkero':'Funk',
-        'blues':'Blues',
-        'reggae':'Reggae',
-        'electronica':'Electrónica','electronico':'Electrónica','dj':'Electrónica',
-        'punk':'Punk',
-        'hip hop':'Rap/Hip Hop','rap':'Rap/Hip Hop','hiphop':'Rap/Hip Hop',
-        'clasica':'Clásica','clasico':'Clásica',
-        'bossanova':'Bossanova','bossa':'Bossanova',
-        'progresivo':'Prog','prog':'Prog',
-        'fusion':'Fusión'
-      }
-
-      // Partir búsqueda en palabras
-      const palabras = sv.split(/\s+/)
-      let instrDetected = null
-      let genDetected = null
-      let zonaWords = []
-
-      for (const p of palabras) {
-        if (instrMap[p]) { instrDetected = instrMap[p]; continue }
-        if (genMap[p]) { genDetected = genMap[p]; continue }
-        if (['en','de','del','la','el','un','una','para','con'].includes(p)) continue
-        // Solo agregar a zona si parece una ubicación (más de 3 letras y no es claramente un artista/término musical)
-        zonaWords.push(p)
-      }
-
-      const zona = zonaWords.join(' ').trim()
-
-      // Si no detectamos instrumento ni género, usar RPC full-text
-      // (evita que nombres de artistas como "deny" se busquen como zona)
-      if (!instrDetected && !genDetected) {
-        const rpcRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/buscar_musicos`, {
-          method: 'POST',
-          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ termino: searchVal })
-        })
-        const perfiles = await rpcRes.json()
-        if (!append) grid.innerHTML = ''
-        if (!perfiles.length) {
-          grid.innerHTML = `<div style="grid-column:1/-1;padding:4rem;text-align:center">
-            <div style="font-size:2rem;margin-bottom:1rem">🎸</div>
-            <div style="font-family:var(--font-display);font-size:1.4rem;margin-bottom:.5rem">Sin resultados</div>
-            <div style="color:var(--gris);font-size:.88rem">Probá con otro término o <a href="buscARTE_registro.html" style="color:var(--neon)">registrate</a> para aparecer acá.</div>
-          </div>`
-          document.getElementById('result-num').textContent = '0'
-          return
-        }
-        perfiles.forEach(p => grid.insertAdjacentHTML('beforeend', buildCard(p)))
-        document.getElementById('result-num').textContent = perfiles.length
-        document.getElementById('btn-load-more').style.display = 'none'
-        return
-      }
-
-      const sbRes = await fetch(q, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } })
-      let perfiles = await sbRes.json()
-
-      // Si no hay resultados con zona exacta, intentar solo instrumento/género
-      if (!perfiles.length && zona && (instrDetected || genDetected)) {
-        let q2 = `${SUPABASE_URL}/rest/v1/perfiles?select=id,nombre,instrumento,generos,ciudad,barrio,bio,referentes,disponibilidad,foto_url&baneado=eq.false&order=created_at.desc`
-        if (instrDetected) q2 += `&instrumento=ilike.*${encodeURIComponent(instrDetected)}*`
-        if (genDetected) q2 += `&generos=ilike.*${encodeURIComponent(genDetected)}*`
-        const sbRes2 = await fetch(q2, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } })
-        perfiles = await sbRes2.json()
-      }
-
-      if (!append) grid.innerHTML = ''
-      if (!perfiles.length) {
-        grid.innerHTML = `<div style="grid-column:1/-1;padding:4rem;text-align:center">
-          <div style="font-size:2rem;margin-bottom:1rem">🎸</div>
-          <div style="font-family:var(--font-display);font-size:1.4rem;margin-bottom:.5rem">Sin resultados</div>
-          <div style="color:var(--gris);font-size:.88rem">Probá con otro término o <a href="buscARTE_registro.html" style="color:var(--neon)">registrate</a> para aparecer acá.</div>
-        </div>`
-        document.getElementById('result-num').textContent = '0'
-        return
-      }
-      perfiles.forEach(p => grid.insertAdjacentHTML('beforeend', buildCard(p)))
-      document.getElementById('result-num').textContent = perfiles.length
-      document.getElementById('btn-load-more').style.display = 'none'
-      return
-    }
-
-    // Sin texto — usar query normal con filtros de chips
-    if (!searchVal && activeFilters.instrumentos.length) {
-      query += `&instrumento=ilike.*${encodeURIComponent(activeFilters.instrumentos[0])}*`
-    }
-    // Filtro género (solo si no hay búsqueda de texto)
-    if (!searchVal && activeFilters.generos.length) {
-      query += `&generos=ilike.*${encodeURIComponent(activeFilters.generos[0])}*`
-    }
-    // Filtro ciudad
-    if (activeFilters.ciudad) {
-      query += `&ciudad=ilike.*${encodeURIComponent(activeFilters.ciudad)}*`
-    }
-    // Filtro barrio
-    if (activeFilters.barrio) {
-      query += `&barrio=ilike.*${encodeURIComponent(activeFilters.barrio)}*`
-    }
-    // Filtro busca (disponibilidad)
-    if (!searchVal && activeFilters.busca && activeFilters.busca.length) {
-      query += `&disponibilidad=ilike.*${encodeURIComponent(activeFilters.busca[0])}*`
-    }
-    // Filtro artista referente
-    const refVal = document.getElementById('referente-input')?.value?.trim()
-    if (refVal) {
-      query += `&referentes=ilike.*${encodeURIComponent(refVal)}*`
+      grid.innerHTML = '<div style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--gris);font-size:.88rem" id="loading-state">Cargando músicos...</div>';
+      offset = 0;
+      if (btnLoad) btnLoad.style.display = 'none';
     }
 
     try {
-      const res = await fetch(query, {
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-      })
-      const perfiles = await res.json()
+      const perfiles = await fetchProfiles();
+      const filtered = getFilteredProfiles(perfiles);
+      const hasFilters = Boolean(
+        document.getElementById('main-search')?.value?.trim() ||
+        document.getElementById('referente-input')?.value?.trim() ||
+        activeFilters.instrumentos.length || activeFilters.generos.length || activeFilters.busca.length ||
+        activeFilters.ciudad || activeFilters.barrio
+      );
 
-      if (!append) grid.innerHTML = ''
+      if (!append) grid.innerHTML = '';
 
-      if (!perfiles.length && !append) {
-        grid.innerHTML = `<div style="grid-column:1/-1;padding:4rem;text-align:center">
-          <div style="font-size:2rem;margin-bottom:1rem">🎸</div>
-          <div style="font-family:var(--font-display);font-size:1.4rem;margin-bottom:.5rem">Sin resultados</div>
-          <div style="color:var(--gris);font-size:.88rem">Probá cambiando los filtros o <a href="buscARTE_registro.html" style="color:var(--neon)">registrarte</a> para aparecer acá.</div>
-        </div>`
-        document.getElementById('result-num').textContent = '0'
-        return
+      updateResultText(filtered.length);
+
+      if (!filtered.length) {
+        grid.innerHTML = emptyStateHtml(hasFilters);
+        if (btnLoad) btnLoad.style.display = 'none';
+        return;
       }
 
-      perfiles.forEach(p => {
-        grid.insertAdjacentHTML('beforeend', buildCard(p))
-      })
+      const pageItems = filtered.slice(offset, offset + PER_PAGE);
+      const bridgeAfter = Math.min(5, pageItems.length - 1);
+      pageItems.forEach((p, i) => {
+        grid.insertAdjacentHTML('beforeend', buildCard(p));
+        if (!append && filtered.length > 3 && i === bridgeAfter) {
+          grid.insertAdjacentHTML('beforeend', buildAdBridgeCard());
+        }
+      });
+      offset += pageItems.length;
 
-      // Contar total
-      const countRes = await fetch(
-        `${SUPABASE_URL}/rest/v1/perfiles?select=id`,
-        { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Prefer': 'count=exact' } }
-      )
-      const total = countRes.headers.get('content-range')?.split('/')[1] || perfiles.length
-      document.getElementById('result-num').textContent = total
-
-      offset += perfiles.length
-      document.getElementById('btn-load-more').style.display = perfiles.length === PER_PAGE ? 'inline-block' : 'none'
-
-    } catch(e) {
-      grid.innerHTML = '<div style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--gris)">Error al cargar. Verificá tu conexión.</div>'
-      console.error(e)
+      if (btnLoad) btnLoad.style.display = offset < filtered.length ? 'inline-block' : 'none';
+    } catch (e) {
+      console.error(e);
+      grid.innerHTML = '<div style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--gris)">Error al cargar músicos. Verificá tu conexión e intentá de nuevo.</div>';
+      updateResultText(0);
+      if (btnLoad) btnLoad.style.display = 'none';
     }
   }
 
   function loadMore() {
-    const btn = document.getElementById('btn-load-more')
-    btn.textContent = 'Cargando...'
-    cargarMusicos(true).then(() => btn.textContent = 'Cargar más músicos')
+    const btn = document.getElementById('btn-load-more');
+    if (btn) btn.textContent = 'Cargando...';
+    cargarMusicos(true).finally(() => { if (btn) btn.textContent = 'Cargar más músicos'; });
   }
 
-  // FILTROS
+  function renderActiveFilters() {
+    const container = document.getElementById('active-filters');
+    if (!container) return;
+    const chips = [...document.querySelectorAll('.fchip.on')].map(c => c.textContent.trim());
+    const barrio = document.getElementById('barrio-input')?.value?.trim();
+    const ref = document.getElementById('referente-input')?.value?.trim();
+    const ciudad = activeFilters.ciudad;
+
+    const html = [];
+    if (ciudad) html.push(`<span class="af-chip">${escapeHtml(ciudad)} <button class="af-remove" onclick="setCiudad('Todo el país');document.getElementById('ciudad-select').value='Todo el país'">×</button></span>`);
+    chips.forEach(f => html.push(`<span class="af-chip">${escapeHtml(f)} <button class="af-remove" onclick="removeFilterChip('${escapeHtml(f)}')">×</button></span>`));
+    if (barrio) html.push(`<span class="af-chip">${escapeHtml(barrio)} <button class="af-remove" onclick="document.getElementById('barrio-input').value='';setBarrio('')">×</button></span>`);
+    if (ref) html.push(`<span class="af-chip">${escapeHtml(ref)} <button class="af-remove" onclick="document.getElementById('referente-input').value='';setReferente('')">×</button></span>`);
+    container.innerHTML = html.join('');
+  }
+
+  function removeFilterChip(label) {
+    document.querySelectorAll('.fchip.on').forEach(chip => {
+      if (chip.textContent.trim() === label) chip.classList.remove('on');
+    });
+    applyFilters();
+  }
+
   function toggleFilter(el) {
-    el.classList.toggle('on')
-    const active = [...document.querySelectorAll('.fchip.on')].map(c=>c.textContent.trim())
-    document.getElementById('active-filters').innerHTML = active.map(f=>
-      `<span class="af-chip">${f} <button class="af-remove" onclick="this.closest('.af-chip').remove();applyFilters()">×</button></span>`
-    ).join('')
-    applyFilters()
+    el.classList.toggle('on');
+    applyFilters();
   }
 
   function applyFilters() {
-    const onChips = [...document.querySelectorAll('.fchip.on')].map(c=>c.textContent.trim())
-    const instrLabels = ['Guitarra','Bajo','Batería','Teclado','Voz / Canto','Saxo','Violín','Cello','Trompeta','Flauta','Percusión','DJ/Prod.','Bandoneón','Charango','Arpa','Acordeón','Contrabajo','Clarinete','Cajón','Bombo leguero','Quena / Zampoña','Ukelele','Controlador MIDI','Técnico de sonido','Compositor / Arreglador','Productor','Mix & Mastering','Manager','Otro']
-    const buscaLabels = ['Banda','Sesiones','Zapada','Proyecto','Clases']
-    activeFilters.instrumentos = onChips.filter(c => instrLabels.includes(c))
-    activeFilters.generos = onChips.filter(c => !instrLabels.includes(c) && !buscaLabels.includes(c))
-    activeFilters.busca = onChips.filter(c => buscaLabels.includes(c))
-    cargarMusicos(false)
+    const onChips = [...document.querySelectorAll('.fchip.on')].map(c => c.textContent.trim());
+    activeFilters.instrumentos = onChips.filter(c => INSTR_LABELS.includes(c));
+    activeFilters.generos = onChips.filter(c => !INSTR_LABELS.includes(c) && !BUSCA_LABELS.includes(c));
+    activeFilters.busca = onChips.filter(c => BUSCA_LABELS.includes(c));
+    renderActiveFilters();
+    cargarMusicos(false);
   }
+
   function setCiudad(val) {
-    activeFilters.ciudad = (val === 'Todo el país') ? '' : val
-    cargarMusicos(false)
+    activeFilters.ciudad = (val === 'Todo el país') ? '' : val;
+    renderActiveFilters();
+    cargarMusicos(false);
   }
+
   function setBarrio(val) {
-    activeFilters.barrio = val.trim()
-    cargarMusicos(false)
+    activeFilters.barrio = String(val || '').trim();
+    renderActiveFilters();
+    cargarMusicos(false);
+  }
+
+  function setReferente(val) {
+    activeFilters.referente = String(val || '').trim();
+    renderActiveFilters();
+    cargarMusicos(false);
   }
 
   function clearFilters() {
-    document.querySelectorAll('.fchip.on').forEach(c=>c.classList.remove('on'))
-    document.getElementById('active-filters').innerHTML = ''
-    const sel = document.getElementById('ciudad-select')
-    if (sel) sel.selectedIndex = 1  // Buenos Aires por defecto
-    const bar = document.getElementById('barrio-input')
-    if (bar) bar.value = ''
-    const ref = document.getElementById('referente-input')
-    if (ref) ref.value = ''
-    activeFilters = { instrumentos:[], generos:[], ciudad:'', barrio:'', busca:[], referente:'' }
-    cargarMusicos(false)
+    document.querySelectorAll('.fchip.on').forEach(c => c.classList.remove('on'));
+    const sel = document.getElementById('ciudad-select');
+    if (sel) sel.value = 'Todo el país';
+    const bar = document.getElementById('barrio-input');
+    if (bar) bar.value = '';
+    const ref = document.getElementById('referente-input');
+    if (ref) ref.value = '';
+    const search = document.getElementById('main-search');
+    if (search) search.value = '';
+    activeFilters = { instrumentos: [], generos: [], ciudad: '', barrio: '', busca: [], referente: '' };
+    renderActiveFilters();
+    cargarMusicos(false);
   }
 
   function setView(v) {
-    document.getElementById('musicians-grid').classList.toggle('list-view',v==='list')
-    document.getElementById('btn-grid').classList.toggle('active',v==='grid')
-    document.getElementById('btn-list').classList.toggle('active',v==='list')
+    document.getElementById('musicians-grid')?.classList.toggle('list-view', v === 'list');
+    document.getElementById('btn-grid')?.classList.toggle('active', v === 'grid');
+    document.getElementById('btn-list')?.classList.toggle('active', v === 'list');
   }
 
   function doSearch() {
-    const q = document.getElementById('main-search').value
-    document.getElementById('result-sub').textContent = 'todos los músicos'
-    cargarMusicos(false)
+    renderActiveFilters();
+    cargarMusicos(false);
+  }
+
+  function applyUrlParams() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const mainSearch = document.getElementById('main-search');
+    if (urlParams.get('q') && mainSearch) mainSearch.value = urlParams.get('q');
+
+    const directFilters = [
+      ['instrumento', 'instrumentos'],
+      ['genero', 'generos'],
+      ['objetivo', 'busca']
+    ];
+
+    directFilters.forEach(([param]) => {
+      const val = urlParams.get(param);
+      if (!val) return;
+      const chip = [...document.querySelectorAll('.fchip')].find(c => normalizeText(c.textContent) === normalizeText(val));
+      if (chip) chip.classList.add('on');
+    });
+
+    const ciudadParam = urlParams.get('ciudad') || urlParams.get('provincia');
+    if (ciudadParam) {
+      const sel = document.getElementById('ciudad-select');
+      const opt = [...(sel?.options || [])].find(o => normalizeText(o.value || o.textContent) === normalizeText(ciudadParam));
+      if (sel && opt) {
+        sel.value = opt.value || opt.textContent;
+        activeFilters.ciudad = sel.value === 'Todo el país' ? '' : sel.value;
+      }
+    }
+
+    const barrioParam = urlParams.get('barrio');
+    if (barrioParam) {
+      const bar = document.getElementById('barrio-input');
+      if (bar) bar.value = barrioParam;
+      activeFilters.barrio = barrioParam;
+    }
+
+    const refParam = urlParams.get('referente');
+    if (refParam) {
+      const ref = document.getElementById('referente-input');
+      if (ref) ref.value = refParam;
+      activeFilters.referente = refParam;
+    }
+
+    applyFilters();
   }
 
   window.addEventListener('DOMContentLoaded', function() {
-    // Buscar al presionar Enter
-    document.getElementById('main-search').addEventListener('keydown', e => {
-      if (e.key === 'Enter') doSearch()
-    })
+    const search = document.getElementById('main-search');
+    if (search) search.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
 
-    // Leer parámetros del index si vienen
-    const urlParams = new URLSearchParams(window.location.search)
-    if (urlParams.get('q')) document.getElementById('main-search').value = urlParams.get('q')
-    if (urlParams.get('instrumento')) {
-      const chip = [...document.querySelectorAll('.filter-chip, .fchip')].find(c => c.textContent.trim() === urlParams.get('instrumento'))
-      if (chip) { chip.classList.add('active','on'); activeFilters.instrumentos = [urlParams.get('instrumento')] }
-    }
-    if (urlParams.get('genero')) {
-      const chip = [...document.querySelectorAll('.filter-chip, .fchip')].find(c => c.textContent.trim() === urlParams.get('genero'))
-      if (chip) { chip.classList.add('active','on'); activeFilters.generos = [urlParams.get('genero')] }
-    }
+    const sort = document.getElementById('sort-select');
+    if (sort) sort.addEventListener('change', () => cargarMusicos(false));
 
-    cargarMusicos(false);
+    const ciudad = document.getElementById('ciudad-select');
+    if (ciudad && ciudad.value !== 'Todo el país') activeFilters.ciudad = ciudad.value;
+
+    applyUrlParams();
   });
-
 
   async function cargarBadgeMensajes(uid) {
     const badge = document.getElementById('nav-msg-badge');
@@ -905,9 +1299,10 @@
     try {
       const lastSeen = localStorage.getItem('ba_msg_last_seen') || new Date().toISOString();
       const res = await fetch(
-        `https://xiaanchoanxmampegoay.supabase.co/rest/v1/mensajes?para_user_id=eq.${uid}&created_at=gt.${lastSeen}&select=id&limit=99`,
-        { headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68', 'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68` } }
+        `${SUPABASE_URL}/rest/v1/mensajes?para_user_id=eq.${encodeURIComponent(uid)}&created_at=gt.${encodeURIComponent(lastSeen)}&select=id&limit=99`,
+        { headers: SB_HEADERS }
       );
+      if (!res.ok) throw new Error('badge mensajes');
       const msgs = await res.json();
       const count = Array.isArray(msgs) ? msgs.length : 0;
       if (count > 0) {
@@ -916,59 +1311,68 @@
       } else {
         badge.style.display = 'none';
       }
-    } catch(e) { if(badge) badge.style.display = 'none'; }
+    } catch (e) {
+      if (badge) badge.style.display = 'none';
+    }
   }
 
   // NAV SESSION
-  (function initNav(){
-    const l=localStorage.getItem('ba_logged')==='1';
-    const n=localStorage.getItem('ba_name')||'Mi perfil';
-    const uid=localStorage.getItem('ba_user_id')||'';
-    const i=n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-    if(l){
-      const g=document.getElementById('nav-guest');
-      const u=document.getElementById('nav-user');
-      if(g)g.style.display='none';
-      if(u)u.style.display='flex';
-      const c=document.getElementById('nav-avatar-circle');
-      if(c)c.textContent=i;
-      const nm=document.getElementById('nav-avatar-name');
-      if(nm)nm.textContent=n.split(' ')[0];
+  (function initNav() {
+    const l = localStorage.getItem('ba_logged') === '1';
+    const n = localStorage.getItem('ba_name') || 'Mi perfil';
+    const uid = localStorage.getItem('ba_user_id') || '';
+    const i = n.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    if (l) {
+      const g = document.getElementById('nav-guest');
+      const u = document.getElementById('nav-user');
+      if (g) g.style.display = 'none';
+      if (u) u.style.display = 'flex';
+      const c = document.getElementById('nav-avatar-circle');
+      if (c) c.textContent = i;
+      const nm = document.getElementById('nav-avatar-name');
+      if (nm) nm.textContent = n.split(' ')[0];
       cargarBadgeMensajes(uid);
-      const miPerfilLink=document.querySelector('.nav-dropdown-item[href*="perfil_publico"]');
-      if(miPerfilLink && uid) miPerfilLink.href='buscARTE_perfil_publico.html?id='+uid;
+      const miPerfilLink = document.querySelector('.nav-dropdown-item[href*="perfil_publico"]');
+      if (miPerfilLink && uid) miPerfilLink.href = 'buscARTE_perfil_publico.html?id=' + encodeURIComponent(uid);
     }
   })();
-  function toggleUserMenu(e){if(e)e.stopPropagation();const w=document.getElementById('nav-avatar-btn');const d=document.getElementById('nav-dropdown');if(w)w.classList.toggle('open');if(d)d.classList.toggle('open');}
-  // Close dropdown when tapping outside
-  document.addEventListener('click', function(e){
-    if(!e.target.closest('#nav-avatar-btn') && !e.target.closest('#nav-dropdown')){
-      const d=document.getElementById('nav-dropdown');const w=document.getElementById('nav-avatar-btn');
-      if(d)d.classList.remove('open');if(w)w.classList.remove('open');
+
+  function toggleUserMenu(e) {
+    if (e) e.stopPropagation();
+    const w = document.getElementById('nav-avatar-btn');
+    const d = document.getElementById('nav-dropdown');
+    if (w) w.classList.toggle('open');
+    if (d) d.classList.toggle('open');
+  }
+
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('#nav-avatar-btn') && !e.target.closest('#nav-dropdown')) {
+      document.getElementById('nav-avatar-btn')?.classList.remove('open');
+      document.getElementById('nav-dropdown')?.classList.remove('open');
     }
   });
-  document.addEventListener('click',e=>{if(!e.target.closest('#nav-user')){document.getElementById('nav-avatar-btn')?.classList.remove('open');document.getElementById('nav-dropdown')?.classList.remove('open');}});
-  function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');window.location.href='index.html';}
+
+  function logout() {
+    localStorage.removeItem('ba_logged');
+    localStorage.removeItem('ba_name');
+    localStorage.removeItem('ba_user_id');
+    window.location.href = 'index.html';
+  }
 
   function closeMobileFilters() {
-    var panel = document.querySelector('.filters-panel');
-    var btn = document.getElementById('mobile-filter-btn');
+    const panel = document.querySelector('.filters-panel');
+    const btn = document.getElementById('mobile-filter-btn');
     if (panel) panel.classList.remove('mobile-open');
     if (btn) btn.textContent = '⚙ Filtros';
   }
+
   function toggleMobileFilters() {
-    var panel = document.querySelector('.filters-panel');
-    var btn = document.getElementById('mobile-filter-btn');
+    const panel = document.querySelector('.filters-panel');
+    const btn = document.getElementById('mobile-filter-btn');
     if (!panel) return;
     panel.classList.toggle('mobile-open');
-    btn.textContent = panel.classList.contains('mobile-open') ? '✕ Cerrar' : '⚙ Filtros';
+    if (btn) btn.textContent = panel.classList.contains('mobile-open') ? '✕ Cerrar' : '⚙ Filtros';
   }
-  // Cerrar al tocar chip (no al escribir en input)
-  document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('fchip') && window.innerWidth <= 900) {
-      setTimeout(closeMobileFilters, 300);
-    }
-  });
 
 </script>
 <div class="mbn-overlay" id="mbn-overlay" onclick="closeMbnPanel()"></div>

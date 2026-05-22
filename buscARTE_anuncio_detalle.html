@@ -61,6 +61,7 @@
   .badge-ofrezco { background:rgba(46,204,113,.1);color:#2ecc71;border:1px solid rgba(46,204,113,.2); }
   .badge-vendo { background:rgba(245,166,35,.1);color:#f5a623;border:1px solid rgba(245,166,35,.2); }
   .badge-jam { background:rgba(212,245,60,.08);color:var(--neon);border:1px solid rgba(212,245,60,.18); }
+  .badge-clases { background:rgba(0,210,200,.1);color:#00d4c8;border:1px solid rgba(0,210,200,.2); }
 
   .detail-titulo { font-family:var(--font-display);font-size:clamp(1.6rem,3vw,2.4rem);letter-spacing:-.02em;line-height:1.1;margin-bottom:1rem; }
 
@@ -243,17 +244,35 @@
 
   @media (max-width:900px) {
     .top-spacer { height:56px !important; }
-    .wrap { padding:1.5rem 1.25rem !important; }
+    .page-wrap { padding:1.5rem 1.25rem !important; }
     .detail-layout { grid-template-columns:1fr !important; gap:1.5rem !important; }
     .detail-sidebar { position:static !important; top:auto !important; }
-    .detail-title { font-size:1.5rem !important; }
+    .detail-titulo { font-size:1.5rem !important; }
     .detail-tags { flex-wrap:wrap !important; gap:.4rem !important; }
     .similar-grid { grid-template-columns:1fr !important; gap:0 !important; background:transparent !important; }
-    .similar-card { border-bottom:1px solid #1a1a1a !important; padding:1rem !important; }
-    .btn-contactar { width:100% !important; text-align:center !important; padding:1rem !important; }
+    .similar-item { border-bottom:1px solid #1a1a1a !important; padding:1rem !important; }
+    .btn-send, .btn-ver-perfil { width:100% !important; text-align:center !important; padding:1rem !important; }
     .detail-meta { flex-wrap:wrap !important; gap:.5rem !important; }
   }
 
+
+
+  .detail-note {
+    border:1px solid rgba(212,245,60,.18);
+    background:rgba(212,245,60,.045);
+    color:var(--gris);
+    padding:.85rem 1rem;
+    font-size:.78rem;
+    line-height:1.55;
+    margin-bottom:1.2rem;
+  }
+  .detail-note strong { color:var(--blanco);font-weight:500; }
+  .btn-secondary-action {
+    width:100%;background:transparent;border:1px solid var(--gris3);color:var(--gris);
+    padding:.7rem;font-family:var(--font-body);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;
+    cursor:none;transition:all .2s;text-align:center;text-decoration:none;display:block;margin-top:.65rem;
+  }
+  .btn-secondary-action:hover { border-color:var(--neon);color:var(--neon); }
 
   /* Lightbox */
   .foto-main { cursor: zoom-in !important; }
@@ -284,6 +303,80 @@
   /* ── MOBILE: avatar abre el panel del bottom nav ── */
   @media (max-width: 900px) {
     .nav-dropdown { display: none !important; }
+  }
+
+
+
+  /* ── CODEO VISUAL V2: detalle como pieza de anuncio ── */
+  .detail-hero-card {
+    position:relative;
+    border:1px solid #1c1c1c;
+    background:linear-gradient(135deg, rgba(212,245,60,.045), rgba(255,255,255,.015) 38%, rgba(0,0,0,.02));
+    padding:1.6rem;
+    margin-bottom:1.8rem;
+    overflow:hidden;
+  }
+  .detail-hero-card::after {
+    content:'';
+    position:absolute;
+    right:-80px;
+    top:-90px;
+    width:260px;
+    height:260px;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(212,245,60,.075), transparent 65%);
+    pointer-events:none;
+  }
+  .detail-hero-top { position:relative;z-index:1;display:flex;justify-content:space-between;gap:1.2rem;align-items:flex-start;margin-bottom:1rem; }
+  .hero-type-wrap { display:flex;flex-wrap:wrap;gap:.5rem;align-items:center; }
+  .hero-status-chip { font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gris);border:1px solid #2a2a2a;padding:.18rem .58rem;background:rgba(255,255,255,.02); }
+  .hero-actions { display:flex;gap:.55rem;align-items:center;flex-shrink:0; }
+  .hero-title { position:relative;z-index:1;font-family:var(--font-display);font-size:clamp(1.75rem,3.4vw,3rem);line-height:1.02;letter-spacing:-.035em;margin-bottom:1rem;max-width:850px; }
+  .hero-meta { position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:.55rem 1rem;color:var(--gris);font-size:.78rem;margin-bottom:1.15rem; }
+  .hero-meta a { color:var(--blanco);text-decoration:none; }
+  .hero-meta a:hover { color:var(--neon); }
+  .hero-action-row { position:relative;z-index:1;display:flex;gap:.65rem;flex-wrap:wrap;align-items:center; }
+  .btn-primary-hero {
+    background:var(--neon);color:var(--negro);border:none;
+    padding:.78rem 1.3rem;font-family:var(--font-display);font-size:.85rem;letter-spacing:.04em;
+    text-decoration:none;display:inline-flex;align-items:center;gap:.45rem;cursor:none;transition:opacity .2s, transform .2s;
+  }
+  .btn-primary-hero:hover { opacity:.86;transform:translateY(-1px); }
+  .btn-share {
+    background:transparent;color:var(--blanco);border:1px solid #2a2a2a;
+    padding:.76rem 1rem;font-family:var(--font-body);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;
+    cursor:none;transition:border-color .2s,color .2s;text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;
+  }
+  .btn-share:hover { border-color:var(--neon);color:var(--neon); }
+  .quick-info-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#1c1c1c;border:1px solid #1c1c1c;margin-bottom:1.6rem; }
+  .quick-info-card { background:var(--negro2);padding:1rem 1.1rem;min-width:0; }
+  .quick-info-label { font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gris2);margin-bottom:.35rem; }
+  .quick-info-value { font-size:.9rem;color:var(--blanco);line-height:1.35;word-break:break-word; }
+  .quick-info-value.strong { font-family:var(--font-display);font-size:1.25rem;color:var(--neon);letter-spacing:-.01em; }
+  .trust-note { border:1px solid #242424;background:rgba(255,255,255,.025);padding:1rem 1.1rem;color:var(--gris);font-size:.78rem;line-height:1.6;margin-top:1.5rem; }
+  .trust-note strong { color:var(--blanco);font-weight:500; }
+  .contact-anchor-offset { scroll-margin-top:86px; }
+  .mobile-sticky-action { display:none; }
+  .sidebar-card.is-contact { border-color:rgba(212,245,60,.22);box-shadow:0 0 0 1px rgba(212,245,60,.03) inset; }
+  .detail-desc { background:rgba(255,255,255,.015);border:1px solid #171717;padding:1.15rem 1.25rem; }
+  .foto-main { min-height:220px; }
+  .ficha { border-color:#242424; }
+  .ficha-row:first-child .ficha-key { color:var(--neon); }
+  @media (max-width:900px) {
+    .page-wrap { padding:1.25rem 1rem 5.4rem !important; }
+    .detail-hero-card { padding:1.15rem;margin-bottom:1.1rem; }
+    .detail-hero-top { flex-direction:column;gap:.8rem; }
+    .hero-actions { width:100%; }
+    .hero-title { font-size:clamp(1.55rem,8vw,2.4rem); }
+    .hero-action-row .btn-primary-hero { display:none; }
+    .quick-info-grid { grid-template-columns:1fr; }
+    .detail-desc { padding:1rem; }
+    .mobile-sticky-action {
+      display:flex;position:fixed;left:0;right:0;bottom:54px;z-index:490;
+      background:rgba(8,8,8,.96);border-top:1px solid #242424;padding:.65rem .9rem;gap:.55rem;backdrop-filter:blur(10px);
+    }
+    .mobile-sticky-action .btn-primary-hero { flex:1;justify-content:center;padding:.85rem .6rem;font-size:.78rem; }
+    .mobile-sticky-action .btn-share { padding:.85rem .7rem;font-size:.72rem; }
   }
 
 </style>
@@ -794,14 +887,9 @@
 </div><!-- end page-wrap -->
 
 <script>
-  // PROTECCIÓN: redirigir si no está logueado
-  (function() {
-    try {
-      if (localStorage.getItem('ba_logged') !== '1') {
-        window.location.replace('index.html');
-      }
-    } catch(e) {}
-  })();
+  // Página pública — el detalle de anuncio se puede navegar sin login.
+  // Para responder o contactar sí se pide cuenta.
+
   // CURSOR
   window.addEventListener('DOMContentLoaded', function() {
     const cursor=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
@@ -816,164 +904,311 @@
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68'
   const hdrs = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }
 
+  const BADGES = { busco:'badge-busco', ofrezco:'badge-ofrezco', jam:'badge-jam', vende:'badge-vendo', vendo:'badge-vendo', clases:'badge-clases' }
+  const LABELS = { busco:'🔍 Busco músico', ofrezco:'🎸 Me ofrezco', jam:'🥁 Jam / Zapada', vende:'🎛️ Vendo / Alquilo', vendo:'🎛️ Vendo / Alquilo', clases:'🎓 Doy clases' }
+  const ACTION_TITLES = { busco:'Responder al anuncio', ofrezco:'Contactar', jam:'Me apunto', vende:'Consultar al vendedor', vendo:'Consultar al vendedor', clases:'Consultar por clases' }
+  const ACTION_BTNS = { busco:'Enviar respuesta →', ofrezco:'Enviar mensaje →', jam:'Confirmar asistencia →', vende:'Enviar consulta →', vendo:'Enviar consulta →', clases:'Enviar consulta →' }
+
+  function normalizarTipo(tipo) {
+    return tipo === 'vendo' ? 'vende' : (tipo || 'busco')
+  }
+  function dbId(v) {
+    const s = String(v ?? '')
+    return /^\d+$/.test(s) ? Number(s) : s
+  }
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;')
+      .replaceAll('"','&quot;')
+      .replaceAll("'",'&#039;')
+  }
+  function escapeAttr(value) {
+    return escapeHtml(value).replaceAll('`','&#096;')
+  }
+  function nl2p(value) {
+    const safe = escapeHtml(value || '').trim()
+    if (!safe) return ''
+    return safe.split(/\n{2,}|\n/).filter(Boolean).map(p => `<p>${p}</p>`).join('')
+  }
+  function safeExternalUrl(url) {
+    try {
+      const u = new URL(String(url || '').trim())
+      if (!['http:', 'https:'].includes(u.protocol)) return ''
+      return u.href
+    } catch(e) { return '' }
+  }
   function timeAgo(iso) {
     if (!iso) return ''
-    const diff = Math.floor((new Date() - new Date(iso)) / 60000)
+    const d = new Date(iso)
+    if (isNaN(d)) return ''
+    const diff = Math.floor((new Date() - d) / 60000)
     if (diff < 1) return 'Hace un momento'
     if (diff < 60) return `Hace ${diff} min`
     if (diff < 1440) return `Hace ${Math.floor(diff/60)} hs`
     return `Hace ${Math.floor(diff/1440)} días`
   }
+  function initials(nombre) {
+    return String(nombre || 'Usuario').split(' ').filter(Boolean).map(w=>w[0]).join('').toUpperCase().slice(0,2) || '?'
+  }
+  function formatFechaEvento(iso) {
+    if (!iso) return null
+    const d = new Date(iso)
+    if (isNaN(d)) return null
+    return {
+      fecha: d.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'}),
+      hora: d.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}),
+      pasado: d < new Date()
+    }
+  }
 
-  const BADGES = { busco:'badge-busco', ofrezco:'badge-ofrezco', jam:'badge-jam', vende:'badge-vendo' }
-  const LABELS = { busco:'🔍 Busco músico', ofrezco:'🎸 Me ofrezco', jam:'🥁 Jam / Zapada', vende:'🎛️ Vendo' }
+  function contactoSidebar(a, autor, id) {
+    const tipo = normalizarTipo(a.tipo)
+    const logged = localStorage.getItem('ba_logged') === '1'
+    const miId = localStorage.getItem('ba_user_id') || ''
+    const esPropio = miId && a.user_id && String(miId) === String(a.user_id)
+    const title = ACTION_TITLES[tipo] || 'Contactar'
+    const btnText = ACTION_BTNS[tipo] || 'Enviar mensaje →'
+
+    if (esPropio) {
+      return `<div class="sidebar-card is-contact contact-anchor-offset" id="contact-card">
+        <div class="sidebar-card-title">Este anuncio es tuyo</div>
+        <div class="sidebar-card-sub">Este detalle ya se puede ver públicamente. Para pausar, editar o eliminar, andá a Mis anuncios.</div>
+        <a href="buscARTE_mis_anuncios.html" class="btn-ver-perfil">Gestionar anuncio →</a>
+      </div>`
+    }
+
+    const loginBlock = logged
+      ? `<textarea placeholder="Escribí tu mensaje..."></textarea>
+         <button class="btn-send" onclick="sendMsg(this)" data-anuncio-id="${escapeAttr(id)}" data-para-id="${escapeAttr(a.user_id || '')}">${btnText}</button>`
+      : `<div class="detail-note"><strong>El anuncio es público.</strong><br>Para responder, consultar o apuntarte necesitás una cuenta gratis.</div>
+         <a class="btn-send" href="buscARTE_login.html?next=${encodeURIComponent(location.pathname + location.search)}" style="display:block;text-align:center;text-decoration:none">Ingresar para responder →</a>
+         <a class="btn-secondary-action" href="buscARTE_registro.html">Crear cuenta gratis</a>`
+
+    return `<div class="sidebar-card is-contact contact-anchor-offset" id="contact-card">
+      <div class="sidebar-card-title">${escapeHtml(title)}</div>
+      <div class="sidebar-card-sub">${tipo === 'jam' ? 'Confirmá asistencia y contale al organizador qué instrumento traés.' : tipo === 'vende' ? 'Consultá antes de coordinar una compra, prueba o retiro.' : tipo === 'clases' ? 'Preguntá horarios, modalidad y disponibilidad.' : 'Contale quién sos y por qué te interesa.'}</div>
+      <div class="contact-form">${loginBlock}</div>
+    </div>`
+  }
+
+  function focusContact() {
+    const card = document.getElementById('contact-card')
+    if (card) {
+      card.scrollIntoView({ behavior:'smooth', block:'start' })
+      setTimeout(() => card.querySelector('textarea')?.focus(), 450)
+    }
+  }
+
+  async function shareAnuncio() {
+    const title = document.querySelector('.hero-title, .detail-titulo')?.textContent?.trim() || 'Anuncio en buscARTE'
+    const url = location.href
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, url })
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(url)
+        alert('Link copiado al portapapeles.')
+      } else {
+        prompt('Copiá el link del anuncio:', url)
+      }
+    } catch(e) {}
+  }
+
+  function autorSidebar(a, autor) {
+    const i = initials(autor.nombre)
+    return `<div class="sidebar-card">
+      <div class="sidebar-card-title">Publicado por</div>
+      <a href="buscARTE_perfil_publico.html?id=${encodeURIComponent(a.user_id || '')}" class="autor-card">
+        <div class="autor-avatar-big" style="background:#0d2010;color:var(--neon)">${escapeHtml(i)}</div>
+        <div class="autor-info">
+          <div class="autor-nombre">${escapeHtml(autor.nombre || 'Usuario')}</div>
+          <div class="autor-meta">${escapeHtml(autor.instrumento || 'Usuario de buscARTE')}${autor.ciudad ? ' · '+escapeHtml(autor.ciudad) : ''}</div>
+        </div>
+      </a>
+      ${a.user_id ? `<a href="buscARTE_perfil_publico.html?id=${encodeURIComponent(a.user_id)}" class="btn-ver-perfil">Ver perfil →</a>` : ''}
+      <a href="buscARTE_contacto.html" class="report-link">⚑ Reportar anuncio</a>
+    </div>`
+  }
+
+  function renderEspecial(a) {
+    const tipo = normalizarTipo(a.tipo)
+    if (tipo === 'vende') {
+      const foto = a.foto_url ? `<div class="foto-section"><div class="foto-main" onclick="openLightbox('${escapeAttr(a.foto_url)}')"><img src="${escapeAttr(a.foto_url)}" alt="Foto del anuncio"></div></div>` : ''
+      const rows = [
+        a.precio ? ['Precio', String(a.precio).startsWith('$') ? a.precio : '$'+a.precio, 'price'] : null,
+        a.categoria_producto ? ['Categoría', a.categoria_producto, ''] : null,
+        a.marca ? ['Marca', a.marca, ''] : null,
+        a.condicion ? ['Condición', a.condicion, ''] : null,
+        a.zona ? ['Zona', a.zona, ''] : null
+      ].filter(Boolean).map(([k,v,cls]) => `<div class="ficha-row"><span class="ficha-key">${escapeHtml(k)}</span><span class="ficha-val ${cls}">${escapeHtml(v)}</span></div>`).join('')
+      return `${foto}${rows ? `<div class="ficha">${rows}</div>` : ''}
+        <div class="trust-note"><strong>Tip de compra/venta:</strong> coordiná en un lugar seguro, revisá el equipo antes de pagar y evitá adelantos si no conocés a la otra persona.</div>`
+    }
+
+    if (tipo === 'clases') {
+      const precioHora = a.precio ? `${String(a.precio).startsWith('$') ? a.precio : '$'+a.precio} / hora` : ''
+      return `<div class="evento-hero" style="border-color:rgba(0,210,200,.2)">
+        <div class="evento-fecha-row">${a.instrumento ? `<span class="evento-fecha-grande" style="color:#00d4c8">🎓 Clases de ${escapeHtml(String(a.instrumento).split(',')[0])}</span>` : `<span class="evento-fecha-grande" style="color:#00d4c8">🎓 Doy clases</span>`}</div>
+        ${a.nivel ? `<div class="evento-lugar">📊 Nivel: <strong>${escapeHtml(a.nivel)}</strong></div>` : ''}
+        ${a.modalidad ? `<div class="evento-lugar">📍 Modalidad: <strong>${escapeHtml(a.modalidad)}</strong></div>` : ''}
+        ${a.zona ? `<div class="evento-lugar">📌 Zona: <strong>${escapeHtml(a.zona)}</strong></div>` : ''}
+        ${precioHora ? `<div class="evento-precio" style="border-color:rgba(0,210,200,.3);color:#00d4c8">💰 ${escapeHtml(precioHora)}</div>` : ''}
+      </div>`
+    }
+
+    if (tipo === 'jam') {
+      const f = formatFechaEvento(a.fecha_evento)
+      const flyer = a.foto_url ? `<div class="foto-section" style="margin-bottom:1.5rem"><div class="foto-main" style="max-height:420px" onclick="openLightbox('${escapeAttr(a.foto_url)}')"><img src="${escapeAttr(a.foto_url)}" alt="Flyer del evento"></div></div>` : ''
+      const fecha = f ? `<div class="evento-hero">
+        <div class="evento-fecha-row">
+          <span class="evento-fecha-grande${f.pasado ? ' anuncio-pasado' : ''}">${escapeHtml(f.fecha)}</span>
+          <span class="evento-hora">${escapeHtml(f.hora)} hs</span>
+        </div>
+        ${a.lugar ? `<div class="evento-lugar">📍 ${escapeHtml(a.lugar)}</div>` : ''}
+        ${a.precio_entrada ? `<div class="evento-precio">🎟 ${escapeHtml(a.precio_entrada)}</div>` : ''}
+      </div>` : ''
+      const url = safeExternalUrl(a.link_evento)
+      const info = (url || a.contacto_evento) ? `<div class="ficha" style="margin-top:1rem">
+        ${url ? `<div class="ficha-row"><span class="ficha-key">Entradas / Info</span><span class="ficha-val"><a href="${escapeAttr(url)}" target="_blank" rel="noopener noreferrer" style="color:var(--neon);word-break:break-all">${escapeHtml(url)}</a></span></div>` : ''}
+        ${a.contacto_evento ? `<div class="ficha-row"><span class="ficha-key">Contacto</span><span class="ficha-val">${escapeHtml(a.contacto_evento)}</span></div>` : ''}
+      </div>` : ''
+      return flyer + fecha + info
+    }
+
+    return ''
+  }
+
+  function renderAnuncio(a, autor, id) {
+    const tipo = normalizarTipo(a.tipo)
+    const label = LABELS[tipo] || escapeHtml(tipo)
+    const badge = BADGES[tipo] || 'badge-busco'
+    const i = initials(autor.nombre)
+    const zona = a.zona || a.lugar || ''
+    const tags = [a.instrumentos, a.instrumento, a.generos, a.categoria_producto, a.nivel, a.modalidad].filter(Boolean).join(',').split(',').map(t=>t.trim()).filter(Boolean)
+    const tagsHTML = [...new Set(tags)].map(t=>`<span class="dtag dtag-neon">${escapeHtml(t)}</span>`).join('')
+    const tipoParam = tipo === 'vende' ? 'vende' : tipo
+    const actionTitle = ACTION_TITLES[tipo] || 'Contactar'
+    const statusLabel = tipo === 'jam' ? 'Evento publicado' : tipo === 'vende' ? 'Marketplace musical' : tipo === 'clases' ? 'Clases disponibles' : 'Anuncio activo'
+    const precio = a.precio ? (String(a.precio).startsWith('$') ? a.precio : '$'+a.precio) : ''
+    const f = tipo === 'jam' ? formatFechaEvento(a.fecha_evento) : null
+    const quickItems = []
+    if (tipo === 'vende' && precio) quickItems.push(['Precio', precio, 'strong'])
+    if (tipo === 'jam' && f) quickItems.push(['Fecha', `${f.fecha} · ${f.hora} hs`, 'strong'])
+    if (tipo === 'clases' && a.instrumento) quickItems.push(['Clase', String(a.instrumento).split(',')[0], 'strong'])
+    if (zona) quickItems.push([tipo === 'jam' ? 'Lugar' : 'Zona', zona, ''])
+    if (tipo === 'vende' && a.condicion) quickItems.push(['Estado', a.condicion, ''])
+    if (tipo === 'clases' && a.modalidad) quickItems.push(['Modalidad', a.modalidad, ''])
+    if (tags.length) quickItems.push(['Tags', [...new Set(tags)].slice(0,3).join(' · '), ''])
+    const quickHTML = quickItems.slice(0,3).map(([k,v,cls]) => `<div class="quick-info-card"><div class="quick-info-label">${escapeHtml(k)}</div><div class="quick-info-value ${cls || ''}">${escapeHtml(v)}</div></div>`).join('')
+
+    document.getElementById('page-wrap').innerHTML = `<div class="breadcrumb">
+      <a href="buscARTE_anuncios.html">Tablón</a>
+      <span>›</span>
+      <a href="buscARTE_anuncios.html?tipo=${encodeURIComponent(tipoParam)}">${label}</a>
+      <span>›</span>
+      ${escapeHtml(a.titulo || 'Anuncio')}
+    </div>
+
+    <section class="detail-hero-card">
+      <div class="detail-hero-top">
+        <div class="hero-type-wrap">
+          <span class="anuncio-tipo-badge ${badge}" style="margin-bottom:0">${label}</span>
+          <span class="hero-status-chip">${escapeHtml(statusLabel)}</span>
+        </div>
+        <div class="hero-actions">
+          <button class="btn-share" onclick="shareAnuncio()">Compartir</button>
+        </div>
+      </div>
+      <h1 class="hero-title">${escapeHtml(a.titulo || 'Sin título')}</h1>
+      <div class="hero-meta">
+        <a href="buscARTE_perfil_publico.html?id=${encodeURIComponent(a.user_id || '')}">Publicado por ${escapeHtml(autor.nombre || 'Usuario')}</a>
+        ${zona ? `<span>📍 ${escapeHtml(zona)}</span>` : ''}
+        <span>🕐 ${escapeHtml(timeAgo(a.created_at))}</span>
+        <span>👁 ${escapeHtml(a.vistas || 0)} vistas</span>
+      </div>
+      <div class="hero-action-row">
+        <button class="btn-primary-hero" onclick="focusContact()">${escapeHtml(actionTitle)} →</button>
+        <a class="btn-share" href="buscARTE_anuncios.html?tipo=${encodeURIComponent(tipoParam)}">Ver más de esta categoría</a>
+      </div>
+    </section>
+
+    ${quickHTML ? `<div class="quick-info-grid">${quickHTML}</div>` : ''}
+
+    <div class="detail-layout">
+      <div class="detail-main">
+        ${renderEspecial(a)}
+        ${a.descripcion ? `<div class="detail-section"><div class="detail-section-title">Descripción</div><div class="detail-desc">${nl2p(a.descripcion)}</div></div>` : ''}
+        ${tagsHTML ? `<div class="detail-section"><div class="detail-section-title">Datos del anuncio</div><div class="tags-row">${tagsHTML}</div></div>` : ''}
+        <div class="similar-section">
+          <div class="similar-title">Seguir explorando</div>
+          <div class="similar-grid">
+            <a href="buscARTE_anuncios.html?tipo=${encodeURIComponent(tipoParam)}" class="similar-item">
+              <span class="similar-badge ${badge}">${label}</span>
+              <div class="similar-titulo">Ver más anuncios de esta categoría</div>
+              <div class="similar-meta">Tablón de anuncios</div>
+            </a>
+            <a href="buscARTE_busqueda.html" class="similar-item">
+              <span class="similar-badge badge-jam" style="background:rgba(212,245,60,.08);color:var(--neon);border:1px solid rgba(212,245,60,.18);">🎵 Músicos</span>
+              <div class="similar-titulo">Explorar músicos de la comunidad</div>
+              <div class="similar-meta">Búsqueda por instrumento y zona</div>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="detail-sidebar">
+        ${contactoSidebar(a, autor, id)}
+        ${autorSidebar(a, autor)}
+      </div>
+    </div>
+    <div class="mobile-sticky-action">
+      <button class="btn-primary-hero" onclick="focusContact()">${escapeHtml(actionTitle)} →</button>
+      <button class="btn-share" onclick="shareAnuncio()">Compartir</button>
+    </div>`
+    document.title = `buscARTE — ${a.titulo || 'Anuncio'}`
+  }
 
   async function cargarAnuncio() {
     const params = new URLSearchParams(window.location.search)
     const id = params.get('id')
 
-    // Sin ID → mostrar demo
+    document.getElementById('demo-bar').style.display = 'none'
+
     if (!id) {
-      document.getElementById('demo-bar').style.display = 'flex'
-      document.getElementById('view-busco').classList.add('active')
+      mostrarError('Elegí un anuncio desde el tablón.')
       return
     }
 
-    // Ocultar demo bar
-    document.getElementById('demo-bar').style.display = 'none'
-
     try {
-      // Cargar anuncio
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/anuncios?id=eq.${id}&select=*`, { headers: hdrs })
-      const [a] = await res.json()
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/anuncios?id=eq.${encodeURIComponent(id)}&select=*`, { headers: hdrs })
+      if (!res.ok) {
+        const errText = await res.text()
+        console.error('Error cargando anuncio:', res.status, errText)
+        mostrarError('No se pudo cargar el anuncio.')
+        return
+      }
+      const arr = await res.json()
+      const a = Array.isArray(arr) ? arr[0] : null
       if (!a) { mostrarError('Anuncio no encontrado.'); return }
 
-      // Cargar autor
-      let autor = { nombre: 'Usuario', instrumento: 'Músico', ciudad: '' }
+      let autor = { nombre: 'Usuario', instrumento: 'Usuario de buscARTE', ciudad: '' }
       if (a.user_id) {
-        const pRes = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${a.user_id}&select=id,nombre,instrumento,ciudad`, { headers: hdrs })
-        const [p] = await pRes.json()
-        if (p) autor = p
+        const pRes = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${encodeURIComponent(a.user_id)}&select=id,nombre,instrumento,ciudad`, { headers: hdrs })
+        if (pRes.ok) {
+          const perfiles = await pRes.json()
+          if (Array.isArray(perfiles) && perfiles[0]) autor = perfiles[0]
+        }
       }
 
-      // Incrementar vistas
-      fetch(`${SUPABASE_URL}/rest/v1/anuncios?id=eq.${id}`, {
+      // Incrementar vistas sin bloquear la carga. Si RLS/permiso lo impide, se ignora.
+      fetch(`${SUPABASE_URL}/rest/v1/anuncios?id=eq.${encodeURIComponent(id)}`, {
         method: 'PATCH',
         headers: { ...hdrs, 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ vistas: (a.vistas || 0) + 1 })
-      })
+        body: JSON.stringify({ vistas: (Number(a.vistas) || 0) + 1 })
+      }).catch(()=>{})
 
-      // Renderizar según tipo
-      const wrap = document.getElementById('page-wrap')
-      const badge = BADGES[a.tipo] || 'badge-busco'
-      const label = LABELS[a.tipo] || a.tipo
-      const initials = autor.nombre.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)
-
-      // Tags
-      const tags = [a.instrumentos, a.generos].filter(Boolean).join(',').split(',').map(t=>t.trim()).filter(Boolean)
-      const tagsHTML = tags.map(t=>`<span class="dtag dtag-neon">${t}</span>`).join('')
-
-      // Bloque especial según tipo
-      let especial = ''
-      if (a.tipo === 'vende') {
-        especial = `
-          ${a.foto_url ? `<div class="foto-section"><div class="foto-main" style="cursor:zoom-in" onclick="openLightbox('${a.foto_url}')"><img src="${a.foto_url}" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in"></div></div>` : ''}
-          <div class="ficha">
-          ${a.precio ? `<div class="ficha-row"><span class="ficha-key">Precio</span><span class="ficha-val price">${String(a.precio).startsWith('$') ? a.precio : '$'+a.precio}</span></div>` : ''}
-          ${a.categoria_producto ? `<div class="ficha-row"><span class="ficha-key">Categoría</span><span class="ficha-val">${a.categoria_producto}</span></div>` : ''}
-          ${a.marca ? `<div class="ficha-row"><span class="ficha-key">Marca</span><span class="ficha-val">${a.marca}</span></div>` : ''}
-          ${a.condicion ? `<div class="ficha-row"><span class="ficha-key">Condición</span><span class="ficha-val">${a.condicion}</span></div>` : ''}
-          ${a.zona ? `<div class="ficha-row"><span class="ficha-key">Zona</span><span class="ficha-val">${a.zona}</span></div>` : ''}
-        </div>`
-      } else if (a.tipo === 'clases') {
-        const precioHora = a.precio ? `$${String(a.precio).replace(/^\$/,'')} / hora` : null
-        especial = `<div class="evento-hero" style="border-color:rgba(0,210,200,.2)">
-          <div class="evento-fecha-row">
-            ${a.instrumento ? `<span class="evento-fecha-grande" style="color:#00d4c8">🎓 Clases de ${a.instrumento.split(',')[0]}</span>` : ''}
-          </div>
-          ${a.nivel ? `<div class="evento-lugar">📊 Nivel: <strong>${a.nivel}</strong></div>` : ''}
-          ${a.modalidad ? `<div class="evento-lugar">📍 Modalidad: <strong>${a.modalidad}</strong></div>` : ''}
-          ${precioHora ? `<div class="evento-precio" style="border-color:rgba(0,210,200,.3);color:#00d4c8">💰 ${precioHora}</div>` : ''}
-        </div>`
-      } else if (a.tipo === 'jam') {
-        const fechaBlock = a.fecha_evento ? (() => {
-          const fecha = new Date(a.fecha_evento)
-          return `<div class="evento-hero">
-            <div class="evento-fecha-row">
-              <span class="evento-fecha-grande">${fecha.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'})}</span>
-              <span class="evento-hora">${fecha.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})} hs</span>
-            </div>
-            ${a.lugar ? `<div class="evento-lugar">📍 ${a.lugar}</div>` : ''}
-            ${a.precio_entrada ? `<div class="evento-precio">🎟 ${a.precio_entrada}</div>` : ''}
-          </div>`
-        })() : ''
-        const flyerBlock = a.foto_url
-          ? `<div class="foto-section" style="margin-bottom:1.5rem">
-              <div class="foto-main" style="cursor:zoom-in;max-height:320px" onclick="openLightbox('${a.foto_url}')">
-                <img src="${a.foto_url}" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in" alt="Flyer">
-              </div>
-             </div>`
-          : ''
-        const linksBlock = (a.link_evento || a.contacto_evento)
-          ? `<div class="ficha" style="margin-top:1rem">
-              ${a.link_evento ? `<div class="ficha-row"><span class="ficha-key">Entradas / Info</span><span class="ficha-val"><a href="${a.link_evento}" target="_blank" rel="noopener" style="color:var(--neon);word-break:break-all">${a.link_evento}</a></span></div>` : ''}
-              ${a.contacto_evento ? `<div class="ficha-row"><span class="ficha-key">Contacto</span><span class="ficha-val">${a.contacto_evento}</span></div>` : ''}
-             </div>`
-          : ''
-        especial = flyerBlock + fechaBlock + linksBlock
-      }
-
-      wrap.innerHTML = `
-        <div class="breadcrumb">
-          <a href="buscARTE_anuncios.html">Tablón</a>
-          <span>›</span>
-          <a href="buscARTE_anuncios.html">${label}</a>
-          <span>›</span>
-          ${a.titulo||'Anuncio'}
-        </div>
-        <div class="detail-layout">
-          <div class="detail-main">
-            <span class="anuncio-tipo-badge ${badge}">${label}</span>
-            <h1 class="detail-titulo">${a.titulo||'Sin título'}</h1>
-            <div class="detail-meta">
-              <a href="buscARTE_perfil_publico.html?id=${a.user_id||''}" class="meta-autor">
-                <div class="meta-avatar" style="background:#0d2010;color:var(--neon)">${initials}</div>
-                <span class="meta-name">${autor.nombre}</span>
-              </a>
-              ${a.zona ? `<span class="meta-sep">·</span><span class="meta-item">📍 ${a.zona}</span>` : ''}
-              <span class="meta-sep">·</span><span class="meta-item">🕐 ${timeAgo(a.created_at)}</span>
-              <span class="meta-sep">·</span><span class="meta-item">👁 ${a.vistas||0} vistas</span>
-            </div>
-            ${especial}
-            ${a.descripcion ? `<div class="detail-section"><div class="detail-section-title">Descripción</div><div class="detail-desc"><p>${a.descripcion.replace(/\n/g,'</p><p>')}</p></div></div>` : ''}
-            ${tagsHTML ? `<div class="detail-section"><div class="detail-section-title">Géneros e instrumentos</div><div class="tags-row">${tagsHTML}</div></div>` : ''}
-          </div>
-          <div class="detail-sidebar">
-            <div class="sidebar-card">
-              <div class="sidebar-card-title">${a.tipo === 'jam' ? 'Me apunto' : a.tipo === 'vende' ? 'Consultar al vendedor' : 'Responder al anuncio'}</div>
-              <div class="sidebar-card-sub">Contale quién sos y por qué te interesa.</div>
-              <div class="contact-form">
-                <textarea placeholder="Escribí tu mensaje..."></textarea>
-                <button class="btn-send" onclick="sendMsg(this)" data-anuncio-id="${id}" data-para-id="${a.user_id||''}">Enviar mensaje →</button>
-                <p class="login-note">¿Sin cuenta? <a href="buscARTE_registro.html">Registrate gratis</a></p>
-              </div>
-            </div>
-            <div class="sidebar-card">
-              <div class="sidebar-card-title">Publicado por</div>
-              <a href="buscARTE_perfil_publico.html?id=${a.user_id||''}" class="autor-card">
-                <div class="autor-avatar-big" style="background:#0d2010;color:var(--neon)">${initials}</div>
-                <div class="autor-info">
-                  <div class="autor-nombre">${autor.nombre}</div>
-                  <div class="autor-meta">${autor.instrumento||'Músico'}${autor.ciudad ? ' · '+autor.ciudad : ''}</div>
-                </div>
-              </a>
-              <a href="buscARTE_perfil_publico.html?id=${a.user_id||''}" class="btn-ver-perfil">Ver perfil completo →</a>
-            </div>
-          </div>
-        </div>`
-
-      document.title = `buscARTE — ${a.titulo||'Anuncio'}`
-
+      renderAnuncio(a, autor, id)
     } catch(e) {
       mostrarError('Error al cargar el anuncio.')
       console.error(e)
@@ -983,7 +1218,8 @@
   function mostrarError(msg) {
     document.getElementById('page-wrap').innerHTML = `<div style="padding:5rem;text-align:center">
       <div style="font-size:2rem;margin-bottom:1rem">😕</div>
-      <div style="font-family:var(--font-display);font-size:1.5rem;margin-bottom:.5rem">${msg}</div>
+      <div style="font-family:var(--font-display);font-size:1.5rem;margin-bottom:.5rem">${escapeHtml(msg)}</div>
+      <div style="color:var(--gris);font-size:.88rem;margin-bottom:1.4rem">Los anuncios se pueden ver sin cuenta. Para responder o publicar, necesitás iniciar sesión.</div>
       <a href="buscARTE_anuncios.html" style="color:var(--neon);text-decoration:none;font-size:.88rem">← Volver al tablón</a>
     </div>`
   }
@@ -997,51 +1233,66 @@
     const paraId = btn.dataset.paraId
     const anuncioId = btn.dataset.anuncioId
 
-    if (!miId) { alert('Necesitás estar registrado para enviar mensajes.'); window.location.href='buscARTE_login.html'; return }
+    if (!miId) {
+      window.location.href = 'buscARTE_login.html?next=' + encodeURIComponent(location.pathname + location.search)
+      return
+    }
+    if (!paraId) {
+      alert('No se pudo encontrar el destinatario del anuncio.')
+      return
+    }
+    if (String(miId) === String(paraId)) {
+      alert('Este anuncio es tuyo. Podés gestionarlo desde Mis anuncios.')
+      return
+    }
 
     btn.textContent = 'Enviando...'
     btn.disabled = true
 
     try {
-      // Crear o encontrar conversación
+      const miIdQ = encodeURIComponent(miId)
+      const paraIdQ = encodeURIComponent(paraId)
       const convRes = await fetch(
-        `${SUPABASE_URL}/rest/v1/conversaciones?or=(and(user1_id.eq.${miId},user2_id.eq.${paraId}),and(user1_id.eq.${paraId},user2_id.eq.${miId}))`,
+        `${SUPABASE_URL}/rest/v1/conversaciones?or=(and(user1_id.eq.${miIdQ},user2_id.eq.${paraIdQ}),and(user1_id.eq.${paraIdQ},user2_id.eq.${miIdQ}))`,
         { headers: hdrs }
       )
+      if (!convRes.ok) throw new Error(await convRes.text())
       let convs = await convRes.json()
       let convId
 
-      if (convs.length) {
+      if (Array.isArray(convs) && convs.length) {
         convId = convs[0].id
       } else {
         const nueva = await fetch(`${SUPABASE_URL}/rest/v1/conversaciones`, {
           method: 'POST',
           headers: { ...hdrs, 'Prefer': 'return=representation' },
-          body: JSON.stringify({ user1_id: parseInt(miId), user2_id: parseInt(paraId), anuncio_id: parseInt(anuncioId), ultimo_mensaje: texto })
+          body: JSON.stringify({ user1_id: dbId(miId), user2_id: dbId(paraId), anuncio_id: dbId(anuncioId), ultimo_mensaje: texto })
         })
-        const [conv] = await nueva.json()
-        convId = conv.id
+        if (!nueva.ok) throw new Error(await nueva.text())
+        const nuevaJson = await nueva.json()
+        convId = Array.isArray(nuevaJson) && nuevaJson[0] ? nuevaJson[0].id : null
       }
 
-      await fetch(`${SUPABASE_URL}/rest/v1/mensajes`, {
+      const msgRes = await fetch(`${SUPABASE_URL}/rest/v1/mensajes`, {
         method: 'POST',
         headers: { ...hdrs, 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ de_user_id: parseInt(miId), para_user_id: parseInt(paraId), contenido: texto })
+        body: JSON.stringify({ de_user_id: dbId(miId), para_user_id: dbId(paraId), contenido: texto })
       })
+      if (!msgRes.ok) throw new Error(await msgRes.text())
 
-      await fetch(`${SUPABASE_URL}/rest/v1/conversaciones?id=eq.${convId}`, {
-        method: 'PATCH',
-        headers: { ...hdrs, 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ ultimo_mensaje: texto, updated_at: new Date().toISOString() })
-      })
+      if (convId) {
+        fetch(`${SUPABASE_URL}/rest/v1/conversaciones?id=eq.${encodeURIComponent(convId)}`, {
+          method: 'PATCH',
+          headers: { ...hdrs, 'Prefer': 'return=minimal' },
+          body: JSON.stringify({ ultimo_mensaje: texto, updated_at: new Date().toISOString() })
+        }).catch(()=>{})
+      }
 
-      // Notificación email al destinatario
+      // Notificación email al destinatario — no bloquea el envío
       try {
-        const emailRes = await fetch(
-          `${SUPABASE_URL}/rest/v1/perfiles?id=eq.${paraId}&select=email,nombre`,
-          { headers: hdrs }
-        )
-        const [dest] = await emailRes.json()
+        const emailRes = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${encodeURIComponent(paraId)}&select=email,nombre`, { headers: hdrs })
+        const destArr = await emailRes.json()
+        const dest = Array.isArray(destArr) ? destArr[0] : null
         if (dest?.email) {
           fetch('/.netlify/functions/send-email', {
             method: 'POST',
@@ -1050,7 +1301,7 @@
               tipo: 'mensaje',
               destinatario: dest.email,
               datos: {
-                remitente: localStorage.getItem('ba_name') || 'Un músico',
+                remitente: localStorage.getItem('ba_name') || 'Un usuario de buscARTE',
                 preview: texto.length > 100 ? texto.slice(0, 100) + '...' : texto
               }
             })
@@ -1061,22 +1312,29 @@
       btn.textContent = '✓ Enviado'
       btn.style.background = '#a8c832'
       ta.value = ''
-      setTimeout(() => { btn.textContent = 'Ver en mensajes →'; btn.style.background = ''; btn.onclick = () => window.location.href='buscARTE_mensajes.html'; btn.disabled = false }, 1500)
-
-    } catch(e) { alert('Error al enviar.'); btn.textContent = 'Enviar mensaje →'; btn.disabled = false }
+      setTimeout(() => {
+        btn.textContent = 'Ver en mensajes →'
+        btn.style.background = ''
+        btn.onclick = () => window.location.href='buscARTE_mensajes.html'
+        btn.disabled = false
+      }, 1300)
+    } catch(e) {
+      console.error('Error enviando mensaje:', e)
+      alert('No se pudo enviar el mensaje. Intentá de nuevo.')
+      btn.textContent = ACTION_BTNS[normalizarTipo(document.querySelector('.anuncio-tipo-badge')?.textContent)] || 'Enviar mensaje →'
+      btn.disabled = false
+    }
   }
 
-  // DEMO SWITCHER — solo cuando no hay ID en URL
+  // DEMO SWITCHER — solo queda para pruebas manuales si se fuerza desde consola
   function showView(tipo, el) {
     document.querySelectorAll('.anuncio-view').forEach(v=>v.classList.remove('active'))
     document.querySelectorAll('.demo-tab').forEach(t=>t.classList.remove('active'))
-    document.getElementById('view-'+tipo).classList.add('active')
-    el.classList.add('active')
+    const view = document.getElementById('view-'+tipo)
+    if (view) view.classList.add('active')
+    if (el) el.classList.add('active')
     window.scrollTo({top:0,behavior:'smooth'})
   }
-
-  // Guardar texto original de cada botón
-  document.querySelectorAll('.btn-send').forEach(b=>b.dataset.orig=b.textContent)
 
   // Cargar anuncio real si hay ID en URL
   cargarAnuncio();
@@ -1087,8 +1345,8 @@
     try {
       const lastSeen = localStorage.getItem('ba_msg_last_seen') || new Date().toISOString();
       const res = await fetch(
-        `https://xiaanchoanxmampegoay.supabase.co/rest/v1/mensajes?para_user_id=eq.${uid}&created_at=gt.${lastSeen}&select=id&limit=99`,
-        { headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68', 'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68` } }
+        `${SUPABASE_URL}/rest/v1/mensajes?para_user_id=eq.${encodeURIComponent(uid)}&created_at=gt.${encodeURIComponent(lastSeen)}&select=id&limit=99`,
+        { headers: hdrs }
       );
       const msgs = await res.json();
       const count = Array.isArray(msgs) ? msgs.length : 0;
@@ -1114,18 +1372,16 @@
       const nm=document.getElementById('nav-avatar-name');if(nm)nm.textContent=n.split(' ')[0];
       cargarBadgeMensajes(uid);
       const miPerfilLink=document.querySelector('.nav-dropdown-item[href*="perfil_publico"]');
-      if(miPerfilLink && uid) miPerfilLink.href='buscARTE_perfil_publico.html?id='+uid;
+      if(miPerfilLink && uid) miPerfilLink.href='buscARTE_perfil_publico.html?id='+encodeURIComponent(uid);
     }
   })();
   function toggleUserMenu(e){if(e)e.stopPropagation();const w=document.getElementById('nav-avatar-btn');const d=document.getElementById('nav-dropdown');if(w)w.classList.toggle('open');if(d)d.classList.toggle('open');}
-  // Close dropdown when tapping outside
   document.addEventListener('click', function(e){
     if(!e.target.closest('#nav-avatar-btn') && !e.target.closest('#nav-dropdown')){
       const d=document.getElementById('nav-dropdown');const w=document.getElementById('nav-avatar-btn');
       if(d)d.classList.remove('open');if(w)w.classList.remove('open');
     }
   });
-  document.addEventListener('click',e=>{if(!e.target.closest('#nav-user')){document.getElementById('nav-avatar-btn')?.classList.remove('open');document.getElementById('nav-dropdown')?.classList.remove('open');}});
   function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');window.location.href='index.html';}
 </script>
 <div class="mbn-overlay" id="mbn-overlay" onclick="closeMbnPanel()"></div>

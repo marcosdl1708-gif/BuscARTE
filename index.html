@@ -690,8 +690,14 @@
     /* STATS */
     .stats-bar {
       grid-template-columns: 1fr 1fr !important;
-      padding: 2rem 1.25rem !important;
+      padding: 0 !important;
     }
+    .stat-item {
+      padding: 1.35rem 1.25rem !important;
+    }
+    .stat-item:nth-child(2) { border-right: none !important; }
+    .stat-item:nth-child(3),
+    .stat-item:nth-child(4) { border-top: 1px solid #1c1c1c !important; }
     .stat-num { font-size: 2rem !important; }
     .stat-label { font-size: .72rem !important; }
 
@@ -731,7 +737,15 @@
       border-right: 1px solid #1c1c1c !important;
     }
     .search-btn { width: 100% !important; }
-    .filters { grid-template-columns: 1fr 1fr !important; gap: .5rem !important; }
+    .filters {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr !important;
+      gap: .5rem !important;
+    }
+    .filter-select {
+      width: 100% !important;
+      min-width: 0 !important;
+    }
 
     /* PROFILES */
     .profiles-grid { grid-template-columns: 1fr !important; }
@@ -794,6 +808,193 @@
     }
     .hero { padding: 4rem 3rem 3rem !important; }
     .hqn-btn { padding: .75rem 1.2rem !important; font-size: .82rem !important; min-width: 120px !important; }
+  }
+
+
+
+  /* ── CODEO CONCEPTO: HOME MÁS ACCIONABLE ── */
+  .hero-product {
+    min-height: 92vh;
+    justify-content: center;
+    padding-top: 7.5rem;
+    padding-bottom: 4rem;
+  }
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 1180px;
+    width: 100%;
+  }
+  .hero-kicker-row {
+    display:flex;
+    flex-wrap:wrap;
+    gap:.6rem;
+    margin-bottom:1.4rem;
+  }
+  .hero-kicker-pill {
+    border:1px solid #2a2a2a;
+    color:var(--gris);
+    padding:.35rem .75rem;
+    font-size:.68rem;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    background:rgba(255,255,255,.02);
+  }
+  .hero-kicker-pill.strong {
+    border-color:rgba(212,245,60,.4);
+    color:var(--neon);
+    background:rgba(212,245,60,.05);
+  }
+  .hero-product h1 {
+    max-width: 980px;
+    margin-bottom: 1.4rem;
+  }
+  .hero-desc-wide {
+    max-width: 680px;
+    font-size: 1.08rem;
+    color: var(--gris);
+    line-height: 1.75;
+    margin-bottom: 2rem;
+  }
+  .hero-desc-wide strong { color:var(--blanco); font-weight:500; }
+  .hero-main-actions {
+    display:flex;
+    align-items:center;
+    gap:1rem;
+    flex-wrap:wrap;
+    margin-bottom:2rem;
+  }
+  .hero-main-actions .btn-neon,
+  .hero-main-actions .btn-ghost {
+    font-size:.9rem;
+    padding:.9rem 1.45rem;
+  }
+  .hero-proof {
+    display:flex;
+    gap:1px;
+    flex-wrap:wrap;
+    max-width: 820px;
+    background:#1c1c1c;
+    border:1px solid #1c1c1c;
+  }
+  .hero-proof span {
+    background:rgba(8,8,8,.88);
+    color:var(--gris);
+    padding:.75rem 1rem;
+    font-size:.72rem;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+  }
+  .hero-proof strong { color:var(--neon); font-weight:500; }
+  .home-search {
+    padding-top: 4.5rem;
+    padding-bottom: 4.5rem;
+    border-top:1px solid #1c1c1c;
+    border-bottom:1px solid #1c1c1c;
+    background:linear-gradient(180deg, #0b0b0b 0%, #080808 100%);
+  }
+  .home-search .section-title {
+    margin-bottom:.8rem !important;
+  }
+  .search-intro {
+    color:var(--gris);
+    max-width:680px;
+    line-height:1.7;
+    margin-top:1rem;
+  }
+  .quick-searches {
+    display:flex;
+    flex-wrap:wrap;
+    gap:.6rem;
+    margin-top:1.2rem;
+  }
+  .quick-chip {
+    background:transparent;
+    border:1px solid #2a2a2a;
+    color:var(--gris);
+    padding:.55rem .85rem;
+    font-family:var(--font-body);
+    font-size:.76rem;
+    letter-spacing:.04em;
+    cursor:none;
+    transition:all .2s;
+  }
+  .quick-chip:hover { color:var(--neon); border-color:var(--neon); background:rgba(212,245,60,.05); }
+  .intent-grid {
+    display:grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap:1px;
+    background:#1c1c1c;
+    border:1px solid #1c1c1c;
+  }
+  .intent-card {
+    background:var(--negro);
+    padding:2.1rem 1.6rem;
+    min-height:240px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    text-decoration:none;
+    color:var(--blanco);
+    transition:background .25s, transform .25s;
+    position:relative;
+    overflow:hidden;
+  }
+  .intent-card:hover {
+    background:#101010;
+    transform:translateY(-2px);
+  }
+  .intent-card::after {
+    content:'→';
+    position:absolute;
+    right:1.3rem;
+    top:1.1rem;
+    color:var(--gris2);
+    font-size:1.2rem;
+    transition:color .2s, transform .2s;
+  }
+  .intent-card:hover::after { color:var(--neon); transform:translateX(3px); }
+  .intent-icon { font-size:2rem; margin-bottom:1.2rem; display:block; }
+  .intent-title {
+    font-family:var(--font-display);
+    font-size:1.2rem;
+    line-height:1;
+    letter-spacing:-.01em;
+    margin-bottom:.75rem;
+  }
+  .intent-desc {
+    color:var(--gris);
+    font-size:.83rem;
+    line-height:1.55;
+  }
+  .intent-meta {
+    margin-top:1.4rem;
+    font-size:.66rem;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--neon);
+  }
+  .profiles-section .section-sub strong { color:var(--blanco); font-weight:500; }
+  @media (min-width:769px) and (max-width:1300px) {
+    .intent-grid { grid-template-columns: repeat(3, 1fr); }
+    .intent-card { min-height:220px; }
+  }
+  @media (max-width:768px) {
+    .hero-product { min-height:auto !important; padding-top:6rem !important; padding-bottom:2.5rem !important; }
+    .hero-kicker-row { gap:.45rem !important; }
+    .hero-kicker-pill { font-size:.58rem !important; padding:.32rem .55rem !important; }
+    .hero-desc-wide { font-size:.9rem !important; margin-bottom:1.2rem !important; }
+    .hero-main-actions { flex-direction:column !important; align-items:stretch !important; gap:.7rem !important; }
+    .hero-main-actions a { width:100% !important; text-align:center !important; }
+    .hero-proof { display:grid !important; grid-template-columns:1fr !important; width:100% !important; }
+    .hero-proof span { font-size:.66rem !important; }
+    .home-search { padding-top:3rem !important; padding-bottom:3rem !important; }
+    .quick-searches { display:grid !important; grid-template-columns:1fr 1fr !important; }
+    .quick-chip { cursor:auto !important; font-size:.68rem !important; padding:.55rem .5rem !important; }
+    .intent-grid { grid-template-columns:1fr !important; }
+    .intent-card { min-height:auto !important; padding:1.35rem 1.2rem !important; }
+    .intent-title { font-size:1.05rem !important; }
+    .intent-meta { margin-top:1rem !important; }
   }
 
 </style>
@@ -872,54 +1073,136 @@
 </nav>
 
 <!-- HERO -->
-<section class="hero">
+<section class="hero hero-product">
   <div class="hero-bg-text">ARTE</div>
 
-  <div class="hero-tag">Red de artistas argentinos</div>
-
-  <h1>
-    ENCONTRÁ<br>
-    TU <span class="accent">LUGAR</span><br>
-    EN LA <span class="rojo">ESCENA</span>
-  </h1>
-
-  <!-- Estado: logueado — full width, fuera del flex row -->
-  <div id="hero-logueado" style="display:none; margin-bottom:2rem;">
-    <p style="color:var(--gris);font-size:.9rem;margin-bottom:1.4rem;letter-spacing:.02em;">
-      Bienvenido de vuelta, <span id="hero-nombre" style="color:var(--blanco);font-weight:500"></span> 👋
-    </p>
-    <div class="hero-quick-nav">
-      <a href="buscARTE_busqueda.html" class="hqn-btn">
-        <span class="hqn-icon">🎵</span>
-        <span class="hqn-label">Músicos</span>
-      </a>
-      <a href="buscARTE_anuncios.html" class="hqn-btn">
-        <span class="hqn-icon">📋</span>
-        <span class="hqn-label">Anuncios</span>
-      </a>
-      <a href="buscARTE_mensajes.html" class="hqn-btn">
-        <span class="hqn-icon">💬</span>
-        <span class="hqn-label">Mensajes</span>
-      </a>
-      <a href="#" class="hqn-btn" id="hero-mi-perfil">
-        <span class="hqn-icon">👤</span>
-        <span class="hqn-label">Mi perfil</span>
-      </a>
+  <div class="hero-content">
+    <div class="hero-kicker-row">
+      <span class="hero-kicker-pill strong">Gratis</span>
+      <span class="hero-kicker-pill">Músicos argentinos</span>
+      <span class="hero-kicker-pill">Jams · anuncios · equipos</span>
     </div>
-  </div>
 
-  <!-- Estado: no logueado -->
-  <div class="hero-bottom" id="hero-invitado-wrap">
-    <p class="hero-desc">
-      La plataforma para que <strong>músicos, artistas y creativos</strong> de toda Argentina se encuentren, conecten y construyan proyectos juntos.
-    </p>
-    <div class="hero-actions" id="hero-invitado">
-      <a href="buscARTE_registro.html" class="btn-neon" style="font-size:0.95rem; padding: 0.9rem 2.2rem;">Crear perfil gratis</a>
-      <a href="#explorar" class="btn-ghost" style="font-size:0.95rem; padding: 0.9rem 2.2rem;">Explorar →</a>
+    <h1>
+      ENCONTRÁ<br>
+      TU <span class="accent">LUGAR</span><br>
+      EN LA <span class="rojo">ESCENA</span>
+    </h1>
+
+    <!-- Estado: logueado -->
+    <div id="hero-logueado" style="display:none; margin-bottom:2rem;">
+      <p style="color:var(--gris);font-size:.95rem;margin-bottom:1.4rem;letter-spacing:.02em;">
+        Bienvenido de vuelta, <span id="hero-nombre" style="color:var(--blanco);font-weight:500"></span> 👋
+      </p>
+      <div class="hero-quick-nav">
+        <a href="buscARTE_busqueda.html" class="hqn-btn">
+          <span class="hqn-icon">🎵</span>
+          <span class="hqn-label">Músicos</span>
+        </a>
+        <a href="buscARTE_anuncios.html" class="hqn-btn">
+          <span class="hqn-icon">📋</span>
+          <span class="hqn-label">Anuncios</span>
+        </a>
+        <a href="buscARTE_mensajes.html" class="hqn-btn">
+          <span class="hqn-icon">💬</span>
+          <span class="hqn-label">Mensajes</span>
+        </a>
+        <a href="#" class="hqn-btn" id="hero-mi-perfil">
+          <span class="hqn-icon">👤</span>
+          <span class="hqn-label">Mi perfil</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Estado: no logueado -->
+    <div id="hero-invitado-wrap">
+      <p class="hero-desc-wide">
+        La red gratuita para <strong>buscar músicos</strong>, publicar anuncios, encontrar jams, ofrecer clases y mover equipos entre artistas de Argentina.
+      </p>
+      <div class="hero-main-actions" id="hero-invitado">
+        <a href="#explorar" class="btn-neon">Explorar gratis</a>
+        <a href="buscARTE_anuncios.html" class="btn-ghost">Ver anuncios</a>
+        <a href="buscARTE_registro.html" class="btn-ghost">Crear perfil</a>
+      </div>
+      <div class="hero-proof">
+        <span><strong>Sin comisiones</strong></span>
+        <span>Sin algoritmos raros</span>
+        <span>Hecho para la escena argentina</span>
+      </div>
     </div>
   </div>
 
   <div class="hero-scroll">scroll</div>
+</section>
+
+<!-- BÚSQUEDA RÁPIDA -->
+<section class="search-section reveal home-search" id="explorar">
+  <div class="section-label">Probá sin registrarte</div>
+  <div class="section-title" style="font-family: var(--font-display); font-size: clamp(2.8rem, 5vw, 4.5rem); line-height: 0.92; letter-spacing: -0.02em; margin-bottom: 0;">¿QUÉ<br>BUSCÁS HOY?</div>
+  <p class="search-intro">Entrá a mirar primero. El registro aparece cuando quieras publicar, guardar o contactar a alguien.</p>
+
+  <div class="search-box">
+    <input class="search-input" id="index-search" type="text" placeholder="Ej: bajista de rock en Almagro, cantante para funk, jam en Palermo..." onkeydown="if(event.key==='Enter') buscarDesdeIndex()">
+    <button class="search-btn" onclick="buscarDesdeIndex()">BUSCAR</button>
+  </div>
+
+  <div class="filters">
+    <select class="filter-select" id="index-instrumento">
+      <option value="">Todos los instrumentos</option>
+      <option>Guitarra</option>
+      <option>Bajo</option>
+      <option>Batería</option>
+      <option>Teclado / Piano</option>
+      <option>Voz / Cantante</option>
+      <option>Violín</option>
+      <option>Saxo</option>
+      <option>Trompeta</option>
+      <option>Percusión</option>
+      <option>DJ / Productor</option>
+    </select>
+    <select class="filter-select" id="index-genero">
+      <option value="">Todos los géneros</option>
+      <option>Rock Nacional</option>
+      <option>Metal</option>
+      <option>Jazz</option>
+      <option>Folklore</option>
+      <option>Tango</option>
+      <option>Cumbia</option>
+      <option>Indie</option>
+      <option>Pop</option>
+      <option>Electrónica</option>
+      <option>Hip Hop</option>
+      <option>Funk</option>
+      <option>Reggae</option>
+    </select>
+    <select class="filter-select" id="index-provincia">
+      <option value="">Todo el país</option>
+      <option>Buenos Aires (CABA)</option>
+      <option>Gran Buenos Aires</option>
+      <option>Rosario</option>
+      <option>Córdoba</option>
+      <option>Mendoza</option>
+      <option>La Plata</option>
+      <option>Mar del Plata</option>
+      <option>Tucumán</option>
+      <option>Salta</option>
+    </select>
+    <select class="filter-select" id="index-objetivo">
+      <option value="">Cualquier objetivo</option>
+      <option>Banda estable</option>
+      <option>Proyecto propio</option>
+      <option>Sesiones / Shows</option>
+      <option>Zapada / Jam</option>
+      <option>Clases</option>
+    </select>
+  </div>
+
+  <div class="quick-searches" aria-label="Búsquedas rápidas">
+    <button class="quick-chip" onclick="setQuickSearch('bajista para banda de rock')">Bajista para banda</button>
+    <button class="quick-chip" onclick="setQuickSearch('jam este fin de semana')">Jam este finde</button>
+    <button class="quick-chip" onclick="setQuickSearch('clases de guitarra')">Clases de guitarra</button>
+    <button class="quick-chip" onclick="setQuickSearch('vendo amplificador')">Vendo ampli</button>
+  </div>
 </section>
 
 <!-- STATS -->
@@ -930,7 +1213,7 @@
   </div>
   <div class="stat-item">
     <div class="stat-num">23<span></span></div>
-    <div class="stat-label">Provincias de Argentina</div>
+    <div class="stat-label">Provincias + CABA</div>
   </div>
   <div class="stat-item">
     <div class="stat-num" id="stat-anuncios">—<span>+</span></div>
@@ -981,44 +1264,68 @@
 <section class="section" id="como-funciona">
   <div class="section-header reveal">
     <div>
-      <div class="section-label">¿Qué podés hacer?</div>
-      <div class="section-title">TODO EN<br>UN SOLO<br>LUGAR.</div>
+      <div class="section-label">Entrá por donde necesites</div>
+      <div class="section-title">MENOS<br>VUELTAS.<br>MÁS MÚSICA.</div>
     </div>
-    <p class="section-sub">buscARTE es mucho más que un buscador de músicos. Es la plataforma completa para todo lo que necesita un artista.</p>
+    <p class="section-sub">La home tiene que responder rápido: <strong>qué hay</strong>, <strong>para quién sirve</strong> y <strong>qué puedo hacer ahora</strong>.</p>
   </div>
 
-  <div class="steps reveal">
-    <div class="step" data-num="01" onclick="irA('buscARTE_busqueda.html')" style="cursor:pointer">
-      <span class="step-icon">🎸</span>
-      <div class="step-title">ENCONTRÁ MÚSICOS</div>
-      <p class="step-desc">Buscá por instrumento, género, barrio y disponibilidad. El sistema de matching por afinidad musical te sugiere los músicos más afines a tu estilo y referentes.</p>
-    </div>
-    <div class="step" data-num="02" onclick="irA('buscARTE_anuncios.html')" style="cursor:pointer">
-      <span class="step-icon">📋</span>
-      <div class="step-title">PUBLICÁ ANUNCIOS</div>
-      <p class="step-desc">"Busco bajista para banda de rock", "me ofrezco para sesiones", "jam de jazz este sábado en Palermo". Cuatro tipos de anuncios para cubrir todas las situaciones.</p>
-    </div>
-    <div class="step" data-num="03" onclick="irA('buscARTE_anuncios.html?tipo=jam')" style="cursor:pointer">
-      <span class="step-icon">🥁</span>
-      <div class="step-title">ORGANIZÁ JAMS</div>
-      <p class="step-desc">Publicá eventos abiertos con fecha, lugar y precio de entrada. Desde zapadas en el parque hasta jam sessions en bares — conectá con músicos para tocar ya.</p>
-    </div>
-    <div class="step" data-num="04" onclick="irA('buscARTE_anuncios.html?tipo=vende')" style="cursor:pointer">
-      <span class="step-icon">🎛️</span>
-      <div class="step-title">COMPRÁ Y VENDÉ</div>
-      <p class="step-desc">Guitarra, amplificador, pedalera, sala de ensayo. El marketplace de instrumentos y equipos para músicos argentinos. Sin intermediarios, directo entre músicos.</p>
-    </div>
+  <div class="intent-grid reveal">
+    <a class="intent-card" href="buscARTE_busqueda.html">
+      <div>
+        <span class="intent-icon">🎸</span>
+        <div class="intent-title">BUSCO<br>MÚSICOS</div>
+        <p class="intent-desc">Filtrá por instrumento, género, zona y disponibilidad. Ideal para armar banda, sesión o proyecto.</p>
+      </div>
+      <div class="intent-meta">Explorar perfiles</div>
+    </a>
+
+    <a class="intent-card" href="buscARTE_registro.html">
+      <div>
+        <span class="intent-icon">🙋</span>
+        <div class="intent-title">ME<br>OFREZCO</div>
+        <p class="intent-desc">Creá tu perfil y dejá claro qué tocás, qué buscás y con quién te gustaría conectar.</p>
+      </div>
+      <div class="intent-meta">Crear perfil gratis</div>
+    </a>
+
+    <a class="intent-card" href="buscARTE_anuncios.html">
+      <div>
+        <span class="intent-icon">📋</span>
+        <div class="intent-title">VER<br>ANUNCIOS</div>
+        <p class="intent-desc">Busquedas de músicos, ofrecidos, clases, fechas, jams y oportunidades publicadas por la comunidad.</p>
+      </div>
+      <div class="intent-meta">Mirar tablón</div>
+    </a>
+
+    <a class="intent-card" href="buscARTE_anuncios.html?tipo=jam">
+      <div>
+        <span class="intent-icon">🥁</span>
+        <div class="intent-title">JAMS<br>Y ZAPADAS</div>
+        <p class="intent-desc">Encontrá espacios para tocar, conocer músicos y mover la escena sin esperar una banda estable.</p>
+      </div>
+      <div class="intent-meta">Buscar jams</div>
+    </a>
+
+    <a class="intent-card" href="buscARTE_anuncios.html?tipo=vendo">
+      <div>
+        <span class="intent-icon">🎛️</span>
+        <div class="intent-title">EQUIPOS<br>Y CLASES</div>
+        <p class="intent-desc">Compra, venta, alquiler y clases entre músicos. Más comunidad, menos marketplace genérico.</p>
+      </div>
+      <div class="intent-meta">Ver oportunidades</div>
+    </a>
   </div>
 </section>
 
 <!-- PERFILES -->
-<section class="profiles-section" id="explorar">
+<section class="profiles-section" id="comunidad">
   <div class="section-header reveal">
     <div>
-      <div class="section-label">Músicos en buscARTE</div>
-      <div class="section-title">CONOCÉ<br>LA COMUNIDAD</div>
+      <div class="section-label">Cómo se ve la comunidad</div>
+      <div class="section-title">PERFILES<br>QUE DAN<br>CONTEXTO</div>
     </div>
-    <p class="section-sub">Miles de músicos de todo el país esperando conectar con alguien como vos.</p>
+    <p class="section-sub">Músicos de todo el país empezando a conectar con alguien como vos.</p>
   </div>
 
   <div class="profiles-grid reveal">
@@ -1082,68 +1389,6 @@
   </div>
 </section>
 
-<!-- BÚSQUEDA -->
-<section class="search-section reveal">
-  <div class="section-label">Buscador</div>
-  <div class="section-title" style="font-family: var(--font-display); font-size: clamp(2.8rem, 5vw, 4.5rem); line-height: 0.92; letter-spacing: -0.02em; margin-bottom: 0;">ENCONTRÁ<br>LO QUE BUSCÁS</div>
-
-  <div class="search-box">
-    <input class="search-input" id="index-search" type="text" placeholder="Ej: bajista de rock en Buenos Aires, baterista de jazz..." onkeydown="if(event.key==='Enter') buscarDesdeIndex()">
-    <button class="search-btn" onclick="buscarDesdeIndex()">BUSCAR</button>
-  </div>
-
-  <div class="filters">
-    <select class="filter-select" id="index-instrumento">
-      <option value="">Todos los instrumentos</option>
-      <option>Guitarra</option>
-      <option>Bajo</option>
-      <option>Batería</option>
-      <option>Teclado / Piano</option>
-      <option>Voz / Cantante</option>
-      <option>Violín</option>
-      <option>Saxo</option>
-      <option>Trompeta</option>
-      <option>Percusión</option>
-      <option>DJ / Productor</option>
-    </select>
-    <select class="filter-select" id="index-genero">
-      <option value="">Todos los géneros</option>
-      <option>Rock Nacional</option>
-      <option>Metal</option>
-      <option>Jazz</option>
-      <option>Folklore</option>
-      <option>Tango</option>
-      <option>Cumbia</option>
-      <option>Indie</option>
-      <option>Pop</option>
-      <option>Electrónica</option>
-      <option>Hip Hop</option>
-      <option>Funk</option>
-      <option>Reggae</option>
-    </select>
-    <select class="filter-select" id="index-provincia">
-      <option value="">Todo el país</option>
-      <option>Buenos Aires (CABA)</option>
-      <option>Gran Buenos Aires</option>
-      <option>Rosario</option>
-      <option>Córdoba</option>
-      <option>Mendoza</option>
-      <option>La Plata</option>
-      <option>Mar del Plata</option>
-      <option>Tucumán</option>
-      <option>Salta</option>
-    </select>
-    <select class="filter-select" id="index-objetivo">
-      <option value="">Cualquier objetivo</option>
-      <option>Banda estable</option>
-      <option>Proyecto propio</option>
-      <option>Sesiones / Shows</option>
-      <option>Zapada / Jam</option>
-      <option>Clases</option>
-    </select>
-  </div>
-</section>
-
 <!-- CTA FINAL -->
 <section class="cta-section reveal">
   <div class="cta-bg"></div>
@@ -1165,9 +1410,9 @@
     <li><a href="buscARTE_terminos.html">Términos</a></li>
     <li><a href="buscARTE_privacidad.html">Privacidad</a></li>
     <li><a href="buscARTE_contacto.html">Contacto</a></li>
-    <li><a href="https://instagram.com/buscarte.ba" target="_blank">@buscarte.ba</a></li>
+    <li><a href="https://instagram.com/buscarte.ba" target="_blank" rel="noopener noreferrer">@buscarte.ba</a></li>
   </ul>
-  <div class="footer-copy">© 2025 buscARTE · Hecho en Argentina 🇦🇷</div>
+  <div class="footer-copy">© 2026 buscARTE · Hecho en Argentina 🇦🇷</div>
 </footer>
 
 <script>
@@ -1236,7 +1481,7 @@
       cargarBadgeMensajes(uid);
       // Fix Mi perfil link with real user ID
       const miPerfilLink=document.querySelector('.nav-dropdown-item[href*="perfil_publico"]');
-      if(miPerfilLink && uid) miPerfilLink.href='buscARTE_perfil_publico.html?id='+uid;
+      if(miPerfilLink && uid) miPerfilLink.href='buscARTE_perfil_publico.html?id=' + encodeURIComponent(uid);
       // Hero logueado: mostrar accesos rápidos
       const inv = document.getElementById('hero-invitado-wrap');
       const log = document.getElementById('hero-logueado');
@@ -1245,35 +1490,41 @@
       const hn = document.getElementById('hero-nombre');
       if(hn) hn.textContent = n.split(' ')[0];
       const hmp = document.getElementById('hero-mi-perfil');
-      if(hmp && uid) hmp.href = 'buscARTE_perfil_publico.html?id=' + uid;
+      if(hmp && uid) hmp.href = 'buscARTE_perfil_publico.html?id=' + encodeURIComponent(uid);
     }
   })();
-  function toggleUserMenu(){const w=document.getElementById('nav-avatar-btn');const d=document.getElementById('nav-dropdown');if(w)w.classList.toggle('open');if(d)d.classList.toggle('open');}
+  function toggleUserMenu(e){ if(e) e.stopPropagation(); const w=document.getElementById('nav-avatar-btn'); const d=document.getElementById('nav-dropdown'); if(w)w.classList.toggle('open'); if(d)d.classList.toggle('open'); }
   document.addEventListener('click',e=>{if(!e.target.closest('#nav-user')){document.getElementById('nav-avatar-btn')?.classList.remove('open');document.getElementById('nav-dropdown')?.classList.remove('open');}});
   function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');window.location.href='index.html';}
 
   // BUSCADOR DEL INDEX
+
+  function setQuickSearch(texto) {
+    const input = document.getElementById('index-search');
+    if (input) {
+      input.value = texto;
+      input.focus();
+    }
+  }
+
+  // No forzamos registro para explorar: el login debería pedirse recién para acciones como publicar, contactar o guardar.
   function buscarDesdeIndex() {
-    const logueado = localStorage.getItem('ba_logged') === '1'
-    if (!logueado) { window.location.href = 'buscARTE_registro.html'; return }
     const q = document.getElementById('index-search')?.value?.trim()
     const instr = document.getElementById('index-instrumento')?.value
     const genero = document.getElementById('index-genero')?.value
     const provincia = document.getElementById('index-provincia')?.value
+    const objetivo = document.getElementById('index-objetivo')?.value
     const params = new URLSearchParams()
     if (q) params.set('q', q)
     if (instr) params.set('instrumento', instr)
     if (genero) params.set('genero', genero)
     if (provincia) params.set('provincia', provincia)
+    if (objetivo) params.set('objetivo', objetivo)
     window.location.href = 'buscARTE_busqueda.html' + (params.toString() ? '?' + params.toString() : '')
   }
 
   function irA(url) {
-    if (localStorage.getItem('ba_logged') !== '1') {
-      window.location.href = 'buscARTE_registro.html'
-    } else {
-      window.location.href = url
-    }
+    window.location.href = url
   }
 
   // CARGAR STATS REALES
@@ -1287,13 +1538,21 @@
         fetch(`${SB_URL}/rest/v1/perfiles?select=id`, { headers: sbHdrs }),
         fetch(`${SB_URL}/rest/v1/anuncios?estado=eq.activo&select=id`, { headers: sbHdrs })
       ])
-      const totalMusicos = rm.headers.get('content-range')?.split('/')[1]
-      const totalAnuncios = ra.headers.get('content-range')?.split('/')[1]
+
+      if (!rm.ok || !ra.ok) throw new Error('No se pudieron cargar las estadísticas del inicio')
+
+      const musicosJson = await rm.json().catch(() => [])
+      const anunciosJson = await ra.json().catch(() => [])
+
+      const totalMusicos = rm.headers.get('content-range')?.split('/')[1] || String(Array.isArray(musicosJson) ? musicosJson.length : '')
+      const totalAnuncios = ra.headers.get('content-range')?.split('/')[1] || String(Array.isArray(anunciosJson) ? anunciosJson.length : '')
       const sm = document.getElementById('stat-musicos')
       const sa = document.getElementById('stat-anuncios')
       if (sm && totalMusicos) sm.innerHTML = `${totalMusicos}<span>+</span>`
       if (sa && totalAnuncios) sa.innerHTML = `${totalAnuncios}<span>+</span>`
-    } catch(e) { console.error(e) }
+    } catch(e) {
+      console.warn('Stats inicio no disponibles:', e)
+    }
   }
   cargarStatsIndex()
 

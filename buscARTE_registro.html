@@ -513,6 +513,65 @@
   .nav-back:hover { color: var(--blanco); }
 
   .top-spacer { height: 65px; }
+
+  .mobile-stepbar {
+    display: none;
+    margin-bottom: 1.25rem;
+    border: 1px solid #1c1c1c;
+    background: rgba(255,255,255,.02);
+    padding: .75rem;
+  }
+  .mobile-stepbar-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: .75rem;
+    margin-bottom: .55rem;
+  }
+  .mobile-stepbar-label {
+    color: var(--neon);
+    font-size: .68rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+  .mobile-stepbar-title {
+    color: var(--blanco);
+    font-size: .78rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .mobile-stepbar-track {
+    height: 3px;
+    background: #222;
+    overflow: hidden;
+  }
+  .mobile-stepbar-fill {
+    width: 25%;
+    height: 100%;
+    background: var(--neon);
+    transition: width .25s ease;
+  }
+  .form-hint {
+    color: var(--gris2);
+    font-size: .76rem;
+    line-height: 1.5;
+    margin-top: -.75rem;
+    margin-bottom: 1.2rem;
+  }
+  .sugerencias-populares {
+    max-height: 220px;
+    overflow: auto;
+    border: 1px solid #1c1c1c;
+    padding: .75rem;
+    background: rgba(255,255,255,.015);
+  }
+  .sugerencias-populares::-webkit-scrollbar { width: 8px; }
+  .sugerencias-populares::-webkit-scrollbar-thumb { background: #2a2a2a; }
+  button:disabled {
+    opacity: .6 !important;
+    pointer-events: none;
+  }
+
   /* NAV LINKS CLICKABLE FIX */
   .nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap { pointer-events:auto !important; }
   nav a, nav button { pointer-events:auto !important; }
@@ -554,7 +613,11 @@
     .btn-back, .btn-next { 
       width: 100% !important; 
       text-align: center !important;
+      justify-content: center !important;
     }
+    .mobile-stepbar { display: block !important; }
+    #step-4 .form-actions > div { width: 100% !important; flex-direction: column !important; }
+    .sugerencias-populares { max-height: 180px !important; }
 
     /* Steps dots */
     .steps-progress { gap: .5rem !important; }
@@ -632,6 +695,13 @@
 
   <!-- PANEL DERECHO -->
   <div class="right-panel">
+    <div class="mobile-stepbar" aria-hidden="true">
+      <div class="mobile-stepbar-top">
+        <span class="mobile-stepbar-label" id="mobile-step-label">Paso 1 de 4</span>
+        <span class="mobile-stepbar-title" id="mobile-step-title">Tu cuenta</span>
+      </div>
+      <div class="mobile-stepbar-track"><div class="mobile-stepbar-fill" id="mobile-step-fill"></div></div>
+    </div>
 
     <!-- STEP 1: Cuenta básica -->
     <div class="form-step active" id="step-1">
@@ -704,7 +774,7 @@
         <span></span>
         <button class="btn-next" onclick="goStep(2)">Siguiente → Tu música</button>
       </div>
-      <p class="login-link">¿Ya tenés cuenta? <a href="#">Ingresá acá</a></p>
+      <p class="login-link">¿Ya tenés cuenta? <a href="buscARTE_login.html">Ingresá acá</a></p>
     </div>
 
     <!-- STEP 2: Instrumento y géneros -->
@@ -742,8 +812,6 @@
         <button class="chip" onclick="toggleChip(this)">Productor</button>
         <button class="chip" onclick="toggleChip(this)">Mix & Mastering</button>
         <button class="chip" onclick="toggleChip(this)">Manager</button>
-        <button class="chip" onclick="toggleChip(this)">Técnico de sonido</button>
-        <button class="chip" onclick="toggleChip(this)">Compositor / Arreglador</button>
         <button class="chip" onclick="toggleChip(this)">Otro</button>
       </div>
 
@@ -807,7 +875,7 @@
       <div class="artist-tags" id="artist-tags"></div>
 
       <span class="chips-label">Sugerencias populares — clickeá para agregar</span>
-      <div class="chips" id="chips-sugerencias">
+      <div class="chips sugerencias-populares" id="chips-sugerencias">
         <button class="chip" onclick="addArtistByName('Soda Stereo', this)">Soda Stereo</button>
         <button class="chip" onclick="addArtistByName('Los Redondos', this)">Los Redondos</button>
         <button class="chip" onclick="addArtistByName('Patricio Rey', this)">Patricio Rey</button>
@@ -919,7 +987,7 @@
         <input type="file" id="reg-foto-input" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="previewFotoRegistro(this)">
         <span class="photo-icon" id="reg-foto-icon">📷</span>
         <img id="reg-foto-preview" style="display:none;width:80px;height:80px;border-radius:50%;object-fit:cover;margin:0 auto">
-        <p class="photo-text" id="reg-foto-text"><strong>Subí tu foto de perfil</strong><br>JPG, PNG o WebP · Máx. 2MB · Opcional</p>
+        <p class="photo-text" id="reg-foto-text"><strong>Subí tu foto de perfil</strong><br>JPG, PNG o WebP · optimizamos la imagen automáticamente · Opcional</p>
       </div>
 
       <div class="form-actions" style="flex-direction:column;align-items:stretch;gap:1rem">
@@ -939,7 +1007,7 @@
         <p class="success-sub">Tu perfil está listo. Ya podés explorar músicos, publicar anuncios y conectar con la escena argentina.</p>
         <a href="buscARTE_busqueda.html" class="btn-next" style="display: inline-flex; text-decoration: none; font-size: 1rem; padding: 1rem 2.5rem; margin-bottom: 1rem;">Ver músicos →</a>
         <br>
-        <a href="#" style="color: var(--gris); font-size: 0.82rem; text-decoration: none;">Completar mi perfil más tarde</a>
+        <a href="buscARTE_perfil.html" style="color: var(--gris); font-size: 0.82rem; text-decoration: none;">Completar mi perfil</a>
       </div>
     </div>
 
@@ -951,14 +1019,16 @@
   const cursor = document.getElementById('cursor');
   const ring = document.getElementById('cursor-ring');
   let mx=0,my=0,rx=0,ry=0;
-  document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
-  function animateCursor() {
-    cursor.style.left=mx+'px'; cursor.style.top=my+'px';
-    rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12;
-    ring.style.left=rx+'px'; ring.style.top=ry+'px';
-    requestAnimationFrame(animateCursor);
+  if (cursor && ring) {
+    document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
+    function animateCursor() {
+      cursor.style.left=mx+'px'; cursor.style.top=my+'px';
+      rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12;
+      ring.style.left=rx+'px'; ring.style.top=ry+'px';
+      requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
   }
-  animateCursor();
 
   // STEPS
   const stepContent = [
@@ -967,7 +1037,7 @@
     { label: 'Paso 2 de 4', title: 'TU\nMÚSICA', desc: 'Contanos qué instrumento tocás y qué géneros son los tuyos.', bg: '02' },
     { label: 'Paso 3 de 4', title: 'TUS\nREFERENTES', desc: 'Tus artistas favoritos definen el matching con otros músicos.', bg: '03' },
     { label: 'Paso 4 de 4', title: 'TU\nPERFIL', desc: 'Últimos detalles para que otros músicos te encuentren.', bg: '04' },
-    { label: '¡Listo!', title: 'BIE\nNVE\nNIDO', desc: 'Ya sos parte de la comunidad buscARTE.', bg: '✓' },
+    { label: '¡Listo!', title: 'BIEN\nVE\nNIDO', desc: 'Ya sos parte de la comunidad buscARTE.', bg: '✓' },
   ];
 
   function goStep(n) {
@@ -977,30 +1047,51 @@
       const email = document.getElementById('reg-email').value.trim()
       const pass = document.getElementById('reg-password').value
       const prov = document.getElementById('sel-provincia').value
-      if (!nombre) { alert('Por favor ingresá tu nombre.'); return }
+      const ciudadField = document.getElementById('field-ciudad')
+      const ciudad = document.getElementById('sel-ciudad')?.value || ''
+      if (!nombre) { alert('Por favor ingresá tu nombre o nombre artístico.'); return }
       if (!email || !email.includes('@')) { alert('Por favor ingresá un email válido.'); return }
       if (pass.length < 8) { alert('La contraseña debe tener al menos 8 caracteres.'); return }
       if (!prov || prov === '') { alert('Por favor seleccioná tu provincia.'); return }
+      if (ciudadField && ciudadField.style.display !== 'none' && !ciudad) {
+        alert('Por favor seleccioná tu ciudad o localidad.');
+        return
+      }
     }
     if (n === 3) {
-      const instrumento = [...document.querySelectorAll('#chips-instrumentos .chip.selected')]
-      if (instrumento.length === 0) { alert('Por favor seleccioná al menos un instrumento.'); return }
+      const instrumentos = [...document.querySelectorAll('#chips-instrumentos .chip.selected')]
+      const generos = [...document.querySelectorAll('#chips-generos .chip.selected')]
+      if (instrumentos.length === 0) { alert('Por favor seleccioná al menos un instrumento o rol.'); return }
+      if (generos.length === 0) { alert('Por favor seleccioná al menos un género.'); return }
     }
+
     document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
     document.getElementById('step-' + n).classList.add('active');
 
     // update left panel
     const c = stepContent[n];
     if (c) {
-      document.getElementById('left-label').textContent = c.label;
-      document.getElementById('left-title').innerHTML = c.title.replace(/\n/g, '<br>');
-      document.getElementById('left-desc').textContent = c.desc;
-      document.getElementById('left-bg').textContent = c.bg;
+      const leftLabel = document.getElementById('left-label')
+      const leftTitle = document.getElementById('left-title')
+      const leftDesc = document.getElementById('left-desc')
+      const leftBg = document.getElementById('left-bg')
+      if (leftLabel) leftLabel.textContent = c.label;
+      if (leftTitle) leftTitle.innerHTML = c.title.replace(/\n/g, '<br>');
+      if (leftDesc) leftDesc.textContent = c.desc;
+      if (leftBg) leftBg.textContent = c.bg;
+
+      const mobileLabel = document.getElementById('mobile-step-label')
+      const mobileTitle = document.getElementById('mobile-step-title')
+      const mobileFill = document.getElementById('mobile-step-fill')
+      if (mobileLabel) mobileLabel.textContent = c.label;
+      if (mobileTitle) mobileTitle.textContent = ['','Tu cuenta','Tu música','Tus referentes','Tu perfil','Listo'][n] || '';
+      if (mobileFill) mobileFill.style.width = (n >= 5 ? 100 : Math.max(25, n * 25)) + '%';
     }
 
     // update progress dots
     for (let i = 1; i <= 4; i++) {
       const ps = document.getElementById('ps-' + i);
+      if (!ps) continue;
       ps.classList.remove('active', 'done');
       if (i < n) ps.classList.add('done');
       else if (i === n) ps.classList.add('active');
@@ -1102,31 +1193,93 @@
   }
 
   // FOTO EN REGISTRO
-  let fotoRegistroUrl = null
+  let fotoRegistroFile = null
+  let fotoRegistroPreparePromise = null
+
+  function fileToImage(file) {
+    return new Promise((resolve, reject) => {
+      const img = new Image()
+      img.onload = () => resolve(img)
+      img.onerror = reject
+      img.src = URL.createObjectURL(file)
+    })
+  }
+
+  async function prepareImageForUpload(file) {
+    if (!file || !file.type || !file.type.startsWith('image/')) {
+      throw new Error('Formato de imagen no válido')
+    }
+
+    // Si ya viene liviana, la dejamos tal cual.
+    if (file.size <= 2 * 1024 * 1024) return file
+
+    const img = await fileToImage(file)
+    const maxSide = 1400
+    let { width, height } = img
+
+    if (width > height && width > maxSide) {
+      height = Math.round(height * (maxSide / width))
+      width = maxSide
+    } else if (height > maxSide) {
+      width = Math.round(width * (maxSide / height))
+      height = maxSide
+    }
+
+    const canvas = document.createElement('canvas')
+    canvas.width = width
+    canvas.height = height
+    const ctx = canvas.getContext('2d')
+    ctx.drawImage(img, 0, 0, width, height)
+
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.82))
+    if (!blob) throw new Error('No se pudo optimizar la imagen')
+
+    return new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' })
+  }
 
   function previewFotoRegistro(input) {
     if (!input.files || !input.files[0]) return
     const file = input.files[0]
-    if (file.size > 2 * 1024 * 1024) { alert('La foto no puede superar 2MB.'); return }
+    if (!file.type || !file.type.startsWith('image/')) {
+      alert('Subí una imagen válida en JPG, PNG o WebP.')
+      input.value = ''
+      return
+    }
+
     const reader = new FileReader()
     reader.onload = e => {
       const preview = document.getElementById('reg-foto-preview')
       preview.src = e.target.result
       preview.style.display = 'block'
       document.getElementById('reg-foto-icon').style.display = 'none'
-      document.getElementById('reg-foto-text').innerHTML = '<strong>✓ Foto lista</strong><br>Se guardará al crear el perfil'
+      document.getElementById('reg-foto-text').innerHTML = '<strong>✓ Foto lista</strong><br>La vamos a optimizar y guardar al crear el perfil'
     }
     reader.readAsDataURL(file)
-    // Guardar referencia al file para subirlo al crear perfil
-    fotoRegistroUrl = input.files[0]
+
+    fotoRegistroFile = file
+    fotoRegistroPreparePromise = prepareImageForUpload(file)
+      .then(prepared => {
+        fotoRegistroFile = prepared
+        const sizeMb = (prepared.size / 1024 / 1024).toFixed(1)
+        document.getElementById('reg-foto-text').innerHTML = `<strong>✓ Foto lista</strong><br>Optimizada para subir (${sizeMb}MB)`
+        return prepared
+      })
+      .catch(e => {
+        console.error('Error preparando imagen:', e)
+        document.getElementById('reg-foto-text').innerHTML = '<strong>No pudimos optimizar la foto</strong><br>Podés seguir sin foto y cargarla después desde Configuración.'
+        fotoRegistroFile = null
+      })
   }
 
   async function subirFotoRegistro(userId) {
-    if (!fotoRegistroUrl) return null
+    if (fotoRegistroPreparePromise) {
+      await fotoRegistroPreparePromise
+    }
+    if (!fotoRegistroFile) return null
     try {
-      const file = fotoRegistroUrl
-      const ext = file.name.split('.').pop()
-      const fileName = `${userId}-${Date.now()}.${ext}`
+      const file = fotoRegistroFile
+      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '')
+      const fileName = `${encodeURIComponent(userId)}-${Date.now()}.${ext || 'jpg'}`
       const res = await fetch(
         `${SUPABASE_URL}/storage/v1/object/fotos-perfil/${fileName}`,
         {
@@ -1134,42 +1287,82 @@
           headers: {
             'apikey': SUPABASE_KEY,
             'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Content-Type': file.type,
+            'Content-Type': file.type || 'image/jpeg',
             'x-upsert': 'true'
           },
           body: file
         }
       )
-      if (res.ok) return `${SUPABASE_URL}/storage/v1/object/public/fotos-perfil/${fileName}`
+      if (!res.ok) {
+        const err = await res.text()
+        console.error('Error subiendo foto:', res.status, err)
+        return null
+      }
+      return `${SUPABASE_URL}/storage/v1/object/public/fotos-perfil/${fileName}`
     } catch(e) { console.error('Error subiendo foto:', e) }
     return null
   }
   let artists = [];
   let dropdownIdx = -1;
 
+
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  }
+
+  function normalizarTexto(value) {
+    return String(value || '').trim().replace(/\s+/g, ' ');
+  }
+
+  function resetCaptchaSafely() {
+    if (window.hcaptcha && typeof window.hcaptcha.reset === 'function') {
+      window.hcaptcha.reset();
+    }
+  }
+
   async function buscarArtistas(query) {
     const dropdown = document.getElementById('artist-dropdown');
-    if (!query || query.length < 2) { dropdown.style.display = 'none'; return; }
+    const q = normalizarTexto(query);
+    if (!dropdown || q.length < 2) {
+      if (dropdown) dropdown.style.display = 'none';
+      return;
+    }
 
     try {
       const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/artistas_sugeridos?nombre=ilike.*${encodeURIComponent(query)}*&order=veces.desc&limit=8`,
+        `${SUPABASE_URL}/rest/v1/artistas_sugeridos?nombre=ilike.*${encodeURIComponent(q)}*&order=veces.desc&limit=8`,
         { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
       );
+      if (!res.ok) throw new Error('No se pudieron cargar sugerencias');
       const sugerencias = await res.json();
       dropdownIdx = -1;
 
-      if (!sugerencias.length) { dropdown.style.display = 'none'; return; }
+      if (!Array.isArray(sugerencias) || !sugerencias.length) {
+        dropdown.style.display = 'none';
+        return;
+      }
 
-      dropdown.innerHTML = sugerencias.map((s, i) =>
-        `<div class="artist-option" data-nombre="${s.nombre}" 
-          style="padding:.65rem 1rem;cursor:pointer;font-size:.85rem;color:#f2ede4;border-bottom:1px solid #222;transition:background .15s"
-          onmousedown="selectArtistFromDropdown('${s.nombre.replace(/'/g,"\\'")}')">
-          ${s.nombre} <span style="color:#555;font-size:.7rem;margin-left:.4rem">${s.veces} ${s.veces===1?'músico':'músicos'}</span>
-        </div>`
-      ).join('');
-      dropdown.style.display = 'block';
-    } catch(e) { dropdown.style.display = 'none'; }
+      dropdown.innerHTML = '';
+      sugerencias.forEach((s) => {
+        const nombre = normalizarTexto(s.nombre);
+        if (!nombre) return;
+        const option = document.createElement('div');
+        option.className = 'artist-option';
+        option.dataset.nombre = nombre;
+        option.style.cssText = 'padding:.65rem 1rem;cursor:pointer;font-size:.85rem;color:#f2ede4;border-bottom:1px solid #222;transition:background .15s';
+        option.innerHTML = `${escapeHtml(nombre)} <span style="color:#555;font-size:.7rem;margin-left:.4rem">${Number(s.veces || 0)} ${Number(s.veces || 0)===1?'músico':'músicos'}</span>`;
+        option.addEventListener('mousedown', () => selectArtistFromDropdown(nombre));
+        dropdown.appendChild(option);
+      });
+      dropdown.style.display = dropdown.children.length ? 'block' : 'none';
+    } catch(e) {
+      dropdown.style.display = 'none';
+    }
   }
 
   function selectArtistFromDropdown(nombre) {
@@ -1235,43 +1428,60 @@
 
   function addArtist() {
     const input = document.getElementById('artist-input');
-    const val = input.value.trim();
+    const val = normalizarTexto(input?.value);
     if (!val) return;
-    if (!artists.includes(val)) {
+    if (!artists.some(a => a.toLowerCase() === val.toLowerCase())) {
       artists.push(val);
       renderArtists();
     }
     input.value = '';
-    document.getElementById('artist-dropdown').style.display = 'none';
+    const dropdown = document.getElementById('artist-dropdown');
+    if (dropdown) dropdown.style.display = 'none';
     input.focus();
   }
 
   function addArtistByName(name, btn) {
-    if (!artists.includes(name)) {
-      artists.push(name);
+    const val = normalizarTexto(name);
+    if (!val) return;
+    const existing = artists.find(a => a.toLowerCase() === val.toLowerCase());
+    if (!existing) {
+      artists.push(val);
       renderArtists();
       if (btn) btn.classList.add('selected');
     } else {
-      artists = artists.filter(a => a !== name);
+      artists = artists.filter(a => a.toLowerCase() !== val.toLowerCase());
       renderArtists();
       if (btn) btn.classList.remove('selected');
     }
   }
 
   function removeArtist(name) {
-    artists = artists.filter(a => a !== name);
+    const val = normalizarTexto(name);
+    artists = artists.filter(a => a.toLowerCase() !== val.toLowerCase());
     renderArtists();
     document.querySelectorAll('#chips-sugerencias .chip').forEach(c => {
-      if (c.textContent.trim() === name) c.classList.remove('selected');
+      if (c.textContent.trim().toLowerCase() === val.toLowerCase()) c.classList.remove('selected');
     });
   }
 
   function renderArtists() {
     const container = document.getElementById('artist-tags');
     if (!container) return;
-    container.innerHTML = artists.map(a =>
-      `<span class="artist-tag">${a}<button class="artist-tag-remove" onclick="removeArtist('${a.replace(/'/g,"\\'")}')">×</button></span>`
-    ).join('');
+    container.innerHTML = '';
+    artists.forEach((artist) => {
+      const tag = document.createElement('span');
+      tag.className = 'artist-tag';
+      const label = document.createElement('span');
+      label.textContent = artist;
+      const removeBtn = document.createElement('button');
+      removeBtn.className = 'artist-tag-remove';
+      removeBtn.type = 'button';
+      removeBtn.textContent = '×';
+      removeBtn.addEventListener('click', () => removeArtist(artist));
+      tag.appendChild(label);
+      tag.appendChild(removeBtn);
+      container.appendChild(tag);
+    });
   }
   // ═══ SUPABASE ═══
   const SUPABASE_URL = 'https://xiaanchoanxmampegoay.supabase.co'
@@ -1290,17 +1500,25 @@
     if (!nombre) { alert('Por favor ingresá tu nombre.'); goStep(1); return; }
     if (!email || !email.includes('@')) { alert('Por favor ingresá un email válido.'); goStep(1); return; }
     if (!password || password.length < 8) { alert('La contraseña debe tener al menos 8 caracteres.'); goStep(1); return; }
+    if (!prov) { alert('Por favor seleccioná tu provincia.'); goStep(1); return; }
+    if (document.getElementById('field-ciudad')?.style.display !== 'none' && !ciudad) { alert('Por favor seleccioná tu ciudad o localidad.'); goStep(1); return; }
 
     // Validar captcha
-    const captchaResponse = hcaptcha.getResponse()
+    if (!window.hcaptcha || typeof window.hcaptcha.getResponse !== 'function') {
+      alert('No se pudo cargar el captcha. Recargá la página e intentá de nuevo.')
+      return
+    }
+    const captchaResponse = window.hcaptcha.getResponse()
     if (!captchaResponse) {
       alert('Por favor completá el captcha para continuar.')
       return
     }
 
     const nombreCompleto = apellido ? `${nombre} ${apellido}` : nombre
-    const instrumentos = [...document.querySelectorAll('#chips-instrumentos .chip.selected')].map(c => c.textContent).join(', ')
-    const generos = [...document.querySelectorAll('#chips-generos .chip.selected')].map(c => c.textContent).join(', ')
+    const instrumentos = [...document.querySelectorAll('#chips-instrumentos .chip.selected')].map(c => c.textContent.trim()).join(', ')
+    const generos = [...document.querySelectorAll('#chips-generos .chip.selected')].map(c => c.textContent.trim()).join(', ')
+    if (!instrumentos) { alert('Por favor seleccioná al menos un instrumento o rol.'); goStep(2); return; }
+    if (!generos) { alert('Por favor seleccioná al menos un género.'); goStep(2); return; }
     const disponibilidad = [...document.querySelectorAll('.objetivo-card.selected')].map(c => c.querySelector('.objetivo-title')?.textContent).join(', ')
     const referentes = artists.join(', ')
     const bio = document.getElementById('bio-text')?.value || ''
@@ -1318,7 +1536,7 @@
           'Authorization': `Bearer ${SUPABASE_KEY}`
         },
         body: JSON.stringify({
-          p_email: email,
+          p_email: email.toLowerCase(),
           p_password: password,
           p_nombre: nombreCompleto,
           p_provincia: provincia,
@@ -1332,16 +1550,20 @@
         })
       })
 
-      const data = await response.json()
+      const raw = await response.text()
+      let data = null
+      try { data = raw ? JSON.parse(raw) : null } catch(e) { data = { error: raw } }
 
-      if (data.error) {
-        if (data.error.includes('duplicate') || data.error.includes('unique')) {
-          alert('Ese email ya está registrado. ¿Querés ingresar?')
+      const errorMsg = data?.error || data?.message || (!response.ok ? raw : '')
+      if (!response.ok || errorMsg) {
+        const err = String(errorMsg || 'Error desconocido')
+        if (err.toLowerCase().includes('duplicate') || err.toLowerCase().includes('unique') || err.toLowerCase().includes('already')) {
+          alert('Ese email ya está registrado. Te llevamos al login.')
           window.location.href = 'buscARTE_login.html'
         } else {
           alert('Hubo un error al guardar tu perfil. Intentá de nuevo.')
-          console.error(data.error)
-          hcaptcha.reset()
+          console.error('Error registrar_usuario:', response.status, err)
+          resetCaptchaSafely()
         }
         btn.textContent = '🎉 Crear mi perfil'
         btn.style.opacity = '1'
@@ -1349,17 +1571,17 @@
         return
       }
 
-      const usuario = data
-      if (fotoRegistroUrl && usuario?.id) {
-        subirFotoRegistro(usuario.id).then(fotoUrl => {
-          if (fotoUrl) {
-            fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${usuario.id}`, {
-              method: 'PATCH',
-              headers: { 'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal' },
-              body: JSON.stringify({ foto_url: fotoUrl })
-            }).catch(e => console.error('Error guardando foto_url:', e))
-          }
-        }).catch(e => console.error('Error subiendo foto:', e))
+      const usuario = Array.isArray(data) ? data[0] : data
+      if (fotoRegistroFile && usuario?.id) {
+        btn.textContent = 'Subiendo foto...'
+        const fotoUrl = await subirFotoRegistro(usuario.id)
+        if (fotoUrl) {
+          await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${encodeURIComponent(usuario.id)}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal' },
+            body: JSON.stringify({ foto_url: fotoUrl })
+          }).catch(e => console.error('Error guardando foto_url:', e))
+        }
       }
       localStorage.setItem('ba_logged', '1')
       localStorage.setItem('ba_name', nombreCompleto)
@@ -1383,7 +1605,7 @@
     } catch (e) {
       alert('No se pudo conectar. Verificá tu conexión e intentá de nuevo.')
       console.error(e)
-      hcaptcha.reset()
+      resetCaptchaSafely()
     } finally {
       btn.textContent = '🎉 Crear mi perfil'
       btn.style.opacity = '1'

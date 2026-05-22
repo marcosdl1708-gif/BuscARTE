@@ -4,290 +4,653 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Generador de nombres para bandas y artistas — buscARTE</title>
+  <meta name="description" content="Generador gratuito de nombres para bandas y artistas. Guardá, copiá y combiná ideas para tu proyecto musical en buscARTE.">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="buscARTE">
+  <link rel="canonical" href="https://buscarte.com.ar/buscARTE_generador.html">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://buscarte.com.ar/buscARTE_generador.html">
+  <meta property="og:title" content="Generador de nombres — buscARTE">
+  <meta property="og:description" content="Generá nombres para bandas y artistas. Guardá tus favoritos y copiá ideas al instante.">
+  <meta property="og:image" content="https://buscarte.com.ar/og-image.jpg">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0a0a0a">
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
-    :root { --neon:#d4f53c;--negro:#0a0a0a;--blanco:#f2ede4;--gris:#888;--gris2:#555;--gris3:#2a2a2a; }
-    * { margin:0;padding:0;box-sizing:border-box; }
-    body { background:var(--negro);color:var(--blanco);font-family:'Archivo',sans-serif;min-height:100vh; }
-    nav { position:sticky;top:0;z-index:100;display:flex;align-items:center;padding:1rem 2rem;border-bottom:1px solid #1c1c1c;background:rgba(8,8,8,.96);backdrop-filter:blur(12px); }
-    .nav-logo { font-family:'Archivo Black',sans-serif;font-size:1.4rem;text-decoration:none;color:var(--blanco) }
-    .nav-logo span { color:var(--neon) }
-    .nav-back { margin-left:auto;color:var(--gris);font-size:.82rem;text-decoration:none;transition:color .15s; }
-    .nav-back:hover { color:var(--blanco); }
-    .wrap { max-width:700px;margin:0 auto;padding:3rem 1.5rem 5rem; }
-    .page-label { font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--neon);margin-bottom:.6rem; }
-    .page-title { font-family:'Archivo Black',sans-serif;font-size:2.5rem;line-height:.92;margin-bottom:.6rem; }
-    .page-sub { color:var(--gris);font-size:.9rem;margin-bottom:2.5rem;line-height:1.7; }
-
-    /* MODO SELECTOR */
-    .mode-tabs { display:flex;gap:.5rem;margin-bottom:2rem; }
-    .mode-tab {
-      flex:1;padding:.8rem;border:1px solid var(--gris3);background:transparent;
-      color:var(--gris);font-family:'Archivo',sans-serif;font-size:.82rem;
-      letter-spacing:.06em;text-transform:uppercase;cursor:pointer;
-      transition:all .15s; text-align:center;
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    :root {
+      --neon:#d4f53c; --negro:#080808; --negro2:#111; --negro3:#1a1a1a;
+      --blanco:#f2ede4; --gris:#888; --gris2:#555; --gris3:#2a2a2a; --rojo:#e8311a;
+      --font-display:'Archivo Black',sans-serif; --font-body:'Archivo',sans-serif;
     }
-    .mode-tab.active { border-color:var(--neon);color:var(--neon);background:rgba(212,245,60,.05); }
+    html { scroll-behavior:smooth; }
+    body { background:var(--negro); color:var(--blanco); font-family:var(--font-body); min-height:100vh; overflow-x:hidden; cursor:none; }
+    body::before { content:''; position:fixed; inset:-50%; width:200%; height:200%; pointer-events:none; opacity:.03; z-index:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"); }
+    .cursor { width:10px; height:10px; background:var(--neon); border-radius:50%; position:fixed; pointer-events:none; z-index:9999; transform:translate(-50%,-50%); }
+    .cursor-ring { width:36px; height:36px; border:1px solid rgba(212,245,60,.35); border-radius:50%; position:fixed; pointer-events:none; z-index:9998; transform:translate(-50%,-50%); transition:all .15s ease; }
+    a, button, input, select, textarea { cursor:none; }
 
-    /* BOTÓN GENERAR */
-    .btn-generar {
-      width:100%;background:var(--neon);border:none;color:#000;
-      padding:1.1rem;font-family:'Archivo Black',sans-serif;font-size:1.1rem;
-      letter-spacing:.04em;cursor:pointer;transition:opacity .2s;margin-bottom:2rem;
-    }
+    nav { position:fixed; top:0; left:0; right:0; z-index:200; display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1rem 2.5rem; height:60px; background:rgba(8,8,8,.96); backdrop-filter:blur(12px); border-bottom:1px solid #1c1c1c; }
+    .nav-logo { font-family:var(--font-display); font-size:1.4rem; color:var(--blanco); text-decoration:none; flex-shrink:0; }
+    .nav-logo span { color:var(--neon); }
+    .nav-center { display:flex; gap:1.6rem; align-items:center; }
+    .nav-link { color:var(--gris); text-decoration:none; font-size:.76rem; letter-spacing:.1em; text-transform:uppercase; transition:color .2s; }
+    .nav-link:hover, .nav-link.active { color:var(--neon); }
+    .nav-right { display:flex; align-items:center; gap:.7rem; flex-shrink:0; }
+    .nav-back { color:var(--gris); text-decoration:none; font-size:.76rem; letter-spacing:.08em; text-transform:uppercase; border:1px solid var(--gris3); padding:.42rem .8rem; transition:all .2s; }
+    .nav-back:hover { color:var(--blanco); border-color:var(--gris2); }
+    .btn-ghost, .btn-neon { text-decoration:none; text-transform:uppercase; letter-spacing:.08em; font-size:.76rem; padding:.48rem .9rem; display:inline-block; }
+    .btn-ghost { color:var(--blanco); border:1px solid var(--gris2); background:transparent; }
+    .btn-neon { color:var(--negro); background:var(--neon); border:1px solid var(--neon); font-weight:600; }
+    .btn-ghost:hover, .btn-neon:hover { opacity:.85; }
+    .nav-user { position:relative; display:none; }
+    .nav-avatar-wrap { display:flex; align-items:center; gap:.5rem; padding:.3rem .6rem; border:1px solid var(--gris3); user-select:none; transition:border-color .2s; }
+    .nav-avatar-wrap:hover { border-color:var(--gris2); }
+    .nav-avatar-circle { width:28px; height:28px; border-radius:50%; background:#0d2010; color:var(--neon); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:.62rem; }
+    .nav-avatar-name { font-size:.78rem; max-width:82px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .nav-avatar-chevron { font-size:.65rem; color:var(--gris); transition:transform .2s; }
+    .nav-avatar-wrap.open .nav-avatar-chevron { transform:rotate(180deg); }
+    .nav-dropdown { position:absolute; top:calc(100% + 8px); right:0; min-width:220px; background:var(--negro2); border:1px solid #2a2a2a; display:none; flex-direction:column; z-index:300; }
+    .nav-dropdown.open { display:flex; }
+    .nav-dropdown-item { display:flex; align-items:center; gap:.65rem; padding:.78rem 1rem; color:var(--gris); text-decoration:none; font-size:.82rem; border:none; background:transparent; font-family:var(--font-body); text-align:left; width:100%; transition:all .15s; }
+    .nav-dropdown-item:hover { background:rgba(255,255,255,.04); color:var(--blanco); }
+    .nav-dropdown-divider { height:1px; background:#1c1c1c; margin:.3rem 0; }
+    .nav-logout:hover { color:var(--rojo) !important; }
+    .top-spacer { height:60px; }
+
+    .wrap { position:relative; z-index:1; max-width:1120px; margin:0 auto; padding:2.2rem 2rem 5rem; }
+    .hero { display:grid; grid-template-columns:1.05fr .95fr; gap:1.5rem; align-items:stretch; margin-bottom:1.4rem; }
+    .hero-main { border:1px solid #1c1c1c; background:linear-gradient(135deg,rgba(212,245,60,.06),rgba(255,255,255,.01)); padding:2rem; position:relative; overflow:hidden; min-height:280px; display:flex; flex-direction:column; justify-content:space-between; }
+    .hero-main::after { content:'NOMBRES'; position:absolute; right:-.4rem; bottom:-1.2rem; font-family:var(--font-display); font-size:5.5rem; line-height:.8; color:transparent; -webkit-text-stroke:1px rgba(242,237,228,.08); pointer-events:none; }
+    .page-label { font-size:.68rem; letter-spacing:.22em; text-transform:uppercase; color:var(--neon); margin-bottom:.75rem; }
+    .page-title { font-family:var(--font-display); font-size:clamp(2.4rem,5vw,4.2rem); line-height:.9; letter-spacing:-.035em; margin-bottom:1rem; max-width:680px; }
+    .page-title span { color:var(--neon); }
+    .page-sub { color:var(--gris); font-size:.96rem; line-height:1.7; max-width:560px; }
+    .hero-actions { display:flex; gap:.7rem; flex-wrap:wrap; margin-top:1.4rem; }
+    .hero-btn { border:1px solid var(--gris3); color:var(--gris); background:transparent; text-decoration:none; padding:.62rem 1rem; font-size:.74rem; letter-spacing:.08em; text-transform:uppercase; transition:all .2s; }
+    .hero-btn:hover { border-color:var(--neon); color:var(--neon); }
+    .hero-btn.primary { background:var(--neon); color:var(--negro); border-color:var(--neon); font-family:var(--font-display); }
+    .hero-side { display:grid; grid-template-rows:auto 1fr; gap:1px; background:#1c1c1c; border:1px solid #1c1c1c; }
+    .tip-card { background:var(--negro2); padding:1.2rem; }
+    .tip-kicker { font-size:.62rem; letter-spacing:.16em; text-transform:uppercase; color:var(--gris2); margin-bottom:.55rem; }
+    .tip-title { font-family:var(--font-display); font-size:1rem; margin-bottom:.3rem; }
+    .tip-text { font-size:.82rem; line-height:1.6; color:var(--gris); }
+    .saved-mini { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:#1c1c1c; }
+    .mini-stat { background:var(--negro2); padding:1rem; }
+    .mini-num { font-family:var(--font-display); font-size:1.55rem; color:var(--neon); line-height:1; }
+    .mini-label { color:var(--gris); font-size:.66rem; text-transform:uppercase; letter-spacing:.08em; margin-top:.3rem; }
+
+    .generator-panel { display:grid; grid-template-columns:300px 1fr; gap:1px; background:#1c1c1c; border:1px solid #1c1c1c; }
+    .controls { background:var(--negro2); padding:1.4rem; }
+    .control-section { margin-bottom:1.45rem; }
+    .control-label { font-size:.62rem; letter-spacing:.18em; text-transform:uppercase; color:var(--gris2); margin-bottom:.65rem; display:block; }
+    .mode-tabs { display:grid; grid-template-columns:1fr; gap:.45rem; }
+    .mode-tab, .vibe-chip, .count-chip { width:100%; border:1px solid var(--gris3); background:transparent; color:var(--gris); font-family:var(--font-body); font-size:.76rem; letter-spacing:.06em; text-transform:uppercase; padding:.72rem .8rem; transition:all .15s; text-align:left; }
+    .mode-tab:hover, .vibe-chip:hover, .count-chip:hover { border-color:#444; color:var(--blanco); }
+    .mode-tab.active, .vibe-chip.active, .count-chip.active { border-color:var(--neon); color:var(--neon); background:rgba(212,245,60,.05); }
+    .chip-grid { display:grid; grid-template-columns:1fr 1fr; gap:.45rem; }
+    .vibe-chip, .count-chip { text-align:center; padding:.56rem .45rem; font-size:.68rem; }
+    .btn-generar { width:100%; background:var(--neon); border:none; color:#000; padding:1rem; font-family:var(--font-display); font-size:.98rem; letter-spacing:.04em; transition:opacity .2s; }
     .btn-generar:hover { opacity:.85; }
-    .btn-generar:active { opacity:.7; }
+    .btn-secondary { width:100%; background:transparent; border:1px solid var(--gris3); color:var(--gris); padding:.72rem; font-size:.74rem; letter-spacing:.08em; text-transform:uppercase; margin-top:.6rem; font-family:var(--font-body); transition:all .2s; }
+    .btn-secondary:hover { color:var(--blanco); border-color:var(--gris2); }
+    .disclaimer { font-size:.72rem; color:var(--gris2); line-height:1.55; margin-top:1rem; }
 
-    /* RESULTADOS */
-    .results { display:flex;flex-direction:column;gap:.75rem; }
-    .result-item {
-      display:flex;align-items:center;justify-content:space-between;
-      background:#0f0f0f;border:1px solid #1c1c1c;padding:1.1rem 1.25rem;
-      transition:border-color .15s;
-    }
-    .result-item:hover { border-color:#333; }
-    .result-name { font-family:'Archivo Black',sans-serif;font-size:1.15rem;letter-spacing:-.01em; }
-    .result-actions { display:flex;gap:.5rem;flex-shrink:0; }
-    .btn-save {
-      background:transparent;border:1px solid var(--gris3);color:var(--gris);
-      padding:.4rem .75rem;font-family:'Archivo',sans-serif;font-size:.72rem;
-      letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;
-    }
-    .btn-save:hover { border-color:var(--neon);color:var(--neon); }
-    .btn-save.saved { border-color:var(--neon);color:var(--neon);background:rgba(212,245,60,.07); }
-    .btn-copy {
-      background:transparent;border:1px solid var(--gris3);color:var(--gris);
-      padding:.4rem .75rem;font-family:'Archivo',sans-serif;font-size:.72rem;
-      letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;
-    }
-    .btn-copy:hover { border-color:#555;color:var(--blanco); }
-    .btn-copy.copied { color:var(--neon); }
+    .results-panel { background:var(--negro); min-height:460px; display:flex; flex-direction:column; }
+    .results-head { padding:1.2rem 1.4rem; border-bottom:1px solid #1c1c1c; display:flex; align-items:center; justify-content:space-between; gap:1rem; }
+    .results-title { font-family:var(--font-display); font-size:1.05rem; }
+    .results-sub { font-size:.74rem; color:var(--gris); }
+    .results-tools { display:flex; gap:.5rem; }
+    .tool-btn { background:transparent; border:1px solid var(--gris3); color:var(--gris); padding:.45rem .72rem; font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; transition:all .2s; font-family:var(--font-body); }
+    .tool-btn:hover { border-color:var(--neon); color:var(--neon); }
+    .results { display:grid; grid-template-columns:repeat(2,1fr); gap:1px; background:#181818; flex:1; }
+    .empty-state { grid-column:1/-1; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:340px; padding:2rem; text-align:center; background:var(--negro); color:var(--gris); }
+    .empty-icon { font-size:2.4rem; margin-bottom:.8rem; opacity:.55; }
+    .empty-title { font-family:var(--font-display); color:var(--blanco); font-size:1.25rem; margin-bottom:.35rem; }
+    .empty-copy { max-width:340px; font-size:.86rem; line-height:1.7; }
+    .result-item { background:var(--negro); padding:1.1rem; min-height:130px; display:flex; flex-direction:column; justify-content:space-between; transition:background .2s; animation:fadeUp .25s ease both; }
+    .result-item:hover { background:#0e0e0e; }
+    .result-name { font-family:var(--font-display); font-size:1.25rem; line-height:1.12; letter-spacing:-.02em; word-break:break-word; }
+    .result-meta { color:var(--gris2); font-size:.66rem; letter-spacing:.08em; text-transform:uppercase; margin-top:.5rem; }
+    .result-actions { display:flex; gap:.45rem; flex-wrap:wrap; margin-top:1rem; }
+    .btn-save, .btn-copy { background:transparent; border:1px solid var(--gris3); color:var(--gris); padding:.4rem .7rem; font-family:var(--font-body); font-size:.68rem; letter-spacing:.07em; text-transform:uppercase; transition:all .15s; }
+    .btn-save:hover { border-color:var(--neon); color:var(--neon); }
+    .btn-copy:hover { border-color:var(--gris2); color:var(--blanco); }
+    .btn-save.saved { border-color:var(--neon); color:var(--neon); background:rgba(212,245,60,.07); }
+    .btn-copy.copied { color:var(--neon); border-color:var(--neon); }
 
-    /* GUARDADOS */
-    .saved-section { margin-top:3rem;border-top:1px solid #1c1c1c;padding-top:2rem; }
-    .saved-title { font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gris);margin-bottom:1rem; }
-    .saved-list { display:flex;flex-wrap:wrap;gap:.5rem; }
-    .saved-chip {
-      display:flex;align-items:center;gap:.5rem;
-      background:#111;border:1px solid #2a2a2a;
-      padding:.4rem .85rem;font-size:.85rem;
-    }
-    .saved-chip-remove { background:none;border:none;color:var(--gris);cursor:pointer;font-size:.9rem;padding:0;line-height:1; }
-    .saved-chip-remove:hover { color:#ff5555; }
-    .empty-state { color:var(--gris);font-size:.82rem;font-style:italic; }
+    .saved-section { margin-top:1.4rem; border:1px solid #1c1c1c; background:var(--negro2); }
+    .saved-header { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1.1rem 1.3rem; border-bottom:1px solid #1c1c1c; }
+    .saved-title { font-family:var(--font-display); font-size:1rem; }
+    .saved-title span { color:var(--neon); }
+    .saved-actions { display:flex; gap:.5rem; }
+    .saved-list { display:flex; flex-wrap:wrap; gap:.5rem; padding:1.2rem; }
+    .saved-chip { display:inline-flex; align-items:center; gap:.55rem; background:#0d0d0d; border:1px solid #2a2a2a; padding:.48rem .75rem; font-size:.84rem; }
+    .saved-chip button { background:none; border:none; color:var(--gris); font-size:1rem; line-height:1; padding:0; transition:color .15s; }
+    .saved-chip button:hover { color:var(--rojo); }
+    .saved-empty { color:var(--gris); font-size:.84rem; padding:1.2rem; }
 
-    /* MOBILE */
-    @media (max-width:768px) {
-      .wrap { padding:2rem 1.25rem 6rem; }
-      .page-title { font-size:1.8rem; }
-      .result-name { font-size:1rem; }
-      body { padding-bottom:54px; }
+    .toast { position:fixed; left:50%; bottom:1.4rem; transform:translateX(-50%) translateY(12px); background:var(--neon); color:var(--negro); font-family:var(--font-display); font-size:.8rem; letter-spacing:.04em; padding:.75rem 1rem; opacity:0; pointer-events:none; z-index:9999; transition:all .2s; }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    @keyframes fadeUp { from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:translateY(0)} }
+
+    @media (max-width: 900px) {
+      .cursor, .cursor-ring { display:none !important; }
+      * { cursor:auto !important; }
+      body { padding-bottom:56px; cursor:auto; }
+      nav { height:auto; min-height:56px; padding:.65rem 1rem; gap:.6rem; }
+      .nav-center { display:none; }
+      .nav-logo { font-size:1.25rem; }
+      .nav-back { font-size:.68rem; padding:.38rem .55rem; }
+      .nav-avatar-name, .nav-avatar-chevron { display:none; }
+      .btn-ghost { display:none; }
+      .btn-neon { padding:.4rem .65rem; font-size:.7rem; }
+      .top-spacer { height:56px; }
+      .wrap { padding:1.2rem 1rem 5rem; }
+      .hero { grid-template-columns:1fr; }
+      .hero-main { padding:1.35rem; min-height:auto; }
+      .hero-main::after { font-size:3.2rem; opacity:.5; }
+      .page-title { font-size:2.2rem; }
+      .saved-mini { grid-template-columns:repeat(3,1fr); }
+      .generator-panel { grid-template-columns:1fr; }
+      .controls { padding:1rem; }
+      .mode-tabs { grid-template-columns:1fr 1fr; }
+      .results-head { flex-direction:column; align-items:flex-start; }
+      .results { grid-template-columns:1fr; }
+      .result-item { min-height:112px; }
+      .saved-header { flex-direction:column; align-items:flex-start; }
+      .toast { bottom:4.2rem; width:calc(100% - 2rem); text-align:center; }
     }
   </style>
 </head>
 <body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
 
 <nav>
   <a href="index.html" class="nav-logo">busc<span>ARTE</span></a>
-  <a href="javascript:history.back()" class="nav-back">← Volver</a>
+  <div class="nav-center">
+    <a href="buscARTE_busqueda.html" class="nav-link">Músicos</a>
+    <a href="buscARTE_anuncios.html" class="nav-link">Anuncios</a>
+    <a href="buscARTE_generador.html" class="nav-link active">Generador</a>
+  </div>
+  <div class="nav-right">
+    <a href="javascript:history.back()" class="nav-back">← Volver</a>
+    <div class="nav-guest" id="nav-guest">
+      <a href="buscARTE_login.html" class="btn-ghost">Ingresar</a>
+      <a href="buscARTE_registro.html" class="btn-neon">Registrarse</a>
+    </div>
+    <div class="nav-user" id="nav-user">
+      <div class="nav-avatar-wrap" id="nav-avatar-btn" onclick="toggleUserMenu(event)">
+        <div class="nav-avatar-circle" id="nav-avatar-circle">?</div>
+        <span class="nav-avatar-name" id="nav-avatar-name">Mi perfil</span>
+        <span class="nav-avatar-chevron">▾</span>
+      </div>
+      <div class="nav-dropdown" id="nav-dropdown">
+        <a href="buscARTE_perfil_publico.html" class="nav-dropdown-item" id="nav-mi-perfil">👤 Mi perfil</a>
+        <a href="buscARTE_perfil.html" class="nav-dropdown-item">⚙️ Configurar perfil</a>
+        <a href="buscARTE_mensajes.html" class="nav-dropdown-item">💬 Mensajes</a>
+        <a href="buscARTE_mis_anuncios.html" class="nav-dropdown-item">📋 Mis anuncios</a>
+        <a href="buscARTE_guardados.html" class="nav-dropdown-item">♡ Guardados</a>
+        <div class="nav-dropdown-divider"></div>
+        <button class="nav-dropdown-item nav-logout" onclick="logout()">↩ Cerrar sesión</button>
+      </div>
+    </div>
+  </div>
 </nav>
+<div class="top-spacer"></div>
 
-<div class="wrap">
-  <div class="page-label">Herramienta</div>
-  <h1 class="page-title">Generador de<br><span style="color:var(--neon)">nombres</span></h1>
-  <p class="page-sub">Para bandas y artistas solistas. Generá opciones al instante, guardá las que te gustan y copialas con un click.</p>
+<main class="wrap">
+  <section class="hero">
+    <div class="hero-main">
+      <div>
+        <div class="page-label">Herramienta creativa</div>
+        <h1 class="page-title">Generador de <span>nombres</span></h1>
+        <p class="page-sub">Para bandas, solistas y proyectos raros que todavía no tienen nombre. Generá ideas, guardá favoritas y copialas para compartir con tu banda.</p>
+      </div>
+      <div class="hero-actions">
+        <a href="#generador" class="hero-btn primary">Generar ahora →</a>
+        <a href="buscARTE_guardados.html" class="hero-btn">Ver guardados</a>
+      </div>
+    </div>
+    <aside class="hero-side">
+      <div class="tip-card">
+        <div class="tip-kicker">Tip buscARTE</div>
+        <div class="tip-title">Usalo como disparador, no como sentencia divina.</div>
+        <p class="tip-text">Probá combinaciones, decilo en voz alta y revisá que no exista otra banda o marca usando el mismo nombre.</p>
+      </div>
+      <div class="saved-mini">
+        <div class="mini-stat"><div class="mini-num" id="stat-saved">0</div><div class="mini-label">Guardados</div></div>
+        <div class="mini-stat"><div class="mini-num" id="stat-generated">0</div><div class="mini-label">Generados</div></div>
+        <div class="mini-stat"><div class="mini-num" id="stat-mode">B</div><div class="mini-label">Modo</div></div>
+      </div>
+    </aside>
+  </section>
 
-  <div class="mode-tabs">
-    <button class="mode-tab active" onclick="setMode('banda', this)">🎸 Nombre de banda</button>
-    <button class="mode-tab" onclick="setMode('solista', this)">🎤 Nombre artístico</button>
-  </div>
+  <section class="generator-panel" id="generador">
+    <aside class="controls">
+      <div class="control-section">
+        <span class="control-label">Tipo de nombre</span>
+        <div class="mode-tabs">
+          <button class="mode-tab active" data-mode="banda">🎸 Banda</button>
+          <button class="mode-tab" data-mode="solista">🎤 Solista</button>
+        </div>
+      </div>
 
-  <button class="btn-generar" onclick="generar()">🎲 Generar nombres</button>
+      <div class="control-section">
+        <span class="control-label">Vibe</span>
+        <div class="chip-grid" id="vibe-grid">
+          <button class="vibe-chip active" data-vibe="random">Random</button>
+          <button class="vibe-chip" data-vibe="under">Under</button>
+          <button class="vibe-chip" data-vibe="indie">Indie</button>
+          <button class="vibe-chip" data-vibe="pesado">Pesado</button>
+          <button class="vibe-chip" data-vibe="electronico">Electro</button>
+          <button class="vibe-chip" data-vibe="rioplatense">Río/Barrios</button>
+        </div>
+      </div>
 
-  <div class="results" id="results">
-    <div class="empty-state" style="padding:2rem;text-align:center">Apretá el botón para generar opciones →</div>
-  </div>
+      <div class="control-section">
+        <span class="control-label">Cantidad</span>
+        <div class="chip-grid">
+          <button class="count-chip" data-count="4">4</button>
+          <button class="count-chip active" data-count="6">6</button>
+          <button class="count-chip" data-count="8">8</button>
+          <button class="count-chip" data-count="12">12</button>
+        </div>
+      </div>
 
-  <div class="saved-section" id="saved-section" style="display:none">
-    <div class="saved-title">♡ Guardados</div>
+      <button class="btn-generar" id="btn-generar">🎲 Generar nombres</button>
+      <button class="btn-secondary" id="btn-clear-results">Limpiar resultados</button>
+      <p class="disclaimer">Los nombres se guardan en este navegador. También los vas a ver en Guardados dentro de la pestaña “Nombres”.</p>
+    </aside>
+
+    <section class="results-panel">
+      <div class="results-head">
+        <div>
+          <div class="results-title">Resultados</div>
+          <div class="results-sub" id="results-sub">Elegí un modo y apretá generar.</div>
+        </div>
+        <div class="results-tools">
+          <button class="tool-btn" id="copy-all-btn">Copiar todos</button>
+          <button class="tool-btn" id="save-all-btn">Guardar todos</button>
+        </div>
+      </div>
+      <div class="results" id="results">
+        <div class="empty-state">
+          <div class="empty-icon">🎲</div>
+          <div class="empty-title">Todavía no hay nombres</div>
+          <p class="empty-copy">Apretá el botón y dejá que el caos creativo haga lo suyo.</p>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <section class="saved-section" id="saved-section">
+    <div class="saved-header">
+      <div>
+        <div class="saved-title">♡ Nombres <span>guardados</span></div>
+        <div class="results-sub">Tus favoritos rápidos de este navegador.</div>
+      </div>
+      <div class="saved-actions">
+        <button class="tool-btn" id="copy-saved-btn">Copiar guardados</button>
+        <button class="tool-btn" id="clear-saved-btn">Vaciar</button>
+      </div>
+    </div>
     <div class="saved-list" id="saved-list"></div>
-  </div>
-</div>
+  </section>
+</main>
+
+<div class="toast" id="toast">Listo</div>
 
 <script>
-  let modo = 'banda';
-  let guardados = JSON.parse(localStorage.getItem('ba_nombres_guardados') || '[]');
-  let usados = new Set();
-
-  // ══════════════════════════════════════════════
-  // BASE DE PALABRAS
-  // ══════════════════════════════════════════════
-
   const BANDA = {
-    prefijos: ['Los','Las','La','El','Los','Las','Proyecto','Colectivo','Banda','Trío','Cuarteto','La Orquesta','El Conjunto','Gran'],
-    adj_masc: ['Roto','Perdido','Oscuro','Vacío','Libre','Eterno','Salvaje','Quieto','Profundo','Amargo','Bravo','Loco','Nuevo','Viejo','Largo','Intenso','Urgente','Maldito','Olvidado','Encendido','Turbio','Fiero','Extraño','Secreto','Latente'],
-    adj_fem: ['Rota','Perdida','Oscura','Vacía','Libre','Eterna','Salvaje','Quieta','Profunda','Amarga','Brava','Loca','Nueva','Vieja','Larga','Intensa','Urgente','Maldita','Olvidada','Encendida','Turbia','Fiera','Extraña','Secreta','Latente'],
+    prefijos: ['Los','Las','La','El','Proyecto','Colectivo','Banda','Trío','Cuarteto','La Orquesta','El Conjunto','Gran'],
+    adj_masc: ['Roto','Perdido','Oscuro','Vacío','Libre','Eterno','Salvaje','Quieto','Profundo','Amargo','Bravo','Loco','Nuevo','Viejo','Intenso','Urgente','Maldito','Olvidado','Encendido','Turbio','Fiero','Extraño','Secreto','Latente'],
+    adj_fem: ['Rota','Perdida','Oscura','Vacía','Libre','Eterna','Salvaje','Quieta','Profunda','Amarga','Brava','Loca','Nueva','Vieja','Intensa','Urgente','Maldita','Olvidada','Encendida','Turbia','Fiera','Extraña','Secreta','Latente'],
     sust_masc: ['Ruido','Tiempo','Abismo','Fuego','Viento','Silencio','Camino','Pulso','Ritmo','Eco','Lazo','Filo','Nudo','Rastro','Vuelo','Sueño','Humo','Trance','Salto','Grito','Tono','Surco','Caos','Alba','Umbral'],
     sust_fem: ['Llama','Sombra','Niebla','Marea','Grieta','Raíz','Orilla','Chispa','Cuerda','Fuga','Ola','Herida','Voz','Tarde','Noche','Cumbre','Hendija','Pólvora','Resaca','Quimera','Tormenta','Espiral','Ceniza','Brasa','Estela'],
-    lugares: ['del Sur','del Norte','del Bajo','del Caos','del Abismo','del Margen','del Río','de la Orilla','de la Noche','del Último Piso','de Palermo','del Conurbano','del Fin del Mundo','de Boedo','de la Villa','del Puerto'],
+    lugares: ['del Sur','del Norte','del Bajo','del Caos','del Abismo','del Margen','del Río','de la Orilla','de la Noche','del Último Piso','de Palermo','del Conurbano','del Fin del Mundo','de Boedo','de la Villa','del Puerto']
   };
 
   const SOLISTA = {
-    articulos: ['El','La',''],
     nombres: ['Luca','Manu','Sol','Nico','Luna','Bruno','Caro','Dante','Vera','Axel','Mora','Omar','Lena','Fede','Zoe','Blas','Noa','Iara','Enzo','Mia','Teo','Kika','Seba','Vale','Ian','Luz','Dex','Alba','Kai','Nara'],
     apellidos_inv: ['Niebla','Caos','Furia','Viento','Sombra','Fuego','Llanura','Marea','Abismo','Pulso','Eco','Grieta','Raíz','Trance','Umbral','Chispa','Llama','Estela','Ceniza','Brasa','Resaca','Espiral','Quimera','Lazo','Rastro'],
     apodos: ['El Zurdo','La Maga','El Viejo','La Furia','El Flaco','La Negra','El Mono','La Rubia','El Ruso','La China','El Chino','El Toro','La Pantera','El Lobo','La Cobra'],
-    artisticos: ['Vértice','Hendrix Jr','Noir','Zénit','Coda','Fuzz','Riff','Loop','Scat','Vamp','Fade','Drop','Warp','Flux','Glitch','Drone','Bass','Kraut','Dub','Shoal'],
+    artisticos: ['Vértice','Noir','Zénit','Coda','Fuzz','Riff','Loop','Scat','Vamp','Fade','Drop','Warp','Flux','Glitch','Drone','Bass','Kraut','Dub','Shoal']
   };
 
-  function rand(arr) {
-    return arr[Math.floor(Math.random() * arr.length)];
+  const VIBES = {
+    random: [],
+    under: ['Sótano','Esquina','Margen','Fiera','Cemento','Roto','Pasillo','Galpón','Noche'],
+    indie: ['Brisa','Estela','Ceniza','Luna','Tarde','Vera','Niebla','Orilla','Fuga'],
+    pesado: ['Furia','Abismo','Grito','Fuego','Mastín','Humo','Pólvora','Caos','Filo'],
+    electronico: ['Loop','Flux','Glitch','Drone','Drop','Warp','Neón','Pulso','Trance'],
+    rioplatense: ['Boedo','Palermo','Bajo','Río','Puerto','Conurbano','Sur','Norte','Orilla']
+  };
+
+  let modo = 'banda';
+  let vibe = 'random';
+  let cantidad = 6;
+  let guardados = cargarGuardadosStorage();
+  let usados = new Set();
+  let resultadosActuales = [];
+  let totalGenerados = 0;
+
+  function cargarGuardadosStorage() {
+    try {
+      const raw = JSON.parse(localStorage.getItem('ba_nombres_guardados') || '[]');
+      return Array.isArray(raw) ? [...new Set(raw.map(String).filter(Boolean))] : [];
+    } catch(e) { return []; }
   }
+  function guardarStorage() { localStorage.setItem('ba_nombres_guardados', JSON.stringify(guardados)); }
+  function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+  function chance(n) { return Math.random() < n; }
+  function escapeHtml(value) {
+    return String(value ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;');
+  }
+  function pickVibeWord() { const arr = VIBES[vibe] || []; return arr.length ? rand(arr) : null; }
 
   function generarNombreBanda() {
-    const tipo = Math.floor(Math.random() * 5);
+    const vw = pickVibeWord();
+    const tipo = Math.floor(Math.random() * 7);
     let nombre = '';
     switch(tipo) {
-      case 0: // "Los [Adj Masc Plural]" → simplificado como "Los [Sust Masc]"
-        nombre = `${rand(['Los','Las'])} ${rand(BANDA.sust_masc)}${rand(['','s'])}`;
+      case 0: nombre = `${rand(['Los','Las'])} ${vw || rand(BANDA.sust_masc)}${chance(.35) ? 's' : ''}`; break;
+      case 1: nombre = `${rand(BANDA.prefijos)} ${rand([...BANDA.sust_masc, ...BANDA.sust_fem, vw].filter(Boolean))} ${rand(BANDA.lugares)}`; break;
+      case 2: {
+        const fem = chance(.5);
+        nombre = `${fem ? 'La' : 'El'} ${rand(fem ? BANDA.sust_fem : BANDA.sust_masc)} ${vw || rand(fem ? BANDA.adj_fem : BANDA.adj_masc)}`;
         break;
-      case 1: // "[Prefijo] [Sust] [Lugar]"
-        nombre = `${rand(BANDA.prefijos)} ${rand([...BANDA.sust_masc,...BANDA.sust_fem])} ${rand(BANDA.lugares)}`;
-        break;
-      case 2: // "El/La [Sust] [Adj]"
-        const useFem2 = Math.random() > 0.5;
-        nombre = `${useFem2 ? 'La' : 'El'} ${rand(useFem2 ? BANDA.sust_fem : BANDA.sust_masc)} ${rand(useFem2 ? BANDA.adj_fem : BANDA.adj_masc)}`;
-        break;
-      case 3: // Solo sustantivo fuerte
-        nombre = rand([...BANDA.sust_masc,...BANDA.sust_fem,...BANDA.adj_masc,...BANDA.adj_fem].filter(w=>w.length > 4));
-        break;
-      case 4: // "[Sust] y [Sust]"
-        const w1 = rand([...BANDA.sust_masc,...BANDA.sust_fem]);
-        let w2 = rand([...BANDA.sust_masc,...BANDA.sust_fem]);
-        while(w2 === w1) w2 = rand([...BANDA.sust_masc,...BANDA.sust_fem]);
+      }
+      case 3: nombre = rand([...BANDA.sust_masc, ...BANDA.sust_fem, ...BANDA.adj_masc, ...BANDA.adj_fem, vw].filter(Boolean).filter(w => w.length > 3)); break;
+      case 4: {
+        const w1 = vw || rand([...BANDA.sust_masc, ...BANDA.sust_fem]);
+        let w2 = rand([...BANDA.sust_masc, ...BANDA.sust_fem]);
+        while (w2 === w1) w2 = rand([...BANDA.sust_masc, ...BANDA.sust_fem]);
         nombre = `${w1} y ${w2}`;
         break;
+      }
+      case 5: nombre = `${rand(['Después de','Antes de','Contra','Sobre'])} ${vw || rand([...BANDA.sust_masc, ...BANDA.sust_fem])}`; break;
+      case 6: nombre = `${vw || rand([...BANDA.sust_fem, ...BANDA.sust_masc])} ${rand(['Club','Sistema','Sociedad','Unidad','Departamento','Ritual'])}`; break;
     }
-    return nombre;
+    return nombre.replace(/\s+/g, ' ').trim();
   }
 
   function generarNombreSolista() {
-    const tipo = Math.floor(Math.random() * 4);
+    const vw = pickVibeWord();
+    const tipo = Math.floor(Math.random() * 6);
     let nombre = '';
     switch(tipo) {
-      case 0: // Nombre + apellido inventado
-        nombre = `${rand(SOLISTA.nombres)} ${rand(SOLISTA.apellidos_inv)}`;
-        break;
-      case 1: // Apodo
-        nombre = rand(SOLISTA.apodos);
-        break;
-      case 2: // Nombre artístico simple
-        nombre = rand(SOLISTA.artisticos);
-        break;
-      case 3: // Artículo + nombre artístico
+      case 0: nombre = `${rand(SOLISTA.nombres)} ${vw || rand(SOLISTA.apellidos_inv)}`; break;
+      case 1: nombre = rand(SOLISTA.apodos); break;
+      case 2: nombre = vw || rand(SOLISTA.artisticos); break;
+      case 3: {
         const art = rand(['El','La','']);
-        nombre = art ? `${art} ${rand([...SOLISTA.artisticos,...SOLISTA.apellidos_inv])}` : rand(SOLISTA.artisticos);
+        nombre = art ? `${art} ${vw || rand([...SOLISTA.artisticos, ...SOLISTA.apellidos_inv])}` : rand(SOLISTA.artisticos);
         break;
+      }
+      case 4: nombre = `${rand(SOLISTA.nombres)} ${rand(['Noir','Fuzz','Loop','Dub','Riff','Flux'])}`; break;
+      case 5: nombre = `${vw || rand(SOLISTA.apellidos_inv)} ${rand(['Kid','Club','Baby','Sound','Wave','Modo'])}`; break;
     }
-    return nombre;
+    return nombre.replace(/\s+/g, ' ').trim();
   }
 
   function generar() {
     const generador = modo === 'banda' ? generarNombreBanda : generarNombreSolista;
     const nuevos = [];
     let intentos = 0;
-    while (nuevos.length < 6 && intentos < 200) {
-      const n = generador();
-      if (!usados.has(n)) {
-        nuevos.push(n);
-        usados.add(n);
+    while (nuevos.length < cantidad && intentos < 400) {
+      const nombre = generador();
+      if (!usados.has(nombre)) {
+        nuevos.push(nombre);
+        usados.add(nombre);
       }
       intentos++;
     }
-    renderResultados(nuevos);
+    resultadosActuales = nuevos;
+    totalGenerados += nuevos.length;
+    renderResultados();
+    updateStats();
   }
 
-  function renderResultados(nombres) {
+  function renderResultados() {
     const container = document.getElementById('results');
-    container.innerHTML = nombres.map(n => {
-      const guardado = guardados.includes(n);
-      return `<div class="result-item" id="item-${CSS.escape(n)}">
-        <div class="result-name">${n}</div>
-        <div class="result-actions">
-          <button class="btn-save ${guardado ? 'saved' : ''}" onclick="toggleGuardar('${n.replace(/'/g,"\\'")}', this)">
-            ${guardado ? '♥ Guardado' : '♡ Guardar'}
-          </button>
-          <button class="btn-copy" onclick="copiar('${n.replace(/'/g,"\\'")}', this)">Copiar</button>
+    const sub = document.getElementById('results-sub');
+    if (!resultadosActuales.length) {
+      container.innerHTML = `<div class="empty-state"><div class="empty-icon">🎲</div><div class="empty-title">Todavía no hay nombres</div><p class="empty-copy">Apretá el botón y dejá que el caos creativo haga lo suyo.</p></div>`;
+      sub.textContent = 'Elegí un modo y apretá generar.';
+      return;
+    }
+    sub.textContent = `${resultadosActuales.length} ideas · ${modo === 'banda' ? 'nombre de banda' : 'nombre artístico'} · ${vibe}`;
+    container.innerHTML = resultadosActuales.map((nombre, index) => {
+      const safe = escapeHtml(nombre);
+      const saved = guardados.includes(nombre);
+      return `<article class="result-item" style="animation-delay:${index * 35}ms">
+        <div>
+          <div class="result-name">${safe}</div>
+          <div class="result-meta">${modo === 'banda' ? 'Banda' : 'Solista'} · ${escapeHtml(vibe)}</div>
         </div>
-      </div>`;
+        <div class="result-actions">
+          <button class="btn-save ${saved ? 'saved' : ''}" data-action="save" data-name="${safe}">${saved ? '♥ Guardado' : '♡ Guardar'}</button>
+          <button class="btn-copy" data-action="copy" data-name="${safe}">Copiar</button>
+        </div>
+      </article>`;
     }).join('');
+  }
+
+  function renderGuardados() {
+    const list = document.getElementById('saved-list');
+    if (!guardados.length) {
+      list.innerHTML = `<div class="saved-empty">Todavía no guardaste nombres. Cuando alguno te haga ruido, mandale ♡.</div>`;
+      updateStats();
+      return;
+    }
+    list.innerHTML = guardados.map(nombre => `<span class="saved-chip">${escapeHtml(nombre)}<button title="Quitar" data-action="remove-saved" data-name="${escapeHtml(nombre)}">×</button></span>`).join('');
+    updateStats();
   }
 
   function toggleGuardar(nombre, btn) {
     if (guardados.includes(nombre)) {
-      guardados = guardados.filter(g => g !== nombre);
-      btn.textContent = '♡ Guardar';
-      btn.classList.remove('saved');
+      guardados = guardados.filter(n => n !== nombre);
+      toast('Quitado de guardados');
     } else {
       guardados.push(nombre);
-      btn.textContent = '♥ Guardado';
-      btn.classList.add('saved');
+      toast('Guardado');
     }
-    localStorage.setItem('ba_nombres_guardados', JSON.stringify(guardados));
+    guardarStorage();
+    renderResultados();
     renderGuardados();
   }
 
-  function copiar(nombre, btn) {
-    navigator.clipboard.writeText(nombre).then(() => {
-      const orig = btn.textContent;
+  async function copiarTexto(texto) {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(texto);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = texto;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+      }
+      return true;
+    } catch(e) { return false; }
+  }
+
+  async function copiarNombre(nombre, btn) {
+    const ok = await copiarTexto(nombre);
+    if (ok) {
+      const old = btn.textContent;
       btn.textContent = '✓ Copiado';
       btn.classList.add('copied');
-      setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1500);
-    });
+      toast('Copiado');
+      setTimeout(() => { btn.textContent = old; btn.classList.remove('copied'); }, 1300);
+    } else {
+      toast('No se pudo copiar');
+    }
   }
 
-  function renderGuardados() {
-    const section = document.getElementById('saved-section');
-    const list = document.getElementById('saved-list');
-    if (!guardados.length) { section.style.display = 'none'; return; }
-    section.style.display = 'block';
-    list.innerHTML = guardados.map(n =>
-      `<span class="saved-chip">${n}<button class="saved-chip-remove" onclick="quitarGuardado('${n.replace(/'/g,"\\'")}')">×</button></span>`
-    ).join('');
-  }
-
-  function quitarGuardado(nombre) {
-    guardados = guardados.filter(g => g !== nombre);
-    localStorage.setItem('ba_nombres_guardados', JSON.stringify(guardados));
-    renderGuardados();
-    // Actualizar botón si está visible
-    document.querySelectorAll('.result-item').forEach(item => {
-      const nameEl = item.querySelector('.result-name');
-      if (nameEl && nameEl.textContent === nombre) {
-        const btn = item.querySelector('.btn-save');
-        if (btn) { btn.textContent = '♡ Guardar'; btn.classList.remove('saved'); }
-      }
-    });
-  }
-
-  function setMode(m, btn) {
-    modo = m;
-    usados.clear();
-    document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  function setActiveButton(selector, btn) {
+    document.querySelectorAll(selector).forEach(el => el.classList.remove('active'));
     btn.classList.add('active');
-    document.getElementById('results').innerHTML = '<div class="empty-state" style="padding:2rem;text-align:center">Apretá el botón para generar opciones →</div>';
   }
 
-  // Inicializar guardados
-  renderGuardados();
-</script>
+  function updateStats() {
+    document.getElementById('stat-saved').textContent = guardados.length;
+    document.getElementById('stat-generated').textContent = totalGenerados;
+    document.getElementById('stat-mode').textContent = modo === 'banda' ? 'B' : 'S';
+  }
 
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(()=>{}); });
-}
+  let toastTimer = null;
+  function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 1500);
+  }
+
+  document.getElementById('btn-generar').addEventListener('click', generar);
+  document.getElementById('btn-clear-results').addEventListener('click', () => {
+    resultadosActuales = [];
+    usados.clear();
+    renderResultados();
+  });
+  document.querySelectorAll('.mode-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      modo = btn.dataset.mode;
+      usados.clear();
+      resultadosActuales = [];
+      setActiveButton('.mode-tab', btn);
+      renderResultados();
+      updateStats();
+    });
+  });
+  document.querySelectorAll('.vibe-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      vibe = btn.dataset.vibe;
+      usados.clear();
+      setActiveButton('.vibe-chip', btn);
+    });
+  });
+  document.querySelectorAll('.count-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      cantidad = Number(btn.dataset.count) || 6;
+      setActiveButton('.count-chip', btn);
+    });
+  });
+  document.getElementById('results').addEventListener('click', e => {
+    const btn = e.target.closest('button[data-action]');
+    if (!btn) return;
+    const name = btn.dataset.name;
+    if (btn.dataset.action === 'save') toggleGuardar(name, btn);
+    if (btn.dataset.action === 'copy') copiarNombre(name, btn);
+  });
+  document.getElementById('saved-list').addEventListener('click', e => {
+    const btn = e.target.closest('button[data-action="remove-saved"]');
+    if (!btn) return;
+    guardados = guardados.filter(n => n !== btn.dataset.name);
+    guardarStorage();
+    renderResultados();
+    renderGuardados();
+    toast('Quitado');
+  });
+  document.getElementById('copy-all-btn').addEventListener('click', async () => {
+    if (!resultadosActuales.length) return toast('No hay resultados');
+    const ok = await copiarTexto(resultadosActuales.join('\n'));
+    toast(ok ? 'Resultados copiados' : 'No se pudo copiar');
+  });
+  document.getElementById('save-all-btn').addEventListener('click', () => {
+    if (!resultadosActuales.length) return toast('No hay resultados');
+    guardados = [...new Set([...guardados, ...resultadosActuales])];
+    guardarStorage();
+    renderResultados();
+    renderGuardados();
+    toast('Todos guardados');
+  });
+  document.getElementById('copy-saved-btn').addEventListener('click', async () => {
+    if (!guardados.length) return toast('No hay guardados');
+    const ok = await copiarTexto(guardados.join('\n'));
+    toast(ok ? 'Guardados copiados' : 'No se pudo copiar');
+  });
+  document.getElementById('clear-saved-btn').addEventListener('click', () => {
+    if (!guardados.length) return;
+    const ok = confirm('¿Vaciar todos los nombres guardados?');
+    if (!ok) return;
+    guardados = [];
+    guardarStorage();
+    renderResultados();
+    renderGuardados();
+    toast('Guardados vaciados');
+  });
+
+  window.addEventListener('DOMContentLoaded', () => {
+    renderGuardados();
+    renderResultados();
+    updateStats();
+    initCursor();
+    initNav();
+  });
+
+  function initCursor() {
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursor-ring');
+    if (!cursor || !ring || window.matchMedia('(max-width: 900px)').matches) return;
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    (function tick(){
+      cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+      rx += (mx - rx) * .12; ry += (my - ry) * .12;
+      ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+      requestAnimationFrame(tick);
+    })();
+  }
+
+  function initNav() {
+    const logged = localStorage.getItem('ba_logged') === '1';
+    const uid = localStorage.getItem('ba_user_id') || '';
+    const name = localStorage.getItem('ba_name') || 'Mi perfil';
+    const guest = document.getElementById('nav-guest');
+    const user = document.getElementById('nav-user');
+    if (logged) {
+      if (guest) guest.style.display = 'none';
+      if (user) user.style.display = 'block';
+      const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
+      document.getElementById('nav-avatar-circle').textContent = initials;
+      document.getElementById('nav-avatar-name').textContent = name.split(' ')[0] || 'Mi perfil';
+      const profile = document.getElementById('nav-mi-perfil');
+      if (profile && uid) profile.href = 'buscARTE_perfil_publico.html?id=' + encodeURIComponent(uid);
+    } else {
+      if (guest) guest.style.display = 'flex';
+      if (user) user.style.display = 'none';
+    }
+  }
+  function toggleUserMenu(e) {
+    if (e) e.stopPropagation();
+    document.getElementById('nav-avatar-btn')?.classList.toggle('open');
+    document.getElementById('nav-dropdown')?.classList.toggle('open');
+  }
+  document.addEventListener('click', e => {
+    if (!e.target.closest('#nav-user')) {
+      document.getElementById('nav-avatar-btn')?.classList.remove('open');
+      document.getElementById('nav-dropdown')?.classList.remove('open');
+    }
+  });
+  function logout() {
+    localStorage.removeItem('ba_logged');
+    localStorage.removeItem('ba_name');
+    localStorage.removeItem('ba_email');
+    localStorage.removeItem('ba_user_id');
+    window.location.href = 'index.html';
+  }
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(()=>{}); });
+  }
 </script>
 </body>
 </html>

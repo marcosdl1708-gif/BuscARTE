@@ -1,24 +1,50 @@
 {
   "name": "buscARTE",
   "short_name": "buscARTE",
-  "description": "La red de músicos argentinos",
-  "start_url": "/index.html",
+  "description": "La red gratuita para músicos argentinos: encontrá músicos, anuncios, jams, clases y compra/venta de equipos.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui",
+    "browser"
+  ],
   "background_color": "#0a0a0a",
   "theme_color": "#0a0a0a",
   "orientation": "portrait-primary",
+  "lang": "es-AR",
+  "dir": "ltr",
+  "categories": [
+    "music",
+    "social",
+    "entertainment"
+  ],
   "icons": [
     {
       "src": "/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
   "screenshots": [
@@ -26,7 +52,46 @@
       "src": "/og-image.jpg",
       "sizes": "1200x630",
       "type": "image/jpeg",
-      "form_factor": "wide"
+      "form_factor": "wide",
+      "label": "buscARTE"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Buscar músicos",
+      "short_name": "Músicos",
+      "description": "Explorar perfiles de músicos",
+      "url": "/buscARTE_busqueda.html",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Ver anuncios",
+      "short_name": "Anuncios",
+      "description": "Explorar anuncios, jams, clases y equipos",
+      "url": "/buscARTE_anuncios.html",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Generador de nombres",
+      "short_name": "Nombres",
+      "description": "Generar nombres para bandas y artistas",
+      "url": "/buscARTE_generador.html",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }

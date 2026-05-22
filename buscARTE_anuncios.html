@@ -1,33 +1,32 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- SEO -->
-  <meta name="keywords" content="busco músico argentina, busco guitarrista, busco baterista, jam session buenos aires, zapada palermo, vendo guitarra argentina, anuncios musicales">
-  <meta name="description" content="Publicá y encontrá anuncios musicales en Argentina. Busco músico para banda, me ofrezco para proyectos, jams y zapadas abiertas, vendo instrumentos. Todo gratis en buscARTE.">
-  <meta name="robots" content="index, follow">
-  <meta name="author" content="buscARTE">
-  <link rel="canonical" href="https://buscarte.com.ar/buscARTE_anuncios.html">
-
-  <!-- Open Graph (WhatsApp, Facebook, Instagram) -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://buscarte.com.ar/buscARTE_anuncios.html">
-  <meta property="og:title" content="Anuncios musicales Argentina — Busco músico, jam sessions, vendo instrumentos | buscARTE">
-  <meta property="og:description" content="Publicá y encontrá anuncios musicales en Argentina. Busco músico para banda, me ofrezco para proyectos, jams y zapadas abiertas, vendo instrumentos. Todo gratis en buscARTE.">
-  <meta property="og:image" content="https://buscarte.com.ar/og-image.jpg">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:locale" content="es_AR">
-  <meta property="og:site_name" content="buscARTE">
-
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Anuncios musicales Argentina — Busco músico, jam sessions, vendo instrumentos | buscARTE">
-  <meta name="twitter:description" content="Publicá y encontrá anuncios musicales en Argentina. Busco músico para banda, me ofrezco para proyectos, jams y zapadas abiertas, vendo instrumentos. Todo gratis en buscARTE.">
-  <meta name="twitter:image" content="https://buscarte.com.ar/og-image.jpg">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<!-- SEO -->
+<meta content="busco músico argentina, busco guitarrista, busco baterista, jam session buenos aires, zapada palermo, vendo guitarra argentina, anuncios musicales" name="keywords"/>
+<meta content="Publicá y encontrá anuncios musicales en Argentina. Busco músico para banda, me ofrezco para proyectos, jams y zapadas abiertas, vendo instrumentos. Todo gratis en buscARTE." name="description"/>
+<meta content="index, follow" name="robots"/>
+<meta content="buscARTE" name="author"/>
+<link href="https://buscarte.com.ar/buscARTE_anuncios.html" rel="canonical"/>
+<!-- Open Graph (WhatsApp, Facebook, Instagram) -->
+<meta content="website" property="og:type"/>
+<meta content="https://buscarte.com.ar/buscARTE_anuncios.html" property="og:url"/>
+<meta content="Anuncios musicales Argentina — Busco músico, jam sessions, vendo instrumentos | buscARTE" property="og:title"/>
+<meta content="Publicá y encontrá anuncios musicales en Argentina. Busco músico para banda, me ofrezco para proyectos, jams y zapadas abiertas, vendo instrumentos. Todo gratis en buscARTE." property="og:description"/>
+<meta content="https://buscarte.com.ar/og-image.jpg" property="og:image"/>
+<meta content="1200" property="og:image:width"/>
+<meta content="630" property="og:image:height"/>
+<meta content="es_AR" property="og:locale"/>
+<meta content="buscARTE" property="og:site_name"/>
+<!-- Twitter Card -->
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="Anuncios musicales Argentina — Busco músico, jam sessions, vendo instrumentos | buscARTE" name="twitter:title"/>
+<meta content="Publicá y encontrá anuncios musicales en Argentina. Busco músico para banda, me ofrezco para proyectos, jams y zapadas abiertas, vendo instrumentos. Todo gratis en buscARTE." name="twitter:description"/>
+<meta content="https://buscarte.com.ar/og-image.jpg" name="twitter:image"/>
 <title>Anuncios musicales Argentina — Busco músico, jam sessions, vendo instrumentos | buscARTE</title>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&amp;family=Archivo:ital,wght@0,300;0,400;0,500;1,300&amp;display=swap" rel="stylesheet"/>
 <style>
   *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
   :root {
@@ -429,838 +428,966 @@
     .nav-dropdown { display: none !important; }
   }
 
+
+
+  /* ═══ CODEO fixes: anuncios UX/mobile ═══ */
+  .anuncios-main { min-width: 0; }
+  .anuncios-intro {
+    border:1px solid #1c1c1c;
+    background:linear-gradient(135deg, rgba(212,245,60,.045), rgba(255,255,255,.015));
+    padding:1rem 1.1rem;
+    margin-bottom:1rem;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:1rem;
+  }
+  .anuncios-intro-title {
+    font-family:var(--font-display);
+    font-size:.95rem;
+    letter-spacing:.02em;
+    margin-bottom:.2rem;
+  }
+  .anuncios-intro-copy {
+    color:var(--gris);
+    font-size:.78rem;
+    line-height:1.55;
+  }
+  .anuncios-intro-actions { display:flex; gap:.5rem; flex-shrink:0; }
+  .mini-link {
+    border:1px solid var(--gris3);
+    color:var(--gris);
+    text-decoration:none;
+    padding:.45rem .75rem;
+    font-size:.68rem;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    transition:all .15s;
+    white-space:nowrap;
+  }
+  .mini-link:hover { border-color:var(--neon); color:var(--neon); }
+  .tipo-tabs { overflow-x:auto; scrollbar-width:none; }
+  .tipo-tabs::-webkit-scrollbar { display:none; }
+  .tipo-tab { min-width:96px; }
+  .anuncio { cursor:pointer; }
+  .anuncio * { cursor:inherit; }
+  .anuncio a, .anuncio button, .anuncio textarea, .reply-form { cursor:none; }
+  .anuncio-flyer {
+    width:100%;
+    max-height:220px;
+    object-fit:cover;
+    margin:.35rem 0 .8rem;
+    display:block;
+    border:1px solid #1c1c1c;
+  }
+  .anuncio-respond { text-decoration:none; display:inline-block; }
+  .empty-actions { display:flex; gap:.6rem; justify-content:center; flex-wrap:wrap; margin-top:1.2rem; }
+  .empty-action {
+    border:1px solid var(--gris3);
+    color:var(--gris);
+    background:transparent;
+    text-decoration:none;
+    padding:.55rem .9rem;
+    font-size:.72rem;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    font-family:var(--font-body);
+  }
+  .empty-action.primary { background:var(--neon); color:var(--negro); border-color:var(--neon); font-weight:700; }
+  .mobile-filter-btn { display:none; }
+
+  @media (min-width:901px) {
+    .tipo-tab { flex:1; }
+  }
+
+  @media (max-width:900px) {
+    .anuncios-main { padding:1rem !important; border-right:none !important; }
+    .main-header { align-items:flex-start !important; gap:1rem !important; }
+    .main-header .btn-publish { width:100%; text-align:center; justify-content:center; }
+    .anuncios-intro { flex-direction:column; align-items:flex-start; }
+    .anuncios-intro-actions { width:100%; display:grid; grid-template-columns:1fr 1fr; }
+    .mini-link { text-align:center; }
+    .tipo-tabs {
+      margin-left:-1rem;
+      margin-right:-1rem;
+      padding:0 1rem;
+      border-left:none;
+      border-right:none;
+      position:sticky;
+      top:56px;
+      z-index:40;
+      background:var(--negro);
+    }
+    .tipo-tab { min-width:118px; flex:0 0 auto; }
+    .mobile-filter-btn {
+      display:flex !important;
+      align-items:center;
+      justify-content:center;
+      gap:.5rem;
+      background:transparent;
+      border:1px solid #2a2a2a;
+      color:#888;
+      padding:.65rem 1rem;
+      font-size:.75rem;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      margin-bottom:1rem;
+      font-family:'Archivo',sans-serif;
+      cursor:auto;
+      width:100%;
+    }
+    .filters-panel.mobile-open {
+      display:block !important;
+      position:fixed !important;
+      top:56px !important;
+      left:0 !important;
+      right:0 !important;
+      bottom:54px !important;
+      z-index:450 !important;
+      overflow-y:auto !important;
+      background:var(--negro2) !important;
+      height:auto !important;
+      border-right:none !important;
+    }
+    .modal-overlay.open { align-items:flex-end !important; }
+    .modal {
+      width:100% !important;
+      max-width:100% !important;
+      max-height:92vh !important;
+      border-left:none !important;
+      border-right:none !important;
+    }
+    .modal-header { padding:1rem 1.25rem !important; }
+    .modal-tipo-selector {
+      display:flex !important;
+      overflow-x:auto !important;
+      grid-template-columns:none !important;
+      padding:.85rem 1rem !important;
+    }
+    .modal-tipo-btn { min-width:112px !important; flex:0 0 auto !important; }
+    .modal-form { padding:1rem 1.25rem !important; }
+    .modal-footer { position:sticky; bottom:0; background:var(--negro2); padding:1rem 1.25rem !important; }
+    .modal-footer .btn-submit, .modal-footer .btn-cancel { flex:1; text-align:center; }
+    .anuncio-titulo { padding-right:0 !important; }
+    .anuncio-time { margin-left:0 !important; width:100%; }
+  }
 </style>
-  <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#0a0a0a">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="buscARTE">
-  <link rel="apple-touch-icon" href="/icons/icon-192.svg">
+<link href="/manifest.json" rel="manifest"/>
+<meta content="#0a0a0a" name="theme-color"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<meta content="buscARTE" name="apple-mobile-web-app-title"/>
+<link href="/icons/icon-192.svg" rel="apple-touch-icon"/>
 </head>
 <body>
-
 <div class="cursor" id="cursor"></div>
 <div class="cursor-ring" id="cursor-ring"></div>
-
 <!-- ═══ MODAL ═══ -->
 <div class="modal-overlay" id="modal" onclick="closeModalOutside(event)">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">Publicar anuncio</div>
-      <button class="modal-close" onclick="closeModal()">×</button>
-    </div>
-    <div class="modal-tipo-selector">
-      <button class="modal-tipo-btn selected" onclick="selectTipo('busco',this)"><span class="modal-tipo-icon">🔍</span><span class="modal-tipo-label">Busco músico</span></button>
-      <button class="modal-tipo-btn" onclick="selectTipo('ofrezco',this)"><span class="modal-tipo-icon">🎸</span><span class="modal-tipo-label">Me ofrezco</span></button>
-      <button class="modal-tipo-btn" onclick="selectTipo('jam',this)"><span class="modal-tipo-icon">🥁</span><span class="modal-tipo-label">Jam / Zapada</span></button>
-      <button class="modal-tipo-btn" onclick="selectTipo('vende',this)"><span class="modal-tipo-icon">🎛️</span><span class="modal-tipo-label">Vendo / Alquilo</span></button>
-      <button class="modal-tipo-btn" onclick="selectTipo('clases',this)"><span class="modal-tipo-icon">🎓</span><span class="modal-tipo-label">Doy clases</span></button>
-    </div>
-
-    <!-- BUSCO MÚSICO -->
-    <div class="modal-form active" id="form-busco">
-      <div class="mfield"><label>Título</label><input type="text" placeholder="Ej: Busco bajista para banda de rock en CABA"></div>
-      <div class="mfield"><label>Descripción</label><textarea placeholder="Qué buscás, experiencia requerida, frecuencia de ensayo, si tenés sala..."></textarea></div>
-      <div class="mfield">
-        <label>Instrumento/s buscado/s <span class="opt">— podés elegir varios</span></label>
-        <div class="mchips">
-          <button class="mchip" onclick="this.classList.toggle('on')">Guitarra</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Bajo</button>
-          <button class="mchip on" onclick="this.classList.toggle('on')">Batería</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Teclado / Piano</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Voz / Canto</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Saxo</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Violín</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Trompeta</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Percusión</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">DJ / Productor</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Bandoneón</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Charango</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Flauta</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Cello</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Arpa</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Acordeón</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Contrabajo</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Clarinete</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Cajón</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Bombo leguero</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Quena / Zampoña</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Ukelele</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Controlador MIDI</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Técnico de sonido</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Compositor / Arreglador</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Productor</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Mix & Mastering</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Manager</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Otro</button>
-        </div>
-      </div>
-      <div class="mfield">
-        <label>Género/s musicales <span class="opt">— podés elegir varios</span></label>
-        <div class="mchips">
-          <button class="mchip on" onclick="this.classList.toggle('on')">Rock</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Rock Nacional</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Metal</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Jazz</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Folklore</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Tango</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Cumbia</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Indie</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Pop</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Electrónica</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Funk</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Punk</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Blues</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Prog</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">R&B</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Rap / Hip Hop</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Reggae</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Tropical</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Clásica</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">House</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Tech House</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Techno</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Trance</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Melodic House & Techno</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Minimal Deep/Tech</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Indie Dance</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Bossanova</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Soul</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Otro</button>
-        </div>
-      </div>
-      <div class="mfield"><label>Zona / barrio</label><input type="text" placeholder="Ej: Almagro, CABA"></div>
-    </div>
-
-    <!-- ME OFREZCO -->
-    <div class="modal-form" id="form-ofrezco">
-      <div class="mfield"><label>Título</label><input type="text" placeholder="Ej: Guitarrista disponible para sesiones y shows — CABA"></div>
-      <div class="mfield"><label>Descripción</label><textarea placeholder="Quién sos, tu experiencia, qué ofrecés, si cobrás, disponibilidad horaria..."></textarea></div>
-      <div class="mfield">
-        <label>Instrumento/s que tocás <span class="opt">— podés elegir varios</span></label>
-        <div class="mchips">
-          <button class="mchip on" onclick="this.classList.toggle('on')">Guitarra</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Bajo</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Batería</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Teclado / Piano</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Voz / Canto</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Saxo</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Violín</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Trompeta</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Percusión</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">DJ / Productor</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Bandoneón</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Charango</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Flauta</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Cello</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Arpa</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Acordeón</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Contrabajo</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Clarinete</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Cajón</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Bombo leguero</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Quena / Zampoña</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Ukelele</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Controlador MIDI</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Técnico de sonido</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Compositor / Arreglador</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Productor</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Mix & Mastering</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Manager</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Otro</button>
-        </div>
-      </div>
-      <div class="mfield">
-        <label>Género/s musicales <span class="opt">— podés elegir varios</span></label>
-        <div class="mchips">
-          <button class="mchip" onclick="this.classList.toggle('on')">Rock</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Rock Nacional</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Metal</button>
-          <button class="mchip on" onclick="this.classList.toggle('on')">Jazz</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Folklore</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Tango</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Cumbia</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Indie</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Pop</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Electrónica</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Funk</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Punk</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Blues</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Prog</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">R&B</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Rap / Hip Hop</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Reggae</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Tropical</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Clásica</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">House</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Tech House</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Techno</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Trance</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Melodic House & Techno</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Minimal Deep/Tech</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Indie Dance</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Bossanova</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Soul</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Otro</button>
-        </div>
-      </div>
-      <div class="mfield"><label>Zona / barrio</label><input type="text" placeholder="Ej: Palermo, CABA"></div>
-    </div>
-
-    <!-- JAM / ZAPADA -->
-    <div class="modal-form" id="form-jam">
-      <div class="mfield"><label>Nombre del evento</label><input type="text" id="jam-titulo" placeholder="Ej: Jam de jazz abierta — Parque Centenario"></div>
-      <div class="mfield"><label>Descripción</label><textarea placeholder="De qué se trata, géneros, quién puede venir, qué llevar, cómo confirmar asistencia..."></textarea></div>
-      <div class="mfield">
-        <label>Género/s musicales <span class="opt">— opcional</span></label>
-        <div class="mchips" id="jam-generos">
-          <button class="mchip on" onclick="this.classList.toggle('on')">Jazz</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Rock</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Blues</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Folklore</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Funk</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">R&B</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Bossanova</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Tango</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Pop</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Cumbia</button>
-          <button class="mchip" onclick="this.classList.toggle('on')">Variado</button>
-        </div>
-      </div>
-      <div class="mrow">
-        <div class="mfield"><label>Fecha</label><input type="date"></div>
-        <div class="mfield"><label>Hora</label><input type="time"></div>
-      </div>
-      <div class="mfield"><label>Lugar / dirección</label><input type="text" placeholder="Ej: Parque Centenario, CABA / Bar La Trastienda, Balvanera"></div>
-      <div class="mrow">
-        <div class="mfield"><label>Precio de entrada <span class="opt">opcional</span></label><input type="text" placeholder="Ej: Gratis / $2.000 / A la gorra"></div>
-        <div class="mfield"><label>Link de entradas o evento <span class="opt">opcional</span></label><input type="url" placeholder="https://..."></div>
-      </div>
-      <div class="mfield"><label>Contacto / más info <span class="opt">opcional</span></label><input type="text" placeholder="Ej: @usuario Instagram / WhatsApp..."></div>
-      <div class="mfield">
-        <label>Flyer del evento <span class="opt">— opcional</span></label>
-        <div class="foto-upload" id="foto-jam-zone" onclick="document.getElementById('foto-jam-input').click()" style="cursor:pointer">
-          <input type="file" id="foto-jam-input" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="subirFotoJam(this)">
-          <img id="foto-jam-preview" style="display:none;width:100%;max-height:200px;object-fit:cover">
-          <p class="foto-upload-text" id="foto-jam-text"><strong>📸 Subir flyer del evento</strong><br>JPG, PNG o WebP · Máx. 2MB</p>
-        </div>
-      </div>
-    </div>
-
-
-    <!-- DOY CLASES -->
-    <div class="modal-form" id="form-clases">
-      <div class="mfield"><label>Título <span class="opt">— opcional, se genera automático</span></label><input type="text" id="clases-titulo" placeholder="Ej: Clases de guitarra para principiantes — Palermo"></div>
-      <div class="mrow">
-        <div class="mfield">
-          <label>Instrumento que enseñás</label>
-          <div class="mchips">
-            <button class="mchip on" onclick="this.classList.toggle('on')">Guitarra</button>
-            <button class="mchip" onclick="this.classList.toggle('on')">Bajo</button>
-            <button class="mchip" onclick="this.classList.toggle('on')">Batería</button>
-            <button class="mchip" onclick="this.classList.toggle('on')">Teclado / Piano</button>
-            <button class="mchip" onclick="this.classList.toggle('on')">Voz / Canto</button>
-            <button class="mchip" onclick="this.classList.toggle('on')">Saxo</button>
-            <button class="mchip" onclick="this.classList.toggle('on')">Violín</button>
-            <button class="mchip" onclick="this.classList.toggle('on')">Trompeta</button>
-            <button class="mchip" onclick="this.classList.toggle('on')">Percusión</button>
-            <button class="mchip" onclick="this.classList.toggle('on')">DJ / Productor</button>
-            <button class="mchip" onclick="this.classList.toggle('on')">Bandoneón</button>
-            <button class="mchip" onclick="this.classList.toggle('on')">Flauta</button>
-            <button class="mchip" onclick="this.classList.toggle('on')">Acordeón</button>
-            <button class="mchip" onclick="this.classList.toggle('on')">Ukelele</button>
-            <button class="mchip" onclick="this.classList.toggle('on')">Contrabajo</button>
-          </div>
-        </div>
-        <div class="mfield">
-          <label>Nivel que enseñás</label>
-          <div class="mchips">
-            <button class="mchip nivel-chip on" onclick="selectNivel(this)">Principiante</button>
-            <button class="mchip nivel-chip" onclick="selectNivel(this)">Intermedio</button>
-            <button class="mchip nivel-chip" onclick="selectNivel(this)">Avanzado</button>
-            <button class="mchip nivel-chip" onclick="selectNivel(this)">Todos los niveles</button>
-          </div>
-        </div>
-      </div>
-      <div class="mrow">
-        <div class="mfield">
-          <label>Modalidad</label>
-          <div class="mchips">
-            <button class="mchip modalidad-chip on" onclick="selectModalidad(this)">Presencial</button>
-            <button class="mchip modalidad-chip" onclick="selectModalidad(this)">Online</button>
-            <button class="mchip modalidad-chip" onclick="selectModalidad(this)">Presencial y online</button>
-          </div>
-        </div>
-        <div class="mfield">
-          <label>Precio por hora <span class="opt">— opcional</span></label>
-          <div style="display:flex;align-items:center;gap:.5rem">
-            <span style="color:var(--gris);font-size:.9rem">$</span>
-            <input type="text" id="clases-precio" placeholder="Ej: 5000" style="flex:1">
-            <span style="color:var(--gris);font-size:.75rem">/hora</span>
-          </div>
-        </div>
-      </div>
-      <div class="mfield"><label>Descripción</label><textarea id="clases-desc" placeholder="Tu experiencia como profe, metodología, duración de clases, si hacés diagnóstico gratuito..."></textarea></div>
-      <div class="mrow">
-        <div class="mfield"><label>Barrio / Zona <span class="opt">— opcional</span></label><input type="text" id="clases-zona" placeholder="Ej: Caballito, CABA"></div>
-      </div>
-    </div>
-
-    <!-- VENDO / ALQUILO -->
-    <div class="modal-form" id="form-vende">
-      <div class="mrow">
-        <div class="mfield">
-          <label>Categoría</label>
-          <select>
-            <option disabled selected>¿Qué es?</option>
-            <option>Guitarra eléctrica</option><option>Guitarra acústica</option><option>Guitarra clásica</option>
-            <option>Bajo eléctrico</option><option>Bajo acústico</option>
-            <option>Batería acústica</option><option>Batería electrónica</option><option>Percusión</option>
-            <option>Teclado / Piano</option><option>Piano acústico</option>
-            <option>Saxo</option><option>Trompeta</option><option>Trombón</option><option>Flauta</option><option>Clarinete</option>
-            <option>Violín</option><option>Cello</option><option>Viola</option>
-            <option>Bandoneón / Acordeón</option><option>Charango / Guitarra folk</option>
-            <option>Amplificador guitarra</option><option>Amplificador bajo</option>
-            <option>Pedalera multiefectos</option><option>Pedal individual</option>
-            <option>Micrófono</option><option>Interfaz de audio</option>
-            <option>Equipo PA / Sonido</option><option>Monitores / Parlantes</option>
-            <option>Home Studio / Grabación</option>
-            <option>Sala de ensayo</option>
-            <option>Cuerdas / Púas / Accesorios</option>
-            <option>Estuche / Funda</option>
-            <option>Otro</option>
-          </select>
-        </div>
-        <div class="mfield"><label>Marca</label><input type="text" placeholder="Ej: Fender, Boss, Otra..."></div>
-      </div>
-      <div class="mfield">
-        <label>Condición</label>
-        <div class="radio-group">
-          <button class="radio-btn selected" onclick="selectRadio(this)">Nuevo</button>
-          <button class="radio-btn" onclick="selectRadio(this)">Usado — excelente</button>
-          <button class="radio-btn" onclick="selectRadio(this)">Usado — bueno</button>
-          <button class="radio-btn" onclick="selectRadio(this)">Para reparar</button>
-        </div>
-      </div>
-      <div class="mrow">
-        <div class="mfield"><label>Precio <span class="opt">— solo números, sin puntos ni símbolos</span></label><input type="number" id="vende-precio" min="0" placeholder="Ej: 450000"></div>
-        <div class="mfield"><label>Zona</label><input type="text" placeholder="Ej: Caballito, CABA"></div>
-      </div>
-      <div class="mfield"><label>Descripción</label><textarea placeholder="Modelo exacto, estado, qué incluye, si tiene caja, si aceptás permuta..."></textarea></div>
-      <div class="mfield">
-        <label>Foto <span class="opt">muy recomendada — genera más consultas</span></label>
-        <div class="foto-upload" id="foto-venta-zone" onclick="document.getElementById('foto-venta-input').click()" style="cursor:pointer">
-          <input type="file" id="foto-venta-input" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="subirFotoVenta(this)">
-          <img id="foto-venta-preview" style="display:none;width:100%;max-height:200px;object-fit:cover">
-          <p class="foto-upload-text" id="foto-venta-text"><strong>Hacé click para subir una foto</strong><br>JPG, PNG o WebP · Máx. 2MB</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
-      <button class="btn-submit" onclick="submitAnuncio()">Publicar →</button>
-    </div>
-  </div>
+<div class="modal">
+<div class="modal-header">
+<div class="modal-title">Publicar anuncio</div>
+<button class="modal-close" onclick="closeModal()">×</button>
 </div>
-
+<div class="modal-tipo-selector">
+<button class="modal-tipo-btn selected" onclick="selectTipo('busco',this)"><span class="modal-tipo-icon">🔍</span><span class="modal-tipo-label">Busco músico</span></button>
+<button class="modal-tipo-btn" onclick="selectTipo('ofrezco',this)"><span class="modal-tipo-icon">🎸</span><span class="modal-tipo-label">Me ofrezco</span></button>
+<button class="modal-tipo-btn" onclick="selectTipo('jam',this)"><span class="modal-tipo-icon">🥁</span><span class="modal-tipo-label">Jam / Zapada</span></button>
+<button class="modal-tipo-btn" onclick="selectTipo('vende',this)"><span class="modal-tipo-icon">🎛️</span><span class="modal-tipo-label">Vendo / Alquilo</span></button>
+<button class="modal-tipo-btn" onclick="selectTipo('clases',this)"><span class="modal-tipo-icon">🎓</span><span class="modal-tipo-label">Doy clases</span></button>
+</div>
+<!-- BUSCO MÚSICO -->
+<div class="modal-form active" id="form-busco">
+<div class="mfield"><label>Título</label><input placeholder="Ej: Busco bajista para banda de rock en CABA" type="text"/></div>
+<div class="mfield"><label>Descripción</label><textarea placeholder="Qué buscás, experiencia requerida, frecuencia de ensayo, si tenés sala..."></textarea></div>
+<div class="mfield">
+<label>Instrumento/s buscado/s <span class="opt">— podés elegir varios</span></label>
+<div class="mchips">
+<button class="mchip" onclick="this.classList.toggle('on')">Guitarra</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Bajo</button>
+<button class="mchip on" onclick="this.classList.toggle('on')">Batería</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Teclado / Piano</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Voz / Canto</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Saxo</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Violín</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Trompeta</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Percusión</button>
+<button class="mchip" onclick="this.classList.toggle('on')">DJ / Productor</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Bandoneón</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Charango</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Flauta</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Cello</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Arpa</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Acordeón</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Contrabajo</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Clarinete</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Cajón</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Bombo leguero</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Quena / Zampoña</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Ukelele</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Controlador MIDI</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Técnico de sonido</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Compositor / Arreglador</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Productor</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Mix &amp; Mastering</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Manager</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Otro</button>
+</div>
+</div>
+<div class="mfield">
+<label>Género/s musicales <span class="opt">— podés elegir varios</span></label>
+<div class="mchips">
+<button class="mchip on" onclick="this.classList.toggle('on')">Rock</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Rock Nacional</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Metal</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Jazz</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Folklore</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Tango</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Cumbia</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Indie</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Pop</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Electrónica</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Funk</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Punk</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Blues</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Prog</button>
+<button class="mchip" onclick="this.classList.toggle('on')">R&amp;B</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Rap / Hip Hop</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Reggae</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Tropical</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Clásica</button>
+<button class="mchip" onclick="this.classList.toggle('on')">House</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Tech House</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Techno</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Trance</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Melodic House &amp; Techno</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Minimal Deep/Tech</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Indie Dance</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Bossanova</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Soul</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Otro</button>
+</div>
+</div>
+<div class="mfield"><label>Zona / barrio</label><input placeholder="Ej: Almagro, CABA" type="text"/></div>
+</div>
+<!-- ME OFREZCO -->
+<div class="modal-form" id="form-ofrezco">
+<div class="mfield"><label>Título</label><input placeholder="Ej: Guitarrista disponible para sesiones y shows — CABA" type="text"/></div>
+<div class="mfield"><label>Descripción</label><textarea placeholder="Quién sos, tu experiencia, qué ofrecés, si cobrás, disponibilidad horaria..."></textarea></div>
+<div class="mfield">
+<label>Instrumento/s que tocás <span class="opt">— podés elegir varios</span></label>
+<div class="mchips">
+<button class="mchip on" onclick="this.classList.toggle('on')">Guitarra</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Bajo</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Batería</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Teclado / Piano</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Voz / Canto</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Saxo</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Violín</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Trompeta</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Percusión</button>
+<button class="mchip" onclick="this.classList.toggle('on')">DJ / Productor</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Bandoneón</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Charango</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Flauta</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Cello</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Arpa</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Acordeón</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Contrabajo</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Clarinete</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Cajón</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Bombo leguero</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Quena / Zampoña</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Ukelele</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Controlador MIDI</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Técnico de sonido</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Compositor / Arreglador</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Productor</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Mix &amp; Mastering</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Manager</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Otro</button>
+</div>
+</div>
+<div class="mfield">
+<label>Género/s musicales <span class="opt">— podés elegir varios</span></label>
+<div class="mchips">
+<button class="mchip" onclick="this.classList.toggle('on')">Rock</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Rock Nacional</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Metal</button>
+<button class="mchip on" onclick="this.classList.toggle('on')">Jazz</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Folklore</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Tango</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Cumbia</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Indie</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Pop</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Electrónica</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Funk</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Punk</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Blues</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Prog</button>
+<button class="mchip" onclick="this.classList.toggle('on')">R&amp;B</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Rap / Hip Hop</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Reggae</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Tropical</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Clásica</button>
+<button class="mchip" onclick="this.classList.toggle('on')">House</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Tech House</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Techno</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Trance</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Melodic House &amp; Techno</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Minimal Deep/Tech</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Indie Dance</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Bossanova</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Soul</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Otro</button>
+</div>
+</div>
+<div class="mfield"><label>Zona / barrio</label><input placeholder="Ej: Palermo, CABA" type="text"/></div>
+</div>
+<!-- JAM / ZAPADA -->
+<div class="modal-form" id="form-jam">
+<div class="mfield"><label>Nombre del evento</label><input id="jam-titulo" placeholder="Ej: Jam de jazz abierta — Parque Centenario" type="text"/></div>
+<div class="mfield"><label>Descripción</label><textarea placeholder="De qué se trata, géneros, quién puede venir, qué llevar, cómo confirmar asistencia..."></textarea></div>
+<div class="mfield">
+<label>Género/s musicales <span class="opt">— opcional</span></label>
+<div class="mchips" id="jam-generos">
+<button class="mchip on" onclick="this.classList.toggle('on')">Jazz</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Rock</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Blues</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Folklore</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Funk</button>
+<button class="mchip" onclick="this.classList.toggle('on')">R&amp;B</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Bossanova</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Tango</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Pop</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Cumbia</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Variado</button>
+</div>
+</div>
+<div class="mrow">
+<div class="mfield"><label>Fecha</label><input type="date"/></div>
+<div class="mfield"><label>Hora</label><input type="time"/></div>
+</div>
+<div class="mfield"><label>Lugar / dirección</label><input placeholder="Ej: Parque Centenario, CABA / Bar La Trastienda, Balvanera" type="text"/></div>
+<div class="mrow">
+<div class="mfield"><label>Precio de entrada <span class="opt">opcional</span></label><input placeholder="Ej: Gratis / $2.000 / A la gorra" type="text"/></div>
+<div class="mfield"><label>Link de entradas o evento <span class="opt">opcional</span></label><input placeholder="https://..." type="url"/></div>
+</div>
+<div class="mfield"><label>Contacto / más info <span class="opt">opcional</span></label><input placeholder="Ej: @usuario Instagram / WhatsApp..." type="text"/></div>
+<div class="mfield">
+<label>Flyer del evento <span class="opt">— opcional</span></label>
+<div class="foto-upload" id="foto-jam-zone" onclick="document.getElementById('foto-jam-input').click()" style="cursor:pointer">
+<input accept="image/jpeg,image/png,image/webp" id="foto-jam-input" onchange="subirFotoJam(this)" style="display:none" type="file"/>
+<img id="foto-jam-preview" style="display:none;width:100%;max-height:200px;object-fit:cover"/>
+<p class="foto-upload-text" id="foto-jam-text"><strong>📸 Subir flyer del evento</strong><br/>JPG, PNG o WebP · Máx. 2MB</p>
+</div>
+</div>
+</div>
+<!-- DOY CLASES -->
+<div class="modal-form" id="form-clases">
+<div class="mfield"><label>Título <span class="opt">— opcional, se genera automático</span></label><input id="clases-titulo" placeholder="Ej: Clases de guitarra para principiantes — Palermo" type="text"/></div>
+<div class="mrow">
+<div class="mfield">
+<label>Instrumento que enseñás</label>
+<div class="mchips">
+<button class="mchip on" onclick="this.classList.toggle('on')">Guitarra</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Bajo</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Batería</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Teclado / Piano</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Voz / Canto</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Saxo</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Violín</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Trompeta</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Percusión</button>
+<button class="mchip" onclick="this.classList.toggle('on')">DJ / Productor</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Bandoneón</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Flauta</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Acordeón</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Ukelele</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Contrabajo</button>
+</div>
+</div>
+<div class="mfield">
+<label>Nivel que enseñás</label>
+<div class="mchips">
+<button class="mchip nivel-chip on" onclick="selectNivel(this)">Principiante</button>
+<button class="mchip nivel-chip" onclick="selectNivel(this)">Intermedio</button>
+<button class="mchip nivel-chip" onclick="selectNivel(this)">Avanzado</button>
+<button class="mchip nivel-chip" onclick="selectNivel(this)">Todos los niveles</button>
+</div>
+</div>
+</div>
+<div class="mrow">
+<div class="mfield">
+<label>Modalidad</label>
+<div class="mchips">
+<button class="mchip modalidad-chip on" onclick="selectModalidad(this)">Presencial</button>
+<button class="mchip modalidad-chip" onclick="selectModalidad(this)">Online</button>
+<button class="mchip modalidad-chip" onclick="selectModalidad(this)">Presencial y online</button>
+</div>
+</div>
+<div class="mfield">
+<label>Precio por hora <span class="opt">— opcional</span></label>
+<div style="display:flex;align-items:center;gap:.5rem">
+<span style="color:var(--gris);font-size:.9rem">$</span>
+<input id="clases-precio" placeholder="Ej: 5000" style="flex:1" type="text"/>
+<span style="color:var(--gris);font-size:.75rem">/hora</span>
+</div>
+</div>
+</div>
+<div class="mfield"><label>Descripción</label><textarea id="clases-desc" placeholder="Tu experiencia como profe, metodología, duración de clases, si hacés diagnóstico gratuito..."></textarea></div>
+<div class="mrow">
+<div class="mfield"><label>Barrio / Zona <span class="opt">— opcional</span></label><input id="clases-zona" placeholder="Ej: Caballito, CABA" type="text"/></div>
+</div>
+</div>
+<!-- VENDO / ALQUILO -->
+<div class="modal-form" id="form-vende">
+<div class="mrow">
+<div class="mfield">
+<label>Categoría</label>
+<select>
+<option disabled="" selected="">¿Qué es?</option>
+<option>Guitarra eléctrica</option><option>Guitarra acústica</option><option>Guitarra clásica</option>
+<option>Bajo eléctrico</option><option>Bajo acústico</option>
+<option>Batería acústica</option><option>Batería electrónica</option><option>Percusión</option>
+<option>Teclado / Piano</option><option>Piano acústico</option>
+<option>Saxo</option><option>Trompeta</option><option>Trombón</option><option>Flauta</option><option>Clarinete</option>
+<option>Violín</option><option>Cello</option><option>Viola</option>
+<option>Bandoneón / Acordeón</option><option>Charango / Guitarra folk</option>
+<option>Amplificador guitarra</option><option>Amplificador bajo</option>
+<option>Pedalera multiefectos</option><option>Pedal individual</option>
+<option>Micrófono</option><option>Interfaz de audio</option>
+<option>Equipo PA / Sonido</option><option>Monitores / Parlantes</option>
+<option>Home Studio / Grabación</option>
+<option>Sala de ensayo</option>
+<option>Cuerdas / Púas / Accesorios</option>
+<option>Estuche / Funda</option>
+<option>Otro</option>
+</select>
+</div>
+<div class="mfield"><label>Marca</label><input placeholder="Ej: Fender, Boss, Otra..." type="text"/></div>
+</div>
+<div class="mfield">
+<label>Condición</label>
+<div class="radio-group">
+<button class="radio-btn selected" onclick="selectRadio(this)">Nuevo</button>
+<button class="radio-btn" onclick="selectRadio(this)">Usado — excelente</button>
+<button class="radio-btn" onclick="selectRadio(this)">Usado — bueno</button>
+<button class="radio-btn" onclick="selectRadio(this)">Para reparar</button>
+</div>
+</div>
+<div class="mrow">
+<div class="mfield"><label>Precio <span class="opt">— solo números, sin puntos ni símbolos</span></label><input id="vende-precio" min="0" placeholder="Ej: 450000" type="number"/></div>
+<div class="mfield"><label>Zona</label><input placeholder="Ej: Caballito, CABA" type="text"/></div>
+</div>
+<div class="mfield"><label>Descripción</label><textarea placeholder="Modelo exacto, estado, qué incluye, si tiene caja, si aceptás permuta..."></textarea></div>
+<div class="mfield">
+<label>Foto <span class="opt">muy recomendada — genera más consultas</span></label>
+<div class="foto-upload" id="foto-venta-zone" onclick="document.getElementById('foto-venta-input').click()" style="cursor:pointer">
+<input accept="image/jpeg,image/png,image/webp" id="foto-venta-input" onchange="subirFotoVenta(this)" style="display:none" type="file"/>
+<img id="foto-venta-preview" style="display:none;width:100%;max-height:200px;object-fit:cover"/>
+<p class="foto-upload-text" id="foto-venta-text"><strong>Hacé click para subir una foto</strong><br/>JPG, PNG o WebP · Máx. 2MB</p>
+</div>
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+<button class="btn-submit" onclick="submitAnuncio()">Publicar →</button>
+</div>
+</div>
+</div>
 <!-- NAV -->
 <nav>
-  <a href="index.html" class="nav-logo">busc<span>ARTE</span></a>
-  <ul class="nav-links">
-    <li><a href="buscARTE_busqueda.html">Músicos</a></li>
-    <li><a href="#" class="active">Anuncios</a></li>
-    <li><a href="buscARTE_mensajes.html" class="nav-link">Mensajes</a></li>
-  </ul>
-  <div class="nav-right">
-      <div class="nav-guest" id="nav-guest">
-      <a href="buscARTE_login.html" class="btn-ghost">Ingresar</a>
-      <a href="buscARTE_registro.html" class="btn-neon">Registrarse</a>
-    </div>
-    <div class="nav-user" id="nav-user" style="display:none">
-      <div class="nav-avatar-wrap" onclick="toggleUserMenu()" id="nav-avatar-btn">
-        <div class="nav-avatar-circle" id="nav-avatar-circle">?</div>
-        <span class="nav-avatar-name" id="nav-avatar-name">Mi perfil</span>
-        <span class="nav-avatar-chevron">&#9662;</span>
-      </div>
-      <div class="nav-dropdown" id="nav-dropdown">
-        <a href="buscARTE_perfil_publico.html" class="nav-dropdown-item">&#128100; Mi perfil</a>
-        <a href="buscARTE_perfil.html" class="nav-dropdown-item">&#9881;&#65039; Configurar perfil</a>
-        <a href="buscARTE_mensajes.html" class="nav-dropdown-item">&#128172; Mensajes <span class="nav-badge" id="nav-msg-badge" style="display:none"></span></a>
-        <a href="buscARTE_mis_anuncios.html" class="nav-dropdown-item">&#128203; Mis anuncios</a>
-        <a href="buscARTE_guardados.html" class="nav-dropdown-item">&#9825; Guardados</a>
-        <a href="buscARTE_generador.html" class="nav-dropdown-item">🎲 Generador de nombres</a>
+<a class="nav-logo" href="index.html">busc<span>ARTE</span></a>
+<ul class="nav-links">
+<li><a href="buscARTE_busqueda.html">Músicos</a></li>
+<li><a class="active" href="#">Anuncios</a></li>
+<li><a class="nav-link" href="buscARTE_mensajes.html">Mensajes</a></li>
+</ul>
+<div class="nav-right">
+<div class="nav-guest" id="nav-guest">
+<a class="btn-ghost" href="buscARTE_login.html">Ingresar</a>
+<a class="btn-neon" href="buscARTE_registro.html">Registrarse</a>
+</div>
+<div class="nav-user" id="nav-user" style="display:none">
+<div class="nav-avatar-wrap" id="nav-avatar-btn" onclick="toggleUserMenu()">
+<div class="nav-avatar-circle" id="nav-avatar-circle">?</div>
+<span class="nav-avatar-name" id="nav-avatar-name">Mi perfil</span>
+<span class="nav-avatar-chevron">▾</span>
+</div>
+<div class="nav-dropdown" id="nav-dropdown">
+<a class="nav-dropdown-item" href="buscARTE_perfil_publico.html">👤 Mi perfil</a>
+<a class="nav-dropdown-item" href="buscARTE_perfil.html">⚙️ Configurar perfil</a>
+<a class="nav-dropdown-item" href="buscARTE_mensajes.html">💬 Mensajes <span class="nav-badge" id="nav-msg-badge" style="display:none"></span></a>
+<a class="nav-dropdown-item" href="buscARTE_mis_anuncios.html">📋 Mis anuncios</a>
+<a class="nav-dropdown-item" href="buscARTE_guardados.html">♡ Guardados</a>
+<a class="nav-dropdown-item" href="buscARTE_generador.html">🎲 Generador de nombres</a>
 <div class="nav-dropdown-divider"></div>
-        <button class="nav-dropdown-item nav-logout" onclick="logout()">&#8617; Cerrar sesión</button>
-      </div>
-    </div>
-  </div>
+<button class="nav-dropdown-item nav-logout" onclick="logout()">↩ Cerrar sesión</button>
+</div>
+</div>
+</div>
 </nav>
 <div class="top-spacer"></div>
-
 <div class="layout">
-
-  <!-- ═══ FILTROS ADAPTATIVOS ═══ -->
-  <aside class="filters-panel" id="anuncios-filters-panel">
-    <div class="filter-header">
-      <div class="filter-title-wrap">
-        <div class="filter-title">Filtros</div>
-        <div class="filter-category-label" id="filter-category-label">Busco músico · Me ofrezco</div>
-      </div>
-      <button class="filter-clear" onclick="clearFilters()">Limpiar</button>
-    </div>
-
-    <!-- FILTROS: BUSCO / OFREZCO -->
-    <div class="filter-panel active" id="fp-musico">
-      <div class="filter-group">
-        <span class="filter-group-label">Instrumento</span>
-        <div class="filter-chips">
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Guitarra</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Bajo</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Batería</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Teclado</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Voz / Canto</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Saxo</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Violín</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Trompeta</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Percusión</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">DJ</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Bandoneón</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Charango</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Flauta</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Cello</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Arpa</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Acordeón</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Contrabajo</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Clarinete</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Cajón</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Bombo leguero</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Quena / Zampoña</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Ukelele</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Controlador MIDI</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Técnico de sonido</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Compositor / Arreglador</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Productor</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Mix & Mastering</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Manager</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Otro</button>
-        </div>
-      </div>
-      <div class="filter-divider"></div>
-      <div class="filter-group">
-        <span class="filter-group-label">Género</span>
-        <div class="filter-chips">
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Rock</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Rock Nacional</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Metal</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Jazz</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Folklore</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Tango</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Cumbia</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Indie</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Pop</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Electrónica</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Funk</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Punk</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Blues</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Prog</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">R&B</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Rap / Hip Hop</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Reggae</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Tropical</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Clásica</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Bossanova</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Soul</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">House</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Tech House</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Techno</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Trance</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Melodic House & Techno</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Minimal Deep/Tech</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Indie Dance</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Otro</button>
-        </div>
-      </div>
-      <div class="filter-divider"></div>
-      <div class="filter-group">
-        <span class="filter-group-label">Zona</span>
-        <select><option>Todo el país</option><option selected>Buenos Aires (CABA)</option><option>Gran Buenos Aires</option><option>Rosario</option><option>Córdoba</option><option>Mendoza</option></select>
-        <div style="margin-top:.5rem"><input type="text" id="zona-musico" placeholder="Barrio (ej: Almagro)" oninput="anunciosOffset=0;cargarAnuncios(false)"></div>
-      </div>
-    </div>
-
-    <!-- FILTROS: JAM / ZAPADA -->
-    <div class="filter-panel" id="fp-jam">
-      <div class="filter-group">
-        <span class="filter-group-label">Cuándo</span>
-        <div class="filter-chips">
-          <button class="fchip on" onclick="this.classList.toggle('on');filtrarJam()">Hoy</button>
-          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Este finde</button>
-          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Esta semana</button>
-          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Este mes</button>
-        </div>
-      </div>
-      <div class="filter-divider"></div>
-      <div class="filter-group">
-        <span class="filter-group-label">Entrada</span>
-        <div class="filter-chips">
-          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Gratis</button>
-          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">A la gorra</button>
-          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Con costo</button>
-        </div>
-      </div>
-      <div class="filter-divider"></div>
-      <div class="filter-group">
-        <span class="filter-group-label">Género musical</span>
-        <div class="filter-chips">
-          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Rock</button>
-          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Jazz</button>
-          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Blues</button>
-          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Folklore</button>
-          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Funk</button>
-          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">R&B</button>
-          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Rap / Hip Hop</button>
-          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Reggae</button>
-          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Pop</button>
-          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Cumbia</button>
-          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Tango</button>
-          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Bossanova</button>
-          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Variado</button>
-          <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Otro</button>
-        </div>
-      </div>
-      <div class="filter-divider"></div>
-      <div class="filter-group">
-        <span class="filter-group-label">Zona</span>
-        <select><option>Todo el país</option><option selected>Buenos Aires (CABA)</option><option>Gran Buenos Aires</option><option>Rosario</option><option>Córdoba</option></select>
-        <div style="margin-top:.5rem"><input type="text" id="zona-jam" placeholder="Barrio / lugar" oninput="anunciosOffset=0;cargarAnuncios(false)"></div>
-      </div>
-    </div>
-
-    <!-- FILTROS: VENDO / ALQUILO -->
-    <div class="filter-panel" id="fp-vende">
-      <div class="filter-group">
-        <span class="filter-group-label">Categoría</span>
-        <div class="filter-chips">
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Guitarra</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Bajo</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Batería</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Teclado</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Vientos</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Cuerdas</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Amplificador</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Pedalera</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Micrófono</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Equipo PA</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Home Studio</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Sala ensayo</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Accesorios</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Otro</button>
-        </div>
-      </div>
-      <div class="filter-divider"></div>
-      <div class="filter-group">
-        <span class="filter-group-label">Condición</span>
-        <div class="filter-chips">
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Nuevo</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Usado</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Para reparar</button>
-        </div>
-      </div>
-      <div class="filter-divider"></div>
-      <div class="filter-group">
-        <span class="filter-group-label">Rango de precio</span>
-        <div class="price-range">
-          <input type="number" id="precio-min" placeholder="Mínimo $" oninput="anunciosOffset=0;cargarAnuncios(false)">
-          <input type="number" id="precio-max" placeholder="Máximo $" oninput="anunciosOffset=0;cargarAnuncios(false)">
-        </div>
-      </div>
-      <div class="filter-divider"></div>
-      <div class="filter-group">
-        <span class="filter-group-label">Zona</span>
-        <select><option>Todo el país</option><option selected>Buenos Aires (CABA)</option><option>Gran Buenos Aires</option><option>Rosario</option><option>Córdoba</option></select>
-        <div style="margin-top:.5rem"><input type="text" id="zona-vende" placeholder="Barrio (ej: Caballito)" oninput="anunciosOffset=0;cargarAnuncios(false)"></div>
-      </div>
-    </div>
-
-    <!-- FILTROS: DOY CLASES -->
-    <div class="filter-panel" id="fp-clases">
-      <div class="filter-group">
-        <span class="filter-group-label">Instrumento</span>
-        <div class="filter-chips">
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Guitarra</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Bajo</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Batería</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Teclado / Piano</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Voz / Canto</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Saxo</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Violín</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Percusión</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Bandoneón</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Acordeón</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Trompeta</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">DJ / Productor</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Ukelele</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Contrabajo</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Flauta</button>
-        </div>
-      </div>
-      <div class="filter-divider"></div>
-      <div class="filter-group">
-        <span class="filter-group-label">Nivel</span>
-        <div class="filter-chips">
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Principiante</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Intermedio</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Avanzado</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Todos los niveles</button>
-        </div>
-      </div>
-      <div class="filter-divider"></div>
-      <div class="filter-group">
-        <span class="filter-group-label">Modalidad</span>
-        <div class="filter-chips">
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Presencial</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Online</button>
-          <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Presencial y online</button>
-        </div>
-      </div>
-    </div>
-
-      <div class="mobile-show-results-wrap-an">
-      <button class="mobile-show-results-an" onclick="closeMobileFiltersAn()">Ver resultados →</button>
-    </div>
-  </aside>
-
-  <!-- ═══ ANUNCIOS ═══ -->
-  <div class="anuncios-main">
-    <div class="main-header">
-      <div>
-        <div class="main-title"><span>142</span> anuncios</div>
-        <div class="main-sub">en Buenos Aires · hoy</div>
-      </div>
-      <button class="btn-publish" onclick="openModal('busco')">+ Publicar anuncio</button>
-    </div>
-
-    <div class="tipo-tabs">
-      <button class="tipo-tab active" onclick="setTab(this,'todos')">Todos</button>
-      <button class="tipo-tab" onclick="setTab(this,'musico')">Busco músico</button>
-      <button class="tipo-tab" onclick="setTab(this,'ofrezco')">Me ofrezco</button>
-      <button class="tipo-tab" onclick="setTab(this,'jam')">Jam / Zapada</button>
-      <button class="tipo-tab" onclick="setTab(this,'vende')">Vendo / Alquilo</button>
-      <button class="tipo-tab" onclick="setTab(this,'clases')">Doy clases</button>
-    </div>
-
-    <div class="anuncios-lista" id="anuncios-lista">
-      <div style="padding:3rem;text-align:center;color:var(--gris);font-size:.88rem" id="anuncios-loading">Cargando anuncios...</div>
-    </div>
-    <div class="load-more">
-      <button class="btn-load" id="btn-load-more" onclick="loadMoreAnuncios(this)" style="display:none">Cargar más anuncios</button>
-    </div>
-  </div>
-
-  <!-- SIDEBAR -->
-  <aside class="right-sidebar">
-    <div class="sidebar-card">
-      <div class="sidebar-card-title">Publicar anuncio</div>
-      <div class="sidebar-card-sub">¿Buscás alguien, te ofrecés, querés organizar una jam o vender algo?</div>
-      <div class="publish-types">
-        <button class="publish-type selected" onclick="selectPublishType(this,'busco')"><span class="ptype-icon">🔍</span><div><span class="ptype-label">Busco músico</span><span class="ptype-desc">Guitarrista, cantante, baterista...</span></div></button>
-        <button class="publish-type" onclick="selectPublishType(this,'ofrezco')"><span class="ptype-icon">🎸</span><div><span class="ptype-label">Me ofrezco</span><span class="ptype-desc">Estoy disponible para proyectos</span></div></button>
-        <button class="publish-type" onclick="selectPublishType(this,'jam')"><span class="ptype-icon">🥁</span><div><span class="ptype-label">Jam / Zapada</span><span class="ptype-desc">Organizá una jam abierta</span></div></button>
-        <button class="publish-type" onclick="selectPublishType(this,'vende')"><span class="ptype-icon">🎛️</span><div><span class="ptype-label">Vendo / Alquilo</span><span class="ptype-desc">Instrumentos, equipos, sala</span></div></button>
-        <button class="publish-type" onclick="selectPublishType(this,'clases')"><span class="ptype-icon">🎓</span><div><span class="ptype-label">Doy clases</span><span class="ptype-desc">Enseñá tu instrumento</span></div></button>
-      </div>
-      <button class="btn-publish-full" onclick="openModalFromSidebar()">Publicar gratis →</button>
-    </div>
-    <div class="sidebar-card">
-      <div style="font-size:.63rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gris2);margin-bottom:1rem;">Actividad en buscARTE</div>
-      <div class="stats-row"><span class="stats-label">Anuncios activos</span><span class="stats-val" id="sidebar-stat-anuncios">—</span></div>
-      <div class="stats-row"><span class="stats-label">Músicos registrados</span><span class="stats-val" id="sidebar-stat-musicos">—</span></div>
-    </div>
-  </aside>
+<!-- ═══ FILTROS ADAPTATIVOS ═══ -->
+<aside class="filters-panel" id="anuncios-filters-panel">
+<div class="filter-header">
+<div class="filter-title-wrap">
+<div class="filter-title">Filtros</div>
+<div class="filter-category-label" id="filter-category-label">Busco músico · Me ofrezco</div>
 </div>
+<button class="filter-clear" onclick="clearFilters()">Limpiar</button>
+</div>
+<!-- FILTROS: BUSCO / OFREZCO -->
+<div class="filter-panel active" id="fp-musico">
+<div class="filter-group">
+<span class="filter-group-label">Instrumento</span>
+<div class="filter-chips">
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Guitarra</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Bajo</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Batería</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Teclado</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Voz / Canto</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Saxo</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Violín</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Trompeta</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Percusión</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">DJ</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Bandoneón</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Charango</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Flauta</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Cello</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Arpa</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Acordeón</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Contrabajo</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Clarinete</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Cajón</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Bombo leguero</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Quena / Zampoña</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Ukelele</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Controlador MIDI</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Técnico de sonido</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Compositor / Arreglador</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Productor</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Mix &amp; Mastering</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Manager</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Otro</button>
+</div>
+</div>
+<div class="filter-divider"></div>
+<div class="filter-group">
+<span class="filter-group-label">Género</span>
+<div class="filter-chips">
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Rock</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Rock Nacional</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Metal</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Jazz</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Folklore</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Tango</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Cumbia</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Indie</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Pop</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Electrónica</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Funk</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Punk</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Blues</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Prog</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">R&amp;B</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Rap / Hip Hop</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Reggae</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Tropical</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Clásica</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Bossanova</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Soul</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">House</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Tech House</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Techno</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Trance</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Melodic House &amp; Techno</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Minimal Deep/Tech</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Indie Dance</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Otro</button>
+</div>
+</div>
+<div class="filter-divider"></div>
+<div class="filter-group">
+<span class="filter-group-label">Zona</span>
+<select><option>Todo el país</option><option selected="">Buenos Aires (CABA)</option><option>Gran Buenos Aires</option><option>Rosario</option><option>Córdoba</option><option>Mendoza</option></select>
+<div style="margin-top:.5rem"><input id="zona-musico" oninput="anunciosOffset=0;cargarAnuncios(false)" placeholder="Barrio (ej: Almagro)" type="text"/></div>
+</div>
+</div>
+<!-- FILTROS: JAM / ZAPADA -->
+<div class="filter-panel" id="fp-jam">
+<div class="filter-group">
+<span class="filter-group-label">Cuándo</span>
+<div class="filter-chips">
+<button class="fchip on" onclick="this.classList.toggle('on');filtrarJam()">Hoy</button>
+<button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Este finde</button>
+<button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Esta semana</button>
+<button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Este mes</button>
+</div>
+</div>
+<div class="filter-divider"></div>
+<div class="filter-group">
+<span class="filter-group-label">Entrada</span>
+<div class="filter-chips">
+<button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Gratis</button>
+<button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">A la gorra</button>
+<button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Con costo</button>
+</div>
+</div>
+<div class="filter-divider"></div>
+<div class="filter-group">
+<span class="filter-group-label">Género musical</span>
+<div class="filter-chips">
+<button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Rock</button>
+<button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Jazz</button>
+<button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Blues</button>
+<button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Folklore</button>
+<button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Funk</button>
+<button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">R&amp;B</button>
+<button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Rap / Hip Hop</button>
+<button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Reggae</button>
+<button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Pop</button>
+<button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Cumbia</button>
+<button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Tango</button>
+<button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Bossanova</button>
+<button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Variado</button>
+<button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Otro</button>
+</div>
+</div>
+<div class="filter-divider"></div>
+<div class="filter-group">
+<span class="filter-group-label">Zona</span>
+<select><option>Todo el país</option><option selected="">Buenos Aires (CABA)</option><option>Gran Buenos Aires</option><option>Rosario</option><option>Córdoba</option></select>
+<div style="margin-top:.5rem"><input id="zona-jam" oninput="anunciosOffset=0;cargarAnuncios(false)" placeholder="Barrio / lugar" type="text"/></div>
+</div>
+</div>
+<!-- FILTROS: VENDO / ALQUILO -->
+<div class="filter-panel" id="fp-vende">
+<div class="filter-group">
+<span class="filter-group-label">Categoría</span>
+<div class="filter-chips">
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Guitarra</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Bajo</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Batería</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Teclado</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Vientos</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Cuerdas</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Amplificador</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Pedalera</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Micrófono</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Equipo PA</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Home Studio</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Sala ensayo</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Accesorios</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Otro</button>
+</div>
+</div>
+<div class="filter-divider"></div>
+<div class="filter-group">
+<span class="filter-group-label">Condición</span>
+<div class="filter-chips">
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Nuevo</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Usado</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Para reparar</button>
+</div>
+</div>
+<div class="filter-divider"></div>
+<div class="filter-group">
+<span class="filter-group-label">Rango de precio</span>
+<div class="price-range">
+<input id="precio-min" oninput="anunciosOffset=0;cargarAnuncios(false)" placeholder="Mínimo $" type="number"/>
+<input id="precio-max" oninput="anunciosOffset=0;cargarAnuncios(false)" placeholder="Máximo $" type="number"/>
+</div>
+</div>
+<div class="filter-divider"></div>
+<div class="filter-group">
+<span class="filter-group-label">Zona</span>
+<select><option>Todo el país</option><option selected="">Buenos Aires (CABA)</option><option>Gran Buenos Aires</option><option>Rosario</option><option>Córdoba</option></select>
+<div style="margin-top:.5rem"><input id="zona-vende" oninput="anunciosOffset=0;cargarAnuncios(false)" placeholder="Barrio (ej: Caballito)" type="text"/></div>
+</div>
+</div>
+<!-- FILTROS: DOY CLASES -->
+<div class="filter-panel" id="fp-clases">
+<div class="filter-group">
+<span class="filter-group-label">Instrumento</span>
+<div class="filter-chips">
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Guitarra</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Bajo</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Batería</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Teclado / Piano</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Voz / Canto</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Saxo</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Violín</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Percusión</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Bandoneón</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Acordeón</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Trompeta</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">DJ / Productor</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Ukelele</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Contrabajo</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Flauta</button>
+</div>
+</div>
+<div class="filter-divider"></div>
+<div class="filter-group">
+<span class="filter-group-label">Nivel</span>
+<div class="filter-chips">
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Principiante</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Intermedio</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Avanzado</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Todos los niveles</button>
+</div>
+</div>
+<div class="filter-divider"></div>
+<div class="filter-group">
+<span class="filter-group-label">Modalidad</span>
+<div class="filter-chips">
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Presencial</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Online</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Presencial y online</button>
+</div>
+</div>
+</div>
+<div class="mobile-show-results-wrap-an">
+<button class="mobile-show-results-an" onclick="closeMobileFiltersAn()">Ver resultados →</button>
+</div>
+</aside>
+<!-- ═══ ANUNCIOS ═══ -->
+<div class="anuncios-main">
+<div class="main-header">
+<div>
+<div class="main-title"><span>142</span> anuncios</div>
+<div class="main-sub">en Buenos Aires · hoy</div>
+</div>
+<button class="btn-publish" onclick="openModal('busco')">+ Publicar anuncio</button>
+</div>
+<div class="anuncios-intro">
+<div>
+<div class="anuncios-intro-title">Anuncios de la escena</div>
+<div class="anuncios-intro-copy">Buscá músicos, ofrecete, encontrá jams, clases o equipos. Navegar es abierto; para publicar o responder necesitás cuenta.</div>
+</div>
+<div class="anuncios-intro-actions">
+<a class="mini-link" href="buscARTE_busqueda.html">🎵 Músicos</a>
+<a class="mini-link" href="buscARTE_registro.html">+ Crear perfil</a>
+</div>
+</div>
+<button class="mobile-filter-btn" id="mobile-filter-btn-an" onclick="toggleMobileFiltersAn()">⚙ Filtros</button>
 
+<div class="tipo-tabs">
+<button class="tipo-tab active" onclick="setTab(this,'todos')">Todos</button>
+<button class="tipo-tab" onclick="setTab(this,'musico')">Busco músico</button>
+<button class="tipo-tab" onclick="setTab(this,'ofrezco')">Me ofrezco</button>
+<button class="tipo-tab" onclick="setTab(this,'jam')">Jam / Zapada</button>
+<button class="tipo-tab" onclick="setTab(this,'vende')">Vendo / Alquilo</button>
+<button class="tipo-tab" onclick="setTab(this,'clases')">Doy clases</button>
+</div>
+<div class="anuncios-lista" id="anuncios-lista">
+<div id="anuncios-loading" style="padding:3rem;text-align:center;color:var(--gris);font-size:.88rem">Cargando anuncios...</div>
+</div>
+<div class="load-more">
+<button class="btn-load" id="btn-load-more" onclick="loadMoreAnuncios(this)" style="display:none">Cargar más anuncios</button>
+</div>
+</div>
+<!-- SIDEBAR -->
+<aside class="right-sidebar">
+<div class="sidebar-card">
+<div class="sidebar-card-title">Publicar anuncio</div>
+<div class="sidebar-card-sub">¿Buscás alguien, te ofrecés, querés organizar una jam o vender algo?</div>
+<div class="publish-types">
+<button class="publish-type selected" onclick="selectPublishType(this,'busco')"><span class="ptype-icon">🔍</span><div><span class="ptype-label">Busco músico</span><span class="ptype-desc">Guitarrista, cantante, baterista...</span></div></button>
+<button class="publish-type" onclick="selectPublishType(this,'ofrezco')"><span class="ptype-icon">🎸</span><div><span class="ptype-label">Me ofrezco</span><span class="ptype-desc">Estoy disponible para proyectos</span></div></button>
+<button class="publish-type" onclick="selectPublishType(this,'jam')"><span class="ptype-icon">🥁</span><div><span class="ptype-label">Jam / Zapada</span><span class="ptype-desc">Organizá una jam abierta</span></div></button>
+<button class="publish-type" onclick="selectPublishType(this,'vende')"><span class="ptype-icon">🎛️</span><div><span class="ptype-label">Vendo / Alquilo</span><span class="ptype-desc">Instrumentos, equipos, sala</span></div></button>
+<button class="publish-type" onclick="selectPublishType(this,'clases')"><span class="ptype-icon">🎓</span><div><span class="ptype-label">Doy clases</span><span class="ptype-desc">Enseñá tu instrumento</span></div></button>
+</div>
+<button class="btn-publish-full" onclick="openModalFromSidebar()">Publicar gratis →</button>
+</div>
+<div class="sidebar-card">
+<div style="font-size:.63rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gris2);margin-bottom:1rem;">Actividad en buscARTE</div>
+<div class="stats-row"><span class="stats-label">Anuncios activos</span><span class="stats-val" id="sidebar-stat-anuncios">—</span></div>
+<div class="stats-row"><span class="stats-label">Músicos registrados</span><span class="stats-val" id="sidebar-stat-musicos">—</span></div>
+</div>
+</aside>
+</div>
 <script>
-  // Página pública — sin protección de login
-
-  // VARIABLES GLOBALES — deben estar primero
+  // Página pública — navegación abierta, acciones con cuenta
   const SUPABASE_URL = 'https://xiaanchoanxmampegoay.supabase.co'
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68'
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68'
+  const SB_HEADERS = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+
   let fotoVentaUrl = null
   let fotoJamUrl = null
+  let uploadVentaPromise = null
+  let uploadJamPromise = null
   let currentTipo = 'busco'
+  let sidebarTipo = 'busco'
   let tipoFiltro = 'todos'
   let anunciosOffset = 0
   const ANUNCIOS_PER_PAGE = 10
-  // CURSOR
-  window.addEventListener('DOMContentLoaded', function() {
-    const cursor=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
-    if (!cursor || !ring) return;
-    let mx=0,my=0,rx=0,ry=0;
-    document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
-    (function tick(){cursor.style.left=mx+'px';cursor.style.top=my+'px';rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(tick);})();
-  });
 
-  // TABS + FILTROS ADAPTATIVOS
+  const BADGES = { busco:'badge-busco', ofrezco:'badge-ofrezco', jam:'badge-jam', vende:'badge-vendo', vendo:'badge-vendo', clases:'badge-clases' }
+  const LABELS = { busco:'🔍 Busco músico', ofrezco:'🎸 Me ofrezco', jam:'🥁 Jam / Zapada', vende:'🎛️ Vendo / Alquilo', vendo:'🎛️ Vendo / Alquilo', clases:'🎓 Doy clases' }
+  const RESPOND_TEXT = { busco:'Ver / responder →', ofrezco:'Ver / responder →', jam:'Ver / asistir →', vende:'Ver / consultar →', vendo:'Ver / consultar →', clases:'Ver / consultar →' }
+
   const filterLabels = {
     todos: 'Todos los anuncios',
     musico: 'Busco músico',
+    busco: 'Busco músico',
     ofrezco: 'Me ofrezco',
     jam: 'Jam / Zapada',
     vende: 'Vendo / Alquilo',
+    vendo: 'Vendo / Alquilo',
     clases: 'Doy clases'
-  };
+  }
   const filterPanels = {
-    todos: 'fp-musico',   // default: muestra filtros musico
+    todos: 'fp-musico',
     musico: 'fp-musico',
+    busco: 'fp-musico',
     ofrezco: 'fp-musico',
     jam: 'fp-jam',
     vende: 'fp-vende',
+    vendo: 'fp-vende',
     clases: 'fp-clases'
-  };
+  }
 
+  const INSTRUMENTOS = ['Guitarra','Bajo','Batería','Teclado','Teclado / Piano','Voz / Canto','Saxo','Violín','Trompeta','Flauta','Percusión','DJ','DJ / Productor','Bandoneón','Charango','Cello','Arpa','Acordeón','Contrabajo','Clarinete','Cajón','Bombo leguero','Quena / Zampoña','Ukelele','Controlador MIDI','Técnico de sonido','Compositor / Arreglador','Productor','Mix & Mastering','Manager','Otro']
+  const GENEROS = ['Rock','Rock Nacional','Metal','Jazz','Folklore','Tango','Cumbia','Indie','Pop','Electrónica','Funk','Punk','Blues','Prog','R&B','Rap / Hip Hop','Reggae','Tropical','Clásica','Bossanova','Soul','House','Tech House','Techno','Trance','Melodic House & Techno','Minimal Deep/Tech','Indie Dance','Variado','Otro']
+  const CATEGORIAS_VENTA = ['Guitarra','Bajo','Batería','Teclado','Vientos','Cuerdas','Amplificador','Pedalera','Micrófono','Equipo PA','Home Studio','Sala ensayo','Accesorios','Otro']
+  const CONDICIONES = ['Nuevo','Usado','Para reparar']
+
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;')
+      .replaceAll('"','&quot;')
+      .replaceAll("'", '&#039;')
+  }
+  function qs(value) { return encodeURIComponent(String(value ?? '')) }
+  function normalizeId(id) {
+    if (!id) return null
+    const s = String(id)
+    return /^\d+$/.test(s) ? Number(s) : s
+  }
+  function canonicalTipo(tipo) {
+    if (tipo === 'vendo') return 'vende'
+    if (tipo === 'musico') return 'busco'
+    return tipo || 'todos'
+  }
+  function isLogged() { return localStorage.getItem('ba_logged') === '1' && !!localStorage.getItem('ba_user_id') }
+  function requireLogin(action) {
+    if (isLogged()) return true
+    const msg = action === 'publicar'
+      ? 'Para publicar un anuncio necesitás crear tu perfil gratis.'
+      : 'Para responder necesitás ingresar o crear tu perfil gratis.'
+    if (confirm(msg + '\n\n¿Querés ir al registro ahora?')) {
+      window.location.href = 'buscARTE_registro.html?next=' + encodeURIComponent('buscARTE_anuncios.html')
+    }
+    return false
+  }
+
+  // CURSOR
+  window.addEventListener('DOMContentLoaded', function() {
+    const cursor=document.getElementById('cursor'), ring=document.getElementById('cursor-ring')
+    if (!cursor || !ring) return
+    let mx=0,my=0,rx=0,ry=0
+    document.addEventListener('mousemove', e=>{ mx=e.clientX; my=e.clientY })
+    ;(function tick(){ cursor.style.left=mx+'px'; cursor.style.top=my+'px'; rx+=(mx-rx)*.12; ry+=(my-ry)*.12; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(tick) })()
+  })
+
+  // TABS + FILTROS
   function setTab(el, tipo) {
-    document.querySelectorAll('.tipo-tab').forEach(t=>t.classList.remove('active'));
-    el.classList.add('active');
-    tipoFiltro = tipo === 'musico' ? 'busco' : tipo === 'ofrezco' ? 'ofrezco' : tipo === 'clases' ? 'clases' : tipo;
-    document.querySelectorAll('.filter-panel').forEach(p=>p.classList.remove('active'));
-    document.getElementById(filterPanels[tipo] || 'fp-musico').classList.add('active');
-    document.getElementById('filter-category-label').textContent = filterLabels[tipo] || '';
-    clearFilters();
-    cargarAnuncios(false);
+    const uiTipo = tipo || 'todos'
+    document.querySelectorAll('.tipo-tab').forEach(t=>t.classList.remove('active'))
+    if (el) el.classList.add('active')
+    else {
+      const btn = [...document.querySelectorAll('.tipo-tab')].find(b => (b.getAttribute('onclick') || '').includes("'" + uiTipo + "'"))
+      if (btn) btn.classList.add('active')
+    }
+
+    tipoFiltro = canonicalTipo(uiTipo)
+    if (uiTipo === 'todos') tipoFiltro = 'todos'
+
+    document.querySelectorAll('.filter-panel').forEach(p=>p.classList.remove('active'))
+    const panel = document.getElementById(filterPanels[uiTipo] || filterPanels[tipoFiltro] || 'fp-musico')
+    if (panel) panel.classList.add('active')
+    const label = document.getElementById('filter-category-label')
+    if (label) label.textContent = filterLabels[uiTipo] || filterLabels[tipoFiltro] || ''
+
+    clearFilters({ reload:false })
+    anunciosOffset = 0
+    cargarAnuncios(false)
   }
 
-  function clearFilters() { document.querySelectorAll('.fchip.on').forEach(c=>c.classList.remove('on')); }
+  function clearFilters(opts = {}) {
+    document.querySelectorAll('.filters-panel .fchip.on').forEach(c=>c.classList.remove('on'))
+    document.querySelectorAll('.filters-panel input').forEach(i => { i.value = '' })
+    document.querySelectorAll('.filters-panel select').forEach(s => { s.selectedIndex = 0 })
+    if (opts.reload !== false) {
+      anunciosOffset = 0
+      cargarAnuncios(false)
+    }
+  }
 
-  // SIDEBAR PUBLISH
-  let sidebarTipo = 'busco';
   function selectPublishType(el, tipo) {
-    document.querySelectorAll('.publish-type').forEach(t=>t.classList.remove('selected'));
-    el.classList.add('selected');
-    sidebarTipo = tipo;
+    document.querySelectorAll('.publish-type').forEach(t=>t.classList.remove('selected'))
+    el.classList.add('selected')
+    sidebarTipo = canonicalTipo(tipo)
   }
-  function openModalFromSidebar() { openModal(sidebarTipo); }
+  function openModalFromSidebar() { openModal(sidebarTipo) }
 
   // MODAL
   function openModal(tipo) {
-    tipo = tipo || 'busco';
-    const idx = {busco:0,ofrezco:1,jam:2,vende:3}[tipo] || 0;
-    document.querySelectorAll('.modal-tipo-btn').forEach((b,i)=>b.classList.toggle('selected',i===idx));
-    showForm(tipo);
-    document.getElementById('modal').classList.add('open');
-    document.body.style.overflow = 'hidden';
+    if (!requireLogin('publicar')) return
+    tipo = canonicalTipo(tipo || 'busco')
+    currentTipo = tipo
+    const idxMap = { busco:0, ofrezco:1, jam:2, vende:3, clases:4 }
+    const idx = idxMap[tipo] ?? 0
+    document.querySelectorAll('.modal-tipo-btn').forEach((b,i)=>b.classList.toggle('selected', i===idx))
+    showForm(tipo)
+    const modal = document.getElementById('modal')
+    if (modal) modal.classList.add('open')
+    document.body.style.overflow = 'hidden'
   }
   function closeModal() {
-    document.getElementById('modal').classList.remove('open');
-    document.body.style.overflow = '';
-    // Reset all form inputs
-    document.querySelectorAll('.modal-form input, .modal-form textarea').forEach(el => el.value = '');
-    document.querySelectorAll('.modal-form .radio-btn').forEach((btn, i) => {
-      btn.classList.toggle('selected', i === 0);
-    });
-    // Reset foto venta
-    fotoVentaUrl = null;
-    fotoJamUrl = null;
-    const jamPrev = document.getElementById('foto-jam-preview');
-    if (jamPrev) { jamPrev.style.display='none'; jamPrev.src=''; }
-    const jamText = document.getElementById('foto-jam-text');
-    if (jamText) jamText.innerHTML = '<strong>📸 Subir flyer del evento</strong><br>JPG, PNG o WebP · Máx. 2MB';
-    const preview = document.getElementById('foto-venta-preview');
-    if (preview) { preview.style.display = 'none'; preview.src = ''; }
-    const fotoText = document.getElementById('foto-venta-text');
-    if (fotoText) fotoText.innerHTML = '<strong>Hacé click para subir una foto</strong><br>JPG, PNG o WebP · Máx. 2MB';
+    const modal = document.getElementById('modal')
+    if (modal) modal.classList.remove('open')
+    document.body.style.overflow = ''
+    document.querySelectorAll('.modal-form input, .modal-form textarea').forEach(el => { el.value = '' })
+    document.querySelectorAll('.radio-group').forEach(group => {
+      group.querySelectorAll('.radio-btn').forEach((btn, i) => btn.classList.toggle('selected', i === 0))
+    })
+    document.querySelectorAll('.nivel-chip, .modalidad-chip').forEach((btn, i) => {
+      const group = btn.closest('.mchips')
+      if (!group) return
+      const buttons = [...group.querySelectorAll('.nivel-chip, .modalidad-chip')]
+      btn.classList.toggle('on', buttons.indexOf(btn) === 0)
+    })
+    fotoVentaUrl = null
+    fotoJamUrl = null
+    uploadVentaPromise = null
+    uploadJamPromise = null
+    resetFotoUI('jam')
+    resetFotoUI('venta')
   }
-  function closeModalOutside(e) { if(e.target===document.getElementById('modal')) closeModal(); }
-  document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
-
-  // SUBIR FOTO DE VENTA
-
-
-  async function subirFotoJam(input) {
-    if (!input.files || !input.files[0]) return
-    const file = input.files[0]
-    if (file.size > 2 * 1024 * 1024) { alert('El flyer no puede superar 2MB.'); return }
-    const reader = new FileReader()
-    reader.onload = e => {
-      const preview = document.getElementById('foto-jam-preview')
-      preview.src = e.target.result; preview.style.display = 'block'
-      document.getElementById('foto-jam-text').style.display = 'none'
-    }
-    reader.readAsDataURL(file)
-    document.getElementById('foto-jam-text').innerHTML = '⏳ Subiendo...'
-    try {
-      const fileName = `jam-${Date.now()}-${file.name}`
-      const res = await fetch(
-        `${SUPABASE_URL}/storage/v1/object/fotos-anuncios/${fileName}`,
-        { method:'POST', headers:{ 'apikey':SUPABASE_KEY, 'Authorization':`Bearer ${SUPABASE_KEY}`, 'Content-Type':file.type, 'x-upsert':'true' }, body:file }
-      )
-      if (res.ok) {
-        fotoJamUrl = `${SUPABASE_URL}/storage/v1/object/public/fotos-anuncios/${fileName}`
-        document.getElementById('foto-jam-text').innerHTML = '✅ Flyer listo'
-      } else { throw new Error() }
-    } catch(e) {
-      document.getElementById('foto-jam-text').innerHTML = '❌ Error al subir'
-      fotoJamUrl = null
-    }
-  }
-
-  async function subirFotoVenta(input) {
-    if (!input.files || !input.files[0]) return
-    const file = input.files[0]
-    if (file.size > 2 * 1024 * 1024) { alert('La foto no puede superar 2MB.'); return }
-
-    // Preview
-    const reader = new FileReader()
-    reader.onload = e => {
-      const preview = document.getElementById('foto-venta-preview')
-      preview.src = e.target.result
-      preview.style.display = 'block'
-      document.getElementById('foto-venta-text').style.display = 'none'
-    }
-    reader.readAsDataURL(file)
-
-    document.getElementById('foto-venta-text').innerHTML = '⏳ Subiendo...'
-
-    try {
-      const fileName = `venta-${Date.now()}-${file.name}`
-      const res = await fetch(
-        `${SUPABASE_URL}/storage/v1/object/fotos-anuncios/${fileName}`,
-        {
-          method: 'POST',
-          headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Content-Type': file.type,
-            'x-upsert': 'true'
-          },
-          body: file
-        }
-      )
-      if (res.ok) {
-        fotoVentaUrl = `${SUPABASE_URL}/storage/v1/object/public/fotos-anuncios/${fileName}`
-        document.getElementById('foto-venta-text').innerHTML = '✅ Foto lista'
-      } else {
-        throw new Error('Error')
-      }
-    } catch(e) {
-      document.getElementById('foto-venta-text').innerHTML = '❌ Error al subir'
-      fotoVentaUrl = null
-    }
-  }
-
+  function closeModalOutside(e) { if(e.target === document.getElementById('modal')) closeModal() }
+  document.addEventListener('keydown', e=>{ if(e.key === 'Escape') closeModal() })
 
   function selectTipo(tipo, el) {
-    currentTipo = tipo
+    currentTipo = canonicalTipo(tipo)
     document.querySelectorAll('.modal-tipo-btn').forEach(b=>b.classList.remove('selected'))
-    el.classList.add('selected')
-    showForm(tipo)
+    if (el) el.classList.add('selected')
+    showForm(currentTipo)
   }
   function showForm(tipo) {
+    tipo = canonicalTipo(tipo)
     document.querySelectorAll('.modal-form').forEach(f=>f.classList.remove('active'))
-    document.getElementById('form-'+tipo).classList.add('active')
+    const form = document.getElementById('form-' + tipo)
+    if (form) form.classList.add('active')
   }
-
-
   function selectNivel(btn) {
     btn.closest('.mchips').querySelectorAll('.nivel-chip').forEach(b=>b.classList.remove('on'))
     btn.classList.add('on')
@@ -1269,66 +1396,151 @@
     btn.closest('.mchips').querySelectorAll('.modalidad-chip').forEach(b=>b.classList.remove('on'))
     btn.classList.add('on')
   }
-
   function selectRadio(el) {
     el.closest('.radio-group').querySelectorAll('.radio-btn').forEach(b=>b.classList.remove('selected'))
     el.classList.add('selected')
   }
 
-  async function submitAnuncio() {
-    const btn = document.querySelector('.btn-submit')
-    // Leer tipo desde el form activo — el método más confiable
-    const formActivo = document.querySelector('.modal-form.active')
-    const tipo = formActivo?.id?.replace('form-', '') || currentTipo
+  // IMÁGENES: comprime fotos grandes de celular antes de subir
+  function resetFotoUI(tipo) {
+    const preview = document.getElementById(tipo === 'jam' ? 'foto-jam-preview' : 'foto-venta-preview')
+    const text = document.getElementById(tipo === 'jam' ? 'foto-jam-text' : 'foto-venta-text')
+    if (preview) { preview.style.display = 'none'; preview.src = '' }
+    if (text) {
+      text.style.display = 'block'
+      text.innerHTML = tipo === 'jam'
+        ? '<strong>📸 Subir flyer del evento</strong><br>JPG, PNG o WebP · se optimiza automático'
+        : '<strong>Hacé click para subir una foto</strong><br>JPG, PNG o WebP · se optimiza automático'
+    }
+  }
 
-    // Recolectar datos según el tipo
-    const miId = localStorage.getItem('ba_user_id')
-    let datos = { tipo, estado: 'activo', user_id: miId ? parseInt(miId) : null }
+  function fileToDataURL(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = e => resolve(e.target.result)
+      reader.onerror = reject
+      reader.readAsDataURL(file)
+    })
+  }
+
+  async function optimizeImage(file, maxSide = 1600, quality = 0.82) {
+    if (!file || !file.type.startsWith('image/')) throw new Error('Formato de imagen inválido')
+    if (file.size <= 2 * 1024 * 1024 && ['image/jpeg','image/png','image/webp'].includes(file.type)) return file
+    const dataUrl = await fileToDataURL(file)
+    const img = await new Promise((resolve, reject) => {
+      const image = new Image()
+      image.onload = () => resolve(image)
+      image.onerror = reject
+      image.src = dataUrl
+    })
+    let { width, height } = img
+    const scale = Math.min(1, maxSide / Math.max(width, height))
+    width = Math.round(width * scale)
+    height = Math.round(height * scale)
+    const canvas = document.createElement('canvas')
+    canvas.width = width
+    canvas.height = height
+    const ctx = canvas.getContext('2d')
+    ctx.drawImage(img, 0, 0, width, height)
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', quality))
+    if (!blob) throw new Error('No se pudo optimizar la imagen')
+    const safeName = (file.name || 'imagen').replace(/\.[^.]+$/, '').replace(/[^a-z0-9_-]+/gi, '-').slice(0, 50)
+    return new File([blob], safeName + '.jpg', { type: 'image/jpeg' })
+  }
+
+  async function uploadAnuncioImage(input, tipo) {
+    if (!input.files || !input.files[0]) return null
+    const original = input.files[0]
+    const preview = document.getElementById(tipo === 'jam' ? 'foto-jam-preview' : 'foto-venta-preview')
+    const text = document.getElementById(tipo === 'jam' ? 'foto-jam-text' : 'foto-venta-text')
+    try {
+      const dataUrl = await fileToDataURL(original)
+      if (preview) { preview.src = dataUrl; preview.style.display = 'block' }
+      if (text) { text.style.display = 'block'; text.innerHTML = '⏳ Optimizando y subiendo...' }
+      const file = await optimizeImage(original)
+      const ext = file.type === 'image/webp' ? 'webp' : 'jpg'
+      const random = (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now())
+      const fileName = `${tipo}-${random}.${ext}`
+      const res = await fetch(`${SUPABASE_URL}/storage/v1/object/fotos-anuncios/${fileName}`, {
+        method:'POST',
+        headers:{ ...SB_HEADERS, 'Content-Type':file.type, 'x-upsert':'true' },
+        body:file
+      })
+      if (!res.ok) {
+        const errText = await res.text().catch(()=> '')
+        throw new Error(errText || 'Error de Storage')
+      }
+      const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/fotos-anuncios/${fileName}`
+      if (text) text.innerHTML = tipo === 'jam' ? '✅ Flyer listo' : '✅ Foto lista'
+      return publicUrl
+    } catch(e) {
+      console.error('Error subiendo imagen:', e)
+      if (text) text.innerHTML = '❌ Error al subir. Probá con otra imagen.'
+      return null
+    }
+  }
+
+  function subirFotoJam(input) {
+    uploadJamPromise = uploadAnuncioImage(input, 'jam').then(url => { fotoJamUrl = url; return url })
+  }
+  function subirFotoVenta(input) {
+    uploadVentaPromise = uploadAnuncioImage(input, 'venta').then(url => { fotoVentaUrl = url; return url })
+  }
+
+  function getSelectedTexts(root, selector = '.mchip.on') {
+    return [...root.querySelectorAll(selector)].map(c=>c.textContent.trim()).filter(Boolean)
+  }
+
+  async function submitAnuncio() {
+    if (!requireLogin('publicar')) return
+    const btn = document.querySelector('.btn-submit')
+    const formActivo = document.querySelector('.modal-form.active')
+    const tipo = canonicalTipo(formActivo?.id?.replace('form-', '') || currentTipo)
+    const miId = normalizeId(localStorage.getItem('ba_user_id'))
+    let datos = { tipo, estado:'activo', user_id: miId }
 
     if (tipo === 'busco' || tipo === 'ofrezco') {
       const form = document.getElementById('form-' + tipo)
-      datos.titulo = form.querySelector('input[type=text]')?.value?.trim()
+      const inputs = [...form.querySelectorAll('input[type=text]')]
+      datos.titulo = inputs[0]?.value?.trim()
       datos.descripcion = form.querySelector('textarea')?.value?.trim()
-      datos.instrumentos = [...form.querySelectorAll('.mchip.on')].filter((_,i,a) => {
-        const labels = [...form.querySelectorAll('.mfield label')]
-        return true
-      }).slice(0, 20).map(c=>c.textContent).join(', ')
-      // Separar instrumentos y géneros
-      const chips = [...form.querySelectorAll('.mchip.on')]
-      const instrLabels = ['Guitarra','Bajo','Batería','Teclado / Piano','Voz / Canto','Saxo','Violín','Trompeta','Flauta','Percusión','DJ / Productor','Bandoneón','Charango','Cello','Arpa','Acordeón','Contrabajo','Clarinete','Cajón','Bombo leguero','Quena / Zampoña','Ukelele','Controlador MIDI','Técnico de sonido','Compositor / Arreglador','Productor','Mix & Mastering','Manager','Outro']
-      datos.instrumentos = chips.filter(c=>instrLabels.includes(c.textContent.trim())).map(c=>c.textContent.trim()).join(', ')
-      datos.generos = chips.filter(c=>!instrLabels.includes(c.textContent.trim())).map(c=>c.textContent.trim()).join(', ')
-      datos.zona = form.querySelector('input[placeholder*="barrio"], input[placeholder*="Barrio"], input[placeholder*="zona"]')?.value?.trim()
+      const chips = getSelectedTexts(form)
+      datos.instrumentos = chips.filter(c => INSTRUMENTOS.includes(c)).join(', ')
+      datos.generos = chips.filter(c => GENEROS.includes(c) && !INSTRUMENTOS.includes(c)).join(', ')
+      datos.zona = inputs[inputs.length - 1]?.value?.trim()
+      if (!datos.titulo && tipo === 'ofrezco') datos.titulo = datos.instrumentos ? `Me ofrezco: ${datos.instrumentos}` : 'Me ofrezco como músico'
+    }
 
-    } else if (tipo === 'clases') {
+    if (tipo === 'clases') {
       const form = document.getElementById('form-clases')
       datos.titulo = document.getElementById('clases-titulo')?.value?.trim()
       datos.descripcion = document.getElementById('clases-desc')?.value?.trim()
       datos.precio = document.getElementById('clases-precio')?.value?.trim()
       datos.zona = document.getElementById('clases-zona')?.value?.trim()
-      const instrChips = [...form.querySelectorAll('.mchip.on:not(.nivel-chip):not(.modalidad-chip)')]
-      datos.instrumento = instrChips.map(c=>c.textContent.trim()).join(', ')
+      datos.instrumento = getSelectedTexts(form, '.mchip.on:not(.nivel-chip):not(.modalidad-chip)').join(', ')
       datos.nivel = form.querySelector('.nivel-chip.on')?.textContent?.trim() || null
       datos.modalidad = form.querySelector('.modalidad-chip.on')?.textContent?.trim() || null
       if (!datos.titulo) datos.titulo = datos.instrumento ? `Clases de ${datos.instrumento.split(',')[0].trim()}` : 'Doy clases'
+    }
 
-    } else if (tipo === 'jam') {
+    if (tipo === 'jam') {
       const form = document.getElementById('form-jam')
       datos.titulo = document.getElementById('jam-titulo')?.value?.trim()
       datos.descripcion = form.querySelector('textarea')?.value?.trim()
-      datos.generos = [...document.querySelectorAll('#jam-generos .mchip.on')].map(c=>c.textContent.trim()).join(', ')
+      datos.generos = getSelectedTexts(document.getElementById('jam-generos')).join(', ')
       const fechaInput = form.querySelector('input[type="date"]')?.value
       const horaInput = form.querySelector('input[type="time"]')?.value || '18:00'
       datos.fecha_evento = fechaInput ? new Date(fechaInput + 'T' + horaInput).toISOString() : null
-      datos.lugar = form.querySelector('input[placeholder*="Lugar"], input[placeholder*="dirección"]')?.value?.trim()
+      datos.lugar = form.querySelector('input[placeholder*="Parque"], input[placeholder*="Trastienda"], input[placeholder*="Lugar"], input[placeholder*="dirección"]')?.value?.trim()
       datos.precio_entrada = form.querySelector('input[placeholder*="Gratis"], input[placeholder*="gorra"]')?.value?.trim()
       datos.link_evento = form.querySelector('input[type="url"]')?.value?.trim()
       datos.contacto_evento = form.querySelector('input[placeholder*="Instagram"], input[placeholder*="WhatsApp"]')?.value?.trim()
-      // Siempre generar título si está vacío
-      if (!datos.titulo && datos.lugar) datos.titulo = `Jam en ${datos.lugar}`
-      if (!datos.titulo) datos.titulo = 'Jam / Zapada'
+      if (!datos.titulo) datos.titulo = datos.lugar ? `Jam en ${datos.lugar}` : 'Jam / Zapada'
+      if (uploadJamPromise) datos.foto_url = await uploadJamPromise
+      else datos.foto_url = fotoJamUrl || null
+    }
 
-    } else if (tipo === 'vende') {
+    if (tipo === 'vende') {
       const form = document.getElementById('form-vende')
       datos.categoria_producto = form.querySelector('select')?.value?.trim()
       datos.marca = form.querySelector('input[placeholder*="Fender"]')?.value?.trim()
@@ -1338,23 +1550,14 @@
       datos.precio = datos.precio_num ? `$${Math.round(datos.precio_num).toLocaleString('es-AR')}` : ''
       datos.zona = form.querySelector('input[placeholder*="Caballito"]')?.value?.trim()
       datos.descripcion = form.querySelector('textarea')?.value?.trim()
-      if (datos.categoria_producto) {
-        datos.titulo = `Vendo ${datos.categoria_producto}${datos.marca ? ' ' + datos.marca : ''}`
-      }
+      datos.titulo = datos.categoria_producto ? `Vendo ${datos.categoria_producto}${datos.marca ? ' ' + datos.marca : ''}` : 'Vendo instrumento'
+      if (uploadVentaPromise) datos.foto_url = await uploadVentaPromise
+      else datos.foto_url = fotoVentaUrl || null
     }
 
-    // Foto URL — aplica a todos los tipos
-    datos.foto_url = tipo === 'jam' ? (fotoJamUrl || null) : (fotoVentaUrl || null)
-
-    // Si es jam o vende sin título, generar automáticamente
-    if (!datos.titulo && tipo === 'jam') datos.titulo = datos.lugar ? `Jam en ${datos.lugar}` : 'Jam / Zapada'
-    if (!datos.titulo && tipo === 'vende') datos.titulo = datos.categoria_producto ? `Vendo ${datos.categoria_producto}` : 'Vendo instrumento'
-    if (!datos.titulo && tipo === 'ofrezco') datos.titulo = 'Me ofrezco como músico'
-
-    // Solo validar para busco
-    if (!datos.titulo) {
-      alert('Por favor completá el título del anuncio.')
-      return
+    if (!datos.titulo) { alert('Completá el título del anuncio.'); return }
+    if (!datos.descripcion && ['busco','ofrezco','jam','clases'].includes(tipo)) {
+      if (!confirm('El anuncio no tiene descripción. ¿Publicarlo igual?')) return
     }
 
     btn.textContent = 'Publicando...'
@@ -1363,327 +1566,265 @@
 
     try {
       const res = await fetch(`${SUPABASE_URL}/rest/v1/anuncios`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`,
-          'Prefer': 'return=representation'
-        },
+        method:'POST',
+        headers:{ ...SB_HEADERS, 'Content-Type':'application/json', 'Prefer':'return=representation' },
         body: JSON.stringify(datos)
       })
-
-      if (res.ok || res.status === 201) {
-        btn.textContent = '✓ Publicado'
-        btn.style.background = '#a8c832'
-        btn.style.opacity = '1'
-        setTimeout(() => {
-          closeModal()
-          btn.textContent = 'Publicar →'
-          btn.style.background = ''
-          btn.disabled = false
-          // Recargar lista para mostrar el nuevo anuncio
-          anunciosOffset = 0
-          cargarAnuncios(false)
-        }, 1200)
-      } else {
-        const err = await res.json()
-        alert('Error al publicar. Intentá de nuevo.')
-        console.error(err)
-        btn.textContent = 'Publicar →'
-        btn.style.opacity = '1'
-        btn.disabled = false
+      if (!res.ok) {
+        const errText = await res.text().catch(()=> '')
+        console.error('Error publicando anuncio:', res.status, errText)
+        alert('No se pudo publicar. Revisá los datos e intentá de nuevo.')
+        return
       }
+      btn.textContent = '✓ Publicado'
+      btn.style.background = '#a8c832'
+      setTimeout(() => {
+        closeModal()
+        btn.textContent = 'Publicar →'
+        btn.style.background = ''
+        anunciosOffset = 0
+        cargarAnuncios(false)
+      }, 900)
     } catch(e) {
-      alert('No se pudo conectar. Verificá tu conexión.')
       console.error(e)
-      btn.textContent = 'Publicar →'
+      alert('No se pudo conectar. Verificá tu conexión.')
+    } finally {
       btn.style.opacity = '1'
       btn.disabled = false
     }
   }
 
-  function agregarAnuncioAlTablon(a) {
-    const badges = { busco:'badge-busco', ofrezco:'badge-ofrezco', jam:'badge-jam', vende:'badge-vendo' }
-    const labels = { busco:'🔍 Busco músico', ofrezco:'🎸 Me ofrezco', jam:'🥁 Jam / Zapada', vende:'🎛️ Vendo' }
-    const nombre = localStorage.getItem('ba_name') || 'Vos'
-    const lista = document.getElementById('anuncios-lista')
-    const el = document.createElement('div')
-    el.className = 'anuncio'
-    el.style.animation = 'fadeUp .3s ease'
-    el.innerHTML = `
-      <span class="anuncio-tipo-badge ${badges[a.tipo]||'badge-busco'}">${labels[a.tipo]||a.tipo}</span>
-      <div class="anuncio-titulo">${a.titulo}</div>
-      <div class="anuncio-desc">${a.descripcion||''}</div>
-      <div class="anuncio-meta">
-        <span class="anuncio-autor"><span class="autor-name">${nombre}</span></span>
-        ${a.zona ? `<span class="anuncio-location">📍 ${a.zona}</span>` : ''}
-        <span class="anuncio-time">Ahora mismo</span>
-      </div>`
-    lista.insertBefore(el, lista.firstChild)
-  }
-
-  function filtrarJam() {
-    const generosActivos = [...document.querySelectorAll('#fp-jam .fchip.on')]
-      .map(c=>c.textContent.trim())
-      .filter(g => !['Hoy','Este finde','Esta semana','Este mes','Gratis','A la gorra','Con costo'].includes(g))
-    // Recargar con filtro de géneros
-    anunciosOffset = 0
-    cargarAnuncios(false)
-  }
-
-  // ── CARGAR ANUNCIOS DESDE SUPABASE ──
-
-  const BADGES = { busco:'badge-busco', ofrezco:'badge-ofrezco', jam:'badge-jam', vende:'badge-vendo', clases:'badge-clases' }
-  const LABELS = { busco:'🔍 Busco músico', ofrezco:'🎸 Me ofrezco', jam:'🥁 Jam / Zapada', vende:'🎛️ Vendo', clases:'🎓 Doy clases' }
-  const RESPOND_TEXT = { busco:'Responder →', ofrezco:'Responder →', jam:'Me apunto →', vende:'Consultar →', clases:'Consultar →' }
-
   function timeAgo(iso) {
     if (!iso) return ''
-    const diff = Math.floor((new Date() - new Date(iso)) / 60000)
+    const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 60000)
     if (diff < 1) return 'Ahora mismo'
     if (diff < 60) return `Hace ${diff} min`
     if (diff < 1440) return `Hace ${Math.floor(diff/60)} hs`
     return `Hace ${Math.floor(diff/1440)} días`
   }
 
-
   function formatFecha(iso) {
-    if (!iso) return null;
-    const d = new Date(iso);
-    if (isNaN(d)) return null;
-    const dias = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-    const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
-    const dia = dias[d.getDay()];
-    const num = d.getDate();
-    const mes = meses[d.getMonth()];
-    const hora = d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
-    const pasado = d < new Date();
-    return { str: `${dia} ${num} ${mes} · ${hora}hs`, pasado };
+    if (!iso) return null
+    const d = new Date(iso)
+    if (isNaN(d)) return null
+    const dias = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb']
+    const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic']
+    const hora = d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0')
+    return { str: `${dias[d.getDay()]} ${d.getDate()} ${meses[d.getMonth()]} · ${hora}hs`, pasado: d < new Date() }
   }
 
   function buildAnuncioCard(a, autorNombre) {
-    const badge = BADGES[a.tipo] || 'badge-busco'
-    const label = LABELS[a.tipo] || a.tipo
-    const respondText = RESPOND_TEXT[a.tipo] || 'Responder →'
-    const tags = [a.instrumentos, a.generos, a.categoria_producto].filter(Boolean).join(',').split(',').map(t=>t.trim()).filter(Boolean).slice(0,3)
+    const tipo = canonicalTipo(a.tipo)
+    const badge = BADGES[tipo] || 'badge-busco'
+    const label = LABELS[tipo] || escapeHtml(tipo)
+    const respondText = RESPOND_TEXT[tipo] || 'Ver anuncio →'
+    const tags = [a.instrumentos, a.instrumento, a.generos, a.categoria_producto, a.nivel, a.modalidad]
+      .filter(Boolean).join(',').split(',').map(t=>t.trim()).filter(Boolean).slice(0,4)
     const zona = a.zona || a.lugar || ''
-    const precio = a.precio ? (a.precio.startsWith('$') ? a.precio : `$${a.precio}`) : ''
-    const tagsHTML = [...tags, precio].filter(Boolean).map(t=>`<span class="anuncio-tag">${t}</span>`).join('')
+    const precio = a.precio || a.precio_entrada || ''
+    const tagsHTML = [...tags, precio].filter(Boolean).map(t=>`<span class="anuncio-tag">${escapeHtml(t)}</span>`).join('')
+    const fechaInfo = (tipo === 'jam' && a.fecha_evento) ? formatFecha(a.fecha_evento) : null
+    const fechaHTML = fechaInfo ? `<div class="anuncio-fecha${fechaInfo.pasado ? ' anuncio-pasado' : ''}"><span class="anuncio-fecha-icon">📅</span>${escapeHtml(fechaInfo.str)}</div>` : ''
+    const fotoHTML = a.foto_url ? `<img src="${escapeHtml(a.foto_url)}" class="anuncio-flyer" alt="Imagen del anuncio" loading="lazy">` : ''
+    const id = escapeHtml(a.id)
+    const profileId = a.user_id ? qs(a.user_id) : ''
+    const detalleUrl = `buscARTE_anuncio_detalle.html?id=${qs(a.id)}`
+    const perfilUrl = a.user_id ? `buscARTE_perfil_publico.html?id=${profileId}` : '#'
+    const autorInicial = escapeHtml((autorNombre || 'U').slice(0,1).toUpperCase())
 
-    const fechaInfo = (a.tipo === 'jam' && a.fecha_evento) ? formatFecha(a.fecha_evento) : null;
-    const fechaHTML = fechaInfo
-      ? `<div class="anuncio-fecha${fechaInfo.pasado ? ' anuncio-pasado' : ''}"><span class="anuncio-fecha-icon">📅</span>${fechaInfo.str}</div>`
-      : '';
-
-    const flyerThumb = a.foto_url ? `<img src="${a.foto_url}" style="width:64px;height:64px;object-fit:cover;border-radius:2px;flex-shrink:0;cursor:pointer" onclick="abrirDetalle(${a.id})" alt="Foto">` : ''
-    return `<div class="anuncio" data-tipo="${a.tipo}" data-id="${a.id}" style="animation:fadeUp .3s ease both">
+    return `<div class="anuncio" data-tipo="${escapeHtml(tipo)}" data-id="${id}" data-autor-id="${escapeHtml(a.user_id || '')}" onclick="openAnuncioDetalle(event,this.dataset.id)" style="animation:fadeUp .3s ease both">
       <span class="anuncio-tipo-badge ${badge}">${label}</span>
       ${fechaHTML}
-      <div class="anuncio-titulo"><a href="buscARTE_anuncio_detalle.html?id=${a.id}" style="color:inherit;text-decoration:none">${a.titulo||'Sin título'}</a></div>
-      <div class="anuncio-desc">${a.descripcion||''}</div>
+      ${fotoHTML}
+      <div class="anuncio-titulo"><a href="${detalleUrl}" onclick="event.stopPropagation()" style="color:inherit;text-decoration:none">${escapeHtml(a.titulo || 'Sin título')}</a></div>
+      <div class="anuncio-desc">${escapeHtml(a.descripcion || '')}</div>
       <div class="anuncio-meta">
-        <a href="buscARTE_perfil_publico.html?id=${a.user_id||''}" class="anuncio-autor">
-          <div class="autor-avatar" style="width:24px;height:24px;border-radius:50%;background:#0d2010;color:var(--neon);display:flex;align-items:center;justify-content:center;font-size:.56rem;font-family:var(--font-display)">${(autorNombre||'?')[0].toUpperCase()}</div>
-          <span class="autor-name">${autorNombre||'Usuario'}</span>
+        <a href="${perfilUrl}" class="anuncio-autor" onclick="event.stopPropagation()">
+          <div class="autor-avatar" style="width:24px;height:24px;border-radius:50%;background:#0d2010;color:var(--neon);display:flex;align-items:center;justify-content:center;font-size:.56rem;font-family:var(--font-display)">${autorInicial}</div>
+          <span class="autor-name">${escapeHtml(autorNombre || 'Usuario')}</span>
         </a>
         ${tagsHTML}
-        ${zona ? `<span class="anuncio-location">📍 ${zona}</span>` : ''}
-        <span class="anuncio-time">${timeAgo(a.created_at)}</span>
-        <button class="anuncio-respond" onclick="toggleReply(this)">${respondText}</button>
-      </div>
-      <div class="reply-form">
-        <textarea placeholder="Escribí tu respuesta..."></textarea>
-        <div class="reply-actions">
-          <button class="btn-send-reply" onclick="sendReply(this)">Enviar →</button>
-          <button class="btn-cancel-reply" onclick="toggleReply(this.closest('.anuncio').querySelector('.anuncio-respond'))">Cancelar</button>
-          <span class="reply-note">¿Sin cuenta? <a href="buscARTE_registro.html">Registrate gratis</a></span>
-        </div>
+        ${zona ? `<span class="anuncio-location">📍 ${escapeHtml(zona)}</span>` : ''}
+        <span class="anuncio-time">${escapeHtml(timeAgo(a.created_at))}</span>
+        <a class="anuncio-respond" href="${detalleUrl}" onclick="event.stopPropagation()">${escapeHtml(respondText)}</a>
       </div>
     </div>`
   }
 
+  function buildQuery() {
+    const ordenJam = tipoFiltro === 'jam'
+    let query = `${SUPABASE_URL}/rest/v1/anuncios?select=*&estado=eq.activo&order=${ordenJam ? 'fecha_evento.asc.nullslast,created_at.desc' : 'created_at.desc'}&limit=${ANUNCIOS_PER_PAGE}&offset=${anunciosOffset}`
+    if (tipoFiltro !== 'todos') query += `&tipo=eq.${qs(tipoFiltro)}`
+
+    const panelActivo = document.querySelector('.filter-panel.active')
+    if (!panelActivo) return query
+    const chipsOn = [...panelActivo.querySelectorAll('.fchip.on')].map(c=>c.textContent.trim())
+    const zonaInput = panelActivo.querySelector('input[id^="zona-"]')
+    const zonaVal = zonaInput?.value?.trim()
+    if (zonaVal) query += `&zona=ilike.*${qs(zonaVal)}*`
+
+    const instrActivos = chipsOn.filter(c => INSTRUMENTOS.includes(c) && !CATEGORIAS_VENTA.includes(c))
+    const generosActivos = chipsOn.filter(c => GENEROS.includes(c) && !['Hoy','Este finde','Esta semana','Este mes','Gratis','A la gorra','Con costo'].includes(c))
+    const catActiva = chipsOn.find(c => CATEGORIAS_VENTA.includes(c))
+    const condActiva = chipsOn.find(c => CONDICIONES.includes(c))
+
+    if (tipoFiltro === 'busco' || tipoFiltro === 'ofrezco' || tipoFiltro === 'todos') {
+      if (instrActivos.length) query += `&instrumentos=ilike.*${qs(instrActivos[0])}*`
+      if (generosActivos.length) query += `&generos=ilike.*${qs(generosActivos[0])}*`
+    }
+    if (tipoFiltro === 'jam') {
+      if (generosActivos.length) query += `&generos=ilike.*${qs(generosActivos[0])}*`
+      const hoy = new Date(); hoy.setHours(0,0,0,0)
+      const manana = new Date(hoy); manana.setDate(manana.getDate()+1)
+      const semana = new Date(hoy); semana.setDate(semana.getDate()+7)
+      const mes = new Date(hoy); mes.setMonth(mes.getMonth()+1)
+      if (chipsOn.includes('Hoy')) query += `&fecha_evento=gte.${hoy.toISOString()}&fecha_evento=lt.${manana.toISOString()}`
+      else if (chipsOn.includes('Este finde')) {
+        const dia = hoy.getDay(); const sab = new Date(hoy); sab.setDate(sab.getDate() + ((6 - dia + 7) % 7)); const lun = new Date(sab); lun.setDate(lun.getDate()+2)
+        query += `&fecha_evento=gte.${sab.toISOString()}&fecha_evento=lt.${lun.toISOString()}`
+      } else if (chipsOn.includes('Esta semana')) query += `&fecha_evento=gte.${hoy.toISOString()}&fecha_evento=lte.${semana.toISOString()}`
+      else if (chipsOn.includes('Este mes')) query += `&fecha_evento=gte.${hoy.toISOString()}&fecha_evento=lte.${mes.toISOString()}`
+      if (chipsOn.includes('Gratis')) query += `&precio_entrada=ilike.*gratis*`
+      else if (chipsOn.includes('A la gorra')) query += `&precio_entrada=ilike.*gorra*`
+    }
+    if (tipoFiltro === 'vende') {
+      if (catActiva) query += `&categoria_producto=ilike.*${qs(catActiva)}*`
+      if (condActiva) query += `&condicion=ilike.*${qs(condActiva)}*`
+      const precioMin = parseFloat(document.getElementById('precio-min')?.value)
+      const precioMax = parseFloat(document.getElementById('precio-max')?.value)
+      if (!isNaN(precioMin) && precioMin > 0) query += `&precio_num=gte.${precioMin}`
+      if (!isNaN(precioMax) && precioMax > 0) query += `&precio_num=lte.${precioMax}`
+    }
+    if (tipoFiltro === 'clases') {
+      const instrActivo = chipsOn.find(c => INSTRUMENTOS.includes(c))
+      const nivelActivo = chipsOn.find(c => ['Principiante','Intermedio','Avanzado','Todos los niveles'].includes(c))
+      const modalActivo = chipsOn.find(c => ['Presencial','Online','Presencial y online'].includes(c))
+      if (instrActivo) query += `&instrumento=ilike.*${qs(instrActivo)}*`
+      if (nivelActivo) query += `&nivel=eq.${qs(nivelActivo)}`
+      if (modalActivo) query += `&modalidad=eq.${qs(modalActivo)}`
+    }
+    return query
+  }
+
   async function cargarAnuncios(append = false) {
     const lista = document.getElementById('anuncios-lista')
+    if (!lista) return
     if (!append) {
       lista.innerHTML = '<div style="padding:3rem;text-align:center;color:var(--gris);font-size:.88rem">Cargando anuncios...</div>'
       anunciosOffset = 0
     }
 
-    const ordenJam = tipoFiltro === 'jam';
-    let query = `${SUPABASE_URL}/rest/v1/anuncios?estado=eq.activo&order=${ordenJam ? 'fecha_evento.asc.nullslast,created_at.desc' : 'created_at.desc'}&limit=${ANUNCIOS_PER_PAGE}&offset=${anunciosOffset}`
-    if (tipoFiltro !== 'todos') query += `&tipo=eq.${tipoFiltro}`
-
-    // Leer chips activos del panel visible
-    const panelActivo = document.querySelector('.filter-panel.active')
-    if (panelActivo) {
-      const chipsOn = [...panelActivo.querySelectorAll('.fchip.on')].map(c=>c.textContent.trim())
-      
-      // Chips que NO son instrumento ni categoría (son géneros)
-      const noInstr = ['Rock','Rock Nacional','Metal','Jazz','Folklore','Tango','Cumbia','Indie','Pop','Electrónica','Funk','Punk','Blues','Prog','R&B','Rap / Hip Hop','Reggae','Tropical','Clásica','Bossanova','Soul','Otro','Variado','House','Tech House','Techno','Trance','Melodic House & Techno','Minimal Deep/Tech','Indie Dance',
-        'Hoy','Este finde','Esta semana','Este mes','Gratis','A la gorra','Con costo']
-      const noCateg = ['Nuevo','Usado','Para reparar']
-      const categLabels = ['Guitarra','Bajo','Batería','Teclado','Vientos','Cuerdas','Amplificador','Pedalera','Micrófono','Equipo PA','Home Studio','Sala ensayo','Accesorios','Otro']
-
-      const instrActivos = chipsOn.filter(c => !noInstr.includes(c) && !noCateg.includes(c) && !categLabels.includes(c))
-      const generosActivos = chipsOn.filter(c => noInstr.includes(c) && !['Hoy','Este finde','Esta semana','Este mes','Gratis','A la gorra','Con costo'].includes(c))
-      const catActiva = chipsOn.find(c => categLabels.includes(c))
-      const condActiva = chipsOn.find(c => noCateg.includes(c))
-
-      // Normalizar DJ/Prod. → buscar como "DJ"
-      // Filtro zona
-      const zonaInput = panelActivo.querySelector('input[id^="zona-"]')
-      const zonaVal = zonaInput?.value?.trim()
-      if (zonaVal) query += `&zona=ilike.*${encodeURIComponent(zonaVal)}*`
-
-      if (instrActivos.length) {
-        const instr = instrActivos[0]
-        query += `&instrumentos=ilike.*${encodeURIComponent(instr)}*`
-      }
-      if (generosActivos.length) query += `&generos=ilike.*${encodeURIComponent(generosActivos[0])}*`
-      if (catActiva && tipoFiltro === 'vende') query += `&categoria_producto=ilike.*${encodeURIComponent(catActiva)}*`
-      if (condActiva && tipoFiltro === 'vende') query += `&condicion=ilike.*${encodeURIComponent(condActiva)}*`
-      // Filtros de clases
-      if (tipoFiltro === 'clases') {
-        const instrActivo = [...document.querySelectorAll('#fp-clases .fchip.on')].find(c => ['Guitarra','Bajo','Batería','Teclado / Piano','Voz / Canto','Saxo','Violín','Trompeta','Percusión','Bandoneón','Acordeón','Flauta'].includes(c.textContent))
-        const nivelActivo = [...document.querySelectorAll('#fp-clases .fchip.on')].find(c => ['Principiante','Intermedio','Avanzado','Todos los niveles'].includes(c.textContent))
-        const modalActivo = [...document.querySelectorAll('#fp-clases .fchip.on')].find(c => ['Presencial','Online','Presencial y online'].includes(c.textContent))
-        if (instrActivo) query += `&instrumento=ilike.*${encodeURIComponent(instrActivo.textContent)}*`
-        if (nivelActivo) query += `&nivel=eq.${encodeURIComponent(nivelActivo.textContent)}`
-        if (modalActivo) query += `&modalidad=eq.${encodeURIComponent(modalActivo.textContent)}`
-      }
-      // Filtros de jam por fecha
-      const hoy = new Date(); hoy.setHours(0,0,0,0)
-      const manana = new Date(hoy); manana.setDate(manana.getDate()+1)
-      const finde = new Date(hoy); finde.setDate(finde.getDate()+7)
-      if (chipsOn.includes('Hoy')) query += `&fecha_evento=gte.${hoy.toISOString()}&fecha_evento=lt.${manana.toISOString()}`
-      else if (chipsOn.includes('Este finde')) { const v=new Date(hoy);v.setDate(v.getDate()+(6-v.getDay())); query += `&fecha_evento=gte.${hoy.toISOString()}&fecha_evento=lte.${v.toISOString()}` }
-      else if (chipsOn.includes('Esta semana')) query += `&fecha_evento=gte.${hoy.toISOString()}&fecha_evento=lte.${finde.toISOString()}`
-      // Filtro precio entrada jam
-      if (chipsOn.includes('Gratis')) query += `&precio_entrada=ilike.*gratis*`
-      else if (chipsOn.includes('A la gorra')) query += `&precio_entrada=ilike.*gorra*`
-      else if (chipsOn.includes('Con costo')) query += `&precio_entrada=not.ilike.*gratis*&precio_entrada=not.is.null`
-    }
-
-    // Filtro precio numérico — debe ir ANTES del fetch
-    const precioMin = parseFloat(document.getElementById('precio-min')?.value)
-    const precioMax = parseFloat(document.getElementById('precio-max')?.value)
-    if (!isNaN(precioMin) && precioMin > 0) query += `&precio_num=gte.${precioMin}`
-    if (!isNaN(precioMax) && precioMax > 0) query += `&precio_num=lte.${precioMax}`
-
     try {
-      const res = await fetch(query, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } })
+      const res = await fetch(buildQuery(), { headers: { ...SB_HEADERS, 'Prefer':'count=exact' } })
+      if (!res.ok) {
+        const errText = await res.text().catch(()=> '')
+        throw new Error(`Supabase ${res.status}: ${errText}`)
+      }
       const anuncios = await res.json()
-
+      const totalHeader = res.headers.get('content-range')?.split('/')[1]
       if (!append) lista.innerHTML = ''
 
       if (!anuncios.length && !append) {
-        lista.innerHTML = `<div style="padding:4rem;text-align:center">
+        lista.innerHTML = `<div style="padding:4rem 1.5rem;text-align:center">
           <div style="font-size:2rem;margin-bottom:1rem">📋</div>
-          <div style="font-family:var(--font-display);font-size:1.4rem;margin-bottom:.5rem">Sin anuncios todavía</div>
-          <div style="color:var(--gris);font-size:.88rem">Sé el primero en publicar algo.</div>
+          <div style="font-family:var(--font-display);font-size:1.4rem;margin-bottom:.5rem">Sin anuncios con esos filtros</div>
+          <div style="color:var(--gris);font-size:.88rem;line-height:1.6">Probá limpiar filtros o publicá lo que estás buscando.</div>
+          <div class="empty-actions">
+            <button class="empty-action" onclick="clearFilters()">Limpiar filtros</button>
+            <button class="empty-action primary" onclick="openModal('busco')">Publicar gratis</button>
+          </div>
         </div>`
         document.querySelector('.main-title span').textContent = '0'
         document.getElementById('btn-load-more').style.display = 'none'
         return
       }
 
-      // Cargar nombres de autores
       const userIds = [...new Set(anuncios.map(a=>a.user_id).filter(Boolean))]
       let autores = {}
       if (userIds.length) {
-        const pRes = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=in.(${userIds.join(',')})&select=id,nombre`, {
-          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-        })
-        const perfiles = await pRes.json()
-        perfiles.forEach(p => autores[p.id] = p.nombre)
+        const ids = userIds.map(id => String(id).replace(/[^a-zA-Z0-9_-]/g,'')).filter(Boolean).join(',')
+        if (ids) {
+          const pRes = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=in.(${ids})&select=id,nombre`, { headers: SB_HEADERS })
+          if (pRes.ok) {
+            const perfiles = await pRes.json()
+            perfiles.forEach(p => autores[p.id] = p.nombre)
+          }
+        }
       }
 
-      anuncios.forEach(a => {
-        lista.insertAdjacentHTML('beforeend', buildAnuncioCard(a, autores[a.user_id]))
-      })
-
-      document.querySelector('.main-title span').textContent = anuncios.length + anunciosOffset
+      anuncios.forEach(a => lista.insertAdjacentHTML('beforeend', buildAnuncioCard(a, autores[a.user_id])))
+      const total = totalHeader && totalHeader !== '*' ? totalHeader : String(anunciosOffset + anuncios.length)
+      document.querySelector('.main-title span').textContent = total
+      document.querySelector('.main-sub').textContent = tipoFiltro === 'todos' ? 'explorá todas las categorías' : (filterLabels[tipoFiltro] || 'anuncios activos')
       anunciosOffset += anuncios.length
       document.getElementById('btn-load-more').style.display = anuncios.length === ANUNCIOS_PER_PAGE ? 'inline-block' : 'none'
-
     } catch(e) {
-      lista.innerHTML = '<div style="padding:3rem;text-align:center;color:var(--gris)">Error al cargar. Verificá tu conexión.</div>'
       console.error(e)
+      lista.innerHTML = '<div style="padding:3rem;text-align:center;color:var(--gris)">Error al cargar anuncios. Verificá tu conexión.</div>'
     }
   }
 
   function loadMoreAnuncios(btn) {
     btn.textContent = 'Cargando...'
-    cargarAnuncios(true).then(() => btn.textContent = 'Cargar más anuncios')
+    cargarAnuncios(true).finally(() => { btn.textContent = 'Cargar más anuncios' })
   }
 
-  // Cargar al iniciar
-  cargarAnuncios(false);
+  function openAnuncioDetalle(event, id) {
+    if (!id) return
+    if (event && event.target.closest('a,button,textarea,input,select,.reply-form')) return
+    window.location.href = 'buscARTE_anuncio_detalle.html?id=' + encodeURIComponent(id)
+  }
 
   function toggleReply(btn) {
-    const form = btn.closest('.anuncio').querySelector('.reply-form');
-    const isOpen = form.classList.contains('open');
-    document.querySelectorAll('.reply-form.open').forEach(f=>f.classList.remove('open'));
-    if (!isOpen) { form.classList.add('open'); setTimeout(()=>form.querySelector('textarea').focus(),100); }
+    if (!requireLogin('responder')) return
+    const form = btn.closest('.anuncio')?.querySelector('.reply-form')
+    if (!form) return
+    const isOpen = form.classList.contains('open')
+    document.querySelectorAll('.reply-form.open').forEach(f=>f.classList.remove('open'))
+    if (!isOpen) { form.classList.add('open'); setTimeout(()=>form.querySelector('textarea')?.focus(),100) }
   }
   function sendReply(btn) {
-    const form = btn.closest('.reply-form');
-    const ta = form.querySelector('textarea');
-    if (!ta.value.trim()) { ta.focus(); return; }
-    btn.textContent = '✓ Enviado';
-    btn.style.background = '#a8c832';
-    ta.value = '';
-    setTimeout(()=>{ form.classList.remove('open'); btn.textContent='Enviar →'; btn.style.background=''; }, 1400);
+    // Las respuestas reales se manejan desde el detalle del anuncio para evitar envíos falsos desde esta lista.
+    const anuncio = btn.closest('.anuncio')
+    if (anuncio?.dataset?.id) window.location.href = 'buscARTE_anuncio_detalle.html?id=' + encodeURIComponent(anuncio.dataset.id)
   }
 
   async function cargarBadgeMensajes(uid) {
-    const badge = document.getElementById('nav-msg-badge');
-    if (!badge || !uid) return;
+    const badge = document.getElementById('nav-msg-badge')
+    if (!badge || !uid) return
     try {
-      const lastSeen = localStorage.getItem('ba_msg_last_seen') || new Date().toISOString();
-      const res = await fetch(
-        `https://xiaanchoanxmampegoay.supabase.co/rest/v1/mensajes?para_user_id=eq.${uid}&created_at=gt.${lastSeen}&select=id&limit=99`,
-        { headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68', 'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68` } }
-      );
-      const msgs = await res.json();
-      const count = Array.isArray(msgs) ? msgs.length : 0;
-      if (count > 0) {
-        badge.textContent = count > 99 ? '99+' : count;
-        badge.style.display = 'inline';
-      } else {
-        badge.style.display = 'none';
-      }
-    } catch(e) { if(badge) badge.style.display = 'none'; }
+      const lastSeen = localStorage.getItem('ba_msg_last_seen') || new Date().toISOString()
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/mensajes?para_user_id=eq.${qs(uid)}&created_at=gt.${qs(lastSeen)}&select=id&limit=99`, { headers: SB_HEADERS })
+      if (!res.ok) throw new Error('badge')
+      const msgs = await res.json()
+      const count = Array.isArray(msgs) ? msgs.length : 0
+      badge.textContent = count > 99 ? '99+' : count
+      badge.style.display = count > 0 ? 'inline' : 'none'
+    } catch(e) { badge.style.display = 'none' }
   }
 
-  // NAV SESSION
-  (function initNav(){
-    const l=localStorage.getItem('ba_logged')==='1';
-    const n=localStorage.getItem('ba_name')||'Mi perfil';
-    const uid=localStorage.getItem('ba_user_id')||'';
-    const i=n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  ;(function initNav(){
+    const l = localStorage.getItem('ba_logged') === '1'
+    const n = localStorage.getItem('ba_name') || 'Mi perfil'
+    const uid = localStorage.getItem('ba_user_id') || ''
+    const i = n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)
     if(l){
-      const g=document.getElementById('nav-guest');
-      const u=document.getElementById('nav-user');
-      if(g)g.style.display='none';
-      if(u)u.style.display='flex';
-      const c=document.getElementById('nav-avatar-circle');
-      if(c)c.textContent=i;
-      const nm=document.getElementById('nav-avatar-name');
-      if(nm)nm.textContent=n.split(' ')[0];
-      cargarBadgeMensajes(uid);
-      // Fix Mi perfil link with real user ID
-      const miPerfilLink=document.querySelector('.nav-dropdown-item[href*="perfil_publico"]');
-      if(miPerfilLink && uid) miPerfilLink.href='buscARTE_perfil_publico.html?id='+uid;
+      const g=document.getElementById('nav-guest'), u=document.getElementById('nav-user')
+      if(g) g.style.display='none'
+      if(u) u.style.display='flex'
+      const c=document.getElementById('nav-avatar-circle'); if(c)c.textContent=i
+      const nm=document.getElementById('nav-avatar-name'); if(nm)nm.textContent=n.split(' ')[0]
+      cargarBadgeMensajes(uid)
+      const miPerfilLink=document.querySelector('.nav-dropdown-item[href*="perfil_publico"]')
+      if(miPerfilLink && uid) miPerfilLink.href='buscARTE_perfil_publico.html?id='+encodeURIComponent(uid)
     }
-  })();
-  // STATS SIDEBAR REALES
+  })()
+
   async function cargarStatsSidebar() {
     try {
       const [rm, ra] = await Promise.all([
-        fetch(`${SUPABASE_URL}/rest/v1/perfiles?select=id`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Prefer': 'count=exact' } }),
-        fetch(`${SUPABASE_URL}/rest/v1/anuncios?estado=eq.activo&select=id`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Prefer': 'count=exact' } })
+        fetch(`${SUPABASE_URL}/rest/v1/perfiles?select=id`, { headers: { ...SB_HEADERS, 'Prefer':'count=exact' } }),
+        fetch(`${SUPABASE_URL}/rest/v1/anuncios?estado=eq.activo&select=id`, { headers: { ...SB_HEADERS, 'Prefer':'count=exact' } })
       ])
       const totalMusicos = rm.headers.get('content-range')?.split('/')[1]
       const totalAnuncios = ra.headers.get('content-range')?.split('/')[1]
@@ -1693,43 +1834,67 @@
       if (sa && totalAnuncios) sa.textContent = totalAnuncios
     } catch(e) {}
   }
-  cargarStatsSidebar();
 
-  function toggleUserMenu(e){if(e)e.stopPropagation();const w=document.getElementById('nav-avatar-btn');const d=document.getElementById('nav-dropdown');if(w)w.classList.toggle('open');if(d)d.classList.toggle('open');}
-  // Close dropdown when tapping outside
+  function toggleUserMenu(e){ if(e)e.stopPropagation(); document.getElementById('nav-avatar-btn')?.classList.toggle('open'); document.getElementById('nav-dropdown')?.classList.toggle('open') }
   document.addEventListener('click', function(e){
     if(!e.target.closest('#nav-avatar-btn') && !e.target.closest('#nav-dropdown')){
-      const d=document.getElementById('nav-dropdown');const w=document.getElementById('nav-avatar-btn');
-      if(d)d.classList.remove('open');if(w)w.classList.remove('open');
+      document.getElementById('nav-avatar-btn')?.classList.remove('open')
+      document.getElementById('nav-dropdown')?.classList.remove('open')
     }
-  });
-  document.addEventListener('click',e=>{if(!e.target.closest('#nav-user')){document.getElementById('nav-avatar-btn')?.classList.remove('open');document.getElementById('nav-dropdown')?.classList.remove('open');}});
-  function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');window.location.href='index.html';}
+  })
+  function logout(){ localStorage.removeItem('ba_logged'); localStorage.removeItem('ba_name'); localStorage.removeItem('ba_user_id'); window.location.href='index.html' }
+
+  function toggleMobileFiltersAn() {
+    const panel = document.getElementById('anuncios-filters-panel')
+    const btn = document.getElementById('mobile-filter-btn-an')
+    if (!panel) return
+    panel.classList.toggle('mobile-open')
+    if (btn) btn.textContent = panel.classList.contains('mobile-open') ? '✕ Cerrar filtros' : '⚙ Filtros'
+  }
+  function closeMobileFiltersAn() {
+    const panel = document.getElementById('anuncios-filters-panel')
+    const btn = document.getElementById('mobile-filter-btn-an')
+    if (panel) panel.classList.remove('mobile-open')
+    if (btn) btn.textContent = '⚙ Filtros'
+  }
+
+  function initAnunciosPage() {
+    const params = new URLSearchParams(window.location.search)
+    const tipoParam = canonicalTipo(params.get('tipo'))
+    if (tipoParam && tipoParam !== 'todos') {
+      const uiTipo = tipoParam === 'busco' ? 'musico' : tipoParam
+      setTab(null, uiTipo)
+    } else {
+      cargarAnuncios(false)
+    }
+    cargarStatsSidebar()
+  }
+  window.addEventListener('DOMContentLoaded', initAnunciosPage)
 </script>
 <div class="mbn-overlay" id="mbn-overlay" onclick="closeMbnPanel()"></div>
 <div class="mbn-panel" id="mbn-panel">
-  <div class="mbn-panel-title">Mi cuenta</div>
-  <a href="#" class="mbn-panel-item" id="mbnp-perfil">
-    <span class="mbn-pi-icon">👤</span> Ver mi perfil
+<div class="mbn-panel-title">Mi cuenta</div>
+<a class="mbn-panel-item" href="#" id="mbnp-perfil">
+<span class="mbn-pi-icon">👤</span> Ver mi perfil
   </a>
-  <a href="buscARTE_perfil.html" class="mbn-panel-item">
-    <span class="mbn-pi-icon">⚙️</span> Configurar perfil
+<a class="mbn-panel-item" href="buscARTE_perfil.html">
+<span class="mbn-pi-icon">⚙️</span> Configurar perfil
   </a>
-  <a href="buscARTE_mis_anuncios.html" class="mbn-panel-item">
-    <span class="mbn-pi-icon">📋</span> Mis anuncios
+<a class="mbn-panel-item" href="buscARTE_mis_anuncios.html">
+<span class="mbn-pi-icon">📋</span> Mis anuncios
   </a>
-  <a href="buscARTE_guardados.html" class="mbn-panel-item">
-    <span class="mbn-pi-icon">🔖</span> Guardados / Favoritos
+<a class="mbn-panel-item" href="buscARTE_guardados.html">
+<span class="mbn-pi-icon">🔖</span> Guardados / Favoritos
   </a>
-  <a href="#" class="mbn-panel-item danger" onclick="mbnLogout()">
-    <span class="mbn-pi-icon">🚪</span> Cerrar sesión
+<a class="mbn-panel-item danger" href="#" onclick="mbnLogout()">
+<span class="mbn-pi-icon">🚪</span> Cerrar sesión
   </a>
 </div>
 <nav class="mobile-bottom-nav" id="mobile-bottom-nav">
-  <a href="buscARTE_busqueda.html" class="mbn-item" data-page="busqueda"><span class="mbn-icon">🎵</span><span>Músicos</span></a>
-  <a href="buscARTE_anuncios.html" class="mbn-item" data-page="anuncios"><span class="mbn-icon">📋</span><span>Anuncios</span></a>
-  <a href="buscARTE_mensajes.html" class="mbn-item" data-page="mensajes"><span class="mbn-icon">💬</span><span>Mensajes</span></a>
-  <button class="mbn-item" onclick="toggleMbnPanel()" style="background:none;border:none;flex:1;padding:0;" data-page="perfil"><span class="mbn-icon">👤</span><span>Mi perfil</span></button>
+<a class="mbn-item" data-page="busqueda" href="buscARTE_busqueda.html"><span class="mbn-icon">🎵</span><span>Músicos</span></a>
+<a class="mbn-item" data-page="anuncios" href="buscARTE_anuncios.html"><span class="mbn-icon">📋</span><span>Anuncios</span></a>
+<a class="mbn-item" data-page="mensajes" href="buscARTE_mensajes.html"><span class="mbn-icon">💬</span><span>Mensajes</span></a>
+<button class="mbn-item" data-page="perfil" onclick="toggleMbnPanel()" style="background:none;border:none;flex:1;padding:0;"><span class="mbn-icon">👤</span><span>Mi perfil</span></button>
 </nav>
 <script>
 (function(){

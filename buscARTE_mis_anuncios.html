@@ -237,6 +237,89 @@
     .nav-dropdown { display: none !important; }
   }
 
+
+
+  /* CODEO VISUAL V2 — panel de gestión más claro */
+  .main { max-width: 1180px; width: 100%; }
+  .page-header { align-items:flex-end; gap:1.5rem; }
+  .page-kicker { font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gris2);margin-bottom:.45rem; }
+  .header-actions { display:flex;gap:.65rem;align-items:center;flex-wrap:wrap; }
+  .btn-outline { background:transparent;border:1px solid var(--gris3);color:var(--gris);padding:.65rem 1rem;font-family:var(--font-body);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;cursor:none;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:.45rem; }
+  .btn-outline:hover { border-color:var(--blanco);color:var(--blanco); }
+  .manager-hero { border:1px solid #1c1c1c;background:linear-gradient(135deg,rgba(212,245,60,.055),rgba(255,255,255,.012) 42%,rgba(0,0,0,0));padding:1.25rem 1.35rem;margin-bottom:1.25rem;display:grid;grid-template-columns:1.2fr .8fr;gap:1rem;align-items:center; }
+  .manager-hero-title { font-family:var(--font-display);font-size:1.05rem;letter-spacing:-.01em;margin-bottom:.35rem; }
+  .manager-hero-copy { color:var(--gris);font-size:.82rem;line-height:1.65;max-width:620px; }
+  .manager-hero-copy strong { color:var(--blanco);font-weight:500; }
+  .status-legend { display:flex;gap:.5rem;flex-wrap:wrap;justify-content:flex-end; }
+  .legend-pill { border:1px solid #242424;background:rgba(255,255,255,.02);padding:.4rem .62rem;font-size:.67rem;color:var(--gris);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap; }
+  .legend-pill strong { color:var(--blanco);font-weight:500; }
+  .overview-grid { display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#1c1c1c;margin-bottom:1.25rem;border:1px solid #1c1c1c; }
+  .overview-card { background:var(--negro2);padding:1rem 1.1rem;min-height:92px;display:flex;flex-direction:column;justify-content:space-between; }
+  .overview-label { font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gris2); }
+  .overview-value { font-family:var(--font-display);font-size:1.75rem;letter-spacing:-.03em;line-height:1;color:var(--blanco); }
+  .overview-value.neon { color:var(--neon); }
+  .overview-sub { font-size:.7rem;color:var(--gris2);line-height:1.3; }
+  .filter-tabs { background:var(--negro2);position:sticky;top:60px;z-index:40; }
+  .anuncios-lista { gap:.75rem;background:transparent; }
+  .mi-anuncio { border:1px solid #1c1c1c;background:linear-gradient(180deg,#0b0b0b,#080808);padding:1.2rem 1.35rem; }
+  .mi-anuncio:hover { background:linear-gradient(180deg,#101010,#0a0a0a);border-color:#252525; }
+  .mi-anuncio.activo { border-left:3px solid var(--neon); }
+  .mi-anuncio.pausado { border-left:3px solid var(--gris2); }
+  .mi-anuncio.vencido { border-left:3px solid var(--rojo);opacity:.78; }
+  .anuncio-top { margin-bottom:.9rem;align-items:center; }
+  .anuncio-titulo { font-size:1.05rem;line-height:1.25;margin-bottom:.35rem; }
+  .anuncio-preview { -webkit-line-clamp:2;color:#a2a2a2; }
+  .tipo-badge,.estado-badge { border-radius:999px; }
+  .anuncio-metrics { border:1px solid #171717;background:rgba(255,255,255,.012);padding:.75rem .85rem;margin-bottom:.9rem;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px; }
+  .metric { padding:.25rem .5rem;border-right:1px solid #181818;min-width:0; }
+  .metric:last-child { border-right:none; }
+  .metric-val { font-size:1.05rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+  .metric-label { margin-top:.12rem; }
+  .anuncio-actions { border-top:1px solid #141414;padding-top:.85rem; }
+  .btn-action { text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:.35rem;min-height:32px; }
+  .btn-action.danger { color:#d98b82;border-color:#3b211d; }
+  .btn-action.danger:hover { background:rgba(232,49,26,.05); }
+  .empty-state { border:1px solid #1c1c1c;background:var(--negro2); }
+  .modal { border-top:3px solid var(--rojo); }
+  .modal-sub strong { color:var(--blanco);font-weight:500; }
+  @media (max-width:900px) {
+    .main { max-width:none; }
+    .page-header { align-items:flex-start !important; }
+    .header-actions { width:100%; }
+    .header-actions .btn-outline,.header-actions .btn-publish { flex:1 1 100%;justify-content:center; }
+    .manager-hero { grid-template-columns:1fr;padding:1rem;margin-bottom:1rem; }
+    .status-legend { justify-content:flex-start; }
+    .overview-grid { grid-template-columns:repeat(2,1fr); }
+    .filter-tabs { top:56px; }
+    .anuncio-metrics { grid-template-columns:1fr !important;gap:.35rem !important; }
+    .metric { border-right:none;border-bottom:1px solid #181818;padding:.45rem 0; }
+    .metric:last-child { border-bottom:none; }
+  }
+
+
+  /* CODEO FIX — badges y mobile reales para esta página */
+  .badge-clases { background:rgba(0,210,200,.1);color:#00d4c8;border:1px solid rgba(0,210,200,.2); }
+  .toast-codeo { position:fixed; left:50%; bottom:76px; transform:translateX(-50%); z-index:1200; background:#111; border:1px solid #2a2a2a; color:var(--blanco); padding:.75rem 1rem; font-size:.82rem; box-shadow:0 12px 32px rgba(0,0,0,.4); max-width:90vw; text-align:center; }
+  .toast-codeo.err { border-color:rgba(232,49,26,.45); color:#ffb7ae; }
+  @media (max-width:900px) {
+    .layout { grid-template-columns:1fr !important; }
+    .sidebar { display:none !important; }
+    .main { padding:1.1rem !important; }
+    .page-header { flex-direction:column !important; align-items:flex-start !important; gap:1rem !important; margin-bottom:1rem !important; }
+    .btn-publish { width:100% !important; justify-content:center !important; padding:.9rem !important; }
+    .filter-tabs { overflow-x:auto !important; -webkit-overflow-scrolling:touch !important; margin-bottom:1rem !important; }
+    .filter-tab { min-width:max-content !important; padding:.65rem .9rem !important; }
+    .mi-anuncio { padding:1rem !important; }
+    .anuncio-top { gap:.8rem !important; }
+    .anuncio-metrics { gap:.9rem !important; flex-wrap:wrap !important; }
+    .metric { min-width:92px !important; }
+    .metric-val { font-size:1rem !important; word-break:break-word !important; }
+    .anuncio-actions { gap:.5rem !important; }
+    .btn-action { flex:1 1 auto !important; text-align:center !important; }
+    .anuncio-date { width:100% !important; margin-left:0 !important; }
+    .modal { width:calc(100vw - 2rem) !important; padding:1.4rem !important; }
+  }
+
 </style>
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0a0a0a">
@@ -254,7 +337,7 @@
 <div class="modal-overlay" id="modal-delete" onclick="closeDelete(event)">
   <div class="modal">
     <div class="modal-title">¿Eliminar anuncio?</div>
-    <p class="modal-sub">Esta acción no se puede deshacer. El anuncio desaparecerá del tablón y todas las respuestas asociadas se perderán.</p>
+    <p class="modal-sub">El anuncio dejará de verse en el tablón público. <strong>Los mensajes asociados se conservan</strong> para no romper conversaciones ni historial.</p>
     <div class="modal-actions">
       <button class="btn-cancel-modal" onclick="closeDeleteModal()">Cancelar</button>
       <button class="btn-delete" onclick="confirmDelete()">Sí, eliminar</button>
@@ -315,6 +398,7 @@
       <a href="#" class="sidebar-link" onclick="filterTab('ofrezco',this)">🎸 Me ofrezco</a>
       <a href="#" class="sidebar-link" onclick="filterTab('jam',this)">🥁 Jam / Zapada</a>
       <a href="#" class="sidebar-link" onclick="filterTab('vendo',this)">🎛️ Vendo / Alquilo</a>
+      <a href="#" class="sidebar-link" onclick="filterTab('clases',this)">🎓 Doy clases</a>
     </div>
 
     <div class="sidebar-divider"></div>
@@ -332,344 +416,395 @@
 
     <div class="page-header">
       <div>
+        <div class="page-kicker">Panel de gestión</div>
         <div class="page-title">Mis <span>anuncios</span></div>
-        <div class="page-sub">4 anuncios publicados · 2 activos</div>
+        <div class="page-sub">Cargando tus publicaciones...</div>
       </div>
-      <button class="btn-publish" onclick="window.location.href='buscARTE_anuncios.html'">+ Nuevo anuncio</button>
+      <div class="header-actions">
+        <a class="btn-outline" href="buscARTE_anuncios.html">← Ver tablón</a>
+        <button class="btn-publish" onclick="window.location.href='buscARTE_anuncios.html'">+ Nuevo anuncio</button>
+      </div>
+    </div>
+
+    <section class="manager-hero" aria-label="Cómo funcionan tus anuncios">
+      <div>
+        <div class="manager-hero-title">Controlá qué aparece en el tablón.</div>
+        <div class="manager-hero-copy"><strong>Activos</strong> se ven públicamente. <strong>Pausados</strong> quedan guardados para reactivar. <strong>Eliminar</strong> saca el anuncio del tablón sin romper mensajes ni respuestas asociadas.</div>
+      </div>
+      <div class="status-legend">
+        <span class="legend-pill">🟢 <strong>Activo</strong></span>
+        <span class="legend-pill">⏸ <strong>Pausado</strong></span>
+        <span class="legend-pill">🔴 <strong>Vencido</strong></span>
+        <span class="legend-pill">🗑 <strong>Eliminado</strong></span>
+      </div>
+    </section>
+
+    <section class="overview-grid" aria-label="Resumen de anuncios">
+      <div class="overview-card"><div class="overview-label">Activos</div><div class="overview-value neon" id="overview-activos">—</div><div class="overview-sub">visibles en el tablón</div></div>
+      <div class="overview-card"><div class="overview-label">Pausados</div><div class="overview-value" id="overview-pausados">—</div><div class="overview-sub">guardados para después</div></div>
+      <div class="overview-card"><div class="overview-label">Vencidos</div><div class="overview-value" id="overview-vencidos">—</div><div class="overview-sub">conviene republicar</div></div>
+      <div class="overview-card"><div class="overview-label">Vistas</div><div class="overview-value" id="overview-vistas">—</div><div class="overview-sub">total acumulado</div></div>
+    </section>
+
+    <div class="filter-tabs" id="quick-filter-tabs">
+      <button class="filter-tab active" onclick="filterTab(event,'todos',this)">Todos</button>
+      <button class="filter-tab" onclick="filterTab(event,'activo',this)">Activos</button>
+      <button class="filter-tab" onclick="filterTab(event,'pausado',this)">Pausados</button>
+      <button class="filter-tab" onclick="filterTab(event,'vencido',this)">Vencidos</button>
+      <button class="filter-tab" onclick="filterTab(event,'busco',this)">Busco</button>
+      <button class="filter-tab" onclick="filterTab(event,'jam',this)">Jams</button>
+      <button class="filter-tab" onclick="filterTab(event,'vende',this)">Venta</button>
+      <button class="filter-tab" onclick="filterTab(event,'clases',this)">Clases</button>
     </div>
 
     <div class="anuncios-lista" id="anuncios-lista">
-
-      <!-- ANUNCIO 1 — ACTIVO -->
-      <div class="mi-anuncio activo" data-estado="activo" data-tipo="ofrezco">
-        <div class="anuncio-top">
-          <div class="anuncio-main">
-            <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.4rem;flex-wrap:wrap">
-              <span class="tipo-badge badge-ofrezco">🎸 Me ofrezco</span>
-              <span class="estado-badge estado-activo">● Activo</span>
-            </div>
-            <div class="anuncio-titulo">Guitarrista disponible para sesiones de grabación y shows — CABA y GBA</div>
-            <div class="anuncio-preview">8 años de experiencia en jazz, rock y fusión. Equipo completo. Disponible fines de semana y noches...</div>
-          </div>
-        </div>
-        <div class="anuncio-metrics">
-          <div class="metric">
-            <div class="metric-val highlight">87</div>
-            <div class="metric-label">Vistas</div>
-          </div>
-          <div class="metric">
-            <div class="metric-val highlight">12</div>
-            <div class="metric-label">Respuestas</div>
-          </div>
-          <div class="metric">
-            <div class="metric-val">5</div>
-            <div class="metric-label">Días activo</div>
-          </div>
-          <div class="metric">
-            <div class="metric-val">Jazz · Rock</div>
-            <div class="metric-label">Géneros</div>
-          </div>
-          <div class="metric">
-            <div class="metric-val">📍 Almagro</div>
-            <div class="metric-label">Zona</div>
-          </div>
-        </div>
-        <div class="anuncio-actions">
-          <button class="btn-action primary" onclick="window.location.href='buscARTE_anuncio_detalle.html'">Ver anuncio →</button>
-          <button class="btn-action" onclick="editAnuncio(this)">✏️ Editar</button>
-          <button class="btn-action" onclick="pauseAnuncio(this)">⏸ Pausar</button>
-          <button class="btn-action danger" onclick="openDeleteModal(this)">🗑 Eliminar</button>
-          <span class="anuncio-date">Publicado hace 5 días</span>
-        </div>
-      </div>
-
-      <!-- ANUNCIO 2 — ACTIVO -->
-      <div class="mi-anuncio activo" data-estado="activo" data-tipo="busco">
-        <div class="anuncio-top">
-          <div class="anuncio-main">
-            <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.4rem;flex-wrap:wrap">
-              <span class="tipo-badge badge-busco">🔍 Busco músico</span>
-              <span class="estado-badge estado-activo">● Activo</span>
-            </div>
-            <div class="anuncio-titulo">Busco bajista y baterista para proyecto de fusión — CABA</div>
-            <div class="anuncio-preview">Guitarrista con material propio busca sección rítmica para armar banda estable con proyección...</div>
-          </div>
-        </div>
-        <div class="anuncio-metrics">
-          <div class="metric">
-            <div class="metric-val highlight">143</div>
-            <div class="metric-label">Vistas</div>
-          </div>
-          <div class="metric">
-            <div class="metric-val highlight">9</div>
-            <div class="metric-label">Respuestas</div>
-          </div>
-          <div class="metric">
-            <div class="metric-val">12</div>
-            <div class="metric-label">Días activo</div>
-          </div>
-          <div class="metric">
-            <div class="metric-val">Jazz · Fusión</div>
-            <div class="metric-label">Géneros</div>
-          </div>
-          <div class="metric">
-            <div class="metric-val">📍 Almagro</div>
-            <div class="metric-label">Zona</div>
-          </div>
-        </div>
-        <div class="anuncio-actions">
-          <button class="btn-action primary" onclick="window.location.href='buscARTE_anuncio_detalle.html'">Ver anuncio →</button>
-          <button class="btn-action" onclick="editAnuncio(this)">✏️ Editar</button>
-          <button class="btn-action" onclick="pauseAnuncio(this)">⏸ Pausar</button>
-          <button class="btn-action danger" onclick="openDeleteModal(this)">🗑 Eliminar</button>
-          <span class="anuncio-date">Publicado hace 12 días</span>
-        </div>
-      </div>
-
-      <!-- ANUNCIO 3 — PAUSADO -->
-      <div class="mi-anuncio pausado" data-estado="pausado" data-tipo="jam">
-        <div class="anuncio-top">
-          <div class="anuncio-main">
-            <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.4rem;flex-wrap:wrap">
-              <span class="tipo-badge badge-jam">🥁 Jam / Zapada</span>
-              <span class="estado-badge estado-pausado">⏸ Pausado</span>
-            </div>
-            <div class="anuncio-titulo">Jam de jazz abierta — Parque Centenario, todos los sábados</div>
-            <div class="anuncio-preview">Jam session abierta, estándar de jazz y bossanova. Sin experiencia previa. Entrada libre...</div>
-          </div>
-        </div>
-        <div class="anuncio-metrics">
-          <div class="metric">
-            <div class="metric-val">56</div>
-            <div class="metric-label">Vistas</div>
-          </div>
-          <div class="metric">
-            <div class="metric-val">5</div>
-            <div class="metric-label">Respuestas</div>
-          </div>
-          <div class="metric">
-            <div class="metric-val">—</div>
-            <div class="metric-label">Días activo</div>
-          </div>
-          <div class="metric">
-            <div class="metric-val">Jazz</div>
-            <div class="metric-label">Género</div>
-          </div>
-          <div class="metric">
-            <div class="metric-val">📍 Caballito</div>
-            <div class="metric-label">Zona</div>
-          </div>
-        </div>
-        <div class="anuncio-actions">
-          <button class="btn-action primary" onclick="resumeAnuncio(this)">▶ Reactivar</button>
-          <button class="btn-action" onclick="editAnuncio(this)">✏️ Editar</button>
-          <button class="btn-action danger" onclick="openDeleteModal(this)">🗑 Eliminar</button>
-          <span class="anuncio-date">Pausado hace 3 días</span>
-        </div>
-      </div>
-
-      <!-- ANUNCIO 4 — VENCIDO -->
-      <div class="mi-anuncio vencido" data-estado="vencido" data-tipo="vendo">
-        <div class="anuncio-top">
-          <div class="anuncio-main">
-            <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.4rem;flex-wrap:wrap">
-              <span class="tipo-badge badge-vendo">🎛️ Vendo</span>
-              <span class="estado-badge estado-vencido">✕ Vencido</span>
-            </div>
-            <div class="anuncio-titulo">Vendo amplificador Fender Blues Junior — excelente estado</div>
-            <div class="anuncio-preview">Fender Blues Junior III en perfecto estado, 15W, válvulas. Precio $780.000. Zona Palermo...</div>
-          </div>
-        </div>
-        <div class="anuncio-metrics">
-          <div class="metric">
-            <div class="metric-val">26</div>
-            <div class="metric-label">Vistas</div>
-          </div>
-          <div class="metric">
-            <div class="metric-val">2</div>
-            <div class="metric-label">Respuestas</div>
-          </div>
-          <div class="metric">
-            <div class="metric-val">30</div>
-            <div class="metric-label">Días activo</div>
-          </div>
-          <div class="metric">
-            <div class="metric-val">$780.000</div>
-            <div class="metric-label">Precio</div>
-          </div>
-          <div class="metric">
-            <div class="metric-val">📍 Palermo</div>
-            <div class="metric-label">Zona</div>
-          </div>
-        </div>
-        <div class="anuncio-actions">
-          <button class="btn-action primary" onclick="republish(this)">🔄 Republicar</button>
-          <button class="btn-action danger" onclick="openDeleteModal(this)">🗑 Eliminar</button>
-          <span class="anuncio-date">Venció hace 8 días</span>
-        </div>
-      </div>
-
+      <div style="padding:3rem;text-align:center;color:var(--gris);font-size:.88rem">Cargando tus anuncios...</div>
+    
     </div>
   </div>
 </div>
 
 <script>
-  // PROTECCIÓN: redirigir si no está logueado
+  // PROTECCIÓN: esta página es privada porque gestiona anuncios propios.
   (function() {
     try {
       if (localStorage.getItem('ba_logged') !== '1') {
-        window.location.replace('index.html');
+        window.location.replace('buscARTE_login.html');
       }
     } catch(e) {}
   })();
+
   // CURSOR
   window.addEventListener('DOMContentLoaded', function() {
-    const cursor=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursor-ring');
     if (!cursor || !ring) return;
-    let mx=0,my=0,rx=0,ry=0;
-    document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
-    (function tick(){cursor.style.left=mx+'px';cursor.style.top=my+'px';rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(tick);})();
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    (function tick(){
+      cursor.style.left = mx + 'px';
+      cursor.style.top = my + 'px';
+      rx += (mx - rx) * .12;
+      ry += (my - ry) * .12;
+      ring.style.left = rx + 'px';
+      ring.style.top = ry + 'px';
+      requestAnimationFrame(tick);
+    })();
   });
 
   // ═══ SUPABASE ═══
-  const SUPABASE_URL = 'https://xiaanchoanxmampegoay.supabase.co'
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68'
-  const hdrs = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }
-  const miId = localStorage.getItem('ba_user_id')
+  const SUPABASE_URL = 'https://xiaanchoanxmampegoay.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68';
+  const hdrs = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' };
+  const miId = localStorage.getItem('ba_user_id');
 
-  const BADGES = { busco:'badge-busco', ofrezco:'badge-ofrezco', jam:'badge-jam', vende:'badge-vendo' }
-  const LABELS = { busco:'🔍 Busco músico', ofrezco:'🎸 Me ofrezco', jam:'🥁 Jam / Zapada', vende:'🎛️ Vendo' }
+  const BADGES = { busco:'badge-busco', ofrezco:'badge-ofrezco', jam:'badge-jam', vende:'badge-vendo', vendo:'badge-vendo', clases:'badge-clases' };
+  const LABELS = { busco:'🔍 Busco músico', ofrezco:'🎸 Me ofrezco', jam:'🥁 Jam / Zapada', vende:'🎛️ Vendo / Alquilo', vendo:'🎛️ Vendo / Alquilo', clases:'🎓 Doy clases' };
+  const ESTADO_CLASS = { activo:'estado-activo', pausado:'estado-pausado', vencido:'estado-vencido', eliminado:'estado-vencido' };
+  const ESTADO_LABEL = { activo:'● Activo', pausado:'⏸ Pausado', vencido:'✕ Vencido', eliminado:'✕ Oculto' };
 
-  function timeAgo(iso) {
-    if (!iso) return ''
-    const diff = Math.floor((new Date() - new Date(iso)) / 60000)
-    if (diff < 1) return 'Hace un momento'
-    if (diff < 60) return `Hace ${diff} min`
-    if (diff < 1440) return `Hace ${Math.floor(diff/60)} hs`
-    return `Hace ${Math.floor(diff/1440)} días`
+  let currentFilter = { tipo: 'todos' };
+  let cardToDelete = null;
+
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
   }
 
-  async function cargarMisAnuncios(filtroEstado = 'todos', filtroTipo = null) {
-    const lista = document.getElementById('anuncios-lista')
-    lista.innerHTML = '<div style="padding:3rem;text-align:center;color:var(--gris);font-size:.88rem">Cargando tus anuncios...</div>'
+  function enc(value) {
+    return encodeURIComponent(String(value ?? ''));
+  }
+
+  function normalizeTipo(tipo) {
+    return tipo === 'vendo' ? 'vende' : (tipo || 'busco');
+  }
+
+  function timeAgo(iso) {
+    if (!iso) return '';
+    const diff = Math.floor((new Date() - new Date(iso)) / 60000);
+    if (diff < 1) return 'Hace un momento';
+    if (diff < 60) return `Hace ${diff} min`;
+    if (diff < 1440) return `Hace ${Math.floor(diff/60)} hs`;
+    return `Hace ${Math.floor(diff/1440)} días`;
+  }
+
+  function showToast(msg, type) {
+    let t = document.getElementById('toast-codeo');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'toast-codeo';
+      document.body.appendChild(t);
+    }
+    t.className = 'toast-codeo' + (type === 'err' ? ' err' : '');
+    t.textContent = msg;
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.remove(); }, 2800);
+  }
+
+  function getHiddenIds() {
+    try { return JSON.parse(localStorage.getItem('ba_hidden_anuncios') || '[]').map(String); }
+    catch(e) { return []; }
+  }
+
+  function hideIdLocally(id) {
+    const ids = new Set(getHiddenIds());
+    ids.add(String(id));
+    localStorage.setItem('ba_hidden_anuncios', JSON.stringify([...ids]));
+  }
+
+  function unhideIdLocally(id) {
+    const ids = getHiddenIds().filter(x => x !== String(id));
+    localStorage.setItem('ba_hidden_anuncios', JSON.stringify(ids));
+  }
+
+  function metricBlock(value, label, highlight) {
+    return `<div class="metric"><div class="metric-val${highlight ? ' highlight' : ''}">${escapeHtml(value)}</div><div class="metric-label">${escapeHtml(label)}</div></div>`;
+  }
+
+  function estadoForCard(estado) {
+    if (estado === 'pausado') return 'pausado';
+    if (estado === 'vencido' || estado === 'eliminado') return 'vencido';
+    return 'activo';
+  }
+
+  function buildCard(a) {
+    const tipo = normalizeTipo(a.tipo);
+    const estado = a.estado || 'activo';
+    const badge = BADGES[tipo] || 'badge-busco';
+    const label = LABELS[tipo] || escapeHtml(tipo);
+    const estadoClass = ESTADO_CLASS[estado] || 'estado-activo';
+    const estadoLabel = ESTADO_LABEL[estado] || '● Activo';
+    const cardClass = estadoForCard(estado);
+    const location = a.zona || a.lugar || a.ciudad || '—';
+    const price = a.precio || a.precio_entrada || (a.precio_num ? '$' + Number(a.precio_num).toLocaleString('es-AR') : '—');
+    const idAttr = escapeHtml(a.id);
+    const idJs = String(a.id).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    const detailUrl = `buscARTE_anuncio_detalle.html?id=${enc(a.id)}`;
+
+    let actions = `<a href="${detailUrl}" class="btn-action primary">Ver anuncio →</a>`;
+    if (estado === 'activo') actions += `<button class="btn-action" onclick="cambiarEstado('${idJs}','pausado',this)">⏸ Pausar</button>`;
+    if (estado === 'pausado') actions += `<button class="btn-action primary" onclick="cambiarEstado('${idJs}','activo',this)">▶ Reactivar</button>`;
+    if (estado === 'vencido') actions += `<button class="btn-action primary" onclick="cambiarEstado('${idJs}','activo',this)">🔄 Republicar</button>`;
+    actions += `<button class="btn-action danger" onclick="openDeleteModal(this)">🗑 Eliminar</button>`;
+
+    const foto = a.foto_url
+      ? `<img src="${escapeHtml(a.foto_url)}" alt="" style="width:56px;height:56px;object-fit:cover;border:1px solid #1c1c1c;flex-shrink:0">`
+      : '';
+
+    const extraMetric = tipo === 'jam'
+      ? metricBlock(a.fecha_evento ? new Date(a.fecha_evento).toLocaleDateString('es-AR', { day:'numeric', month:'short' }) : '—', 'Fecha')
+      : tipo === 'clases'
+        ? metricBlock(a.modalidad || '—', 'Modalidad')
+        : metricBlock(price, tipo === 'vende' ? 'Precio' : 'Dato');
+
+    return `<div class="mi-anuncio ${cardClass}" data-estado="${escapeHtml(estado)}" data-tipo="${escapeHtml(tipo)}" data-id="${idAttr}">
+      <div class="anuncio-top">
+        ${foto}
+        <div class="anuncio-main">
+          <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.4rem;flex-wrap:wrap">
+            <span class="tipo-badge ${badge}">${label}</span>
+            <span class="estado-badge ${estadoClass}">${estadoLabel}</span>
+          </div>
+          <div class="anuncio-titulo">${escapeHtml(a.titulo || 'Sin título')}</div>
+          <div class="anuncio-preview">${escapeHtml(a.descripcion || '')}</div>
+        </div>
+      </div>
+      <div class="anuncio-metrics">
+        ${metricBlock(a.vistas || 0, 'Vistas', true)}
+        ${metricBlock(location, 'Zona')}
+        ${extraMetric}
+      </div>
+      <div class="anuncio-actions">
+        ${actions}
+        <span class="anuncio-date">${escapeHtml(timeAgo(a.created_at))}</span>
+      </div>
+    </div>`;
+  }
+
+  async function fetchAllMisAnuncios() {
+    if (!miId) return [];
+    const query = `${SUPABASE_URL}/rest/v1/anuncios?user_id=eq.${enc(miId)}&order=created_at.desc`;
+    const res = await fetch(query, { headers: hdrs });
+    if (!res.ok) {
+      const txt = await res.text();
+      throw new Error(`Supabase ${res.status}: ${txt}`);
+    }
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  }
+
+  function visibleForStats(a) {
+    return a.estado !== 'eliminado' && !getHiddenIds().includes(String(a.id));
+  }
+
+  function applyVisibleFilter(anuncios) {
+    const f = currentFilter.tipo;
+    return anuncios.filter(visibleForStats).filter(a => {
+      if (!f || f === 'todos') return true;
+      if (['activo','pausado','vencido'].includes(f)) return a.estado === f;
+      return normalizeTipo(a.tipo) === normalizeTipo(f);
+    });
+  }
+
+  function updateStats(anuncios) {
+    const visibles = anuncios.filter(visibleForStats);
+    const total = visibles.length;
+    const activos = visibles.filter(a => a.estado === 'activo').length;
+    const pausados = visibles.filter(a => a.estado === 'pausado').length;
+    const vencidos = visibles.filter(a => a.estado === 'vencido').length;
+    const vistasTotal = visibles.reduce((sum, a) => sum + Number(a.vistas || 0), 0);
+
+    const sub = document.querySelector('.page-sub');
+    if (sub) sub.textContent = `${total} anuncios publicados · ${activos} activos`;
+    const set = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
+    set('count-todos', total);
+    set('count-activos', activos);
+    set('count-pausados', pausados);
+    set('count-vencidos', vencidos);
+    set('stat-vistas-total', vistasTotal);
+    set('stat-total', total);
+    set('stat-activos-total', activos);
+    set('overview-activos', activos);
+    set('overview-pausados', pausados);
+    set('overview-vencidos', vencidos);
+    set('overview-vistas', vistasTotal);
+  }
+
+  async function cargarMisAnuncios() {
+    const lista = document.getElementById('anuncios-lista');
+    lista.innerHTML = '<div style="padding:3rem;text-align:center;color:var(--gris);font-size:.88rem">Cargando tus anuncios...</div>';
 
     if (!miId) {
-      lista.innerHTML = '<div style="padding:3rem;text-align:center;color:var(--gris)">Necesitás estar logueado para ver tus anuncios.<br><a href="buscARTE_login.html" style="color:var(--neon)">Ingresar</a></div>'
-      return
+      lista.innerHTML = '<div style="padding:3rem;text-align:center;color:var(--gris)">Necesitás estar logueado para ver tus anuncios.<br><a href="buscARTE_login.html" style="color:var(--neon)">Ingresar</a></div>';
+      return;
     }
 
     try {
-      let query = `${SUPABASE_URL}/rest/v1/anuncios?user_id=eq.${miId}&order=created_at.desc`
-      if (filtroEstado !== 'todos') query += `&estado=eq.${filtroEstado}`
-      if (filtroTipo) query += `&tipo=eq.${filtroTipo}`
+      const anuncios = await fetchAllMisAnuncios();
+      updateStats(anuncios);
+      const visibles = applyVisibleFilter(anuncios);
 
-      const res = await fetch(query, { headers: hdrs })
-      const anuncios = await res.json()
-
-      // Actualizar stats sidebar
-      const total = anuncios.length
-      const activos = anuncios.filter(a=>a.estado==='activo').length
-      const vistasTotal = anuncios.reduce((sum,a) => sum + (a.vistas||0), 0)
-      document.querySelector('.page-sub').textContent = `${total} anuncios publicados · ${activos} activos`
-      const ct = document.getElementById('count-todos'); if(ct) ct.textContent = total;
-      const ca = document.getElementById('count-activos'); if(ca) ca.textContent = activos;
-      const cp = document.getElementById('count-pausados'); if(cp) cp.textContent = anuncios.filter(a=>a.estado==='pausado').length;
-      const cv = document.getElementById('count-vencidos'); if(cv) cv.textContent = anuncios.filter(a=>a.estado==='vencido').length;
-      const sv = document.getElementById('stat-vistas-total'); if(sv) sv.textContent = vistasTotal;
-      const st = document.getElementById('stat-total'); if(st) st.textContent = total;
-      const sa = document.getElementById('stat-activos-total'); if(sa) sa.textContent = activos;
-
-      if (!anuncios.length) {
-        lista.innerHTML = `<div style="padding:4rem;text-align:center">
-          <span style="font-size:3rem;display:block;margin-bottom:1rem;opacity:.4">📋</span>
-          <div style="font-family:var(--font-display);font-size:1.5rem;margin-bottom:.5rem">Sin anuncios todavía</div>
-          <div style="color:var(--gris);font-size:.88rem;margin-bottom:2rem">Publicá tu primer anuncio y aparecerá acá.</div>
+      if (!visibles.length) {
+        const msg = currentFilter.tipo === 'todos'
+          ? 'Publicá tu primer anuncio y aparecerá acá.'
+          : 'No hay anuncios con este filtro.';
+        lista.innerHTML = `<div class="empty-state">
+          <span class="empty-icon">📋</span>
+          <div class="empty-title">Sin anuncios</div>
+          <div class="empty-sub">${escapeHtml(msg)}</div>
           <button class="btn-publish" onclick="window.location.href='buscARTE_anuncios.html'">+ Publicar ahora</button>
-        </div>`
-        return
+        </div>`;
+        return;
       }
 
-      lista.innerHTML = ''
-      anuncios.forEach(a => {
-        const badge = BADGES[a.tipo] || 'badge-busco'
-        const label = LABELS[a.tipo] || a.tipo
-        const estadoClass = { activo:'estado-activo', pausado:'estado-pausado', vencido:'estado-vencido' }[a.estado] || 'estado-activo'
-        const estadoLabel = { activo:'● Activo', pausado:'⏸ Pausado', vencido:'✕ Vencido' }[a.estado] || '● Activo'
-        const cardClass = { activo:'activo', pausado:'pausado', vencido:'vencido' }[a.estado] || 'activo'
-
-        const el = document.createElement('div')
-        el.className = `mi-anuncio ${cardClass}`
-        el.dataset.estado = a.estado
-        el.dataset.tipo = a.tipo
-        el.dataset.id = a.id
-        el.innerHTML = `
-          <div class="anuncio-top">
-            <div class="anuncio-main">
-              <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.4rem;flex-wrap:wrap">
-                <span class="tipo-badge ${badge}">${label}</span>
-                <span class="estado-badge ${estadoClass}">${estadoLabel}</span>
-              </div>
-              <div class="anuncio-titulo">${a.titulo||'Sin título'}</div>
-              <div class="anuncio-preview">${a.descripcion||''}</div>
-            </div>
-          </div>
-          <div class="anuncio-metrics">
-            <div class="metric"><div class="metric-val highlight">${a.vistas||0}</div><div class="metric-label">Vistas</div></div>
-            <div class="metric"><div class="metric-val">${a.zona||a.lugar||'—'}</div><div class="metric-label">Zona</div></div>
-            <div class="metric"><div class="metric-val">${a.precio||a.precio_entrada||'—'}</div><div class="metric-label">Precio</div></div>
-          </div>
-          <div class="anuncio-actions">
-            <a href="buscARTE_anuncio_detalle.html?id=${a.id}" class="btn-action primary">Ver anuncio →</a>
-            ${a.estado === 'activo' ? `<button class="btn-action" onclick="cambiarEstado(${a.id},'pausado',this)">⏸ Pausar</button>` : ''}
-            ${a.estado === 'pausado' ? `<button class="btn-action primary" onclick="cambiarEstado(${a.id},'activo',this)">▶ Reactivar</button>` : ''}
-            ${a.estado === 'vencido' ? `<button class="btn-action primary" onclick="cambiarEstado(${a.id},'activo',this)">🔄 Republicar</button>` : ''}
-            <button class="btn-action danger" onclick="openDeleteModal(this)">🗑 Eliminar</button>
-            <span class="anuncio-date">${timeAgo(a.created_at)}</span>
-          </div>`
-        lista.appendChild(el)
-      })
+      lista.innerHTML = visibles.map(buildCard).join('');
     } catch(e) {
-      lista.innerHTML = '<div style="padding:3rem;text-align:center;color:var(--gris)">Error al cargar. Verificá tu conexión.</div>'
-      console.error(e)
+      lista.innerHTML = '<div style="padding:3rem;text-align:center;color:var(--gris)">Error al cargar tus anuncios. Intentá de nuevo.</div>';
+      console.error(e);
     }
   }
 
   async function cambiarEstado(id, nuevoEstado, btn) {
-    btn.textContent = 'Guardando...'
+    if (!id || !miId) return;
+    const original = btn.textContent;
+    btn.textContent = 'Guardando...';
+    btn.disabled = true;
     try {
-      await fetch(`${SUPABASE_URL}/rest/v1/anuncios?id=eq.${id}`, {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/anuncios?id=eq.${enc(id)}&user_id=eq.${enc(miId)}`, {
         method: 'PATCH',
         headers: { ...hdrs, 'Prefer': 'return=minimal' },
         body: JSON.stringify({ estado: nuevoEstado })
-      })
-      cargarMisAnuncios()
-    } catch(e) { alert('Error. Intentá de nuevo.'); console.error(e) }
+      });
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(`Supabase ${res.status}: ${txt}`);
+      }
+      if (nuevoEstado === 'activo') unhideIdLocally(id);
+      showToast('Estado actualizado.');
+      await cargarMisAnuncios();
+    } catch(e) {
+      console.error(e);
+      showToast('No se pudo actualizar el anuncio. Intentá de nuevo.', 'err');
+      btn.textContent = original;
+      btn.disabled = false;
+    }
   }
 
   async function confirmDelete() {
-    if (!cardToDelete) return
-    const id = cardToDelete.dataset.id
-    if (!id) { alert('Error: no se pudo obtener el ID del anuncio.'); return }
+    if (!cardToDelete || !miId) return;
+    const id = cardToDelete.dataset.id;
+    if (!id) { showToast('No se pudo obtener el ID del anuncio.', 'err'); return; }
+
+    const btn = document.querySelector('.btn-delete');
+    const oldText = btn ? btn.textContent : '';
+    if (btn) { btn.textContent = 'Eliminando...'; btn.disabled = true; }
+
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/anuncios?id=eq.${id}`, {
-        method: 'DELETE',
-        headers: { ...hdrs, 'Prefer': 'return=minimal' }
-      })
+      // Primero intentamos un soft delete real si la base acepta estado='eliminado'.
+      let res = await fetch(`${SUPABASE_URL}/rest/v1/anuncios?id=eq.${enc(id)}&user_id=eq.${enc(miId)}`, {
+        method: 'PATCH',
+        headers: { ...hdrs, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ estado: 'eliminado' })
+      });
+
       if (!res.ok) {
-        const errText = await res.text()
-        console.error('Error Supabase DELETE:', res.status, errText)
-        alert(`Error al eliminar (${res.status}). Revisá la consola.`)
-        return
+        // Fallback seguro: pausar para sacarlo del tablón público y ocultarlo localmente.
+        const errText = await res.text();
+        console.warn('estado=eliminado no disponible. Fallback a pausado:', res.status, errText);
+        res = await fetch(`${SUPABASE_URL}/rest/v1/anuncios?id=eq.${enc(id)}&user_id=eq.${enc(miId)}`, {
+          method: 'PATCH',
+          headers: { ...hdrs, 'Prefer': 'return=minimal' },
+          body: JSON.stringify({ estado: 'pausado' })
+        });
+        if (!res.ok) {
+          const txt = await res.text();
+          throw new Error(`Supabase ${res.status}: ${txt}`);
+        }
+        hideIdLocally(id);
       }
-      cardToDelete.style.transition = 'opacity .3s, transform .3s'
-      cardToDelete.style.opacity = '0'
-      cardToDelete.style.transform = 'translateX(-20px)'
-      setTimeout(() => { cardToDelete.remove(); closeDeleteModal() }, 300)
-    } catch(e) { alert('Error al eliminar: ' + e.message); console.error(e) }
+
+      cardToDelete.style.transition = 'opacity .25s, transform .25s';
+      cardToDelete.style.opacity = '0';
+      cardToDelete.style.transform = 'translateX(-16px)';
+      setTimeout(() => { closeDeleteModal(); cargarMisAnuncios(); }, 260);
+      showToast('Anuncio eliminado del tablón.');
+    } catch(e) {
+      console.error(e);
+      showToast('No se pudo eliminar el anuncio. Intentá de nuevo.', 'err');
+      if (btn) { btn.textContent = oldText || 'Sí, ocultar'; btn.disabled = false; }
+    }
   }
 
-  // Cargar al iniciar
-  cargarMisAnuncios();
+  function filterTab(a, b, c) {
+    let e, tipo, el;
+    if (a && typeof a.preventDefault === 'function') { e = a; tipo = b; el = c; }
+    else { e = window.event; tipo = a; el = b; }
+    if (e && typeof e.preventDefault === 'function') e.preventDefault();
+
+    currentFilter.tipo = normalizeTipo(tipo || 'todos');
+    document.querySelectorAll('.sidebar-link, .filter-tab').forEach(l => l.classList.remove('active'));
+    if (el) el.classList.add('active');
+    cargarMisAnuncios();
+  }
+
+  function openDeleteModal(btn) {
+    cardToDelete = btn.closest('.mi-anuncio');
+    document.getElementById('modal-delete').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeDeleteModal() {
+    document.getElementById('modal-delete').classList.remove('open');
+    document.body.style.overflow = '';
+    cardToDelete = null;
+    const btn = document.querySelector('.btn-delete');
+    if (btn) { btn.textContent = 'Sí, eliminar'; btn.disabled = false; }
+  }
+  function closeDelete(e) { if(e.target===document.getElementById('modal-delete')) closeDeleteModal(); }
+  document.addEventListener('keydown', e => { if(e.key === 'Escape') closeDeleteModal(); });
 
   async function cargarBadgeMensajes(uid) {
     const badge = document.getElementById('nav-msg-badge');
@@ -677,9 +812,10 @@
     try {
       const lastSeen = localStorage.getItem('ba_msg_last_seen') || new Date().toISOString();
       const res = await fetch(
-        `https://xiaanchoanxmampegoay.supabase.co/rest/v1/mensajes?para_user_id=eq.${uid}&created_at=gt.${lastSeen}&select=id&limit=99`,
-        { headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68', 'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68` } }
+        `${SUPABASE_URL}/rest/v1/mensajes?para_user_id=eq.${enc(uid)}&created_at=gt.${enc(lastSeen)}&select=id&limit=99`,
+        { headers: hdrs }
       );
+      if (!res.ok) throw new Error('badge');
       const msgs = await res.json();
       const count = Array.isArray(msgs) ? msgs.length : 0;
       if (count > 0) {
@@ -693,95 +829,48 @@
 
   // NAV SESSION
   (function initNav(){
-    const l=localStorage.getItem('ba_logged')==='1';
-    const n=localStorage.getItem('ba_name')||'Mi perfil';
-    const uid=localStorage.getItem('ba_user_id')||'';
-    const i=n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    const l = localStorage.getItem('ba_logged') === '1';
+    const n = localStorage.getItem('ba_name') || 'Mi perfil';
+    const uid = localStorage.getItem('ba_user_id') || '';
+    const i = n.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
     if(l){
-      const g=document.getElementById('nav-guest');const u=document.getElementById('nav-user');
-      if(g)g.style.display='none';if(u)u.style.display='flex';
-      const c=document.getElementById('nav-avatar-circle');if(c)c.textContent=i;
-      const nm=document.getElementById('nav-avatar-name');if(nm)nm.textContent=n.split(' ')[0];
+      const g = document.getElementById('nav-guest');
+      const u = document.getElementById('nav-user');
+      if(g) g.style.display = 'none';
+      if(u) u.style.display = 'flex';
+      const c = document.getElementById('nav-avatar-circle');
+      if(c) c.textContent = i;
+      const nm = document.getElementById('nav-avatar-name');
+      if(nm) nm.textContent = n.split(' ')[0];
       cargarBadgeMensajes(uid);
-      const miPerfilLink=document.querySelector('.nav-dropdown-item[href*="perfil_publico"]');
-      if(miPerfilLink && uid) miPerfilLink.href='buscARTE_perfil_publico.html?id='+uid;
+      const miPerfilLink = document.querySelector('.nav-dropdown-item[href*="perfil_publico"]');
+      if(miPerfilLink && uid) miPerfilLink.href = 'buscARTE_perfil_publico.html?id=' + enc(uid);
     }
   })();
-  function toggleUserMenu(e){if(e)e.stopPropagation();const w=document.getElementById('nav-avatar-btn');const d=document.getElementById('nav-dropdown');if(w)w.classList.toggle('open');if(d)d.classList.toggle('open');}
-  // Close dropdown when tapping outside
+
+  function toggleUserMenu(e){
+    if(e) e.stopPropagation();
+    const w = document.getElementById('nav-avatar-btn');
+    const d = document.getElementById('nav-dropdown');
+    if(w) w.classList.toggle('open');
+    if(d) d.classList.toggle('open');
+  }
   document.addEventListener('click', function(e){
     if(!e.target.closest('#nav-avatar-btn') && !e.target.closest('#nav-dropdown')){
-      const d=document.getElementById('nav-dropdown');const w=document.getElementById('nav-avatar-btn');
-      if(d)d.classList.remove('open');if(w)w.classList.remove('open');
+      const d = document.getElementById('nav-dropdown');
+      const w = document.getElementById('nav-avatar-btn');
+      if(d) d.classList.remove('open');
+      if(w) w.classList.remove('open');
     }
   });
-  document.addEventListener('click',e=>{if(!e.target.closest('#nav-user')){document.getElementById('nav-avatar-btn')?.classList.remove('open');document.getElementById('nav-dropdown')?.classList.remove('open');}});
-  function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');window.location.href='index.html';}
-
-  // FILTROS
-  function filterTab(tipo, el) {
-    event.preventDefault();
-    document.querySelectorAll('.sidebar-link').forEach(l=>l.classList.remove('active'));
-    el.classList.add('active');
-    const items = document.querySelectorAll('.mi-anuncio');
-    items.forEach(item => {
-      if (tipo === 'todos') { item.style.display = ''; }
-      else if (['activo','pausado','vencido'].includes(tipo)) { item.style.display = item.dataset.estado === tipo ? '' : 'none'; }
-      else { item.style.display = item.dataset.tipo === tipo ? '' : 'none'; }
-    });
+  function logout(){
+    localStorage.removeItem('ba_logged');
+    localStorage.removeItem('ba_name');
+    localStorage.removeItem('ba_user_id');
+    window.location.href='index.html';
   }
 
-  // ACCIONES
-  function pauseAnuncio(btn) {
-    const card = btn.closest('.mi-anuncio');
-    card.classList.remove('activo');
-    card.classList.add('pausado');
-    card.dataset.estado = 'pausado';
-    card.querySelector('.estado-badge').className = 'estado-badge estado-pausado';
-    card.querySelector('.estado-badge').textContent = '⏸ Pausado';
-    btn.textContent = '▶ Reactivar';
-    btn.onclick = function(){ resumeAnuncio(this); };
-  }
-  function resumeAnuncio(btn) {
-    const card = btn.closest('.mi-anuncio');
-    card.classList.remove('pausado');
-    card.classList.add('activo');
-    card.dataset.estado = 'activo';
-    card.querySelector('.estado-badge').className = 'estado-badge estado-activo';
-    card.querySelector('.estado-badge').textContent = '● Activo';
-    btn.textContent = '⏸ Pausar';
-    btn.onclick = function(){ pauseAnuncio(this); };
-  }
-  function republish(btn) {
-    const card = btn.closest('.mi-anuncio');
-    card.classList.remove('vencido');
-    card.classList.add('activo');
-    card.style.opacity = '1';
-    card.dataset.estado = 'activo';
-    card.querySelector('.estado-badge').className = 'estado-badge estado-activo';
-    card.querySelector('.estado-badge').textContent = '● Activo';
-    btn.textContent = '✓ Republicado';
-    setTimeout(()=>{ btn.textContent='⏸ Pausar'; btn.onclick=function(){pauseAnuncio(this);}; }, 1500);
-  }
-  function editAnuncio(btn) {
-    btn.textContent = '✓ Guardado';
-    setTimeout(()=>btn.textContent='✏️ Editar', 1200);
-  }
-
-  // MODAL ELIMINAR
-  let cardToDelete = null;
-  function openDeleteModal(btn) {
-    cardToDelete = btn.closest('.mi-anuncio');
-    document.getElementById('modal-delete').classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-  function closeDeleteModal() {
-    document.getElementById('modal-delete').classList.remove('open');
-    document.body.style.overflow = '';
-    cardToDelete = null;
-  }
-  function closeDelete(e) { if(e.target===document.getElementById('modal-delete')) closeDeleteModal(); }
-  document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeDeleteModal(); });
+  cargarMisAnuncios();
 </script>
 <div class="mbn-overlay" id="mbn-overlay" onclick="closeMbnPanel()"></div>
 <div class="mbn-panel" id="mbn-panel">

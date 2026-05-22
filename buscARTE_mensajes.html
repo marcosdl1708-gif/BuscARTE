@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>buscARTE — Mensajes</title>
+<meta name="robots" content="noindex, nofollow">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
@@ -14,413 +15,187 @@
     --font-display:'Archivo Black',sans-serif;
     --font-body:'Archivo',sans-serif;
   }
+  html, body { height:100%; }
   body { background:var(--negro); color:var(--blanco); font-family:var(--font-body); font-weight:300; height:100vh; overflow:hidden; cursor:none; }
   .cursor { width:10px;height:10px;background:var(--neon);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%); }
   .cursor-ring { width:36px;height:36px;border:1px solid rgba(212,245,60,0.35);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .15s ease; }
   body::before { content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");opacity:.03;pointer-events:none;z-index:1000; }
 
-  /* NAV */
   nav { position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:.9rem 2.5rem;border-bottom:1px solid #1c1c1c;background:rgba(8,8,8,0.97);backdrop-filter:blur(12px);height:56px; }
   .nav-logo { font-family:var(--font-display);font-size:1.3rem;color:var(--blanco);text-decoration:none;flex-shrink:0; }
   .nav-logo span { color:var(--neon); }
   .nav-links { display:flex;gap:2rem;list-style:none; }
-  .nav-links a { color:var(--gris);text-decoration:none;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;transition:color .2s; }
-  .nav-links a:hover { color:var(--blanco); }
-  .nav-links a.active { color:var(--neon); }
+  .nav-link { color:var(--gris);text-decoration:none;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;transition:color .2s; }
+  .nav-link:hover { color:var(--blanco); }
+  .nav-link.active { color:var(--neon); }
   .nav-right { display:flex;gap:.8rem;align-items:center; }
-  .nav-avatar { width:30px;height:30px;border-radius:50%;background:#0d2010;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.65rem;color:var(--neon);cursor:none;flex-shrink:0; }
-
-  /* LAYOUT — ocupa toda la pantalla menos nav */
-  .mensajes-layout {
-    display:grid;
-    grid-template-columns:300px 1fr;
-    height:calc(100vh - 56px);
-    margin-top:56px;
-  }
-
-  /* ═══ PANEL IZQUIERDO — lista de conversaciones ═══ */
-  .conv-panel {
-    border-right:1px solid #1c1c1c;
-    display:flex;
-    flex-direction:column;
-    background:var(--negro2);
-    overflow:hidden;
-  }
-
-  .conv-header {
-    padding:1.2rem 1.5rem;
-    border-bottom:1px solid #1c1c1c;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    flex-shrink:0;
-  }
-  .conv-header-title { font-family:var(--font-display);font-size:1rem;letter-spacing:.02em; }
-  .conv-count { font-size:.68rem;color:var(--neon);background:rgba(212,245,60,.1);border:1px solid rgba(212,245,60,.2);padding:.1rem .5rem;letter-spacing:.06em; }
-
-  .conv-search {
-    padding:.8rem 1.5rem;
-    border-bottom:1px solid #1c1c1c;
-    flex-shrink:0;
-  }
-  .conv-search input {
-    width:100%;background:var(--negro);border:1px solid var(--gris3);color:var(--blanco);
-    padding:.55rem .9rem;font-family:var(--font-body);font-size:.82rem;font-weight:300;
-    outline:none;transition:border-color .2s;
-  }
-  .conv-search input:focus { border-color:var(--neon); }
-  .conv-search input::placeholder { color:var(--gris2); }
-
-  .conv-list { flex:1;overflow-y:auto; }
-  .conv-list::-webkit-scrollbar { width:3px; }
-  .conv-list::-webkit-scrollbar-thumb { background:var(--gris3); }
-
-  .conv-item {
-    display:flex;align-items:flex-start;gap:.85rem;
-    padding:1rem 1.5rem;
-    border-bottom:1px solid #161616;
-    cursor:none;
-    transition:background .15s;
-    position:relative;
-  }
-  .conv-item:hover { background:rgba(255,255,255,.02); }
-  .conv-item.active { background:rgba(212,245,60,.04);border-left:2px solid var(--neon); }
-  .conv-item.unread .conv-preview { color:var(--blanco); }
-  .conv-item.unread .conv-name { font-weight:500; }
-
-  .conv-avatar {
-    width:40px;height:40px;border-radius:50%;
-    display:flex;align-items:center;justify-content:center;
-    font-family:var(--font-display);font-size:.85rem;
-    flex-shrink:0;position:relative;
-  }
-  .conv-online {
-    position:absolute;bottom:1px;right:1px;
-    width:9px;height:9px;background:#4caf50;
-    border-radius:50%;border:2px solid var(--negro2);
-  }
-  .conv-body { flex:1;min-width:0; }
-  .conv-top { display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.2rem; }
-  .conv-name { font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--blanco); }
-  .conv-time { font-size:.65rem;color:var(--gris2);flex-shrink:0;margin-left:.5rem; }
-  .conv-preview { font-size:.75rem;color:var(--gris);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:.2rem; }
-  .conv-context { font-size:.65rem;color:var(--gris2);display:flex;align-items:center;gap:.3rem; }
-  .conv-unread-dot { position:absolute;top:1.2rem;right:1.2rem;width:7px;height:7px;background:var(--neon);border-radius:50%; }
-
-  /* ═══ PANEL DERECHO — conversación ═══ */
-  .chat-panel {
-    display:flex;
-    flex-direction:column;
-    overflow:hidden;
-  }
-
-  /* HEADER DEL CHAT */
-  .chat-header {
-    padding:1rem 1.8rem;
-    border-bottom:1px solid #1c1c1c;
-    display:flex;
-    align-items:center;
-    gap:1rem;
-    flex-shrink:0;
-    background:var(--negro);
-  }
-  .chat-header-avatar {
-    width:38px;height:38px;border-radius:50%;
-    display:flex;align-items:center;justify-content:center;
-    font-family:var(--font-display);font-size:.8rem;
-    flex-shrink:0;position:relative;
-  }
-  .chat-online { position:absolute;bottom:1px;right:1px;width:9px;height:9px;background:#4caf50;border-radius:50%;border:2px solid var(--negro); }
-  .chat-header-info { flex:1; }
-  .chat-header-name { font-weight:500;font-size:.92rem;margin-bottom:.1rem; }
-  .chat-header-meta { font-size:.72rem;color:var(--gris); }
-  .chat-header-actions { display:flex;gap:.6rem; }
-  .chat-action-btn {
-    background:transparent;border:1px solid var(--gris3);color:var(--gris);
-    padding:.38rem .85rem;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;
-    cursor:none;transition:all .2s;font-family:var(--font-body);text-decoration:none;display:inline-block;
-  }
-  .chat-action-btn:hover { border-color:var(--blanco);color:var(--blanco); }
-
-  /* CONTEXTO DEL ANUNCIO */
-  .chat-context-bar {
-    padding:.65rem 1.8rem;
-    background:rgba(212,245,60,.03);
-    border-bottom:1px solid rgba(212,245,60,.1);
-    display:flex;align-items:center;gap:.8rem;
-    flex-shrink:0;
-  }
-  .chat-context-label { font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--neon);flex-shrink:0; }
-  .chat-context-text { font-size:.75rem;color:var(--gris);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
-  .chat-context-link { font-size:.68rem;color:var(--neon);text-decoration:none;flex-shrink:0;transition:opacity .2s;cursor:none; }
-  .chat-context-link:hover { opacity:.7; }
-
-  /* MENSAJES */
-  .chat-messages {
-    flex:1;
-    overflow-y:auto;
-    padding:1.5rem 1.8rem;
-    display:flex;
-    flex-direction:column;
-    gap:.8rem;
-  }
-  .chat-messages::-webkit-scrollbar { width:3px; }
-  .chat-messages::-webkit-scrollbar-thumb { background:var(--gris3); }
-
-  /* SEPARADOR DE FECHA */
-  .date-sep {
-    display:flex;align-items:center;gap:.8rem;
-    margin:.5rem 0;
-  }
-  .date-sep::before, .date-sep::after { content:'';flex:1;height:1px;background:#1c1c1c; }
-  .date-sep span { font-size:.65rem;color:var(--gris2);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap; }
-
-  /* BURBUJA DE MENSAJE */
-  .msg { display:flex;gap:.7rem;align-items:flex-end;max-width:70%; }
-  .msg.sent { align-self:flex-end;flex-direction:row-reverse; }
-  .msg.received { align-self:flex-start; }
-
-  .msg-avatar {
-    width:28px;height:28px;border-radius:50%;
-    display:flex;align-items:center;justify-content:center;
-    font-family:var(--font-display);font-size:.58rem;
-    flex-shrink:0;margin-bottom:.2rem;
-  }
-  .msg.sent .msg-avatar { display:none; }
-
-  .msg-bubble {
-    padding:.7rem 1rem;
-    font-size:.85rem;
-    line-height:1.55;
-    font-weight:300;
-    max-width:100%;
-  }
-  .msg.received .msg-bubble {
-    background:var(--negro2);
-    border:1px solid #1c1c1c;
-    color:var(--blanco);
-    border-radius:0 8px 8px 8px;
-  }
-  .msg.sent .msg-bubble {
-    background:rgba(212,245,60,.1);
-    border:1px solid rgba(212,245,60,.2);
-    color:var(--blanco);
-    border-radius:8px 0 8px 8px;
-  }
-  .msg-time { font-size:.62rem;color:var(--gris2);flex-shrink:0;margin-bottom:.35rem; }
-  .msg.sent .msg-time { text-align:right; }
-
-  .msg-wrap { display:flex;flex-direction:column; }
-  .msg.sent .msg-wrap { align-items:flex-end; }
-
-  /* MENSAJE DE SISTEMA */
-  .msg-system {
-    align-self:center;
-    font-size:.68rem;color:var(--gris2);
-    padding:.3rem .8rem;
-    border:1px solid #1c1c1c;
-    text-align:center;
-    margin:.3rem 0;
-  }
-
-  /* INPUT AREA */
-  .chat-input-area {
-    padding:1rem 1.8rem;
-    border-top:1px solid #1c1c1c;
-    background:var(--negro);
-    flex-shrink:0;
-  }
-  .chat-input-wrap {
-    display:flex;
-    gap:.7rem;
-    align-items:flex-end;
-  }
-  .chat-input-wrap textarea {
-    flex:1;
-    background:var(--negro2);
-    border:1px solid var(--gris3);
-    color:var(--blanco);
-    padding:.75rem 1rem;
-    font-family:var(--font-body);
-    font-size:.88rem;
-    font-weight:300;
-    outline:none;
-    resize:none;
-    min-height:44px;
-    max-height:120px;
-    transition:border-color .2s;
-    line-height:1.5;
-  }
-  .chat-input-wrap textarea:focus { border-color:var(--neon); }
-  .chat-input-wrap textarea::placeholder { color:var(--gris2); }
-  .chat-send-btn {
-    background:var(--neon);border:none;color:var(--negro);
-    width:44px;height:44px;
-    display:flex;align-items:center;justify-content:center;
-    font-size:1.1rem;cursor:none;transition:opacity .2s;
-    flex-shrink:0;
-  }
-  .chat-send-btn:hover { opacity:.85; }
-  .chat-input-hint { font-size:.65rem;color:var(--gris2);margin-top:.4rem; }
-
-  /* EMPTY STATE */
-  .chat-empty {
-    flex:1;
-    display:flex;flex-direction:column;
-    align-items:center;justify-content:center;
-    gap:.8rem;
-    color:var(--gris2);
-  }
-  .chat-empty-icon { font-size:3rem;opacity:.4; }
-  .chat-empty-title { font-family:var(--font-display);font-size:1.2rem;color:var(--gris);letter-spacing:.02em; }
-  .chat-empty-sub { font-size:.8rem;line-height:1.6;text-align:center;max-width:280px; }
-
-  /* AVATARES */
-  .av-a{background:#0d2010;color:var(--neon);}
-  .av-b{background:#2a0a05;color:#ff6b5b;}
-  .av-c{background:#050d2a;color:#5b9fff;}
-  .av-d{background:#1a0d2a;color:#c45bff;}
-  .av-e{background:#2a1a05;color:#ffaa5b;}
-  .av-f{background:#0d1a2a;color:#5bd4ff;}
-  /* NAV DROPDOWN */
+  .btn-ghost { background:transparent;border:1px solid var(--gris2);color:var(--blanco);padding:.48rem 1rem;font-family:var(--font-body);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;cursor:none;transition:border-color .2s;text-decoration:none;display:inline-block; }
+  .btn-ghost:hover { border-color:var(--blanco); }
+  .btn-neon { background:var(--neon);border:none;color:var(--negro);padding:.48rem 1rem;font-family:var(--font-body);font-weight:500;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;cursor:none;transition:opacity .2s;text-decoration:none;display:inline-block; }
+  .btn-neon:hover { opacity:.85; }
   .nav-user { position:relative; }
   .nav-avatar-wrap { display:flex;align-items:center;gap:.5rem;cursor:none;padding:.3rem .6rem;border:1px solid var(--gris3);transition:border-color .2s;user-select:none; }
   .nav-avatar-wrap:hover { border-color:var(--gris2); }
   .nav-avatar-circle { width:28px;height:28px;border-radius:50%;background:#0d2010;color:var(--neon);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.62rem;flex-shrink:0; }
-  .nav-avatar-name { font-size:.78rem;color:var(--blanco); }
+  .nav-avatar-name { font-size:.78rem;color:var(--blanco);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
   .nav-avatar-chevron { font-size:.6rem;color:var(--gris);transition:transform .2s; }
   .nav-avatar-wrap.open .nav-avatar-chevron { transform:rotate(180deg); }
-  .nav-dropdown { position:absolute;top:calc(100% + 8px);right:0;background:var(--negro2);border:1px solid #2a2a2a;min-width:200px;display:none;flex-direction:column;z-index:300; }
+  .nav-dropdown { position:absolute;top:calc(100% + 8px);right:0;background:var(--negro2);border:1px solid #2a2a2a;min-width:210px;display:none;flex-direction:column;z-index:300; }
   .nav-dropdown.open { display:flex; }
   .nav-dropdown-item { display:flex;align-items:center;gap:.6rem;padding:.75rem 1.1rem;color:var(--gris);text-decoration:none;font-size:.82rem;transition:all .15s;background:transparent;border:none;font-family:var(--font-body);cursor:none;text-align:left;width:100%; }
   .nav-dropdown-item:hover { background:rgba(255,255,255,.04);color:var(--blanco); }
   .nav-dropdown-divider { height:1px;background:#1c1c1c;margin:.3rem 0; }
   .nav-logout:hover { color:var(--rojo) !important; }
   .nav-badge { background:var(--neon);color:var(--negro);font-size:.62rem;font-weight:700;padding:.15rem .45rem;margin-left:.5rem;border-radius:2px;min-width:1.2rem;text-align:center;display:inline-block; }
-  /* NAV LINKS FIX */
-  .nav-links { list-style:none !important; display:flex !important; gap:2rem !important; padding:0 !important; margin:0 !important; }
-  .nav-links li { list-style:none !important; }
-  .nav-link { color:var(--gris);text-decoration:none;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;transition:color .2s; }
-  .nav-link:hover { color:var(--blanco); }
-  .nav-link.active { color:var(--neon); }
-  /* NAV AVATAR NAME — truncate long usernames */
-  .nav-avatar-name { font-size:.78rem;color:var(--blanco);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
-  /* NAV LINKS CLICKABLE FIX */
-  .nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap { pointer-events:auto !important; }
-  nav a, nav button { pointer-events:auto !important; }
+  .nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap, nav a, nav button { pointer-events:auto !important; }
 
-  /* ── BOTTOM NAV MOBILE ── */
+  .mensajes-layout { display:grid;grid-template-columns:330px 1fr;height:calc(100vh - 56px);margin-top:56px; }
+  .conv-panel { border-right:1px solid #1c1c1c;display:flex;flex-direction:column;background:var(--negro2);overflow:hidden; }
+  .conv-header { padding:1rem 1.3rem;border-bottom:1px solid #1c1c1c;display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-shrink:0; }
+  .conv-header-title { font-family:var(--font-display);font-size:1.05rem;letter-spacing:.02em;line-height:1; }
+  .conv-header-sub { font-size:.68rem;color:var(--gris);margin-top:.28rem;line-height:1.4; }
+  .conv-count { display:none;font-size:.66rem;color:var(--neon);background:rgba(212,245,60,.1);border:1px solid rgba(212,245,60,.2);padding:.16rem .5rem;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap; }
+  .conv-tools { padding:.85rem 1.3rem;border-bottom:1px solid #1c1c1c;display:flex;flex-direction:column;gap:.65rem;flex-shrink:0; }
+  .conv-search input { width:100%;background:var(--negro);border:1px solid var(--gris3);color:var(--blanco);padding:.62rem .9rem;font-family:var(--font-body);font-size:.84rem;font-weight:300;outline:none;transition:border-color .2s; }
+  .conv-search input:focus { border-color:var(--neon); }
+  .conv-search input::placeholder { color:var(--gris2); }
+  .conv-tabs { display:flex;border:1px solid #1c1c1c; }
+  .conv-tab { flex:1;background:transparent;border:0;border-right:1px solid #1c1c1c;color:var(--gris);padding:.45rem .3rem;font-family:var(--font-body);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;cursor:none;transition:all .15s; }
+  .conv-tab:last-child { border-right:0; }
+  .conv-tab.active { background:var(--neon);color:var(--negro); }
+  .conv-tab:hover:not(.active) { color:var(--blanco);background:rgba(255,255,255,.03); }
+  .conv-list { flex:1;overflow-y:auto; }
+  .conv-list::-webkit-scrollbar, .chat-messages::-webkit-scrollbar { width:3px; }
+  .conv-list::-webkit-scrollbar-thumb, .chat-messages::-webkit-scrollbar-thumb { background:var(--gris3); }
+  .conv-item { display:flex;align-items:flex-start;gap:.85rem;padding:1rem 1.2rem;border-bottom:1px solid #161616;cursor:none;transition:background .15s;position:relative; }
+  .conv-item:hover { background:rgba(255,255,255,.025); }
+  .conv-item.active { background:rgba(212,245,60,.045);border-left:2px solid var(--neon);padding-left:calc(1.2rem - 2px); }
+  .conv-item.unread .conv-preview, .conv-item.unread .conv-name { color:var(--blanco);font-weight:500; }
+  .conv-avatar, .chat-header-avatar, .msg-avatar { border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);flex-shrink:0;overflow:hidden;background:#0d2010;color:var(--neon); }
+  .conv-avatar { width:40px;height:40px;font-size:.82rem;position:relative; }
+  .conv-avatar img, .chat-header-avatar img, .msg-avatar img { width:100%;height:100%;object-fit:cover;display:block; }
+  .conv-body { flex:1;min-width:0; }
+  .conv-top { display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.22rem;gap:.5rem; }
+  .conv-name { font-size:.86rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--blanco); }
+  .conv-time { font-size:.64rem;color:var(--gris2);flex-shrink:0; }
+  .conv-preview { font-size:.75rem;color:var(--gris);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:.25rem;line-height:1.35; }
+  .conv-context { font-size:.65rem;color:var(--gris2);display:flex;align-items:center;gap:.3rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+  .conv-unread-dot { position:absolute;top:1.15rem;right:1rem;width:8px;height:8px;background:var(--neon);border-radius:50%; }
+  .conv-empty { padding:2rem 1.3rem;text-align:center;color:var(--gris);font-size:.82rem;line-height:1.7; }
+  .conv-empty a { color:var(--neon);text-decoration:none; }
+
+  .chat-panel { display:flex;flex-direction:column;overflow:hidden;background:var(--negro); }
+  .mobile-chat-back { display:none; }
+  .chat-header { padding:1rem 1.8rem;border-bottom:1px solid #1c1c1c;display:none;align-items:center;gap:1rem;flex-shrink:0;background:var(--negro); }
+  .chat-header-avatar { width:42px;height:42px;font-size:.86rem; }
+  .chat-header-info { flex:1;min-width:0; }
+  .chat-header-name { font-weight:500;font-size:.95rem;margin-bottom:.12rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+  .chat-header-meta { font-size:.72rem;color:var(--gris);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+  .chat-header-actions { display:flex;gap:.6rem; }
+  .chat-action-btn { background:transparent;border:1px solid var(--gris3);color:var(--gris);padding:.42rem .85rem;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;cursor:none;transition:all .2s;font-family:var(--font-body);text-decoration:none;display:inline-block;white-space:nowrap; }
+  .chat-action-btn:hover { border-color:var(--blanco);color:var(--blanco); }
+  .chat-context-bar { padding:.65rem 1.8rem;background:rgba(212,245,60,.035);border-bottom:1px solid rgba(212,245,60,.1);display:none;align-items:center;gap:.8rem;flex-shrink:0; }
+  .chat-context-label { font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--neon);flex-shrink:0; }
+  .chat-context-text { font-size:.75rem;color:var(--gris);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+  .chat-context-link { font-size:.68rem;color:var(--neon);text-decoration:none;flex-shrink:0;transition:opacity .2s;cursor:none; }
+  .chat-context-link:hover { opacity:.7; }
+  .chat-messages { flex:1;overflow-y:auto;padding:1.5rem 1.8rem;display:flex;flex-direction:column;gap:.8rem; }
+  .date-sep { display:flex;align-items:center;gap:.8rem;margin:.5rem 0; }
+  .date-sep::before, .date-sep::after { content:'';flex:1;height:1px;background:#1c1c1c; }
+  .date-sep span { font-size:.65rem;color:var(--gris2);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap; }
+  .msg { display:flex;gap:.7rem;align-items:flex-end;max-width:72%; }
+  .msg.sent { align-self:flex-end;flex-direction:row-reverse; }
+  .msg.received { align-self:flex-start; }
+  .msg-avatar { width:28px;height:28px;font-size:.58rem;margin-bottom:.2rem; }
+  .msg.sent .msg-avatar { display:none; }
+  .msg-wrap { display:flex;flex-direction:column;min-width:0; }
+  .msg.sent .msg-wrap { align-items:flex-end; }
+  .msg-bubble { padding:.74rem 1rem;font-size:.86rem;line-height:1.56;font-weight:300;max-width:100%;word-break:break-word; }
+  .msg.received .msg-bubble { background:var(--negro2);border:1px solid #1c1c1c;color:var(--blanco);border-radius:0 8px 8px 8px; }
+  .msg.sent .msg-bubble { background:rgba(212,245,60,.1);border:1px solid rgba(212,245,60,.2);color:var(--blanco);border-radius:8px 0 8px 8px; }
+  .msg-time { font-size:.62rem;color:var(--gris2);flex-shrink:0;margin-top:.25rem; }
+  .msg-system { align-self:center;font-size:.68rem;color:var(--gris2);padding:.35rem .8rem;border:1px solid #1c1c1c;text-align:center;margin:.3rem 0; }
+  .chat-empty { flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.8rem;color:var(--gris2);text-align:center; }
+  .chat-empty-icon { font-size:3rem;opacity:.4; }
+  .chat-empty-title { font-family:var(--font-display);font-size:1.2rem;color:var(--gris);letter-spacing:.02em; }
+  .chat-empty-sub { font-size:.82rem;line-height:1.7;max-width:320px; }
+  .chat-empty a { color:var(--neon);text-decoration:none; }
+  .chat-input-area { padding:1rem 1.8rem;border-top:1px solid #1c1c1c;background:var(--negro);flex-shrink:0;display:none; }
+  .chat-input-wrap { display:flex;gap:.7rem;align-items:flex-end; }
+  .chat-input-wrap textarea { flex:1;background:var(--negro2);border:1px solid var(--gris3);color:var(--blanco);padding:.75rem 1rem;font-family:var(--font-body);font-size:.88rem;font-weight:300;outline:none;resize:none;min-height:44px;max-height:120px;transition:border-color .2s;line-height:1.5; }
+  .chat-input-wrap textarea:focus { border-color:var(--neon); }
+  .chat-input-wrap textarea::placeholder { color:var(--gris2); }
+  .chat-send-btn { background:var(--neon);border:none;color:var(--negro);width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;cursor:none;transition:opacity .2s;flex-shrink:0;font-family:var(--font-display); }
+  .chat-send-btn:hover { opacity:.85; }
+  .chat-send-btn:disabled { opacity:.45; cursor:not-allowed; }
+  .chat-input-hint { font-size:.65rem;color:var(--gris2);margin-top:.4rem;display:flex;justify-content:space-between;gap:1rem; }
+  .send-error { color:var(--rojo); }
+
+  .quick-replies { display:none; flex-wrap:wrap; gap:.45rem; margin-bottom:.75rem; }
+  .quick-replies.visible { display:flex; }
+  .quick-reply-label { width:100%; font-size:.62rem; color:var(--gris2); letter-spacing:.12em; text-transform:uppercase; margin-bottom:.05rem; }
+  .quick-reply { background:#0d0d0d; border:1px solid var(--gris3); color:var(--gris); padding:.38rem .7rem; font-size:.68rem; letter-spacing:.04em; cursor:none; transition:all .15s; font-family:var(--font-body); }
+  .quick-reply:hover { border-color:var(--neon); color:var(--neon); background:rgba(212,245,60,.04); }
+  .chat-toolbar-pill { font-size:.62rem; color:var(--gris2); border:1px solid #242424; padding:.28rem .6rem; text-transform:uppercase; letter-spacing:.08em; white-space:nowrap; }
+  .chat-action-btn.soft { border-color:#242424; color:var(--gris2); }
+  .chat-action-btn.soft:hover { color:var(--neon); border-color:rgba(212,245,60,.35); }
+  .chat-input-hint .char-count { color:var(--gris2); white-space:nowrap; }
+  .chat-input-hint .char-count.warning { color:var(--rojo); }
+  .composer-disabled-note { display:none; font-size:.7rem; color:var(--gris2); margin-bottom:.6rem; line-height:1.5; }
+  .composer-disabled-note.visible { display:block; }
+  .msg-bubble { word-break:break-word; }
+
   .mobile-bottom-nav { display:none; }
-
-  /* ── PERFIL PANEL MOBILE ── */
-  .mbn-overlay {
-    display:none; position:fixed; inset:0; background:rgba(0,0,0,.6);
-    z-index:490; opacity:0; transition:opacity .2s;
-  }
+  .mbn-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:490; opacity:0; transition:opacity .2s; }
   .mbn-overlay.open { display:block; opacity:1; }
-  .mbn-panel {
-    position:fixed; bottom:-100%; left:0; right:0;
-    background:#111; border-top:1px solid #2a2a2a;
-    z-index:495; padding:1.5rem 1.25rem 4.5rem;
-    border-radius:12px 12px 0 0;
-    transition:bottom .25s cubic-bezier(.4,0,.2,1);
-  }
+  .mbn-panel { position:fixed; bottom:-100%; left:0; right:0; background:#111; border-top:1px solid #2a2a2a; z-index:495; padding:1.5rem 1.25rem 4.5rem; border-radius:12px 12px 0 0; transition:bottom .25s cubic-bezier(.4,0,.2,1); }
   .mbn-panel.open { bottom:0; }
-  .mbn-panel-title {
-    font-size:.65rem; letter-spacing:.1em; text-transform:uppercase;
-    color:#555; margin-bottom:1rem; font-family:'Archivo',sans-serif;
-  }
-  .mbn-panel-item {
-    display:flex; align-items:center; gap:.9rem;
-    padding:.9rem 0; border-bottom:1px solid #1c1c1c;
-    text-decoration:none; color:#f2ede4;
-    font-family:'Archivo',sans-serif; font-size:.95rem;
-  }
+  .mbn-panel-title { font-size:.65rem; letter-spacing:.1em; text-transform:uppercase; color:#555; margin-bottom:1rem; }
+  .mbn-panel-item { display:flex; align-items:center; gap:.9rem; padding:.9rem 0; border-bottom:1px solid #1c1c1c; text-decoration:none; color:#f2ede4; font-size:.95rem; }
   .mbn-panel-item:last-child { border-bottom:none; }
   .mbn-panel-item .mbn-pi-icon { font-size:1.1rem; width:1.5rem; text-align:center; }
   .mbn-panel-item.danger { color:#ff5555; }
 
   @media (max-width:900px) {
-    .mobile-bottom-nav {
-      display:flex; position:fixed; bottom:0; left:0; right:0;
-      background:#0f0f0f; border-top:1px solid #2a2a2a;
-      z-index:500; height:54px;
-    }
-    .mbn-item {
-      flex:1; display:flex; flex-direction:column; align-items:center;
-      justify-content:center; color:#666; text-decoration:none;
-      font-size:.55rem; letter-spacing:.05em; text-transform:uppercase;
-      font-family:'Archivo',sans-serif; gap:.18rem; transition:color .15s;
-    }
-    .mbn-item.active { color:#d4f53c; }
-    .mbn-icon { font-size:1.1rem; line-height:1; }
-    body { padding-bottom:54px !important; }
-  }
-
-  @media (max-width:900px) {
     .cursor, .cursor-ring { display:none !important; }
     * { cursor:auto !important; }
-    nav { padding:.6rem 1rem !important; }
-    .nav-links, .nav-center { display:none !important; }
+    body { height:100vh; overflow:hidden; padding-bottom:54px !important; }
+    nav { height:56px;padding:.6rem 1rem !important; }
+    .nav-links { display:none !important; }
     .btn-ghost { display:none !important; }
     .btn-neon { padding:.4rem .75rem !important; font-size:.72rem !important; }
-  }
-
-  @media (max-width:900px) {
-    body { height:100vh; overflow:hidden; padding-bottom:54px !important; }
-    .mensajes-layout { grid-template-columns:1fr !important; }
-    .conv-panel { height:calc(100vh - 56px - 54px) !important; width:100% !important; }
-    .chat-panel {
-      position:fixed !important;
-      top:56px; left:0; right:0; bottom:54px;
-      z-index:300 !important;
-      display:none !important;
-      flex-direction:column !important;
-      background:var(--negro) !important;
-    }
+    .nav-dropdown { display:none !important; }
+    .mobile-bottom-nav { display:flex; position:fixed; bottom:0; left:0; right:0; background:#0f0f0f; border-top:1px solid #2a2a2a; z-index:500; height:54px; }
+    .mbn-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#666; text-decoration:none; font-size:.55rem; letter-spacing:.05em; text-transform:uppercase; font-family:var(--font-body); gap:.18rem; transition:color .15s; }
+    .mbn-item.active { color:var(--neon); }
+    .mbn-icon { font-size:1.1rem; line-height:1; }
+    .mensajes-layout { grid-template-columns:1fr !important;height:calc(100vh - 56px - 54px); }
+    .conv-panel { height:calc(100vh - 56px - 54px) !important;width:100% !important; }
+    .conv-header { padding:.9rem 1rem; }
+    .conv-tools { padding:.75rem 1rem; }
+    .conv-item { padding:.9rem 1rem; }
+    .chat-panel { position:fixed !important;top:56px;left:0;right:0;bottom:54px;z-index:300 !important;display:none !important;flex-direction:column !important;background:var(--negro) !important; }
     .chat-panel.mobile-visible { display:flex !important; }
-    .mobile-chat-back {
-      display:flex !important; align-items:center; gap:.5rem;
-      padding:.65rem 1.2rem; background:rgba(8,8,8,.98);
-      border-bottom:1px solid #1c1c1c;
-      color:var(--neon); font-family:var(--font-body);
-      font-size:.82rem; cursor:auto; width:100%;
-      text-align:left; border:none; flex-shrink:0;
-    }
-    .chat-messages { padding:1rem !important; }
-    .chat-input-area { padding:.65rem 1rem !important; flex-shrink:0; }
+    .mobile-chat-back { display:flex !important; align-items:center; gap:.5rem;padding:.65rem 1rem; background:rgba(8,8,8,.98);border-bottom:1px solid #1c1c1c;color:var(--neon);font-family:var(--font-body);font-size:.82rem;cursor:auto;width:100%;text-align:left;border:none;flex-shrink:0; }
     .chat-header { padding:.75rem 1rem !important; }
-    .chat-header-actions .chat-action-btn:not(:first-child) { display:none; }
-    .chat-context-bar { padding:.4rem 1rem !important; }
+    .chat-context-bar { padding:.45rem 1rem !important; }
+    .chat-messages { padding:1rem !important; }
+    .chat-input-area { padding:.65rem 1rem !important; }
+    .quick-replies { overflow-x:auto; flex-wrap:nowrap; padding-bottom:.2rem; }
+    .quick-reply-label { flex:0 0 100%; }
     .msg { max-width:88% !important; }
+    .chat-header-actions .chat-action-btn:not(:first-child) { display:none; }
+    .chat-input-hint { font-size:.6rem; }
   }
-  .mobile-chat-back { display:none; }
-
-
-  /* ── MOBILE: dropdown del avatar accesible ── */
-  @media (max-width: 900px) {
-    .nav-avatar-wrap { cursor: auto !important; -webkit-tap-highlight-color: transparent; }
-    .nav-dropdown { z-index: 450 !important; min-width: 220px !important; }
-    .nav-dropdown.open { display: flex !important; }
-    .nav-dropdown-item { padding: .85rem 1.2rem !important; font-size: .88rem !important; }
-  }
-
-
-  /* ── MOBILE: avatar abre el panel del bottom nav ── */
-  @media (max-width: 900px) {
-    .nav-dropdown { display: none !important; }
-  }
-
 </style>
-  <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#0a0a0a">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="buscARTE">
-  <link rel="apple-touch-icon" href="/icons/icon-192.svg">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="buscARTE">
+<link rel="apple-touch-icon" href="/icons/icon-192.svg">
 </head>
 <body>
-
 <div class="cursor" id="cursor"></div>
 <div class="cursor-ring" id="cursor-ring"></div>
 
@@ -437,7 +212,7 @@
       <a href="buscARTE_registro.html" class="btn-neon">Registrarse</a>
     </div>
     <div class="nav-user" id="nav-user" style="display:none">
-      <div class="nav-avatar-wrap" onclick="toggleUserMenu()" id="nav-avatar-btn">
+      <div class="nav-avatar-wrap" onclick="toggleUserMenu(event)" id="nav-avatar-btn">
         <div class="nav-avatar-circle" id="nav-avatar-circle">?</div>
         <span class="nav-avatar-name" id="nav-avatar-name">Mi perfil</span>
         <span class="nav-avatar-chevron">▾</span>
@@ -457,490 +232,549 @@
 </nav>
 
 <div class="mensajes-layout">
-
-  <!-- ═══ LISTA DE CONVERSACIONES ═══ -->
-  <div class="conv-panel">
+  <aside class="conv-panel">
     <div class="conv-header">
-      <div class="conv-header-title">Mensajes</div>
-      <span class="conv-count" id="conv-count" style="display:none">0 nuevos</span>
+      <div>
+        <div class="conv-header-title">Mensajes</div>
+        <div class="conv-header-sub" id="conv-subtitle">Conversaciones de tu cuenta</div>
+      </div>
+      <span class="conv-count" id="conv-count"></span>
     </div>
-    <div class="conv-search">
-      <input type="text" placeholder="Buscar conversación...">
+    <div class="conv-tools">
+      <div class="conv-search">
+        <input type="text" id="conv-search-input" placeholder="Buscar por nombre o mensaje..." oninput="renderConversaciones()">
+      </div>
+      <div class="conv-tabs">
+        <button class="conv-tab active" id="tab-todas" onclick="setConvFilter('todas')">Todas</button>
+        <button class="conv-tab" id="tab-nuevas" onclick="setConvFilter('nuevas')">Nuevas</button>
+      </div>
     </div>
     <div class="conv-list" id="conv-list-container">
-      <!-- Cargado dinámicamente -->
-      <div style="padding:2rem 1.5rem;text-align:center;color:var(--gris);font-size:.82rem" id="conv-loading">Cargando...</div>
+      <div class="conv-empty" id="conv-loading">Cargando...</div>
     </div>
-  </div>
+  </aside>
 
-  <!-- ═══ PANEL DE CHAT ═══ -->
-  <div class="chat-panel" id="chat-panel">
-
-    <!-- HEADER -->
-    <div class="chat-header" id="chat-header" style="display:none">
-      <div class="chat-header-avatar" id="chat-header-avatar" style="width:38px;height:38px;border-radius:50%;background:#0d2010;color:var(--neon);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.8rem;flex-shrink:0">?</div>
+  <section class="chat-panel" id="chat-panel">
+    <button class="mobile-chat-back" onclick="closeMobileChat()">← Conversaciones</button>
+    <header class="chat-header" id="chat-header">
+      <div class="chat-header-avatar" id="chat-header-avatar">?</div>
       <div class="chat-header-info">
         <div class="chat-header-name" id="chat-header-name">—</div>
         <div class="chat-header-meta" id="chat-header-meta">—</div>
       </div>
       <div class="chat-header-actions">
+        <span class="chat-toolbar-pill" id="chat-status-pill">Activo</span>
+        <button type="button" class="chat-action-btn soft" onclick="cargarMensajes(true)">Actualizar</button>
         <a href="#" id="chat-ver-perfil" class="chat-action-btn">Ver perfil →</a>
       </div>
-    </div>
-    <div class="chat-context-bar" id="chat-context-bar" style="display:none">
-      <span class="chat-context-label">✦ Anuncio</span>
+    </header>
+    <div class="chat-context-bar" id="chat-context-bar">
+      <span class="chat-context-label" id="chat-context-label">✦ Contexto</span>
       <span class="chat-context-text" id="chat-context-text">—</span>
+      <a href="#" class="chat-context-link" id="chat-context-link" style="display:none">Ver →</a>
     </div>
-
-    <!-- MENSAJES -->
     <div class="chat-messages" id="chat-messages">
       <div class="chat-empty">
         <span class="chat-empty-icon">💬</span>
         <div class="chat-empty-title">Seleccioná una conversación</div>
-        <p class="chat-empty-sub">Tus mensajes van a aparecer acá.</p>
+        <p class="chat-empty-sub">Tus mensajes van a aparecer acá. Elegí una conversación de la izquierda para seguir hablando.</p><div style="display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center"><a href="buscARTE_busqueda.html" class="chat-action-btn">Buscar músicos</a><a href="buscARTE_anuncios.html" class="chat-action-btn">Ver anuncios</a></div>
       </div>
     </div>
-
-    <!-- INPUT -->
-    <div class="chat-input-area">
+    <div class="chat-input-area" id="chat-input-area">
+      <div class="quick-replies" id="quick-replies">
+        <div class="quick-reply-label">Respuestas rápidas</div>
+        <button type="button" class="quick-reply" onclick="insertQuickReply('Hola, vi tu perfil y me interesa conectar. ¿Tenés disponibilidad?')">Disponibilidad</button>
+        <button type="button" class="quick-reply" onclick="insertQuickReply('Buenas, ¿te copa coordinar una prueba o ensayo esta semana?')">Coordinar ensayo</button>
+        <button type="button" class="quick-reply" onclick="insertQuickReply('Hola, te escribo por el anuncio. ¿Sigue vigente?')">Anuncio vigente</button>
+        <button type="button" class="quick-reply" onclick="insertQuickReply('Genial, pasame más data y vemos cómo seguimos.')">Pedir data</button>
+      </div>
+      <div class="composer-disabled-note" id="composer-note">Seleccioná una conversación para escribir.</div>
       <div class="chat-input-wrap">
-        <textarea
-          id="chat-input"
-          placeholder="Escribí un mensaje..."
-          rows="1"
-          onkeydown="handleKey(event)"
-          oninput="autoResize(this)"
-        ></textarea>
-        <button class="chat-send-btn" onclick="sendMessage()">↑</button>
+        <textarea id="chat-input" placeholder="Escribí un mensaje..." rows="1" maxlength="1000" onkeydown="handleKey(event)" oninput="autoResize(this); updateComposerState()"></textarea>
+        <button class="chat-send-btn" id="chat-send-btn" onclick="sendMessage()" disabled>↑</button>
       </div>
-      <div class="chat-input-hint">Enter para enviar · Shift+Enter para nueva línea</div>
+      <div class="chat-input-hint">
+        <span>Enter para enviar · Shift+Enter para nueva línea</span>
+        <span><span class="char-count" id="chat-char-count">0/1000</span> <span class="send-error" id="send-error"></span></span>
+      </div>
     </div>
-
-  </div>
+  </section>
 </div>
 
-<script>
-  // PROTECCIÓN: redirigir si no está logueado
-  (function() {
-    try {
-      if (localStorage.getItem('ba_logged') !== '1') {
-        window.location.replace('index.html');
-      }
-    } catch(e) {}
-  })();
-  // CURSOR
-  window.addEventListener('DOMContentLoaded', function() {
-    const cursor=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
-    if (!cursor || !ring) return;
-    let mx=0,my=0,rx=0,ry=0;
-    document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
-    (function tick(){cursor.style.left=mx+'px';cursor.style.top=my+'px';rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(tick);})();
-  });
-
-  // SUPABASE
-  const SUPABASE_URL = 'https://xiaanchoanxmampegoay.supabase.co'
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68'
-
-  const headers = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }
-  const miUserId = localStorage.getItem('ba_user_id')
-  const miNombre = localStorage.getItem('ba_name') || 'Yo'
-
-  let convActiva = null
-  let pollingInterval = null
-
-  function getInitials(nombre) {
-    if (!nombre) return '?'
-    return nombre.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)
-  }
-  function timeAgo(iso) {
-    if (!iso) return ''
-    const d = new Date(iso), now = new Date()
-    const diff = Math.floor((now - d) / 60000)
-    if (diff < 1) return 'Ahora'
-    if (diff < 60) return `Hace ${diff} min`
-    if (diff < 1440) return `Hace ${Math.floor(diff/60)} hs`
-    return d.toLocaleDateString('es-AR', {day:'numeric', month:'short'})
-  }
-
-  // ── CARGAR CONVERSACIONES ──
-  async function cargarConversaciones() {
-    if (!miUserId) {
-      // Sin login mostramos demo
-      return
-    }
-    try {
-      const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/conversaciones?or=(user1_id.eq.${miUserId},user2_id.eq.${miUserId})&order=updated_at.desc`,
-        { headers }
-      )
-      const convs = await res.json()
-      const lista = document.getElementById('conv-list-container') || document.querySelector('.conv-list')
-      lista.innerHTML = ''
-
-      if (!convs.length) {
-        lista.innerHTML = `<div style="padding:2rem 1.5rem;text-align:center;color:var(--gris);font-size:.82rem;line-height:1.7">
-          Todavía no tenés conversaciones.<br>
-          <a href="buscARTE_busqueda.html" style="color:var(--neon);text-decoration:none">Buscá músicos →</a>
-        </div>`
-        document.getElementById('chat-messages').innerHTML = `
-          <div class="chat-empty">
-            <span class="chat-empty-icon">💬</span>
-            <div class="chat-empty-title">Sin mensajes</div>
-            <p class="chat-empty-sub">Cuando contactes a un músico o alguien te escriba, las conversaciones van a aparecer acá.</p>
-          </div>`
-        return
-      }
-
-      for (const conv of convs) {
-        const otroId = conv.user1_id == miUserId ? conv.user2_id : conv.user1_id
-        const perfilRes = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${otroId}&select=id,nombre,instrumento,ciudad`, { headers })
-        const [perfil] = await perfilRes.json()
-        if (!perfil) continue
-
-        const initials = getInitials(perfil.nombre)
-        const item = document.createElement('div')
-        item.className = 'conv-item'
-        item.dataset.convId = conv.id
-        item.dataset.otroId = otroId
-        item.dataset.otroNombre = perfil.nombre
-        item.dataset.otroMeta = `${perfil.instrumento||'Músico'} · ${perfil.ciudad||''}`
-        item.innerHTML = `
-          <div class="conv-avatar" style="background:#0d2010;color:var(--neon)">${initials}</div>
-          <div class="conv-body">
-            <div class="conv-top">
-              <span class="conv-name">${perfil.nombre}</span>
-              <span class="conv-time">${timeAgo(conv.updated_at)}</span>
-            </div>
-            <div class="conv-preview">${conv.ultimo_mensaje||'Nueva conversación'}</div>
-            <div class="conv-context">${conv.anuncio_id ? '📋 Anuncio' : '👤 Perfil directo'}</div>
-          </div>`
-        item.onclick = () => abrirConv(item)
-        lista.appendChild(item)
-      }
-    } catch(e) { console.error('Error cargando convs:', e) }
-  }
-
-  // ── ABRIR CONVERSACIÓN ──
-  async function abrirConv(item) {
-    document.querySelectorAll('.conv-item').forEach(i=>i.classList.remove('active'))
-    item.classList.add('active')
-
-    convActiva = {
-      id: item.dataset.convId,
-      otroId: item.dataset.otroId,
-      otroNombre: item.dataset.otroNombre,
-      otroMeta: item.dataset.otroMeta
-    }
-
-    const initials = getInitials(convActiva.otroNombre)
-    const chatHeader = document.getElementById('chat-header')
-    const chatCtxBar = document.getElementById('chat-context-bar')
-    if (chatHeader) chatHeader.style.display = 'flex'
-    if (chatCtxBar) chatCtxBar.style.display = 'flex'
-    document.getElementById('chat-header-avatar').textContent = initials
-    document.getElementById('chat-header-name').textContent = convActiva.otroNombre
-    document.getElementById('chat-header-meta').textContent = convActiva.otroMeta
-    const verPerfilLink = document.getElementById('chat-ver-perfil')
-    if (verPerfilLink) verPerfilLink.href = 'buscARTE_perfil_publico.html?id=' + convActiva.otroId
-
-    await cargarMensajes()
-    document.getElementById('chat-input').focus()
-
-    // Polling cada 5 seg para nuevos mensajes
-    if (pollingInterval) clearInterval(pollingInterval)
-    pollingInterval = setInterval(cargarMensajes, 5000)
-  }
-
-  // ── CARGAR MENSAJES ──
-  async function cargarMensajes() {
-    if (!convActiva) return
-    try {
-      // Filtrar mensajes SOLO de esta conversación (entre estos 2 usuarios)
-      const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/mensajes?or=(and(de_user_id.eq.${miUserId},para_user_id.eq.${convActiva.otroId}),and(de_user_id.eq.${convActiva.otroId},para_user_id.eq.${miUserId}))&order=created_at.asc`,
-        { headers }
-      )
-      const msgs = await res.json()
-      const container = document.getElementById('chat-messages')
-      const wasAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 50
-
-      container.innerHTML = '<div class="date-sep"><span>Hoy</span></div>'
-      msgs.forEach(m => {
-        const sent = m.de_user_id == miUserId
-        const initials = sent ? getInitials(miNombre) : getInitials(convActiva.otroNombre)
-        const time = new Date(m.created_at).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})
-        const el = document.createElement('div')
-        el.className = `msg ${sent ? 'sent' : 'received'}`
-        el.innerHTML = sent
-          ? `<div class="msg-wrap"><div class="msg-bubble">${m.contenido.replace(/\n/g,'<br>')}</div><div class="msg-time">${time}</div></div>`
-          : `<div class="msg-avatar" style="background:#0d2010;color:var(--neon)">${initials}</div><div class="msg-wrap"><div class="msg-bubble">${m.contenido.replace(/\n/g,'<br>')}</div><div class="msg-time">${time}</div></div>`
-        container.appendChild(el)
-      })
-      if (wasAtBottom) container.scrollTop = container.scrollHeight
-    } catch(e) { console.error('Error cargando mensajes:', e) }
-  }
-
-  // ── ENVIAR MENSAJE ──
-  async function sendMessage() {
-    const input = document.getElementById('chat-input')
-    const text = input.value.trim()
-    if (!text) return
-
-    // Si no hay sesión real, modo demo
-    if (!miUserId || !convActiva) {
-      const msgs = document.getElementById('chat-messages')
-      const now = new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})
-      const el = document.createElement('div')
-      el.className = 'msg sent'
-      el.innerHTML = `<div class="msg-wrap"><div class="msg-bubble">${text.replace(/\n/g,'<br>')}</div><div class="msg-time">${now}</div></div>`
-      msgs.appendChild(el)
-      msgs.scrollTop = msgs.scrollHeight
-      input.value = ''
-      input.style.height = 'auto'
-      return
-    }
-
-    input.value = ''
-    input.style.height = 'auto'
-
-    try {
-      // Guardar mensaje
-      await fetch(`${SUPABASE_URL}/rest/v1/mensajes`, {
-        method: 'POST',
-        headers: { ...headers, 'Prefer': 'return=minimal' },
-        body: JSON.stringify({
-          de_user_id: parseInt(miUserId),
-          para_user_id: parseInt(convActiva.otroId),
-          contenido: text
-        })
-      })
-
-      // Actualizar último mensaje en conversación
-      await fetch(`${SUPABASE_URL}/rest/v1/conversaciones?id=eq.${convActiva.id}`, {
-        method: 'PATCH',
-        headers: { ...headers, 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ ultimo_mensaje: text, updated_at: new Date().toISOString() })
-      })
-
-      // Notificación por email al destinatario
-      try {
-        const emailRes = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${convActiva.otroId}&select=email,nombre`, {
-          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-        })
-        const [destinatario] = await emailRes.json()
-        if (destinatario?.email) {
-          fetch('/.netlify/functions/send-email', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              tipo: 'mensaje',
-              destinatario: destinatario.email,
-              datos: {
-                remitente: localStorage.getItem('ba_name') || 'Un músico',
-                preview: text.length > 100 ? text.slice(0, 100) + '...' : text
-              }
-            })
-          }).catch(e => console.error('Error enviando notificación:', e))
-        }
-      } catch(e) { console.error('Error obteniendo email destinatario:', e) }
-
-      await cargarMensajes()
-    } catch(e) { console.error('Error enviando:', e) }
-  }
-
-  function handleKey(e) {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() }
-  }
-  function autoResize(el) {
-    el.style.height = 'auto'
-    el.style.height = Math.min(el.scrollHeight, 120) + 'px'
-  }
-
-  // Cargar al iniciar
-  if (!miUserId) {
-    // No logueado — mostrar aviso
-    document.querySelector('.conv-list').innerHTML = `
-      <div style="padding:2rem 1.5rem;text-align:center;color:var(--gris);font-size:.82rem;line-height:1.7">
-        Ingresá para ver tus mensajes.<br>
-        <a href="buscARTE_login.html" style="color:var(--neon);text-decoration:none">Ingresar →</a>
-      </div>`
-    document.getElementById('chat-messages').innerHTML = `
-      <div class="chat-empty">
-        <span class="chat-empty-icon">💬</span>
-        <div class="chat-empty-title">Mensajes</div>
-        <p class="chat-empty-sub">Registrate para enviar y recibir mensajes de otros músicos.</p>
-      </div>`
-  } else {
-    cargarConversaciones()
-  }
-  document.getElementById('chat-messages').scrollTop = 99999;
-
-
-  async function cargarBadgeMensajes(uid) {
-    const badge = document.getElementById('nav-msg-badge');
-    if (!badge || !uid) return;
-    try {
-      const lastSeen = localStorage.getItem('ba_msg_last_seen') || new Date().toISOString();
-      const res = await fetch(
-        `https://xiaanchoanxmampegoay.supabase.co/rest/v1/mensajes?para_user_id=eq.${uid}&created_at=gt.${lastSeen}&select=id&limit=99`,
-        { headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68', 'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68` } }
-      );
-      const msgs = await res.json();
-      const count = Array.isArray(msgs) ? msgs.length : 0;
-      if (count > 0) {
-        badge.textContent = count > 99 ? '99+' : count;
-        badge.style.display = 'inline';
-      } else {
-        badge.style.display = 'none';
-      }
-    } catch(e) { if(badge) badge.style.display = 'none'; }
-  }
-
-  // NAV SESSION
-  (function initNav(){
-    const l=localStorage.getItem('ba_logged')==='1';
-    const n=localStorage.getItem('ba_name')||'Mi perfil';
-    const uid=localStorage.getItem('ba_user_id')||'';
-    const i=n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-    if(l){
-      const g=document.getElementById('nav-guest');
-      const u=document.getElementById('nav-user');
-      if(g)g.style.display='none';
-      if(u)u.style.display='flex';
-      const c=document.getElementById('nav-avatar-circle');
-      if(c)c.textContent=i;
-      const nm=document.getElementById('nav-avatar-name');
-      if(nm)nm.textContent=n.split(' ')[0];
-      cargarBadgeMensajes(uid);
-      // Fix Mi perfil link with real user ID
-      const miPerfilLink=document.querySelector('.nav-dropdown-item[href*="perfil_publico"]');
-      if(miPerfilLink && uid) miPerfilLink.href='buscARTE_perfil_publico.html?id='+uid;
-    }
-  })();
-  function toggleUserMenu(e){if(e)e.stopPropagation();const w=document.getElementById('nav-avatar-btn');const d=document.getElementById('nav-dropdown');if(w)w.classList.toggle('open');if(d)d.classList.toggle('open');}
-  // Close dropdown when tapping outside
-  document.addEventListener('click', function(e){
-    if(!e.target.closest('#nav-avatar-btn') && !e.target.closest('#nav-dropdown')){
-      const d=document.getElementById('nav-dropdown');const w=document.getElementById('nav-avatar-btn');
-      if(d)d.classList.remove('open');if(w)w.classList.remove('open');
-    }
-  });
-  document.addEventListener('click',e=>{if(!e.target.closest('#nav-user')){document.getElementById('nav-avatar-btn')?.classList.remove('open');document.getElementById('nav-dropdown')?.classList.remove('open');}});
-  function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');window.location.href='index.html';}
-
-  // ── MOBILE CHAT TOGGLE ──
-  (function initMobileChat() {
-    if (window.innerWidth > 900) return;
-    var chatPanel = document.getElementById('chat-panel');
-    if (!chatPanel) return;
-    // Botón volver
-    var backBtn = document.createElement('button');
-    backBtn.className = 'mobile-chat-back';
-    backBtn.innerHTML = '← Conversaciones';
-    backBtn.onclick = function() {
-      chatPanel.classList.remove('mobile-visible');
-    };
-    chatPanel.insertBefore(backBtn, chatPanel.firstChild);
-  })();
-
-  // Parchar abrirConv para mostrar chat en mobile
-  document.addEventListener('DOMContentLoaded', function() {
-    if (window.innerWidth > 900) return;
-    var lista = document.querySelector('.conv-list');
-    if (!lista) return;
-    var observer = new MutationObserver(function() {
-      lista.querySelectorAll('.conv-item').forEach(function(item) {
-        if (item._mobilePatched) return;
-        item._mobilePatched = true;
-        var origClick = item.onclick;
-        item.onclick = function(e) {
-          if (origClick) origClick.call(item, e);
-          var p = document.getElementById('chat-panel');
-          if (p) p.classList.add('mobile-visible');
-        };
-      });
-    });
-    observer.observe(lista, { childList:true, subtree:true });
-  });
-
-</script>
 <div class="mbn-overlay" id="mbn-overlay" onclick="closeMbnPanel()"></div>
 <div class="mbn-panel" id="mbn-panel">
   <div class="mbn-panel-title">Mi cuenta</div>
-  <a href="#" class="mbn-panel-item" id="mbnp-perfil">
-    <span class="mbn-pi-icon">👤</span> Ver mi perfil
-  </a>
-  <a href="buscARTE_perfil.html" class="mbn-panel-item">
-    <span class="mbn-pi-icon">⚙️</span> Configurar perfil
-  </a>
-  <a href="buscARTE_mis_anuncios.html" class="mbn-panel-item">
-    <span class="mbn-pi-icon">📋</span> Mis anuncios
-  </a>
-  <a href="buscARTE_guardados.html" class="mbn-panel-item">
-    <span class="mbn-pi-icon">🔖</span> Guardados / Favoritos
-  </a>
-  <a href="#" class="mbn-panel-item danger" onclick="mbnLogout()">
-    <span class="mbn-pi-icon">🚪</span> Cerrar sesión
-  </a>
+  <a href="#" class="mbn-panel-item" id="mbnp-perfil"><span class="mbn-pi-icon">👤</span> Ver mi perfil</a>
+  <a href="buscARTE_perfil.html" class="mbn-panel-item"><span class="mbn-pi-icon">⚙️</span> Configurar perfil</a>
+  <a href="buscARTE_mis_anuncios.html" class="mbn-panel-item"><span class="mbn-pi-icon">📋</span> Mis anuncios</a>
+  <a href="buscARTE_guardados.html" class="mbn-panel-item"><span class="mbn-pi-icon">🔖</span> Guardados / Favoritos</a>
+  <a href="#" class="mbn-panel-item danger" onclick="mbnLogout()"><span class="mbn-pi-icon">🚪</span> Cerrar sesión</a>
 </div>
 <nav class="mobile-bottom-nav" id="mobile-bottom-nav">
   <a href="buscARTE_busqueda.html" class="mbn-item" data-page="busqueda"><span class="mbn-icon">🎵</span><span>Músicos</span></a>
   <a href="buscARTE_anuncios.html" class="mbn-item" data-page="anuncios"><span class="mbn-icon">📋</span><span>Anuncios</span></a>
-  <a href="buscARTE_mensajes.html" class="mbn-item" data-page="mensajes"><span class="mbn-icon">💬</span><span>Mensajes</span></a>
+  <a href="buscARTE_mensajes.html" class="mbn-item active" data-page="mensajes"><span class="mbn-icon">💬</span><span>Mensajes</span></a>
   <button class="mbn-item" onclick="toggleMbnPanel()" style="background:none;border:none;flex:1;padding:0;" data-page="perfil"><span class="mbn-icon">👤</span><span>Mi perfil</span></button>
 </nav>
-<script>
-(function(){
-  var uid = localStorage.getItem('ba_user_id');
-  var el = document.getElementById('mbnp-perfil');
-  if(el && uid) el.href = 'buscARTE_perfil_publico.html?id='+uid;
-  else if(el) el.href = 'buscARTE_login.html';
-  var path = window.location.pathname.split('/').pop();
-  document.querySelectorAll('.mbn-item[data-page]').forEach(function(a){
-    if(path.indexOf(a.dataset.page) !== -1) a.style.color='#d4f53c';
-  });
-})();
-function toggleMbnPanel(){
-  document.getElementById('mbn-panel').classList.toggle('open');
-  document.getElementById('mbn-overlay').classList.toggle('open');
-}
-function closeMbnPanel(){
-  document.getElementById('mbn-panel').classList.remove('open');
-  document.getElementById('mbn-overlay').classList.remove('open');
-}
-function mbnLogout(){
-  localStorage.removeItem('ba_logged');
-  localStorage.removeItem('ba_name');
-  localStorage.removeItem('ba_user_id');
-  window.location.href='index.html';
-}
 
-</script>
 <script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
-  });
-}
+  const PREVIEW_MODE = false;
+  const SUPABASE_URL = 'https://xiaanchoanxmampegoay.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68';
+  const headers = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' };
+  let miUserId = localStorage.getItem('ba_user_id');
+  const miNombre = localStorage.getItem('ba_name') || 'Yo';
 
-  // En mobile, el avatar del nav abre el panel del bottom nav
-  (function() {
-    if (window.innerWidth > 900) return;
-    const btn = document.getElementById('nav-avatar-btn');
-    if (!btn) return;
-    // Remover onclick original y poner el del panel
-    btn.removeAttribute('onclick');
-    btn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      if (typeof toggleMbnPanel === 'function') {
-        toggleMbnPanel();
+  let conversaciones = [];
+  let perfilesPorId = {};
+  let anunciosPorId = {};
+  let convActiva = null;
+  let pollingInterval = null;
+  let convFilter = 'todas';
+  let unreadByUserId = {};
+  let lastSeenInicial = localStorage.getItem('ba_msg_last_seen') || '1970-01-01T00:00:00.000Z';
+
+  if (!PREVIEW_MODE && localStorage.getItem('ba_logged') !== '1') {
+    window.location.replace('buscARTE_login.html?redirect=' + encodeURIComponent('buscARTE_mensajes.html'));
+  }
+
+  function escapeHTML(value) {
+    return String(value ?? '').replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
+  }
+  function normalizeId(value) {
+    const n = Number(value);
+    return Number.isFinite(n) && String(value).trim() !== '' ? n : value;
+  }
+  function filterValue(value) { return encodeURIComponent(String(value)); }
+  function getInitials(nombre) {
+    if (!nombre) return '?';
+    return nombre.trim().split(/\s+/).map(w=>w[0]).join('').toUpperCase().slice(0,2) || '?';
+  }
+  function avatarHTML(perfil, cls) {
+    const nombre = perfil?.nombre || 'Usuario';
+    if (perfil?.foto_url) return `<div class="${cls}"><img src="${escapeHTML(perfil.foto_url)}" alt=""></div>`;
+    return `<div class="${cls}">${escapeHTML(getInitials(nombre))}</div>`;
+  }
+  function timeAgo(iso) {
+    if (!iso) return '';
+    const d = new Date(iso), now = new Date();
+    const diff = Math.floor((now - d) / 60000);
+    if (diff < 1) return 'Ahora';
+    if (diff < 60) return `Hace ${diff} min`;
+    if (diff < 1440) return `Hace ${Math.floor(diff/60)} hs`;
+    if (diff < 10080) return `Hace ${Math.floor(diff/1440)} días`;
+    return d.toLocaleDateString('es-AR', {day:'numeric', month:'short'});
+  }
+  function dateLabel(iso) {
+    const d = new Date(iso);
+    const today = new Date();
+    const y = new Date(); y.setDate(today.getDate() - 1);
+    if (d.toDateString() === today.toDateString()) return 'Hoy';
+    if (d.toDateString() === y.toDateString()) return 'Ayer';
+    return d.toLocaleDateString('es-AR', {day:'numeric', month:'long'});
+  }
+  async function readJson(res) {
+    const text = await res.text();
+    if (!text) return null;
+    try { return JSON.parse(text); } catch(e) { return { error: text }; }
+  }
+  function setStatus(msg) { document.getElementById('conv-subtitle').textContent = msg; }
+
+  window.addEventListener('DOMContentLoaded', function() {
+    initCursor();
+    initNav();
+    initMobilePanelLinks();
+    updateComposerState();
+    document.getElementById('composer-note')?.classList.add('visible');
+    if (PREVIEW_MODE) cargarDemo(); else cargarConversaciones();
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  });
+
+  function initCursor() {
+    const cursor=document.getElementById('cursor'), ring=document.getElementById('cursor-ring');
+    if (!cursor || !ring) return;
+    let mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+    (function tick(){cursor.style.left=mx+'px';cursor.style.top=my+'px';rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(tick);})();
+  }
+
+  async function cargarConversaciones() {
+    if (!miUserId) return;
+    try {
+      setStatus('Cargando conversaciones...');
+      await calcularNuevos();
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/conversaciones?or=(user1_id.eq.${filterValue(miUserId)},user2_id.eq.${filterValue(miUserId)})&order=updated_at.desc`, { headers });
+      if (!res.ok) throw new Error('conversaciones ' + res.status + ': ' + await res.text());
+      conversaciones = await res.json();
+
+      const ids = [...new Set(conversaciones.map(c => String(c.user1_id) === String(miUserId) ? c.user2_id : c.user1_id).filter(Boolean))];
+      await cargarPerfiles(ids);
+      const anuncioIds = [...new Set(conversaciones.map(c => c.anuncio_id).filter(Boolean))];
+      await cargarAnuncios(anuncioIds);
+
+      setStatus(`${conversaciones.length} conversación${conversaciones.length === 1 ? '' : 'es'}`);
+      renderConversaciones();
+      abrirDesdeURLSiHaceFalta();
+
+      setTimeout(() => {
+        localStorage.setItem('ba_msg_last_seen', new Date().toISOString());
+        const badge = document.getElementById('nav-msg-badge');
+        if (badge) badge.style.display = 'none';
+      }, 1200);
+    } catch(e) {
+      console.error('Error cargando conversaciones:', e);
+      document.getElementById('conv-list-container').innerHTML = `<div class="conv-empty">No se pudieron cargar tus mensajes.<br><button class="chat-action-btn" style="margin-top:1rem" onclick="cargarConversaciones()">Reintentar</button></div>`;
+      setStatus('Error al cargar');
+    }
+  }
+
+  async function calcularNuevos() {
+    unreadByUserId = {};
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/mensajes?para_user_id=eq.${filterValue(miUserId)}&created_at=gt.${encodeURIComponent(lastSeenInicial)}&select=id,de_user_id,created_at&limit=999`, { headers });
+      if (!res.ok) return;
+      const nuevos = await res.json();
+      nuevos.forEach(m => { unreadByUserId[String(m.de_user_id)] = (unreadByUserId[String(m.de_user_id)] || 0) + 1; });
+      const total = nuevos.length;
+      const el = document.getElementById('conv-count');
+      const badge = document.getElementById('nav-msg-badge');
+      if (total > 0) {
+        el.textContent = total > 99 ? '99+ nuevos' : `${total} nuevo${total === 1 ? '' : 's'}`;
+        el.style.display = 'inline-block';
+        if (badge) { badge.textContent = total > 99 ? '99+' : total; badge.style.display = 'inline-block'; }
+      } else {
+        el.style.display = 'none';
+        if (badge) badge.style.display = 'none';
       }
-    });
-    // También quitar el chevron en mobile que confunde
-    const chevron = btn.querySelector('.nav-avatar-chevron');
-    if (chevron) chevron.style.display = 'none';
-  })();
+    } catch(e) {}
+  }
 
+  async function cargarPerfiles(ids) {
+    perfilesPorId = {};
+    if (!ids.length) return;
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=in.(${ids.map(filterValue).join(',')})&select=id,nombre,instrumento,ciudad,foto_url,email`, { headers });
+    if (!res.ok) throw new Error('perfiles ' + res.status + ': ' + await res.text());
+    const perfiles = await res.json();
+    perfiles.forEach(p => { perfilesPorId[String(p.id)] = p; });
+  }
+
+  async function cargarAnuncios(ids) {
+    anunciosPorId = {};
+    if (!ids.length) return;
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/anuncios?id=in.(${ids.map(filterValue).join(',')})&select=id,titulo,tipo`, { headers });
+      if (!res.ok) return;
+      const anuncios = await res.json();
+      anuncios.forEach(a => { anunciosPorId[String(a.id)] = a; });
+    } catch(e) {}
+  }
+
+  function renderConversaciones() {
+    const lista = document.getElementById('conv-list-container');
+    const q = (document.getElementById('conv-search-input')?.value || '').trim().toLowerCase();
+    let data = conversaciones.map(conv => decorateConv(conv));
+    if (convFilter === 'nuevas') data = data.filter(c => c.unreadCount > 0);
+    if (q) data = data.filter(c => [c.nombre, c.meta, c.preview, c.contexto].join(' ').toLowerCase().includes(q));
+
+    if (!data.length) {
+      lista.innerHTML = `<div class="conv-empty">${q ? 'No encontramos conversaciones con esa búsqueda.' : convFilter === 'nuevas' ? 'No tenés mensajes nuevos.' : 'Todavía no tenés conversaciones.<br><a href="buscARTE_busqueda.html">Buscar músicos →</a>'}</div>`;
+      return;
+    }
+    lista.innerHTML = data.map(c => `
+      <div class="conv-item ${convActiva && String(convActiva.id) === String(c.id) ? 'active' : ''} ${c.unreadCount > 0 ? 'unread' : ''}" data-conv-id="${escapeHTML(c.id)}" onclick="abrirConvPorId('${escapeHTML(c.id)}')">
+        ${avatarHTML(c.perfil, 'conv-avatar')}
+        <div class="conv-body">
+          <div class="conv-top"><span class="conv-name">${escapeHTML(c.nombre)}</span><span class="conv-time">${escapeHTML(timeAgo(c.updated_at))}</span></div>
+          <div class="conv-preview">${escapeHTML(c.preview)}</div>
+          <div class="conv-context">${escapeHTML(c.contexto)}</div>
+        </div>
+        ${c.unreadCount > 0 ? '<span class="conv-unread-dot"></span>' : ''}
+      </div>
+    `).join('');
+  }
+
+  function decorateConv(conv) {
+    const otroId = String(conv.user1_id) === String(miUserId) ? conv.user2_id : conv.user1_id;
+    const perfil = perfilesPorId[String(otroId)] || { id: otroId, nombre:'Usuario eliminado', instrumento:'Músico' };
+    const anuncio = conv.anuncio_id ? anunciosPorId[String(conv.anuncio_id)] : null;
+    return {
+      ...conv,
+      otroId,
+      perfil,
+      nombre: perfil.nombre || 'Usuario',
+      meta: `${perfil.instrumento || 'Músico'}${perfil.ciudad ? ' · ' + perfil.ciudad : ''}`,
+      preview: conv.ultimo_mensaje || 'Nueva conversación',
+      contexto: anuncio ? `📋 ${anuncio.titulo || 'Anuncio'}` : '👤 Perfil directo',
+      unreadCount: unreadByUserId[String(otroId)] || 0
+    };
+  }
+
+  function setConvFilter(filter) {
+    convFilter = filter;
+    document.querySelectorAll('.conv-tab').forEach(b => b.classList.remove('active'));
+    document.getElementById(filter === 'nuevas' ? 'tab-nuevas' : 'tab-todas').classList.add('active');
+    renderConversaciones();
+  }
+
+  function abrirConvPorId(id) {
+    const conv = conversaciones.find(c => String(c.id) === String(id));
+    if (!conv) return;
+    abrirConv(decorateConv(conv));
+  }
+
+  async function abrirConv(conv) {
+    convActiva = conv;
+    document.querySelectorAll('.conv-item').forEach(i => i.classList.toggle('active', String(i.dataset.convId) === String(conv.id)));
+    document.getElementById('chat-panel').classList.add('mobile-visible');
+    document.getElementById('chat-header').style.display = 'flex';
+    document.getElementById('chat-input-area').style.display = 'block';
+    document.getElementById('quick-replies')?.classList.add('visible');
+    document.getElementById('composer-note')?.classList.remove('visible');
+    updateComposerState();
+
+    document.getElementById('chat-header-avatar').innerHTML = avatarHTML(conv.perfil, 'chat-header-avatar').replace(/^<div class="chat-header-avatar">|<\/div>$/g, '');
+    if (conv.perfil?.foto_url) document.getElementById('chat-header-avatar').innerHTML = `<img src="${escapeHTML(conv.perfil.foto_url)}" alt="">`;
+    else document.getElementById('chat-header-avatar').textContent = getInitials(conv.nombre);
+    document.getElementById('chat-header-name').textContent = conv.nombre;
+    document.getElementById('chat-header-meta').textContent = conv.meta;
+    document.getElementById('chat-ver-perfil').href = 'buscARTE_perfil_publico.html?id=' + encodeURIComponent(conv.otroId);
+
+    const ctxBar = document.getElementById('chat-context-bar');
+    const ctxText = document.getElementById('chat-context-text');
+    const ctxLink = document.getElementById('chat-context-link');
+    if (conv.anuncio_id && anunciosPorId[String(conv.anuncio_id)]) {
+      ctxBar.style.display = 'flex';
+      ctxText.textContent = anunciosPorId[String(conv.anuncio_id)].titulo || 'Anuncio';
+      ctxLink.href = 'buscARTE_anuncio_detalle.html?id=' + encodeURIComponent(conv.anuncio_id);
+      ctxLink.style.display = 'inline-block';
+    } else {
+      ctxBar.style.display = 'none';
+      ctxText.textContent = '';
+      ctxLink.style.display = 'none';
+    }
+
+    unreadByUserId[String(conv.otroId)] = 0;
+    renderConversaciones();
+    await cargarMensajes(true);
+    document.getElementById('chat-input').focus();
+    history.replaceState(null, '', 'buscARTE_mensajes.html?conv=' + encodeURIComponent(conv.id));
+
+    if (pollingInterval) clearInterval(pollingInterval);
+    pollingInterval = setInterval(() => cargarMensajes(false), 6000);
+  }
+
+  async function cargarMensajes(forceScroll) {
+    if (!convActiva) return;
+    const container = document.getElementById('chat-messages');
+    if (PREVIEW_MODE && window.demoMensajes) {
+      const msgs = window.demoMensajes[String(convActiva.id)] || [];
+      renderMensajes(msgs);
+      container.scrollTop = container.scrollHeight;
+      return;
+    }
+    const wasAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 80;
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/mensajes?or=(and(de_user_id.eq.${filterValue(miUserId)},para_user_id.eq.${filterValue(convActiva.otroId)}),and(de_user_id.eq.${filterValue(convActiva.otroId)},para_user_id.eq.${filterValue(miUserId)}))&order=created_at.asc`, { headers });
+      if (!res.ok) throw new Error('mensajes ' + res.status + ': ' + await res.text());
+      const msgs = await res.json();
+      renderMensajes(msgs);
+      if (forceScroll || wasAtBottom) container.scrollTop = container.scrollHeight;
+      localStorage.setItem('ba_msg_last_seen', new Date().toISOString());
+    } catch(e) {
+      console.error('Error cargando mensajes:', e);
+      container.innerHTML = `<div class="chat-empty"><span class="chat-empty-icon">⚠️</span><div class="chat-empty-title">No se pudieron cargar los mensajes</div><p class="chat-empty-sub">Revisá tu conexión e intentá de nuevo.</p></div>`;
+    }
+  }
+
+  function renderMensajes(msgs) {
+    const container = document.getElementById('chat-messages');
+    if (!msgs.length) {
+      container.innerHTML = `<div class="chat-empty"><span class="chat-empty-icon">💬</span><div class="chat-empty-title">Conversación nueva</div><p class="chat-empty-sub">Todavía no hay mensajes. Rompé el hielo.</p></div>`;
+      return;
+    }
+    let html = '';
+    let currentDate = '';
+    msgs.forEach(m => {
+      const label = dateLabel(m.created_at);
+      if (label !== currentDate) {
+        currentDate = label;
+        html += `<div class="date-sep"><span>${escapeHTML(label)}</span></div>`;
+      }
+      const sent = String(m.de_user_id) === String(miUserId);
+      const time = new Date(m.created_at).toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit' });
+      const text = escapeHTML(m.contenido || '').replace(/\n/g, '<br>');
+      html += sent
+        ? `<div class="msg sent"><div class="msg-wrap"><div class="msg-bubble">${text}</div><div class="msg-time">${escapeHTML(time)}</div></div></div>`
+        : `<div class="msg received">${avatarHTML(convActiva.perfil, 'msg-avatar')}<div class="msg-wrap"><div class="msg-bubble">${text}</div><div class="msg-time">${escapeHTML(time)}</div></div></div>`;
+    });
+    container.innerHTML = html;
+  }
+
+  async function sendMessage() {
+    const input = document.getElementById('chat-input');
+    const btn = document.getElementById('chat-send-btn');
+    const error = document.getElementById('send-error');
+    const text = input.value.trim();
+    if (!text || !convActiva) { updateComposerState(); return; }
+    if (text.length > 1000) { error.textContent = 'Máximo 1000 caracteres.'; return; }
+    if (PREVIEW_MODE && window.demoMensajes) {
+      window.demoMensajes[String(convActiva.id)] = window.demoMensajes[String(convActiva.id)] || [];
+      window.demoMensajes[String(convActiva.id)].push({ de_user_id: miUserId, para_user_id: convActiva.otroId, contenido: text, created_at: new Date().toISOString() });
+      input.value = ''; autoResize(input); updateComposerState(); renderMensajes(window.demoMensajes[String(convActiva.id)]);
+      document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
+      return;
+    }
+    const original = input.value;
+    error.textContent = '';
+    btn.disabled = true;
+    btn.textContent = '…';
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/mensajes`, {
+        method:'POST',
+        headers: { ...headers, 'Prefer':'return=minimal' },
+        body: JSON.stringify({ de_user_id: normalizeId(miUserId), para_user_id: normalizeId(convActiva.otroId), contenido: text })
+      });
+      if (!res.ok) throw new Error('mensaje ' + res.status + ': ' + await res.text());
+
+      const patch = await fetch(`${SUPABASE_URL}/rest/v1/conversaciones?id=eq.${filterValue(convActiva.id)}`, {
+        method:'PATCH',
+        headers: { ...headers, 'Prefer':'return=minimal' },
+        body: JSON.stringify({ ultimo_mensaje:text, updated_at:new Date().toISOString() })
+      });
+      if (!patch.ok) console.warn('No se pudo actualizar conversación', patch.status, await patch.text());
+
+      input.value = '';
+      autoResize(input);
+      updateComposerState();
+      notificarPorEmail(convActiva.otroId, text);
+      await cargarMensajes(true);
+      await cargarConversaciones();
+      if (convActiva) abrirConvPorId(convActiva.id);
+    } catch(e) {
+      console.error('Error enviando:', e);
+      input.value = original;
+      updateComposerState();
+      error.textContent = 'No se pudo enviar. Probá de nuevo.';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '↑';
+      updateComposerState();
+    }
+  }
+
+  async function notificarPorEmail(destinoId, text) {
+    try {
+      const perfil = perfilesPorId[String(destinoId)];
+      let destinatario = perfil;
+      if (!destinatario?.email) {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${filterValue(destinoId)}&select=email,nombre`, { headers });
+        if (res.ok) [destinatario] = await res.json();
+      }
+      if (!destinatario?.email) return;
+      fetch('/.netlify/functions/send-email', {
+        method:'POST',
+        headers: { 'Content-Type':'application/json' },
+        body: JSON.stringify({ tipo:'mensaje', destinatario:destinatario.email, datos: { remitente:miNombre || 'Un músico', preview:text.length > 120 ? text.slice(0,120) + '...' : text } })
+      }).catch(()=>{});
+    } catch(e) {}
+  }
+
+  function insertQuickReply(text) {
+    const input = document.getElementById('chat-input');
+    if (!input) return;
+    input.value = text;
+    autoResize(input);
+    updateComposerState();
+    input.focus();
+  }
+
+  function updateComposerState() {
+    const input = document.getElementById('chat-input');
+    const btn = document.getElementById('chat-send-btn');
+    const count = document.getElementById('chat-char-count');
+    const len = input ? input.value.length : 0;
+    if (count) {
+      count.textContent = len + '/1000';
+      count.classList.toggle('warning', len > 900);
+    }
+    if (btn) btn.disabled = !convActiva || !input || !input.value.trim();
+  }
+
+  function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
+  function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
+  function closeMobileChat() { document.getElementById('chat-panel').classList.remove('mobile-visible'); }
+
+  function abrirDesdeURLSiHaceFalta() {
+    const params = new URLSearchParams(location.search);
+    const convId = params.get('conv');
+    if (convId && conversaciones.some(c => String(c.id) === String(convId))) abrirConvPorId(convId);
+  }
+
+  function initNav() {
+    const logged = localStorage.getItem('ba_logged') === '1' || PREVIEW_MODE;
+    const n = localStorage.getItem('ba_name') || 'Mi perfil';
+    const uid = localStorage.getItem('ba_user_id') || '';
+    const initials = getInitials(n);
+    if (logged) {
+      document.getElementById('nav-guest').style.display = 'none';
+      document.getElementById('nav-user').style.display = 'flex';
+      document.getElementById('nav-avatar-circle').textContent = initials;
+      document.getElementById('nav-avatar-name').textContent = n.split(' ')[0] || 'Mi perfil';
+      const miPerfilLink = document.querySelector('.nav-dropdown-item[href*="perfil_publico"]');
+      if (miPerfilLink && uid) miPerfilLink.href = 'buscARTE_perfil_publico.html?id=' + encodeURIComponent(uid);
+    }
+  }
+  function toggleUserMenu(e) { if(e)e.stopPropagation(); document.getElementById('nav-avatar-btn')?.classList.toggle('open'); document.getElementById('nav-dropdown')?.classList.toggle('open'); }
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('#nav-avatar-btn') && !e.target.closest('#nav-dropdown')) {
+      document.getElementById('nav-avatar-btn')?.classList.remove('open');
+      document.getElementById('nav-dropdown')?.classList.remove('open');
+    }
+  });
+  function logout() { localStorage.removeItem('ba_logged'); localStorage.removeItem('ba_name'); localStorage.removeItem('ba_email'); localStorage.removeItem('ba_user_id'); window.location.href='index.html'; }
+  function toggleMbnPanel() { document.getElementById('mbn-panel').classList.toggle('open'); document.getElementById('mbn-overlay').classList.toggle('open'); }
+  function closeMbnPanel() { document.getElementById('mbn-panel').classList.remove('open'); document.getElementById('mbn-overlay').classList.remove('open'); }
+  function mbnLogout() { logout(); }
+  function initMobilePanelLinks() {
+    const uid = localStorage.getItem('ba_user_id');
+    const el = document.getElementById('mbnp-perfil');
+    if (el && uid) el.href = 'buscARTE_perfil_publico.html?id=' + encodeURIComponent(uid);
+    else if (el) el.href = 'buscARTE_login.html';
+    if (window.innerWidth <= 900) {
+      const btn = document.getElementById('nav-avatar-btn');
+      if (btn) {
+        btn.removeAttribute('onclick');
+        btn.addEventListener('click', function(e) { e.stopPropagation(); toggleMbnPanel(); });
+        const chevron = btn.querySelector('.nav-avatar-chevron');
+        if (chevron) chevron.style.display = 'none';
+      }
+    }
+  }
+
+  function cargarDemo() {
+    localStorage.setItem('ba_name', localStorage.getItem('ba_name') || 'Marcos');
+    conversaciones = [
+      { id:1, user1_id:99, user2_id:101, ultimo_mensaje:'Dale, me copa. ¿Tenés disponibilidad esta semana?', updated_at:new Date(Date.now()-15*60000).toISOString(), anuncio_id:10 },
+      { id:2, user1_id:99, user2_id:102, ultimo_mensaje:'Te mando unos audios y lo charlamos.', updated_at:new Date(Date.now()-3*3600000).toISOString(), anuncio_id:null },
+      { id:3, user1_id:103, user2_id:99, ultimo_mensaje:'¿Sigue disponible el ampli?', updated_at:new Date(Date.now()-28*3600000).toISOString(), anuncio_id:11 }
+    ];
+    perfilesPorId = {
+      '101': { id:101, nombre:'Lucía Moreno', instrumento:'Bajo', ciudad:'Almagro' },
+      '102': { id:102, nombre:'Nico Ruiz', instrumento:'Batería', ciudad:'Caballito' },
+      '103': { id:103, nombre:'Sofi Luna', instrumento:'Guitarra', ciudad:'Palermo' }
+    };
+    anunciosPorId = { '10':{id:10,titulo:'Busco bajista para proyecto indie'}, '11':{id:11,titulo:'Vendo ampli Fender'} };
+    unreadByUserId = { '101':1, '103':1 };
+    miUserId = '99';
+    setStatus('3 conversaciones demo');
+    const badge = document.getElementById('conv-count'); badge.textContent='2 nuevos'; badge.style.display='inline-block';
+    renderConversaciones();
+    window.demoMensajes = {
+      '1':[{de_user_id:101,para_user_id:99,contenido:'Hola! Vi tu anuncio y me interesa tocar.',created_at:new Date(Date.now()-3600000).toISOString()},{de_user_id:99,para_user_id:101,contenido:'Buenísimo, ¿tenés algún video?',created_at:new Date(Date.now()-3000000).toISOString()},{de_user_id:101,para_user_id:99,contenido:'Sí, te paso un link. También puedo ensayar por Almagro.',created_at:new Date(Date.now()-15*60000).toISOString()}],
+      '2':[{de_user_id:102,para_user_id:99,contenido:'Te mando unos audios y lo charlamos.',created_at:new Date(Date.now()-3*3600000).toISOString()}],
+      '3':[{de_user_id:103,para_user_id:99,contenido:'¿Sigue disponible el ampli?',created_at:new Date(Date.now()-28*3600000).toISOString()}]
+    };
+  }
 </script>
 </body>
 </html>

@@ -1,11 +1,20 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>buscARTE — Mis guardados</title>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
-  <style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>buscARTE — Mis guardados</title>
+<meta name="description" content="Tus perfiles y nombres guardados en buscARTE.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="canonical" href="https://buscarte.com.ar/buscARTE_guardados.html">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="buscARTE">
+<link rel="apple-touch-icon" href="/icons/icon-192.svg">
+<style>
   *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
   :root {
     --negro:#080808; --negro2:#111; --negro3:#1a1a1a;
@@ -14,512 +23,706 @@
     --font-display:'Archivo Black',sans-serif;
     --font-body:'Archivo',sans-serif;
   }
-  body { background:var(--negro); color:var(--blanco); font-family:var(--font-body); font-weight:300; min-height:100vh; overflow-x:hidden; cursor:none; }
+  body {
+    background:var(--negro); color:var(--blanco); font-family:var(--font-body);
+    font-weight:300; min-height:100vh; overflow-x:hidden; cursor:none; padding-bottom:0;
+  }
   .cursor { width:10px;height:10px;background:var(--neon);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%); }
   .cursor-ring { width:36px;height:36px;border:1px solid rgba(212,245,60,0.35);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .15s ease; }
-  body::before { content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");opacity:.03;pointer-events:none;z-index:1000; }
+  body::before {
+    content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity:.03;pointer-events:none;z-index:0;
+  }
 
   /* NAV */
-  nav { position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1rem 2.5rem;border-bottom:1px solid #1c1c1c;background:rgba(8,8,8,0.96);backdrop-filter:blur(12px); }
+  nav {
+    position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;
+    padding:1rem 2.5rem;border-bottom:1px solid #1c1c1c;background:rgba(8,8,8,0.97);backdrop-filter:blur(12px);height:60px;
+  }
   .nav-logo { font-family:var(--font-display);font-size:1.4rem;color:var(--blanco);text-decoration:none;flex-shrink:0; }
   .nav-logo span { color:var(--neon); }
-  .nav-search { flex:1;max-width:500px;margin:0 2rem;display:flex; }
-  .nav-search input { flex:1;background:var(--negro2);border:1px solid var(--gris3);border-right:none;color:var(--blanco);padding:.6rem 1rem;font-family:var(--font-body);font-size:.88rem;font-weight:300;outline:none;transition:border-color .2s; }
-  .nav-search input:focus { border-color:var(--neon); }
-  .nav-search input::placeholder { color:var(--gris2); }
-  .nav-search button { background:var(--neon);border:none;color:var(--negro);padding:.6rem 1.2rem;font-family:var(--font-display);font-size:.78rem;letter-spacing:.06em;cursor:none;transition:opacity .2s;flex-shrink:0; }
-  .nav-search button:hover { opacity:.85; }
-  .nav-right { display:flex;align-items:center;gap:.8rem;flex-shrink:0; }
+  .nav-links { list-style:none;display:flex;gap:2rem;padding:0;margin:0; }
+  .nav-link { color:var(--gris);text-decoration:none;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;transition:color .2s; }
+  .nav-link:hover { color:var(--blanco); }
+  .nav-link.active { color:var(--neon); }
+  .nav-right { display:flex;align-items:center;gap:.8rem; }
   .btn-ghost { background:transparent;border:1px solid var(--gris2);color:var(--blanco);padding:.48rem 1rem;font-family:var(--font-body);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;cursor:none;transition:border-color .2s;text-decoration:none;display:inline-block; }
   .btn-ghost:hover { border-color:var(--blanco); }
   .btn-neon { background:var(--neon);border:none;color:var(--negro);padding:.48rem 1rem;font-family:var(--font-body);font-weight:500;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;cursor:none;transition:opacity .2s;text-decoration:none;display:inline-block; }
   .btn-neon:hover { opacity:.85; }
   .top-spacer { height:60px; }
 
-  /* LAYOUT */
-  .layout { display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 60px); }
-
-  /* FILTROS */
-  .filters-panel { border-right:1px solid #1c1c1c;padding:1.8rem 0;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto;background:var(--negro2); }
-  .filters-panel::-webkit-scrollbar { width:3px; }
-  .filters-panel::-webkit-scrollbar-thumb { background:var(--gris3); }
-  .filter-header { padding:0 1.5rem 1rem;border-bottom:1px solid #1c1c1c;margin-bottom:1.2rem;display:flex;align-items:center;justify-content:space-between; }
-  .filter-title { font-family:var(--font-display);font-size:.95rem; }
-  .filter-clear { font-size:.68rem;color:var(--neon);cursor:none;background:none;border:none;font-family:var(--font-body);letter-spacing:.08em;text-transform:uppercase;padding:0; }
-  .filter-group { padding:0 1.5rem;margin-bottom:1.4rem; }
-  .filter-group-label { font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gris2);margin-bottom:.6rem;display:block; }
-  .filter-group select, .filter-group input[type=text] { width:100%;background:var(--negro);border:1px solid var(--gris3);color:var(--blanco);padding:.62rem .9rem;font-family:var(--font-body);font-size:.82rem;font-weight:300;outline:none;transition:border-color .2s;appearance:none;border-radius:0; }
-  .filter-group select:focus, .filter-group input:focus { border-color:var(--neon); }
-  .filter-chips { display:flex;flex-wrap:wrap;gap:.35rem; }
-  .fchip { padding:.3rem .65rem;border:1px solid var(--gris3);color:var(--gris);font-size:.67rem;letter-spacing:.07em;text-transform:uppercase;cursor:none;transition:all .15s;background:transparent;font-family:var(--font-body); }
-  .fchip:hover { border-color:#555;color:var(--blanco); }
-  .fchip.on { border-color:var(--neon);color:var(--neon);background:rgba(212,245,60,.05); }
-  .filter-divider { height:1px;background:#1c1c1c;margin:0 1.5rem 1.4rem; }
-
-  /* RESULTADOS */
-  .results-area { padding:1.8rem 2rem; }
-  .results-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;padding-bottom:1.2rem;border-bottom:1px solid #1c1c1c; }
-  .results-count { font-family:var(--font-display);font-size:1.8rem;letter-spacing:-.02em;line-height:1; }
-  .results-count span { color:var(--neon); }
-  .results-sub { font-size:.75rem;color:var(--gris);margin-top:.2rem; }
-  .results-controls { display:flex;align-items:center;gap:.8rem; }
-  .sort-select { background:var(--negro2);border:1px solid var(--gris3);color:var(--blanco);padding:.45rem .9rem;font-family:var(--font-body);font-size:.78rem;outline:none;appearance:none;cursor:none; }
   .nav-user { position:relative; }
   .nav-avatar-wrap { display:flex;align-items:center;gap:.5rem;cursor:none;padding:.3rem .6rem;border:1px solid var(--gris3);transition:border-color .2s;user-select:none; }
   .nav-avatar-wrap:hover { border-color:var(--gris2); }
   .nav-avatar-circle { width:28px;height:28px;border-radius:50%;background:#0d2010;color:var(--neon);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.62rem;flex-shrink:0; }
-  .nav-avatar-name { font-size:.78rem;color:var(--blanco); }
+  .nav-avatar-name { font-size:.78rem;color:var(--blanco);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
   .nav-avatar-chevron { font-size:.6rem;color:var(--gris);transition:transform .2s; }
   .nav-avatar-wrap.open .nav-avatar-chevron { transform:rotate(180deg); }
-  .nav-dropdown { position:absolute;top:calc(100% + 8px);right:0;background:var(--negro2);border:1px solid #2a2a2a;min-width:200px;display:none;flex-direction:column;z-index:300; }
+  .nav-dropdown { position:absolute;top:calc(100% + 8px);right:0;background:var(--negro2);border:1px solid #2a2a2a;min-width:220px;display:none;flex-direction:column;z-index:300; }
   .nav-dropdown.open { display:flex; }
   .nav-dropdown-item { display:flex;align-items:center;gap:.6rem;padding:.75rem 1.1rem;color:var(--gris);text-decoration:none;font-size:.82rem;transition:all .15s;background:transparent;border:none;font-family:var(--font-body);cursor:none;text-align:left;width:100%; }
-  .nav-dropdown-item:hover { background:rgba(255,255,255,.04);color:var(--blanco); }
+  .nav-dropdown-item:hover, .nav-dropdown-item.active-item { background:rgba(255,255,255,.04);color:var(--blanco); }
   .nav-dropdown-divider { height:1px;background:#1c1c1c;margin:.3rem 0; }
   .nav-logout:hover { color:var(--rojo) !important; }
-  .nav-badge { background:var(--neon);color:var(--negro);font-size:.62rem;font-weight:700;padding:.15rem .45rem;margin-left:.5rem;border-radius:2px;min-width:1.2rem;text-align:center;display:inline-block; }
-  .view-btn { background:transparent;border:none;color:var(--gris);padding:.38rem .6rem;font-size:.85rem;cursor:none;transition:all .15s; }
-  .view-btn.active { background:var(--negro3);color:var(--neon); }
+  .nav-badge { background:var(--neon);color:var(--negro);font-size:.62rem;font-weight:700;padding:.15rem .45rem;margin-left:auto;border-radius:2px;min-width:1.2rem;text-align:center;display:inline-block; }
 
-  .active-filters { display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.4rem;min-height:.5rem; }
-  .af-chip { display:inline-flex;align-items:center;gap:.35rem;padding:.25rem .6rem;background:rgba(212,245,60,.07);border:1px solid rgba(212,245,60,.2);color:var(--neon);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase; }
-  .af-remove { background:none;border:none;color:rgba(212,245,60,.5);cursor:none;font-size:.85rem;padding:0;line-height:1;transition:color .15s;font-family:var(--font-body); }
-  .af-remove:hover { color:var(--neon); }
+  /* PAGE */
+  main { position:relative;z-index:1; }
+  .guardados-wrap { max-width:1120px;margin:0 auto;padding:2.2rem 2rem 4rem; }
+  .page-topline { display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.4rem; }
+  .back-link {
+    display:inline-flex;align-items:center;gap:.45rem;color:var(--gris);text-decoration:none;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;
+    border:1px solid var(--gris3);padding:.45rem .8rem;transition:all .2s;cursor:none;
+  }
+  .back-link:hover { color:var(--blanco);border-color:var(--gris2); }
+  .mini-note { color:var(--gris2);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase; }
 
-  /* GRID */
-  .musicians-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:#181818;overflow:hidden; }
-  .musicians-grid.list-view { grid-template-columns:1fr;background:transparent;gap:0; }
-  .musician-card { min-width:0;overflow:hidden; }
+  .guardados-hero {
+    border:1px solid #1c1c1c;background:linear-gradient(135deg,rgba(212,245,60,.055),rgba(255,255,255,.015) 45%,rgba(8,8,8,.2));
+    padding:1.6rem 1.8rem;margin-bottom:1.4rem;display:grid;grid-template-columns:1fr auto;gap:1.2rem;align-items:end;
+  }
+  .page-label { font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--neon);margin-bottom:.45rem; }
+  .guardados-title { font-family:var(--font-display);font-size:clamp(1.8rem,4vw,2.8rem);line-height:.95;letter-spacing:-.03em; }
+  .guardados-title span { color:var(--neon); }
+  .guardados-sub { color:var(--gris);font-size:.88rem;line-height:1.65;max-width:560px;margin-top:.7rem; }
+  .hero-stats { display:flex;gap:1px;background:#1c1c1c;border:1px solid #1c1c1c;min-width:260px; }
+  .hero-stat { background:#0d0d0d;padding:1rem 1.15rem;min-width:100px;text-align:center; }
+  .hero-stat-val { font-family:var(--font-display);font-size:1.5rem;color:var(--neon);line-height:1; }
+  .hero-stat-label { font-size:.62rem;color:var(--gris2);letter-spacing:.11em;text-transform:uppercase;margin-top:.35rem; }
 
-  /* CARD — limpia y minimalista */
-  .musician-card { background:var(--negro);padding:1.4rem;cursor:none;transition:background .2s;position:relative;display:flex;flex-direction:column;gap:.8rem; }
-  .musician-card:hover { background:#0e0e0e; }
-  .musician-card.premium-card { border-top:2px solid var(--neon); }
-  .premium-dot { position:absolute;top:.75rem;right:.75rem;background:var(--neon);color:var(--negro);font-size:.55rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.12rem .4rem; }
+  .toolbar { display:flex;align-items:center;justify-content:space-between;gap:1rem;border:1px solid #1c1c1c;background:var(--negro2);padding:.75rem;margin-bottom:1.2rem;position:sticky;top:60px;z-index:50; }
+  .tabs { display:flex;gap:.4rem;flex-wrap:wrap; }
+  .tab-btn {
+    background:transparent;border:1px solid var(--gris3);color:var(--gris);padding:.5rem .85rem;
+    font-family:var(--font-body);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;cursor:none;transition:all .2s;
+  }
+  .tab-btn:hover { border-color:#555;color:var(--blanco); }
+  .tab-btn.active { background:var(--neon);border-color:var(--neon);color:var(--negro);font-weight:600; }
+  .toolbar-actions { display:flex;align-items:center;gap:.6rem; }
+  .search-box { display:flex;min-width:260px; }
+  .search-box input {
+    width:100%;background:var(--negro);border:1px solid var(--gris3);color:var(--blanco);padding:.55rem .8rem;font-family:var(--font-body);font-size:.82rem;outline:none;
+  }
+  .search-box input:focus { border-color:var(--neon); }
+  .sort-select { background:var(--negro);border:1px solid var(--gris3);color:var(--blanco);padding:.55rem .8rem;font-family:var(--font-body);font-size:.78rem;outline:none;cursor:none; }
 
-  .card-top { display:flex;align-items:center;gap:.85rem; }
-  .card-avatar { width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.9rem;flex-shrink:0;position:relative; }
-  .online-dot { position:absolute;bottom:1px;right:1px;width:8px;height:8px;background:#4caf50;border-radius:50%;border:2px solid var(--negro); }
+  .section-panel { display:none; }
+  .section-panel.active { display:block; }
+  .guardados-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:#181818;border:1px solid #181818; }
+  .saved-card {
+    background:var(--negro);padding:1.25rem;cursor:none;transition:background .2s, border-color .2s;position:relative;display:flex;flex-direction:column;gap:.85rem;min-width:0;
+  }
+  .saved-card:hover { background:#0e0e0e; }
+  .saved-card.removing { opacity:0;transform:translateY(4px);transition:opacity .25s, transform .25s; }
+  .card-top { display:flex;align-items:center;gap:.85rem;min-width:0; }
+  .card-avatar { width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.9rem;flex-shrink:0;overflow:hidden; }
+  .card-avatar img { width:100%;height:100%;object-fit:cover;display:block; }
   .card-info { flex:1;min-width:0; }
-  .card-name { font-weight:500;font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:.1rem; }
-  .card-instrument { font-size:.72rem;color:var(--neon);margin-bottom:.08rem; }
-  .card-location { font-size:.7rem;color:var(--gris); }
-  .card-match { text-align:right;flex-shrink:0; }
-  .match-num { font-family:var(--font-display);font-size:1.25rem;color:var(--neon);line-height:1; }
-  .match-label { font-size:.56rem;color:var(--gris);letter-spacing:.08em;text-transform:uppercase; }
-
+  .card-name { font-weight:500;font-size:.98rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:.12rem; }
+  .card-instrument { font-size:.74rem;color:var(--neon);margin-bottom:.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+  .card-location { font-size:.7rem;color:var(--gris);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+  .btn-unsave {
+    background:rgba(232,49,26,.06);border:1px solid rgba(232,49,26,.18);color:#ff6b5b;font-size:.78rem;cursor:none;padding:.42rem .58rem;
+    transition:all .2s;flex-shrink:0;font-family:var(--font-body);
+  }
+  .btn-unsave:hover { border-color:var(--rojo);color:var(--rojo); }
   .card-tags { display:flex;gap:.3rem;flex-wrap:wrap; }
   .ctag { font-size:.63rem;padding:.14rem .48rem;border:1px solid var(--gris3);color:var(--gris);text-transform:uppercase;letter-spacing:.06em; }
-
-  .card-bio { font-size:.78rem;color:var(--gris);line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
-
-  .card-footer { display:flex;align-items:center;justify-content:space-between;gap:.8rem;padding-top:.75rem;border-top:1px solid #161616; }
+  .card-bio { font-size:.78rem;color:var(--gris);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.35rem; }
+  .card-footer { display:flex;align-items:center;justify-content:space-between;gap:.8rem;padding-top:.75rem;border-top:1px solid #161616;margin-top:auto; }
   .card-refs { font-size:.68rem;color:var(--gris2);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
   .card-refs em { color:var(--gris);font-style:normal; }
-  .card-cta { background:transparent;border:1px solid var(--gris3);color:var(--gris);padding:.35rem .85rem;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;cursor:none;transition:all .2s;font-family:var(--font-body);flex-shrink:0;text-decoration:none;display:inline-block;white-space:nowrap; }
+  .card-cta { background:transparent;border:1px solid var(--gris3);color:var(--gris);padding:.38rem .85rem;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;cursor:none;transition:all .2s;font-family:var(--font-body);flex-shrink:0;text-decoration:none;display:inline-block;white-space:nowrap; }
   .card-cta:hover { border-color:var(--neon);color:var(--neon); }
 
-  /* LIST VIEW */
-  .list-view .musician-card { flex-direction:row;align-items:center;padding:1rem 1.5rem;border-bottom:1px solid #141414; }
-  .list-view .card-top { flex:0 0 260px; }
-  .list-view .card-tags { flex:0 0 auto; }
-  .list-view .card-bio { flex:1;padding:0 1.5rem; }
-  .list-view .card-footer { border-top:none;padding-top:0;flex:0 0 auto; }
-  .list-view .card-refs { display:none; }
+  .names-grid { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:#181818;border:1px solid #181818; }
+  .name-card { background:var(--negro);padding:1rem;display:flex;flex-direction:column;gap:.9rem;min-height:120px; }
+  .name-value { font-family:var(--font-display);font-size:1.12rem;line-height:1.1;letter-spacing:-.01em;word-break:break-word; }
+  .name-actions { display:flex;gap:.45rem;margin-top:auto; }
+  .tiny-btn { flex:1;background:transparent;border:1px solid var(--gris3);color:var(--gris);padding:.4rem .5rem;font-family:var(--font-body);font-size:.67rem;letter-spacing:.07em;text-transform:uppercase;cursor:none;transition:all .2s; }
+  .tiny-btn:hover { border-color:var(--neon);color:var(--neon); }
+  .tiny-btn.danger:hover { border-color:var(--rojo);color:var(--rojo); }
 
-  .load-more { padding:2.5rem;text-align:center;border-top:1px solid #1c1c1c; }
-  .btn-load { background:transparent;border:1px solid var(--gris3);color:var(--gris);padding:.75rem 2.5rem;font-family:var(--font-display);font-size:.85rem;letter-spacing:.06em;cursor:none;transition:all .2s; }
-  .btn-load:hover { border-color:var(--blanco);color:var(--blanco); }
+  .empty-state { grid-column:1/-1;padding:4rem 2rem;text-align:center;background:var(--negro); }
+  .empty-icon { font-size:2.4rem;margin-bottom:1rem;opacity:.55; }
+  .empty-title { font-family:var(--font-display);font-size:1.45rem;margin-bottom:.5rem; }
+  .empty-sub { color:var(--gris);font-size:.88rem;line-height:1.7;margin-bottom:1.2rem; }
+  .empty-actions { display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap; }
+  .btn-outline { background:transparent;border:1px solid var(--gris3);color:var(--blanco);padding:.65rem 1rem;font-family:var(--font-body);font-size:.76rem;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;cursor:none;transition:all .2s; }
+  .btn-outline:hover { border-color:var(--neon);color:var(--neon); }
+  .btn-solid { background:var(--neon);border:1px solid var(--neon);color:var(--negro);padding:.65rem 1rem;font-family:var(--font-display);font-size:.78rem;letter-spacing:.04em;text-decoration:none;cursor:none;transition:opacity .2s; }
+  .btn-solid:hover { opacity:.85; }
 
-  .av-a{background:#0d2010;color:var(--neon);}
-  .av-b{background:#2a0a05;color:#ff6b5b;}
-  .av-c{background:#050d2a;color:#5b9fff;}
-  .av-d{background:#1a0d2a;color:#c45bff;}
-  .av-e{background:#2a1a05;color:#ffaa5b;}
-  .av-f{background:#0d1a2a;color:#5bd4ff;}
-
-  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-  .musician-card:nth-child(1){animation:fadeUp .3s .04s ease both}
-  .musician-card:nth-child(2){animation:fadeUp .3s .08s ease both}
-  .musician-card:nth-child(3){animation:fadeUp .3s .12s ease both}
-  .musician-card:nth-child(4){animation:fadeUp .3s .16s ease both}
-  .musician-card:nth-child(5){animation:fadeUp .3s .20s ease both}
-  .musician-card:nth-child(6){animation:fadeUp .3s .24s ease both}
-  .musician-card:nth-child(7){animation:fadeUp .3s .28s ease both}
-  .musician-card:nth-child(8){animation:fadeUp .3s .32s ease both}
-  .musician-card:nth-child(9){animation:fadeUp .3s .36s ease both}
-  /* NAV LINKS FIX */
-  .nav-links { list-style:none !important; display:flex !important; gap:2rem !important; padding:0 !important; margin:0 !important; }
-  .nav-links li { list-style:none !important; }
-  .nav-link { color:var(--gris);text-decoration:none;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;transition:color .2s; }
-  .nav-link:hover { color:var(--blanco); }
-  .nav-link.active { color:var(--neon); }
-  /* NAV AVATAR NAME — truncate long usernames */
-  .nav-avatar-name { font-size:.78rem;color:var(--blanco);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
-  /* NAV LINKS CLICKABLE FIX */
-  .nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap { pointer-events:auto !important; }
-  nav a, nav button { pointer-events:auto !important; }
+  .notice { display:none;background:rgba(212,245,60,.08);border:1px solid rgba(212,245,60,.22);color:var(--neon);padding:.7rem .9rem;margin-bottom:1rem;font-size:.82rem; }
+  .notice.error { background:rgba(232,49,26,.08);border-color:rgba(232,49,26,.25);color:#ff6b5b; }
 
   .mobile-bottom-nav { display:none; }
-
-  /* ── PERFIL PANEL MOBILE ── */
-  .mbn-overlay {
-    display:none; position:fixed; inset:0; background:rgba(0,0,0,.6);
-    z-index:490; opacity:0; transition:opacity .2s;
-  }
+  .mbn-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:490; opacity:0; transition:opacity .2s; }
   .mbn-overlay.open { display:block; opacity:1; }
-  .mbn-panel {
-    position:fixed; bottom:-100%; left:0; right:0;
-    background:#111; border-top:1px solid #2a2a2a;
-    z-index:495; padding:1.5rem 1.25rem 4.5rem;
-    border-radius:12px 12px 0 0;
-    transition:bottom .25s cubic-bezier(.4,0,.2,1);
-  }
+  .mbn-panel { position:fixed; bottom:-100%; left:0; right:0; background:#111; border-top:1px solid #2a2a2a; z-index:495; padding:1.5rem 1.25rem 4.5rem; border-radius:12px 12px 0 0; transition:bottom .25s cubic-bezier(.4,0,.2,1); }
   .mbn-panel.open { bottom:0; }
-  .mbn-panel-title {
-    font-size:.65rem; letter-spacing:.1em; text-transform:uppercase;
-    color:#555; margin-bottom:1rem; font-family:'Archivo',sans-serif;
-  }
-  .mbn-panel-item {
-    display:flex; align-items:center; gap:.9rem;
-    padding:.9rem 0; border-bottom:1px solid #1c1c1c;
-    text-decoration:none; color:#f2ede4;
-    font-family:'Archivo',sans-serif; font-size:.95rem;
-  }
+  .mbn-panel-title { font-size:.65rem; letter-spacing:.1em; text-transform:uppercase; color:#555; margin-bottom:1rem; }
+  .mbn-panel-item { display:flex; align-items:center; gap:.9rem; padding:.9rem 0; border-bottom:1px solid #1c1c1c; text-decoration:none; color:#f2ede4; font-size:.95rem; }
   .mbn-panel-item:last-child { border-bottom:none; }
   .mbn-panel-item .mbn-pi-icon { font-size:1.1rem; width:1.5rem; text-align:center; }
   .mbn-panel-item.danger { color:#ff5555; }
 
-  @media (max-width:900px) {
-    .mobile-bottom-nav {
-      display:flex; position:fixed; bottom:0; left:0; right:0;
-      background:#0f0f0f; border-top:1px solid #2a2a2a;
-      z-index:500; height:54px;
-    }
-    .mbn-item {
-      flex:1; display:flex; flex-direction:column; align-items:center;
-      justify-content:center; color:#666; text-decoration:none;
-      font-size:.55rem; letter-spacing:.05em; text-transform:uppercase;
-      font-family:'Archivo',sans-serif; gap:.18rem; transition:color .15s;
-    }
-    .mbn-item.active { color:#d4f53c; }
-    .mbn-icon { font-size:1.1rem; line-height:1; }
-    body { padding-bottom:54px !important; }
-  }
+  nav a, nav button, .nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap { pointer-events:auto !important; }
 
   @media (max-width:900px) {
     .cursor, .cursor-ring { display:none !important; }
     * { cursor:auto !important; }
-    nav { padding:.6rem 1rem !important; }
-    .nav-links, .nav-center { display:none !important; }
-    .btn-ghost { display:none !important; }
-    .btn-neon { padding:.4rem .75rem !important; font-size:.72rem !important; }
+    body { padding-bottom:54px !important; }
+    nav { padding:.6rem 1rem !important;height:56px; }
+    .top-spacer { height:56px; }
+    .nav-links, .nav-guest .btn-ghost { display:none !important; }
+    .nav-logo { font-size:1.25rem; }
+    .btn-neon { padding:.4rem .75rem !important;font-size:.72rem !important; }
+    .nav-dropdown { display:none !important; }
+    .nav-avatar-wrap { cursor:auto !important;-webkit-tap-highlight-color:transparent; }
+    .nav-avatar-chevron { display:none; }
+
+    .mobile-bottom-nav { display:flex; position:fixed; bottom:0; left:0; right:0; background:#0f0f0f; border-top:1px solid #2a2a2a; z-index:500; height:54px; }
+    .mbn-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#666; text-decoration:none; font-size:.55rem; letter-spacing:.05em; text-transform:uppercase; gap:.18rem; transition:color .15s; }
+    .mbn-item.active { color:var(--neon); }
+    .mbn-icon { font-size:1.1rem;line-height:1; }
+
+    .guardados-wrap { padding:1.4rem 1.15rem 2.5rem; }
+    .page-topline { margin-bottom:1rem; }
+    .mini-note { display:none; }
+    .guardados-hero { grid-template-columns:1fr;padding:1.25rem;margin-bottom:1rem; }
+    .guardados-sub { font-size:.84rem; }
+    .hero-stats { min-width:0;width:100%; }
+    .hero-stat { flex:1;min-width:0;padding:.8rem .5rem; }
+    .hero-stat-val { font-size:1.25rem; }
+    .toolbar { position:static;flex-direction:column;align-items:stretch;padding:.65rem;gap:.65rem; }
+    .tabs { display:grid;grid-template-columns:1fr 1fr;gap:.45rem; }
+    .toolbar-actions { flex-direction:column;align-items:stretch;gap:.5rem; }
+    .search-box { min-width:0;width:100%; }
+    .sort-select { width:100%; }
+    .guardados-grid, .names-grid { grid-template-columns:1fr; }
+    .card-footer { flex-direction:column;align-items:stretch;gap:.65rem; }
+    .card-refs { white-space:normal; }
+    .card-cta { text-align:center; }
   }
-
-  @media (max-width:900px) {
-    .top-spacer { height:56px !important; }
-    .page-wrap { padding:1.5rem 1.25rem !important; }
-    .page-title { font-size:1.4rem !important; }
-    .guardados-grid { grid-template-columns:1fr !important; }
-    .saved-card { padding:1rem !important; }
-    .page-header { flex-direction:column !important; align-items:flex-start !important; gap:.75rem !important; }
-  }
-
-
-  @media (max-width:900px) {
-    main { padding-top:66px !important; }
-    .guardados-wrap { padding:0 1.25rem 1.5rem !important; }
-    .guardados-title { font-size:1.5rem !important; }
-  }
-
-
-  /* ── MOBILE: dropdown del avatar accesible ── */
-  @media (max-width: 900px) {
-    .nav-avatar-wrap { cursor: auto !important; -webkit-tap-highlight-color: transparent; }
-    .nav-dropdown { z-index: 450 !important; min-width: 220px !important; }
-    .nav-dropdown.open { display: flex !important; }
-    .nav-dropdown-item { padding: .85rem 1.2rem !important; font-size: .88rem !important; }
-  }
-
-
-  /* ── MOBILE: avatar abre el panel del bottom nav ── */
-  @media (max-width: 900px) {
-    .nav-dropdown { display: none !important; }
-  }
-
 </style>
-  <style>
-    .guardados-wrap { max-width:1100px;margin:0 auto;padding:2.5rem 2rem; }
-    .guardados-header { margin-bottom:2rem;border-bottom:1px solid #1c1c1c;padding-bottom:1.5rem; }
-    .guardados-title { font-family:var(--font-display);font-size:2.2rem;color:var(--blanco); }
-    .guardados-title span { color:var(--neon); }
-    .guardados-sub { color:var(--gris);font-size:.85rem;margin-top:.3rem; }
-    .guardados-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:#181818; }
-    
-  </style>
-  <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#0a0a0a">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="buscARTE">
-  <link rel="apple-touch-icon" href="/icons/icon-192.svg">
 </head>
 <body>
 <div class="cursor" id="cursor"></div>
 <div class="cursor-ring" id="cursor-ring"></div>
 
-
+<nav>
+  <a href="index.html" class="nav-logo">busc<span>ARTE</span></a>
+  <ul class="nav-links">
+    <li><a href="buscARTE_busqueda.html" class="nav-link">Músicos</a></li>
+    <li><a href="buscARTE_anuncios.html" class="nav-link">Anuncios</a></li>
+    <li><a href="buscARTE_mensajes.html" class="nav-link">Mensajes</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="nav-guest" id="nav-guest">
+      <a href="buscARTE_login.html" class="btn-ghost">Ingresar</a>
+      <a href="buscARTE_registro.html" class="btn-neon">Registrarse</a>
+    </div>
+    <div class="nav-user" id="nav-user" style="display:none">
+      <div class="nav-avatar-wrap" onclick="toggleUserMenu(event)" id="nav-avatar-btn">
+        <div class="nav-avatar-circle" id="nav-avatar-circle">?</div>
+        <span class="nav-avatar-name" id="nav-avatar-name">Mi perfil</span>
+        <span class="nav-avatar-chevron">▾</span>
+      </div>
+      <div class="nav-dropdown" id="nav-dropdown">
+        <a href="buscARTE_perfil_publico.html" class="nav-dropdown-item">👤 Mi perfil</a>
+        <a href="buscARTE_perfil.html" class="nav-dropdown-item">⚙️ Configurar perfil</a>
+        <a href="buscARTE_mensajes.html" class="nav-dropdown-item">💬 Mensajes <span class="nav-badge" id="nav-msg-badge" style="display:none"></span></a>
+        <a href="buscARTE_mis_anuncios.html" class="nav-dropdown-item">📋 Mis anuncios</a>
+        <a href="buscARTE_guardados.html" class="nav-dropdown-item active-item">♡ Guardados</a>
+        <a href="buscARTE_generador.html" class="nav-dropdown-item">🎲 Generador de nombres</a>
+        <div class="nav-dropdown-divider"></div>
+        <button class="nav-dropdown-item nav-logout" onclick="logout()">↩ Cerrar sesión</button>
+      </div>
+    </div>
+  </div>
+</nav>
+<div class="top-spacer"></div>
 
 <main>
   <div class="guardados-wrap">
-    <div class="guardados-header">
-      <div class="guardados-title">♡ Mis <span>guardados</span></div>
-      <div class="guardados-sub"><span id="result-num">0</span> músicos guardados</div>
+    <div class="page-topline">
+      <a href="javascript:history.back()" class="back-link">← Volver</a>
+      <div class="mini-note">Tus cosas favoritas en buscARTE</div>
     </div>
-    <div class="guardados-grid" id="musicians-grid">
-      <div style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--gris);font-size:.88rem">Cargando...</div>
-    </div>
+
+    <section class="guardados-hero">
+      <div>
+        <div class="page-label">Guardados</div>
+        <h1 class="guardados-title">Mis <span>guardados</span></h1>
+        <p class="guardados-sub">Perfiles que querés volver a contactar y nombres que guardaste en el generador. Todo en un solo lugar, sin mezclarlo con el tablón público.</p>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-val" id="stat-musicos">—</div>
+          <div class="hero-stat-label">Músicos</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-val" id="stat-nombres">—</div>
+          <div class="hero-stat-label">Nombres</div>
+        </div>
+      </div>
+    </section>
+
+    <div id="notice" class="notice"></div>
+
+    <section class="toolbar">
+      <div class="tabs">
+        <button class="tab-btn active" id="tab-musicos" onclick="setSection('musicos')">♡ Músicos</button>
+        <button class="tab-btn" id="tab-nombres" onclick="setSection('nombres')">🎲 Nombres</button>
+      </div>
+      <div class="toolbar-actions">
+        <div class="search-box">
+          <input type="text" id="search-input" placeholder="Buscar en guardados..." oninput="renderCurrentSection()">
+        </div>
+        <select class="sort-select" id="sort-select" onchange="renderCurrentSection()">
+          <option value="recientes">Más recientes</option>
+          <option value="az">Nombre A-Z</option>
+          <option value="instrumento">Instrumento</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="section-panel active" id="panel-musicos">
+      <div class="guardados-grid" id="musicians-grid">
+        <div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-title">Cargando...</div></div>
+      </div>
+    </section>
+
+    <section class="section-panel" id="panel-nombres">
+      <div class="names-grid" id="names-grid"></div>
+    </section>
   </div>
 </main>
 
+<div class="mbn-overlay" id="mbn-overlay" onclick="closeMbnPanel()"></div>
+<div class="mbn-panel" id="mbn-panel">
+  <div class="mbn-panel-title">Mi cuenta</div>
+  <a href="#" class="mbn-panel-item" id="mbnp-perfil"><span class="mbn-pi-icon">👤</span> Ver mi perfil</a>
+  <a href="buscARTE_perfil.html" class="mbn-panel-item"><span class="mbn-pi-icon">⚙️</span> Configurar perfil</a>
+  <a href="buscARTE_mis_anuncios.html" class="mbn-panel-item"><span class="mbn-pi-icon">📋</span> Mis anuncios</a>
+  <a href="buscARTE_guardados.html" class="mbn-panel-item"><span class="mbn-pi-icon">🔖</span> Guardados / Favoritos</a>
+  <a href="#" class="mbn-panel-item danger" onclick="mbnLogout()"><span class="mbn-pi-icon">🚪</span> Cerrar sesión</a>
+</div>
+<nav class="mobile-bottom-nav" id="mobile-bottom-nav">
+  <a href="buscARTE_busqueda.html" class="mbn-item" data-page="busqueda"><span class="mbn-icon">🎵</span><span>Músicos</span></a>
+  <a href="buscARTE_anuncios.html" class="mbn-item" data-page="anuncios"><span class="mbn-icon">📋</span><span>Anuncios</span></a>
+  <a href="buscARTE_mensajes.html" class="mbn-item" data-page="mensajes"><span class="mbn-icon">💬</span><span>Mensajes</span></a>
+  <button class="mbn-item active" onclick="toggleMbnPanel()" style="background:none;border:none;flex:1;padding:0;" data-page="perfil"><span class="mbn-icon">👤</span><span>Mi perfil</span></button>
+</nav>
+
 <script>
-  // PROTECCIÓN
-  (function() {
-    try { if (localStorage.getItem('ba_logged') !== '1') window.location.replace('index.html'); } catch(e) {}
-  })();
+  const SUPABASE_URL = 'https://xiaanchoanxmampegoay.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68';
+  const hdrs = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` };
 
-  const SUPABASE_URL = 'https://xiaanchoanxmampegoay.supabase.co'
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68'
-  const hdrs = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+  let currentSection = 'musicos';
+  let perfilesGuardados = [];
+  let nombresGuardados = [];
+  let cargandoPerfiles = false;
+  let previewMode = false;
 
-  // CURSOR
-  window.addEventListener('DOMContentLoaded', function() {
-    const cursor=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
-    if (!cursor || !ring) return;
+  function requireLogin() {
+    try {
+      if (localStorage.getItem('ba_logged') !== '1') {
+        window.location.replace('buscARTE_login.html?redirect=' + encodeURIComponent('buscARTE_guardados.html'));
+      }
+    } catch(e) {}
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;')
+      .replaceAll('"','&quot;')
+      .replaceAll("'","&#039;");
+  }
+
+  function showNotice(msg, type) {
+    const notice = document.getElementById('notice');
+    if (!notice) return;
+    notice.textContent = msg;
+    notice.className = 'notice' + (type === 'error' ? ' error' : '');
+    notice.style.display = 'block';
+    clearTimeout(showNotice._t);
+    showNotice._t = setTimeout(() => { notice.style.display = 'none'; }, 2600);
+  }
+
+  function initCursor() {
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursor-ring');
+    if (!cursor || !ring || window.matchMedia('(max-width: 900px)').matches) return;
     let mx=0,my=0,rx=0,ry=0;
-    document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
-    (function tick(){cursor.style.left=mx+'px';cursor.style.top=my+'px';rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(tick);})();
-  });
+    document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
+    (function tick(){
+      cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+      rx += (mx-rx)*.12; ry += (my-ry)*.12;
+      ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+      requestAnimationFrame(tick);
+    })();
+  }
 
-  const COLORES = ['#1a0a2e','#0a2e1a','#2e1a0a','#0a1a2e','#2e0a1a','#1a2e0a']
-  const TEXTO = ['#c45bff','#4cff9f','#ffaa5b','#5b9fff','#ff5b8a','#c9ff5b']
+  const COLORES = ['#1a0a2e','#0a2e1a','#2e1a0a','#0a1a2e','#2e0a1a','#1a2e0a'];
+  const TEXTO = ['#c45bff','#4cff9f','#ffaa5b','#5b9fff','#ff5b8a','#c9ff5b'];
 
   function colorIdx(nombre) {
-    if (!nombre) return 0
-    return nombre.charCodeAt(0) % COLORES.length
+    if (!nombre) return 0;
+    let total = 0;
+    for (const ch of String(nombre)) total += ch.charCodeAt(0);
+    return total % COLORES.length;
   }
+
   function getInitials(nombre) {
-    if (!nombre) return '?'
-    return nombre.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)
+    if (!nombre) return '?';
+    return String(nombre).trim().split(/\s+/).map(w=>w[0]).join('').toUpperCase().slice(0,2) || '?';
+  }
+
+  function normalizeText(value) {
+    return String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
+  function getFilteredPerfiles() {
+    const q = normalizeText(document.getElementById('search-input')?.value || '');
+    const sort = document.getElementById('sort-select')?.value || 'recientes';
+    let arr = [...perfilesGuardados];
+
+    if (q) {
+      arr = arr.filter(p => normalizeText([
+        p.nombre, p.instrumento, p.generos, p.ciudad, p.barrio, p.bio, p.referentes
+      ].join(' ')).includes(q));
+    }
+
+    if (sort === 'az') arr.sort((a,b) => String(a.nombre||'').localeCompare(String(b.nombre||''), 'es'));
+    if (sort === 'instrumento') arr.sort((a,b) => String(a.instrumento||'').localeCompare(String(b.instrumento||''), 'es'));
+    return arr;
+  }
+
+  function getFilteredNombres() {
+    const q = normalizeText(document.getElementById('search-input')?.value || '');
+    let arr = [...nombresGuardados];
+    if (q) arr = arr.filter(n => normalizeText(n).includes(q));
+    if ((document.getElementById('sort-select')?.value || '') === 'az') arr.sort((a,b) => a.localeCompare(b, 'es'));
+    return arr;
   }
 
   function buildCard(p) {
-    const idx = colorIdx(p.nombre)
-    const initials = getInitials(p.nombre)
-    const generos = (p.generos||'').split(',').map(g=>g.trim()).filter(Boolean).slice(0,3)
-    const location = [p.barrio, p.ciudad].filter(Boolean).join(', ')
-    const tags = generos.map(g=>`<span class="ctag">${g}</span>`).join('')
-    const refs = p.referentes ? `🎵 <em>${p.referentes.split(',').slice(0,3).join(', ')}</em>` : ''
-    const bio = p.bio || (p.instrumento ? `Toca ${p.instrumento}` : 'Músico en buscARTE')
+    const idx = colorIdx(p.nombre);
+    const initials = getInitials(p.nombre);
+    const generos = String(p.generos||'').split(',').map(g=>g.trim()).filter(Boolean).slice(0,3);
+    const location = [p.barrio, p.ciudad].filter(Boolean).join(', ');
+    const tags = generos.map(g=>`<span class="ctag">${escapeHtml(g)}</span>`).join('');
+    const refs = p.referentes ? `🎵 <em>${escapeHtml(String(p.referentes).split(',').slice(0,3).join(', '))}</em>` : 'Sin referentes cargados';
+    const bio = p.bio || (p.instrumento ? `Toca ${p.instrumento}` : 'Músico en buscARTE');
     const avatarHTML = p.foto_url
-      ? `<div class="card-avatar" style="background:#000;overflow:hidden"><img src="${p.foto_url}" style="width:100%;height:100%;object-fit:cover"></div>`
-      : `<div class="card-avatar" style="background:${COLORES[idx]};color:${TEXTO[idx]}">${initials}</div>`
-    return `<div class="musician-card" data-id="${p.id}">
+      ? `<div class="card-avatar" style="background:#000"><img src="${escapeHtml(p.foto_url)}" alt="${escapeHtml(p.nombre || 'Perfil')}"></div>`
+      : `<div class="card-avatar" style="background:${COLORES[idx]};color:${TEXTO[idx]}">${escapeHtml(initials)}</div>`;
+
+    return `<article class="saved-card" data-id="${escapeHtml(p.id)}">
       <div class="card-top">
         ${avatarHTML}
         <div class="card-info">
-          <div class="card-name">${p.nombre||'Sin nombre'}</div>
-          <div class="card-instrument">${p.instrumento||'Músico'}</div>
-          <div class="card-location">${location ? '📍 '+location : ''}</div>
+          <div class="card-name">${escapeHtml(p.nombre || 'Sin nombre')}</div>
+          <div class="card-instrument">${escapeHtml(p.instrumento || 'Músico')}</div>
+          <div class="card-location">${location ? '📍 ' + escapeHtml(location) : 'Sin ubicación cargada'}</div>
         </div>
-        <button class="btn-unsave" onclick="quitarGuardado(${p.id}, this)" title="Quitar de guardados" style="margin-left:auto;background:none;border:none;color:#ff5555;font-size:1.2rem;cursor:pointer;padding:.5rem">♥</button>
+        <button class="btn-unsave" onclick="quitarGuardado('${String(p.id).replace(/'/g, "\\'")}', this)" title="Quitar de guardados">♥</button>
       </div>
       ${tags ? `<div class="card-tags">${tags}</div>` : ''}
-      <div class="card-bio">${bio}</div>
+      <div class="card-bio">${escapeHtml(bio)}</div>
       <div class="card-footer">
         <div class="card-refs">${refs}</div>
-        <a href="buscARTE_perfil_publico.html?id=${p.id}" class="card-cta">Ver perfil →</a>
+        <a href="buscARTE_perfil_publico.html?id=${encodeURIComponent(p.id)}" class="card-cta">Ver perfil →</a>
       </div>
-    </div>`
+    </article>`;
+  }
+
+  function renderPerfiles() {
+    const grid = document.getElementById('musicians-grid');
+    const arr = getFilteredPerfiles();
+    document.getElementById('stat-musicos').textContent = String(perfilesGuardados.length);
+
+    if (!arr.length) {
+      const hasAny = perfilesGuardados.length > 0;
+      grid.innerHTML = `<div class="empty-state">
+        <div class="empty-icon">${hasAny ? '🔎' : '♡'}</div>
+        <div class="empty-title">${hasAny ? 'No hay resultados con esa búsqueda' : 'Sin músicos guardados todavía'}</div>
+        <div class="empty-sub">${hasAny ? 'Probá con otro nombre, instrumento, barrio o género.' : 'Cuando guardes un perfil desde la búsqueda, va a aparecer acá.'}</div>
+        <div class="empty-actions">
+          ${hasAny ? `<button class="btn-outline" onclick="limpiarBusqueda()">Limpiar búsqueda</button>` : `<a href="buscARTE_busqueda.html" class="btn-solid">Buscar músicos →</a>`}
+        </div>
+      </div>`;
+      return;
+    }
+
+    grid.innerHTML = arr.map(buildCard).join('');
+  }
+
+  function renderNombres() {
+    const grid = document.getElementById('names-grid');
+    nombresGuardados = JSON.parse(localStorage.getItem('ba_nombres_guardados') || '[]');
+    document.getElementById('stat-nombres').textContent = String(nombresGuardados.length);
+    const arr = getFilteredNombres();
+
+    if (!arr.length) {
+      const hasAny = nombresGuardados.length > 0;
+      grid.innerHTML = `<div class="empty-state">
+        <div class="empty-icon">${hasAny ? '🔎' : '🎲'}</div>
+        <div class="empty-title">${hasAny ? 'No hay nombres con esa búsqueda' : 'Todavía no guardaste nombres'}</div>
+        <div class="empty-sub">${hasAny ? 'Probá escribiendo otra cosa.' : 'Los nombres que guardes en el generador también pueden vivir acá.'}</div>
+        <div class="empty-actions">
+          ${hasAny ? `<button class="btn-outline" onclick="limpiarBusqueda()">Limpiar búsqueda</button>` : `<a href="buscARTE_generador.html" class="btn-solid">Abrir generador →</a>`}
+        </div>
+      </div>`;
+      return;
+    }
+
+    grid.innerHTML = arr.map(n => `<article class="name-card">
+      <div class="name-value">${escapeHtml(n)}</div>
+      <div class="name-actions">
+        <button class="tiny-btn" onclick="copiarNombre('${String(n).replace(/'/g, "\\'")}', this)">Copiar</button>
+        <button class="tiny-btn danger" onclick="quitarNombre('${String(n).replace(/'/g, "\\'")}')">Quitar</button>
+      </div>
+    </article>`).join('');
+  }
+
+  function renderCurrentSection() {
+    if (currentSection === 'musicos') renderPerfiles();
+    else renderNombres();
+  }
+
+  function setSection(section) {
+    currentSection = section;
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById('tab-' + section).classList.add('active');
+    document.querySelectorAll('.section-panel').forEach(panel => panel.classList.remove('active'));
+    document.getElementById('panel-' + section).classList.add('active');
+
+    const sort = document.getElementById('sort-select');
+    if (section === 'nombres') {
+      [...sort.options].forEach(opt => opt.disabled = opt.value === 'instrumento');
+      if (sort.value === 'instrumento') sort.value = 'az';
+    } else {
+      [...sort.options].forEach(opt => opt.disabled = false);
+    }
+    renderCurrentSection();
+  }
+
+  function limpiarBusqueda() {
+    const input = document.getElementById('search-input');
+    if (input) input.value = '';
+    renderCurrentSection();
   }
 
   async function cargarGuardados() {
-    const miId = localStorage.getItem('ba_user_id')
-    if (!miId) return
-    const grid = document.getElementById('musicians-grid')
-    grid.innerHTML = '<div style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--gris);font-size:.88rem">Cargando...</div>'
+    const miId = localStorage.getItem('ba_user_id');
+    const grid = document.getElementById('musicians-grid');
+    if (!miId && !previewMode) return;
+
+    cargandoPerfiles = true;
+    grid.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-title">Cargando...</div></div>';
 
     try {
-      // Cargar IDs guardados
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles_guardados?user_id=eq.${miId}&select=perfil_id`, { headers: hdrs })
-      const guardados = await res.json()
+      let ids = [];
+      if (previewMode) {
+        perfilesGuardados = [
+          { id: 1, nombre:'Lucía Moreno', instrumento:'Guitarra', generos:'Jazz, Rock, Funk', ciudad:'CABA', barrio:'Almagro', bio:'Guitarrista disponible para sesiones y shows.', referentes:'Spinetta, Amy Winehouse, John Mayer' },
+          { id: 2, nombre:'Nicolás Bustos', instrumento:'Batería', generos:'Rock, Indie', ciudad:'CABA', barrio:'Caballito', bio:'Buscando proyectos con material propio.', referentes:'Radiohead, Soda Stereo, Él Mató' }
+        ];
+      } else {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles_guardados?user_id=eq.${encodeURIComponent(miId)}&select=perfil_id`, { headers: hdrs });
+        if (!res.ok) throw new Error(await res.text());
+        const guardados = await res.json();
+        ids = Array.isArray(guardados) ? guardados.map(g => g.perfil_id).filter(Boolean) : [];
 
-      if (!guardados.length) {
-        grid.innerHTML = `<div style="grid-column:1/-1;padding:4rem;text-align:center">
-          <div style="font-size:2rem;margin-bottom:1rem">♡</div>
-          <div style="font-family:var(--font-display);font-size:1.4rem;margin-bottom:.5rem">Sin guardados todavía</div>
-          <div style="color:var(--gris);font-size:.88rem">Cuando guardes un perfil va a aparecer acá. <a href="buscARTE_busqueda.html" style="color:var(--neon)">Buscar músicos →</a></div>
-        </div>`
-        const rn = document.getElementById('result-num'); if(rn) rn.textContent = '0'
-        return
+        if (!ids.length) {
+          perfilesGuardados = [];
+        } else {
+          const pRes = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=in.(${ids.join(',')})&select=id,nombre,instrumento,generos,ciudad,barrio,bio,referentes,foto_url`, { headers: hdrs });
+          if (!pRes.ok) throw new Error(await pRes.text());
+          const perfiles = await pRes.json();
+          const order = new Map(ids.map((id, idx) => [String(id), idx]));
+          perfilesGuardados = (Array.isArray(perfiles) ? perfiles : []).sort((a,b) => (order.get(String(a.id)) ?? 9999) - (order.get(String(b.id)) ?? 9999));
+        }
       }
 
-      const ids = guardados.map(g => g.perfil_id).join(',')
-      const pRes = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=in.(${ids})&select=id,nombre,instrumento,generos,ciudad,barrio,bio,referentes,foto_url`, { headers: hdrs })
-      const perfiles = await pRes.json()
-
-      grid.innerHTML = ''
-      perfiles.forEach(p => grid.insertAdjacentHTML('beforeend', buildCard(p)))
-      const rn2 = document.getElementById('result-num'); if(rn2) rn2.textContent = perfiles.length
-
+      renderPerfiles();
+      renderNombres();
     } catch(e) {
-      grid.innerHTML = '<div style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--gris)">Error al cargar. Verificá tu conexión.</div>'
-      console.error(e)
+      console.error(e);
+      grid.innerHTML = `<div class="empty-state">
+        <div class="empty-icon">⚠️</div>
+        <div class="empty-title">No se pudieron cargar tus guardados</div>
+        <div class="empty-sub">Probá recargar la página. Si sigue pasando, avisame desde Contacto.</div>
+        <div class="empty-actions"><button class="btn-outline" onclick="cargarGuardados()">Reintentar</button></div>
+      </div>`;
+    } finally {
+      cargandoPerfiles = false;
     }
   }
 
   async function quitarGuardado(perfilId, btn) {
-    const miId = localStorage.getItem('ba_user_id')
-    if (!miId) return
-    btn.textContent = '...'
+    const miId = localStorage.getItem('ba_user_id');
+    if (!miId && !previewMode) return;
+    const card = btn.closest('.saved-card');
+    const original = btn.textContent;
+    btn.textContent = '...';
+    btn.disabled = true;
+
     try {
-      await fetch(`${SUPABASE_URL}/rest/v1/perfiles_guardados?user_id=eq.${miId}&perfil_id=eq.${perfilId}`, {
-        method: 'DELETE',
-        headers: hdrs
-      })
-      btn.closest('.musician-card').style.opacity = '0'
-      btn.closest('.musician-card').style.transition = 'opacity .3s'
-      setTimeout(() => { btn.closest('.musician-card').remove(); cargarGuardados() }, 300)
-    } catch(e) { btn.textContent = '♥'; console.error(e) }
+      if (!previewMode) {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles_guardados?user_id=eq.${encodeURIComponent(miId)}&perfil_id=eq.${encodeURIComponent(perfilId)}`, {
+          method: 'DELETE',
+          headers: hdrs
+        });
+        if (!res.ok) throw new Error(await res.text());
+      }
+
+      perfilesGuardados = perfilesGuardados.filter(p => String(p.id) !== String(perfilId));
+      card?.classList.add('removing');
+      setTimeout(renderPerfiles, 240);
+      showNotice('Perfil quitado de guardados.');
+    } catch(e) {
+      console.error(e);
+      btn.textContent = original;
+      btn.disabled = false;
+      showNotice('No se pudo quitar el perfil. Intentá de nuevo.', 'error');
+    }
   }
 
-  window.addEventListener('DOMContentLoaded', cargarGuardados);
+  function copiarNombre(nombre, btn) {
+    const done = () => {
+      const original = btn.textContent;
+      btn.textContent = '✓ Copiado';
+      setTimeout(() => { btn.textContent = original; }, 1300);
+    };
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(nombre).then(done).catch(() => fallbackCopy(nombre, done));
+    } else {
+      fallbackCopy(nombre, done);
+    }
+  }
 
+  function fallbackCopy(text, cb) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try { document.execCommand('copy'); cb?.(); } catch(e) {}
+    ta.remove();
+  }
+
+  function quitarNombre(nombre) {
+    nombresGuardados = JSON.parse(localStorage.getItem('ba_nombres_guardados') || '[]').filter(n => n !== nombre);
+    localStorage.setItem('ba_nombres_guardados', JSON.stringify(nombresGuardados));
+    renderNombres();
+    showNotice('Nombre quitado de guardados.');
+  }
 
   async function cargarBadgeMensajes(uid) {
     const badge = document.getElementById('nav-msg-badge');
     if (!badge || !uid) return;
     try {
       const lastSeen = localStorage.getItem('ba_msg_last_seen') || new Date().toISOString();
-      const res = await fetch(
-        `https://xiaanchoanxmampegoay.supabase.co/rest/v1/mensajes?para_user_id=eq.${uid}&created_at=gt.${lastSeen}&select=id&limit=99`,
-        { headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68', 'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68` } }
-      );
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/mensajes?para_user_id=eq.${encodeURIComponent(uid)}&created_at=gt.${encodeURIComponent(lastSeen)}&select=id&limit=99`, { headers: hdrs });
+      if (!res.ok) throw new Error('badge');
       const msgs = await res.json();
       const count = Array.isArray(msgs) ? msgs.length : 0;
       if (count > 0) {
         badge.textContent = count > 99 ? '99+' : count;
-        badge.style.display = 'inline';
+        badge.style.display = 'inline-block';
       } else {
         badge.style.display = 'none';
       }
-    } catch(e) { if(badge) badge.style.display = 'none'; }
+    } catch(e) {
+      badge.style.display = 'none';
+    }
   }
 
-  // NAV SESSION
-  (function initNav(){
-    const l=localStorage.getItem('ba_logged')==='1';
-    const n=localStorage.getItem('ba_name')||'Mi perfil';
-    const uid=localStorage.getItem('ba_user_id')||'';
-    const i=n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-    if(l){
-      const g=document.getElementById('nav-guest');const u=document.getElementById('nav-user');
-      if(g)g.style.display='none';if(u)u.style.display='flex';
-      const c=document.getElementById('nav-avatar-circle');if(c)c.textContent=i;
-      const nm=document.getElementById('nav-avatar-name');if(nm)nm.textContent=n.split(' ')[0];
+  function initNav(){
+    const logged = localStorage.getItem('ba_logged') === '1';
+    const name = localStorage.getItem('ba_name') || 'Mi perfil';
+    const uid = localStorage.getItem('ba_user_id') || '';
+    const initials = getInitials(name);
+    const guest = document.getElementById('nav-guest');
+    const user = document.getElementById('nav-user');
+
+    if (logged) {
+      if (guest) guest.style.display = 'none';
+      if (user) user.style.display = 'flex';
+      const circle = document.getElementById('nav-avatar-circle');
+      if (circle) circle.textContent = initials;
+      const nm = document.getElementById('nav-avatar-name');
+      if (nm) nm.textContent = String(name).split(' ')[0];
+      const miPerfilLink = document.querySelector('.nav-dropdown-item[href*="perfil_publico"]');
+      if (miPerfilLink && uid) miPerfilLink.href = 'buscARTE_perfil_publico.html?id=' + encodeURIComponent(uid);
       cargarBadgeMensajes(uid);
-      const miPerfilLink=document.querySelector('.nav-dropdown-item[href*="perfil_publico"]');
-      if(miPerfilLink && uid) miPerfilLink.href='buscARTE_perfil_publico.html?id='+uid;
+    } else {
+      if (guest) guest.style.display = 'flex';
+      if (user) user.style.display = 'none';
     }
-  })();
-  function toggleUserMenu(e){if(e)e.stopPropagation();const w=document.getElementById('nav-avatar-btn');const d=document.getElementById('nav-dropdown');if(w)w.classList.toggle('open');if(d)d.classList.toggle('open');}
-  // Close dropdown when tapping outside
+
+    const mbnp = document.getElementById('mbnp-perfil');
+    if (mbnp && uid) mbnp.href = 'buscARTE_perfil_publico.html?id=' + encodeURIComponent(uid);
+    else if (mbnp) mbnp.href = 'buscARTE_login.html';
+  }
+
+  function toggleUserMenu(e){
+    if (window.innerWidth <= 900) {
+      e?.stopPropagation();
+      toggleMbnPanel();
+      return;
+    }
+    e?.stopPropagation();
+    document.getElementById('nav-avatar-btn')?.classList.toggle('open');
+    document.getElementById('nav-dropdown')?.classList.toggle('open');
+  }
+
   document.addEventListener('click', function(e){
     if(!e.target.closest('#nav-avatar-btn') && !e.target.closest('#nav-dropdown')){
-      const d=document.getElementById('nav-dropdown');const w=document.getElementById('nav-avatar-btn');
-      if(d)d.classList.remove('open');if(w)w.classList.remove('open');
+      document.getElementById('nav-dropdown')?.classList.remove('open');
+      document.getElementById('nav-avatar-btn')?.classList.remove('open');
     }
   });
-  document.addEventListener('click',e=>{if(!e.target.closest('#nav-user')){document.getElementById('nav-avatar-btn')?.classList.remove('open');document.getElementById('nav-dropdown')?.classList.remove('open');}});
-  function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');window.location.href='index.html';}
-</script>
-<div class="mbn-overlay" id="mbn-overlay" onclick="closeMbnPanel()"></div>
-<div class="mbn-panel" id="mbn-panel">
-  <div class="mbn-panel-title">Mi cuenta</div>
-  <a href="#" class="mbn-panel-item" id="mbnp-perfil">
-    <span class="mbn-pi-icon">👤</span> Ver mi perfil
-  </a>
-  <a href="buscARTE_perfil.html" class="mbn-panel-item">
-    <span class="mbn-pi-icon">⚙️</span> Configurar perfil
-  </a>
-  <a href="buscARTE_mis_anuncios.html" class="mbn-panel-item">
-    <span class="mbn-pi-icon">📋</span> Mis anuncios
-  </a>
-  <a href="buscARTE_guardados.html" class="mbn-panel-item">
-    <span class="mbn-pi-icon">🔖</span> Guardados / Favoritos
-  </a>
-  <a href="#" class="mbn-panel-item danger" onclick="mbnLogout()">
-    <span class="mbn-pi-icon">🚪</span> Cerrar sesión
-  </a>
-</div>
-<nav class="mobile-bottom-nav" id="mobile-bottom-nav">
-  <a href="buscARTE_busqueda.html" class="mbn-item" data-page="busqueda"><span class="mbn-icon">🎵</span><span>Músicos</span></a>
-  <a href="buscARTE_anuncios.html" class="mbn-item" data-page="anuncios"><span class="mbn-icon">📋</span><span>Anuncios</span></a>
-  <a href="buscARTE_mensajes.html" class="mbn-item" data-page="mensajes"><span class="mbn-icon">💬</span><span>Mensajes</span></a>
-  <button class="mbn-item" onclick="toggleMbnPanel()" style="background:none;border:none;flex:1;padding:0;" data-page="perfil"><span class="mbn-icon">👤</span><span>Mi perfil</span></button>
-</nav>
-<script>
-(function(){
-  var uid = localStorage.getItem('ba_user_id');
-  var el = document.getElementById('mbnp-perfil');
-  if(el && uid) el.href = 'buscARTE_perfil_publico.html?id='+uid;
-  else if(el) el.href = 'buscARTE_login.html';
-  var path = window.location.pathname.split('/').pop();
-  document.querySelectorAll('.mbn-item[data-page]').forEach(function(a){
-    if(path.indexOf(a.dataset.page) !== -1) a.style.color='#d4f53c';
+
+  function toggleMbnPanel(){
+    document.getElementById('mbn-panel')?.classList.toggle('open');
+    document.getElementById('mbn-overlay')?.classList.toggle('open');
+  }
+  function closeMbnPanel(){
+    document.getElementById('mbn-panel')?.classList.remove('open');
+    document.getElementById('mbn-overlay')?.classList.remove('open');
+  }
+  function logout(){
+    localStorage.removeItem('ba_logged');
+    localStorage.removeItem('ba_name');
+    localStorage.removeItem('ba_email');
+    localStorage.removeItem('ba_user_id');
+    window.location.href = 'index.html';
+  }
+  function mbnLogout(){ logout(); }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    initCursor();
+    if (!previewMode) requireLogin();
+    initNav();
+    renderNombres();
+    cargarGuardados();
   });
-})();
-function toggleMbnPanel(){
-  document.getElementById('mbn-panel').classList.toggle('open');
-  document.getElementById('mbn-overlay').classList.toggle('open');
-}
-function closeMbnPanel(){
-  document.getElementById('mbn-panel').classList.remove('open');
-  document.getElementById('mbn-overlay').classList.remove('open');
-}
-function mbnLogout(){
-  localStorage.removeItem('ba_logged');
-  localStorage.removeItem('ba_name');
-  localStorage.removeItem('ba_user_id');
-  window.location.href='index.html';
-}
 
-</script>
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
-  });
-}
-
-  // En mobile, el avatar del nav abre el panel del bottom nav
-  (function() {
-    if (window.innerWidth > 900) return;
-    const btn = document.getElementById('nav-avatar-btn');
-    if (!btn) return;
-    // Remover onclick original y poner el del panel
-    btn.removeAttribute('onclick');
-    btn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      if (typeof toggleMbnPanel === 'function') {
-        toggleMbnPanel();
-      }
-    });
-    // También quitar el chevron en mobile que confunde
-    const chevron = btn.querySelector('.nav-avatar-chevron');
-    if (chevron) chevron.style.display = 'none';
-  })();
-
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(()=>{}); });
+  }
 </script>
 </body>
 </html>

@@ -3,101 +3,519 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- SEO -->
-  <meta name="description" content="Términos y condiciones de uso de buscARTE, la red de músicos argentinos.">
+  <meta name="description" content="Términos y condiciones de uso de buscARTE: perfiles, anuncios, mensajes, marketplace, eventos, reportes y responsabilidad entre usuarios.">
   <meta name="robots" content="index, follow">
   <meta name="author" content="buscARTE">
   <link rel="canonical" href="https://buscarte.com.ar/buscARTE_terminos.html">
-
-  <!-- Open Graph (WhatsApp, Facebook, Instagram) -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://buscarte.com.ar/buscARTE_terminos.html">
   <meta property="og:title" content="Términos de uso — buscARTE">
-  <meta property="og:description" content="Términos y condiciones de uso de buscARTE, la red de músicos argentinos.">
+  <meta property="og:description" content="Términos y condiciones de uso de buscARTE: perfiles, anuncios, mensajes, marketplace, eventos, reportes y responsabilidad entre usuarios.">
   <meta property="og:image" content="https://buscarte.com.ar/og-image.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:locale" content="es_AR">
   <meta property="og:site_name" content="buscARTE">
-
-  <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Términos de uso — buscARTE">
-  <meta name="twitter:description" content="Términos y condiciones de uso de buscARTE, la red de músicos argentinos.">
+  <meta name="twitter:description" content="Términos y condiciones de uso de buscARTE: perfiles, anuncios, mensajes, marketplace, eventos, reportes y responsabilidad entre usuarios.">
   <meta name="twitter:image" content="https://buscarte.com.ar/og-image.jpg">
   <title>Términos de uso — buscARTE</title>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="buscARTE">
+  <link rel="apple-touch-icon" href="/icons/icon-192.svg">
   <style>
-    :root { --neon:#d4f53c;--negro:#0a0a0a;--blanco:#f2ede4;--gris:#888; }
-    * { margin:0;padding:0;box-sizing:border-box; }
-    body { background:var(--negro);color:var(--blanco);font-family:'Archivo',sans-serif;line-height:1.7; }
-    nav { display:flex;align-items:center;padding:1rem 2rem;border-bottom:1px solid #1c1c1c; }
-    .nav-logo { font-family:'Archivo Black',sans-serif;font-size:1.4rem;text-decoration:none;color:var(--blanco) }
-    .nav-logo span { color:var(--neon) }
-    .wrap { max-width:760px;margin:0 auto;padding:4rem 2rem; }
-    h1 { font-family:'Archivo Black',sans-serif;font-size:2.5rem;margin-bottom:.5rem }
-    h1 span { color:var(--neon) }
-    .fecha { color:var(--gris);font-size:.85rem;margin-bottom:3rem }
-    h2 { font-size:1.1rem;font-weight:700;margin:2.5rem 0 .75rem;color:var(--neon) }
-    p { color:#ccc;margin-bottom:1rem }
-    ul { color:#ccc;padding-left:1.5rem;margin-bottom:1rem }
-    ul li { margin-bottom:.5rem }
-    footer { text-align:center;padding:2rem;color:var(--gris);font-size:.8rem;border-top:1px solid #1c1c1c;margin-top:4rem }
-    footer a { color:var(--neon);text-decoration:none }
-  
-  @media (max-width: 768px) {
-    nav { padding: .75rem 1rem; }
-    .wrap { padding: 2rem 1.25rem; }
-    h1 { font-size: 1.8rem; }
-    h2 { font-size: 1rem; }
-    p, ul { font-size: .9rem; }
+
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --negro:#080808; --negro2:#111; --negro3:#1a1a1a;
+    --blanco:#f2ede4; --neon:#d4f53c; --rojo:#e8311a;
+    --gris:#888; --gris2:#555; --gris3:#2a2a2a;
+    --font-display:'Archivo Black',sans-serif;
+    --font-body:'Archivo',sans-serif;
   }
-</style>
+  html { scroll-behavior:smooth; }
+  body {
+    background:var(--negro);
+    color:var(--blanco);
+    font-family:var(--font-body);
+    font-weight:300;
+    min-height:100vh;
+    overflow-x:hidden;
+    cursor:none;
+    line-height:1.75;
+  }
+  body::before {
+    content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity:.03;pointer-events:none;z-index:0;
+  }
+  .cursor { width:10px;height:10px;background:var(--neon);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%); }
+  .cursor-ring { width:36px;height:36px;border:1px solid rgba(212,245,60,0.35);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .15s ease; }
+
+  nav {
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    display:flex;align-items:center;justify-content:space-between;
+    height:60px;padding:0 2.5rem;
+    border-bottom:1px solid #1c1c1c;
+    background:rgba(8,8,8,.96);backdrop-filter:blur(12px);
+  }
+  .nav-logo { font-family:var(--font-display);font-size:1.4rem;color:var(--blanco);text-decoration:none;flex-shrink:0; }
+  .nav-logo span { color:var(--neon); }
+  .nav-links { display:flex;align-items:center;gap:1.6rem;list-style:none; }
+  .nav-link { color:var(--gris);text-decoration:none;font-size:.76rem;letter-spacing:.1em;text-transform:uppercase;transition:color .2s; }
+  .nav-link:hover, .nav-link.active { color:var(--neon); }
+  .nav-right { display:flex;align-items:center;gap:.8rem; }
+  .btn-ghost, .btn-neon {
+    padding:.48rem 1rem;
+    font-family:var(--font-body);
+    font-size:.76rem;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    text-decoration:none;
+    cursor:none;
+    transition:all .2s;
+    border-radius:0;
+    display:inline-flex;align-items:center;justify-content:center;
+    border:1px solid var(--gris2);
+    white-space:nowrap;
+  }
+  .btn-ghost { background:transparent;color:var(--blanco); }
+  .btn-ghost:hover { border-color:var(--blanco); }
+  .btn-neon { background:var(--neon);border-color:var(--neon);color:var(--negro);font-weight:500; }
+  .btn-neon:hover { opacity:.86; }
+  .nav-user { position:relative;display:none; }
+  .nav-avatar-wrap { display:flex;align-items:center;gap:.5rem;cursor:none;padding:.3rem .6rem;border:1px solid var(--gris3);transition:border-color .2s;user-select:none; }
+  .nav-avatar-wrap:hover { border-color:var(--gris2); }
+  .nav-avatar-circle { width:28px;height:28px;border-radius:50%;background:#0d2010;color:var(--neon);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.62rem;flex-shrink:0; }
+  .nav-avatar-name { font-size:.78rem;color:var(--blanco);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+  .nav-avatar-chevron { font-size:.6rem;color:var(--gris);transition:transform .2s; }
+  .nav-avatar-wrap.open .nav-avatar-chevron { transform:rotate(180deg); }
+  .nav-dropdown { position:absolute;top:calc(100% + 8px);right:0;background:var(--negro2);border:1px solid #2a2a2a;min-width:210px;display:none;flex-direction:column;z-index:300; }
+  .nav-dropdown.open { display:flex; }
+  .nav-dropdown-item { display:flex;align-items:center;gap:.6rem;padding:.78rem 1.1rem;color:var(--gris);text-decoration:none;font-size:.82rem;transition:all .15s;background:transparent;border:none;font-family:var(--font-body);cursor:none;text-align:left;width:100%; }
+  .nav-dropdown-item:hover { background:rgba(255,255,255,.04);color:var(--blanco); }
+  .nav-dropdown-divider { height:1px;background:#1c1c1c;margin:.3rem 0; }
+  .nav-logout:hover { color:var(--rojo) !important; }
+  .top-spacer { height:60px; }
+
+  main { position:relative;z-index:1; }
+  .hero {
+    border-bottom:1px solid #1c1c1c;
+    padding:4rem 2.5rem 2.5rem;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero-inner { max-width:1120px;margin:0 auto;position:relative;z-index:1;display:grid;grid-template-columns:1fr 330px;gap:2rem;align-items:end; }
+  .hero-kicker { font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--neon);margin-bottom:.8rem; }
+  h1 { font-family:var(--font-display);font-size:clamp(2.4rem,6vw,5rem);line-height:.9;letter-spacing:-.04em;margin-bottom:1rem; }
+  h1 span { color:var(--neon); }
+  .hero-desc { color:var(--gris);font-size:1rem;line-height:1.7;max-width:650px; }
+  .hero-bg {
+    position:absolute;right:-3rem;top:50%;transform:translateY(-50%);
+    font-family:var(--font-display);font-size:13rem;
+    color:transparent;-webkit-text-stroke:1px #161616;
+    letter-spacing:-.06em;white-space:nowrap;pointer-events:none;user-select:none;
+  }
+  .hero-card {
+    border:1px solid rgba(212,245,60,.18);
+    background:rgba(212,245,60,.035);
+    padding:1.4rem;
+  }
+  .hero-card-label { font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--neon);margin-bottom:.65rem; }
+  .hero-card-text { color:var(--blanco);font-size:.9rem;line-height:1.7; }
+  .meta-row { display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.3rem; }
+  .meta-chip { border:1px solid var(--gris3);color:var(--gris);padding:.3rem .75rem;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase; }
+  .meta-chip.neon { border-color:rgba(212,245,60,.3);color:var(--neon);background:rgba(212,245,60,.05); }
+
+  .doc-layout {
+    max-width:1120px;
+    margin:0 auto;
+    padding:2.5rem;
+    display:grid;
+    grid-template-columns:260px 1fr;
+    gap:2.5rem;
+  }
+  .toc {
+    position:sticky;
+    top:84px;
+    align-self:start;
+    border:1px solid #1c1c1c;
+    background:var(--negro2);
+    padding:1.25rem;
+  }
+  .toc-title { font-family:var(--font-display);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gris);margin-bottom:.9rem; }
+  .toc a { display:block;color:var(--gris);text-decoration:none;font-size:.8rem;padding:.45rem 0;border-bottom:1px solid #191919;transition:color .15s; }
+  .toc a:last-child { border-bottom:none; }
+  .toc a:hover { color:var(--neon); }
+  .doc-content {
+    min-width:0;
+  }
+  .summary-grid {
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:1px;
+    background:#1c1c1c;
+    margin-bottom:2.4rem;
+  }
+  .summary-card {
+    background:var(--negro2);
+    padding:1.25rem;
+    min-height:130px;
+  }
+  .summary-icon { font-size:1.4rem;margin-bottom:.55rem; }
+  .summary-title { font-family:var(--font-display);font-size:.82rem;line-height:1.2;margin-bottom:.45rem; }
+  .summary-text { color:var(--gris);font-size:.8rem;line-height:1.6; }
+  section {
+    padding:2rem 0;
+    border-bottom:1px solid #1c1c1c;
+  }
+  section:first-of-type { padding-top:0; }
+  section:last-of-type { border-bottom:none; }
+  h2 {
+    font-family:var(--font-display);
+    font-size:1.15rem;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    color:var(--neon);
+    margin-bottom:.85rem;
+    line-height:1.25;
+  }
+  p { color:#cfcfcf;margin-bottom:1rem;font-size:.96rem;line-height:1.8; }
+  ul { color:#cfcfcf;padding-left:1.2rem;margin-bottom:1rem; }
+  li { margin-bottom:.55rem; }
+  strong { color:var(--blanco);font-weight:500; }
+  a { color:var(--neon);text-decoration:none; }
+  a:hover { opacity:.75; }
+  .callout {
+    border-left:2px solid var(--neon);
+    background:rgba(212,245,60,.045);
+    padding:1rem 1.2rem;
+    margin:1.2rem 0;
+    color:var(--gris);
+    font-size:.9rem;
+    line-height:1.7;
+  }
+  .danger-callout {
+    border-left-color:var(--rojo);
+    background:rgba(232,49,26,.06);
+  }
+  .footer {
+    position:relative;z-index:1;
+    border-top:1px solid #1c1c1c;
+    padding:2rem 2.5rem;
+    display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;color:var(--gris);font-size:.82rem;
+  }
+  .footer-links { display:flex;gap:1rem;flex-wrap:wrap; }
+  .footer-links a { color:var(--gris); }
+  .footer-links a:hover { color:var(--neon); }
+
+  .mobile-bottom-nav { display:none; }
+
+  @media (max-width:900px) {
+    .cursor, .cursor-ring { display:none !important; }
+    * { cursor:auto !important; }
+    nav { height:56px;padding:.6rem 1rem; }
+    .nav-links { display:none; }
+    .nav-guest .btn-ghost { display:none; }
+    .btn-neon { padding:.4rem .75rem;font-size:.72rem; }
+    .top-spacer { height:56px; }
+    .hero { padding:2.5rem 1.25rem 2rem; }
+    .hero-inner { grid-template-columns:1fr;gap:1.2rem; }
+    .hero-bg { font-size:6rem;right:-1.5rem;top:1rem;transform:none;opacity:.8; }
+    h1 { font-size:2.25rem; }
+    .hero-desc { font-size:.92rem; }
+    .doc-layout { grid-template-columns:1fr;padding:1.5rem 1.25rem 5.5rem;gap:1.5rem; }
+    .toc { position:relative;top:auto;display:none; }
+    .summary-grid { grid-template-columns:1fr; }
+    section { padding:1.55rem 0; }
+    h2 { font-size:1rem; }
+    p, li { font-size:.9rem; }
+    .footer { flex-direction:column;text-align:center;padding:2rem 1.25rem 5rem; }
+    .mobile-bottom-nav {
+      display:flex; position:fixed; bottom:0; left:0; right:0;
+      background:#0f0f0f; border-top:1px solid #2a2a2a;
+      z-index:500; height:54px;
+    }
+    .mbn-item {
+      flex:1; display:flex; flex-direction:column; align-items:center;
+      justify-content:center; color:#666; text-decoration:none;
+      font-size:.55rem; letter-spacing:.05em; text-transform:uppercase;
+      font-family:var(--font-body); gap:.18rem; transition:color .15s;
+      background:none;border:none;
+    }
+    .mbn-item.active { color:var(--neon); }
+    .mbn-icon { font-size:1.1rem; line-height:1; }
+    body { padding-bottom:54px; }
+  }
+
+  </style>
 </head>
 <body>
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursor-ring"></div>
+  
 <nav>
   <a href="index.html" class="nav-logo">busc<span>ARTE</span></a>
+  <ul class="nav-links">
+    <li><a href="buscARTE_busqueda.html" class="nav-link">Músicos</a></li>
+    <li><a href="buscARTE_anuncios.html" class="nav-link">Anuncios</a></li>
+    <li><a href="buscARTE_contacto.html" class="nav-link">Contacto</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="nav-guest" id="nav-guest">
+      <a href="buscARTE_login.html" class="btn-ghost">Ingresar</a>
+      <a href="buscARTE_registro.html" class="btn-neon">Registrarse</a>
+    </div>
+    <div class="nav-user" id="nav-user">
+      <div class="nav-avatar-wrap" onclick="toggleUserMenu(event)" id="nav-avatar-btn">
+        <div class="nav-avatar-circle" id="nav-avatar-circle">?</div>
+        <span class="nav-avatar-name" id="nav-avatar-name">Mi perfil</span>
+        <span class="nav-avatar-chevron">▾</span>
+      </div>
+      <div class="nav-dropdown" id="nav-dropdown">
+        <a href="buscARTE_perfil_publico.html" data-my-profile class="nav-dropdown-item">👤 Mi perfil</a>
+        <a href="buscARTE_perfil.html" class="nav-dropdown-item">⚙️ Configurar perfil</a>
+        <a href="buscARTE_mensajes.html" class="nav-dropdown-item">💬 Mensajes</a>
+        <a href="buscARTE_mis_anuncios.html" class="nav-dropdown-item">📋 Mis anuncios</a>
+        <a href="buscARTE_guardados.html" class="nav-dropdown-item">♡ Guardados</a>
+        <div class="nav-dropdown-divider"></div>
+        <button class="nav-dropdown-item nav-logout" onclick="logout()">↩ Cerrar sesión</button>
+      </div>
+    </div>
+  </div>
 </nav>
+<div class="top-spacer"></div>
 
-<div class="wrap">
-  <h1>Términos de <span>uso</span></h1>
-  <p class="fecha">Última actualización: mayo 2025</p>
+  
+<main>
+  <section class="hero">
+    <div class="hero-bg">TÉRMINOS</div>
+    <div class="hero-inner">
+      <div>
+        <div class="hero-kicker">Reglas de la comunidad</div>
+        <h1>Términos de <span>uso</span></h1>
+        <p class="hero-desc">Las condiciones básicas para usar buscARTE: perfiles, anuncios, mensajes, eventos, compra/venta, clases y participación en la escena musical.</p>
+        <div class="meta-row">
+          <span class="meta-chip neon">Última actualización: mayo 2026</span>
+          <span class="meta-chip">Plataforma gratuita</span>
+          <span class="meta-chip">Sin comisiones</span>
+        </div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-card-label">Idea central</div>
+        <div class="hero-card-text">buscARTE es un espacio gratuito para conectar músicos y actores de la escena musical. Usalo con buena fe, sin spam y respetando a otras personas.</div>
+      </div>
+    </div>
+  </section>
 
-  <h2>1. Aceptación</h2>
-  <p>Al registrarte y usar buscARTE aceptás estos términos. Si no estás de acuerdo, no uses la plataforma.</p>
+  <div class="doc-layout">
+    <aside class="toc">
+      <div class="toc-title">En esta página</div>
+      <a href="#aceptacion">Aceptación</a>
+      <a href="#servicio">El servicio</a>
+      <a href="#cuenta">Tu cuenta</a>
+      <a href="#anuncios">Anuncios</a>
+      <a href="#mensajes">Mensajes</a>
+      <a href="#normas">Normas</a>
+      <a href="#responsabilidad">Responsabilidad</a>
+      <a href="#moderacion">Moderación</a>
+      <a href="#eliminacion">Eliminar cuenta</a>
+      <a href="#contacto">Contacto</a>
+    </aside>
 
-  <h2>2. El servicio</h2>
-  <p>buscARTE es una red social gratuita para músicos argentinos. Permite crear perfiles, publicar anuncios, enviar mensajes y conectar con otros artistas.</p>
+    <div class="doc-content">
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="summary-icon">🎵</div>
+          <div class="summary-title">Para músicos y la escena</div>
+          <div class="summary-text">Perfiles de músicos, anuncios, jams, compra/venta, clases, salas, eventos y proyectos musicales.</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-icon">📋</div>
+          <div class="summary-title">Publicar es tu responsabilidad</div>
+          <div class="summary-text">Cada usuario responde por lo que publica, ofrece, vende, compra, coordina o comunica.</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-icon">🛡️</div>
+          <div class="summary-title">Podemos moderar</div>
+          <div class="summary-text">Podemos ocultar contenido, suspender cuentas o revisar reportes si hay abuso, spam o contenido indebido.</div>
+        </div>
+      </div>
 
-  <h2>3. Tu cuenta</h2>
-  <ul>
-    <li>Sos responsable de la información que publiques en tu perfil.</li>
-    <li>No podés crear cuentas falsas ni hacerte pasar por otra persona.</li>
-    <li>Podés eliminar tu cuenta en cualquier momento contactándonos.</li>
-  </ul>
+      <section id="aceptacion">
+        <h2>1. Aceptación</h2>
+        <p>Al usar buscARTE aceptás estos términos. Si no estás de acuerdo, no uses la plataforma.</p>
+        <p>También aceptás usar buscARTE con buena fe, respeto por otros usuarios y datos verdaderos o razonablemente representativos de tu actividad.</p>
+      </section>
 
-  <h2>4. Contenido</h2>
-  <ul>
-    <li>No publiques contenido ofensivo, discriminatorio o ilegal.</li>
-    <li>No uses la plataforma para spam o publicidad no autorizada.</li>
-    <li>buscARTE se reserva el derecho de eliminar contenido que viole estas normas.</li>
-  </ul>
+      <section id="servicio">
+        <h2>2. El servicio</h2>
+        <p>buscARTE es una plataforma gratuita para músicos argentinos y la escena musical. Permite crear perfiles, buscar músicos, publicar anuncios, organizar o encontrar jams/eventos, vender o alquilar equipos, ofrecer clases, guardar favoritos y enviar mensajes.</p>
+        <div class="callout">buscARTE no cobra comisión por las conexiones, mensajes, publicaciones o acuerdos entre usuarios.</div>
+      </section>
 
-  <h2>5. Privacidad</h2>
-  <p>Tu información se usa únicamente para el funcionamiento de la plataforma. No vendemos datos a terceros. Consultá nuestra <a href="buscARTE_privacidad.html" style="color:var(--neon)">política de privacidad</a> para más detalle.</p>
+      <section id="cuenta">
+        <h2>3. Tu cuenta y perfil</h2>
+        <ul>
+          <li>Sos responsable de mantener segura tu cuenta.</li>
+          <li>No podés crear cuentas falsas, suplantar identidad o usar datos engañosos.</li>
+          <li>Los perfiles visibles en <strong>Músicos</strong> deben representar a músicos, artistas o roles musicales pertinentes.</li>
+          <li>Podés editar tu información desde <strong>Configurar perfil</strong>.</li>
+        </ul>
+        <p>buscARTE puede evolucionar para permitir distintos roles dentro de la escena musical, como músicos, docentes, salas, organizadores, técnicos, productores o vendedores de equipos.</p>
+      </section>
 
-  <h2>6. Limitación de responsabilidad</h2>
-  <p>buscARTE es un espacio de conexión entre músicos. No nos responsabilizamos por acuerdos, transacciones o situaciones que surjan entre usuarios fuera de la plataforma.</p>
+      <section id="anuncios">
+        <h2>4. Anuncios, eventos y marketplace</h2>
+        <p>Los anuncios son responsabilidad de quien los publica. Esto incluye búsquedas de músicos, ofrecimientos, jams, eventos, clases, compra/venta y alquiler de equipos.</p>
+        <ul>
+          <li>No publiques productos, servicios o eventos falsos, engañosos o ilegales.</li>
+          <li>No uses anuncios para spam, estafas, publicidad masiva o contenido ajeno a la escena musical.</li>
+          <li>En compra/venta, verificá el estado del equipo, acordá condiciones claras y evitá adelantos dudosos.</li>
+          <li>En eventos o jams, indicá fecha, lugar, precio y condiciones de participación con claridad.</li>
+        </ul>
+        <div class="callout danger-callout">buscARTE no participa de pagos, envíos, acuerdos comerciales ni encuentros fuera de la plataforma. Coordiná con cuidado.</div>
+      </section>
 
-  <h2>7. Cambios</h2>
-  <p>Podemos actualizar estos términos en cualquier momento. Te notificaremos por email si hay cambios importantes.</p>
+      <section id="mensajes">
+        <h2>5. Mensajes y contacto entre usuarios</h2>
+        <p>Los mensajes sirven para conectar usuarios dentro de buscARTE. No uses mensajes para acoso, spam, amenazas, estafas, contenido discriminatorio o publicidad no solicitada.</p>
+        <p>Podemos enviar emails transaccionales para avisar sobre mensajes o actividad relevante.</p>
+      </section>
 
-  <h2>8. Contacto</h2>
-  <p>Dudas o consultas: <a href="buscARTE_contacto.html" style="color:var(--neon)">formulario de contacto</a></p>
+      <section id="normas">
+        <h2>6. Contenido no permitido</h2>
+        <ul>
+          <li>Contenido ofensivo, discriminatorio, violento, sexual explícito o ilegal.</li>
+          <li>Spam, phishing, estafas, enlaces maliciosos o publicidad masiva no autorizada.</li>
+          <li>Suplantación de identidad, perfiles falsos o uso de fotos/datos de terceros sin permiso.</li>
+          <li>Publicaciones que no tengan relación razonable con música, arte, escena, eventos, clases o equipamiento.</li>
+          <li>Conductas abusivas, acoso o presión indebida a otros usuarios.</li>
+        </ul>
+      </section>
+
+      <section id="privacidad">
+        <h2>7. Privacidad</h2>
+        <p>El uso de tus datos se explica en la <a href="buscARTE_privacidad.html">Política de privacidad</a>. Al usar buscARTE también aceptás esa política.</p>
+      </section>
+
+      <section id="responsabilidad">
+        <h2>8. Limitación de responsabilidad</h2>
+        <p>buscARTE es un espacio de conexión. No garantizamos que encuentres músicos, bandas, compradores, vendedores, alumnos, docentes, eventos o resultados específicos.</p>
+        <p>No somos responsables por acuerdos, pagos, encuentros, transacciones, daños, pérdidas o conflictos que surjan entre usuarios dentro o fuera de la plataforma.</p>
+      </section>
+
+      <section id="moderacion">
+        <h2>9. Moderación, reportes y suspensión</h2>
+        <p>Podemos revisar reportes, ocultar contenido, pausar publicaciones, suspender cuentas o tomar medidas si detectamos abuso, spam, fraude, perfiles falsos o incumplimiento de estos términos.</p>
+        <p>También podemos corregir, limitar o retirar funciones si hay errores técnicos, problemas de seguridad o uso indebido.</p>
+      </section>
+
+      <section id="eliminacion">
+        <h2>10. Eliminación de cuenta</h2>
+        <p>Podés eliminar tu cuenta desde la opción correspondiente en <strong>Configurar perfil</strong>, si está disponible, o contactarnos para pedir asistencia.</p>
+        <p>La eliminación puede borrar o desvincular perfil, mensajes, anuncios, guardados y otros datos asociados, según la implementación técnica disponible en ese momento.</p>
+      </section>
+
+      <section id="cambios">
+        <h2>11. Cambios en los términos</h2>
+        <p>Podemos actualizar estos términos cuando sea necesario. Si el cambio es importante, intentaremos comunicarlo por los canales disponibles, como la web o email.</p>
+      </section>
+
+      <section id="contacto">
+        <h2>12. Contacto</h2>
+        <p>Dudas, reportes o consultas: escribinos desde el <a href="buscARTE_contacto.html">formulario de contacto</a>.</p>
+      </section>
+    </div>
+  </div>
+</main>
+
+  <footer class="footer">
+    <div><a href="index.html" class="nav-logo" style="font-size:1rem">busc<span>ARTE</span></a></div>
+    <div class="footer-links">
+      <a href="buscARTE_terminos.html">Términos</a>
+      <a href="buscARTE_privacidad.html">Privacidad</a>
+      <a href="buscARTE_contacto.html">Contacto</a>
+      <a href="https://instagram.com/buscarte.ba" target="_blank" rel="noopener noreferrer">Instagram</a>
+    </div>
+  </footer>
+  
+<div class="mobile-bottom-nav">
+  <a href="buscARTE_busqueda.html" class="mbn-item"><span class="mbn-icon">🎵</span><span>Músicos</span></a>
+  <a href="buscARTE_anuncios.html" class="mbn-item"><span class="mbn-icon">📋</span><span>Anuncios</span></a>
+  <a href="buscARTE_mensajes.html" class="mbn-item"><span class="mbn-icon">💬</span><span>Mensajes</span></a>
+  <a href="buscARTE_perfil.html" class="mbn-item"><span class="mbn-icon">👤</span><span>Perfil</span></a>
 </div>
 
-<footer>
-  <a href="index.html">buscARTE</a> · <a href="buscARTE_privacidad.html">Privacidad</a> · <a href="buscARTE_contacto.html">Contacto</a>
-</footer>
+  <script>
+
+  window.addEventListener('DOMContentLoaded', function() {
+    const cursor=document.getElementById('cursor'), ring=document.getElementById('cursor-ring');
+    if (cursor && ring && window.matchMedia('(pointer:fine)').matches) {
+      let mx=0,my=0,rx=0,ry=0;
+      document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
+      (function tick(){
+        cursor.style.left=mx+'px'; cursor.style.top=my+'px';
+        rx+=(mx-rx)*.12; ry+=(my-ry)*.12;
+        ring.style.left=rx+'px'; ring.style.top=ry+'px';
+        requestAnimationFrame(tick);
+      })();
+    }
+
+    const logged = localStorage.getItem('ba_logged') === '1';
+    const guest = document.getElementById('nav-guest');
+    const user = document.getElementById('nav-user');
+    const uid = localStorage.getItem('ba_user_id') || '';
+    const name = localStorage.getItem('ba_name') || 'Mi perfil';
+    if (logged) {
+      if (guest) guest.style.display = 'none';
+      if (user) user.style.display = 'block';
+      const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2) || '?';
+      const circle = document.getElementById('nav-avatar-circle');
+      const nameEl = document.getElementById('nav-avatar-name');
+      if (circle) circle.textContent = initials;
+      if (nameEl) nameEl.textContent = name.split(' ')[0] || 'Mi perfil';
+      const profileLinks = document.querySelectorAll('[data-my-profile]');
+      profileLinks.forEach(a => { a.href = uid ? 'buscARTE_perfil_publico.html?id=' + encodeURIComponent(uid) : 'buscARTE_login.html'; });
+    } else {
+      if (guest) guest.style.display = 'flex';
+      if (user) user.style.display = 'none';
+    }
+  });
+
+  function toggleUserMenu(e) {
+    if (e) e.stopPropagation();
+    document.getElementById('nav-avatar-btn')?.classList.toggle('open');
+    document.getElementById('nav-dropdown')?.classList.toggle('open');
+  }
+
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('#nav-avatar-btn') && !e.target.closest('#nav-dropdown')) {
+      document.getElementById('nav-avatar-btn')?.classList.remove('open');
+      document.getElementById('nav-dropdown')?.classList.remove('open');
+    }
+  });
+
+  function logout() {
+    localStorage.removeItem('ba_logged');
+    localStorage.removeItem('ba_name');
+    localStorage.removeItem('ba_email');
+    localStorage.removeItem('ba_user_id');
+    window.location.href = 'index.html';
+  }
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    });
+  }
+
+  </script>
 </body>
 </html>
