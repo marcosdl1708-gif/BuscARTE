@@ -641,8 +641,35 @@
     return String(v || '').toLowerCase().trim();
   }
 
+  function isOculto(a) {
+    return a.oculto === true || String(a.oculto || '').toLowerCase() === 'true';
+  }
+
   function visibleForStats(a) {
-    return estadoNorm(a.estado) !== 'eliminado' && !getHiddenIds().includes(String(a.id));
+    return !isOculto(a) && estadoNorm(a.estado) !== 'eliminado' && !getHiddenIds().includes(String(a.id));
+  }
+
+  async function gestionarAnuncioRPC(id, accion) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/gestionar_anuncio`, {
+      method: 'POST',
+      headers: { ...hdrs, 'Prefer': 'return=representation' },
+      body: JSON.stringify({
+        p_anuncio_id: Number(id),
+        p_user_id: Number(miId),
+        p_accion: accion
+      })
+    });
+    const raw = await res.text();
+    if (!res.ok) {
+      throw new Error(`RPC gestionar_anuncio ${res.status}: ${raw}`);
+    }
+    let data = [];
+    try { data = raw ? JSON.parse(raw) : []; } catch(e) { data = []; }
+    const row = Array.isArray(data) ? data[0] : data;
+    if (!row || !row.id) {
+      throw new Error('La RPC no devolvió el anuncio actualizado.');
+    }
+    return row;
   }
 
   function applyVisibleFilter(anuncios) {
@@ -719,61 +746,26 @@
     btn.textContent = 'Guardando...';
     btn.disabled = true;
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/anuncios?id=eq.${enc(id)}&user_id=eq.${enc(miId)}`, {
-        method: 'PATCH',
-        headers: { ...hdrs, 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ estado: nuevoEstado })
-      });
-      if (!res.ok) {
-        const txt = await res.text();
-        throw new Error(`Supabase ${res.status}: ${txt}`);
-      }
+      const accion = nuevoEstado === 'activo' ? 'reactivar' : 'pausar';
+      await gestionarAnuncioRPC(id, accion);
       if (nuevoEstado === 'activo') unhideIdLocally(id);
-      showToast('Estado actualizado.');
+      showToast(nuevoEstado === 'activo' ? 'Anuncio reactivado.' : 'Anuncio pausado.');
       await cargarMisAnuncios();
     } catch(e) {
       console.error(e);
-      showToast('No se pudo actualizar el anuncio. Intentá de nuevo.', 'err');
+      showToast('No se pudo actualizar el anuncio. Revisá permisos/RPC.', 'err');
       btn.textContent = original;
       btn.disabled = false;
     }
   }
 
-  async function patchEstadoVerificado(id, estado) {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/anuncios?id=eq.${enc(id)}&select=id,user_id,estado`, {
-      method: 'PATCH',
-      headers: { ...hdrs, 'Prefer': 'return=representation' },
-      body: JSON.stringify({ estado })
-    });
-    if (!res.ok) {
-      const txt = await res.text();
-      throw new Error(`Supabase ${res.status}: ${txt}`);
-    }
-    const data = await res.json().catch(() => []);
-    if (!Array.isArray(data) || !data.length) {
-      throw new Error('Supabase no devolvió filas actualizadas. El anuncio puede no existir o no tener permisos.');
-    }
-    const row = data[0];
-    if (String(row.user_id) !== String(miId)) {
-      throw new Error('El anuncio no pertenece al usuario actual.');
-    }
-    return row;
-  }
-
   async function softDeleteAnuncioVerificado(id) {
-    // Primero probamos un estado explícito de oculto. Si la base no acepta ese valor,
-    // usamos pausado, que el tablón público filtra como no visible.
-    try {
-      return await patchEstadoVerificado(id, 'eliminado');
-    } catch(firstErr) {
-      console.warn('estado=eliminado no disponible o no aplicado. Fallback a pausado:', firstErr);
-      return await patchEstadoVerificado(id, 'pausado');
-    }
+    return await gestionarAnuncioRPC(id, 'eliminar');
   }
 
   async function syncHiddenDeletes(anuncios) {
-    // Si en el hotfix anterior se ocultó localmente antes de confirmar Supabase,
-    // este paso sincroniza esos ocultos contra la base al volver a abrir Mis anuncios.
+    // Migra intentos de eliminado del hotfix anterior: si quedó oculto local pero activo en base,
+    // ahora lo manda a la RPC real de Supabase.
     const hidden = getHiddenIds();
     if (!hidden.length) return;
     const propiosOcultosActivos = anuncios.filter(a => hidden.includes(String(a.id)) && estadoNorm(a.estado) === 'activo');
@@ -781,6 +773,7 @@
       try {
         const row = await softDeleteAnuncioVerificado(a.id);
         a.estado = row.estado || 'pausado';
+        a.oculto = true;
       } catch(e) {
         console.warn('No se pudo sincronizar anuncio oculto localmente:', a.id, e);
       }
@@ -812,7 +805,7 @@
       setTimeout(() => { closeDeleteModal(); cargarMisAnuncios(); }, 240);
     } catch(e) {
       console.error(e);
-      showToast('No se pudo eliminar en Supabase. No lo oculté para evitar falsos positivos.', 'err');
+      showToast('No se pudo eliminar. Falta crear/autorizar la RPC gestionar_anuncio en Supabase.', 'err');
       if (btn) { btn.textContent = oldText || 'Sí, eliminar'; btn.disabled = false; }
     }
   }

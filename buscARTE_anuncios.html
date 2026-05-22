@@ -1305,8 +1305,8 @@
     return tipo || 'todos'
   }
   function getHiddenAnuncioIds() {
-    try { return JSON.parse(localStorage.getItem('ba_hidden_anuncios') || '[]').map(String) }
-    catch(e) { return [] }
+    try { return JSON.parse(localStorage.getItem('ba_hidden_anuncios') || '[]').map(String); }
+    catch(e) { return []; }
   }
   function isLogged() { return localStorage.getItem('ba_logged') === '1' && !!localStorage.getItem('ba_user_id') }
   function requireLogin(action) {
@@ -1758,6 +1758,7 @@
 
   function anuncioVisibleCliente(a) {
     if (getHiddenAnuncioIds().includes(String(a.id))) return false
+    if (a.oculto === true || String(a.oculto || '').toLowerCase() === 'true') return false
     const estado = String(a.estado || '').toLowerCase().trim()
     // Si no hay estado, no bloqueamos: preferimos mostrar antes que dejar el tablón vacío.
     if (estado && !['activo','activa','publicado','publicada'].includes(estado)) return false
@@ -1943,7 +1944,7 @@
     try {
       const [rm, ra] = await Promise.all([
         fetch(`${SUPABASE_URL}/rest/v1/perfiles?select=id`, { headers: { ...SB_HEADERS, 'Prefer':'count=exact' } }),
-        fetch(`${SUPABASE_URL}/rest/v1/anuncios?estado=eq.activo&select=id`, { headers: { ...SB_HEADERS, 'Prefer':'count=exact' } })
+        fetch(`${SUPABASE_URL}/rest/v1/anuncios?estado=eq.activo&oculto=is.false&select=id`, { headers: { ...SB_HEADERS, 'Prefer':'count=exact' } })
       ])
       const totalMusicos = rm.headers.get('content-range')?.split('/')[1]
       const totalAnuncios = ra.headers.get('content-range')?.split('/')[1]
@@ -1977,7 +1978,20 @@
     if (btn) btn.textContent = '⚙ Filtros'
   }
 
-  function initAnunciosPage() {
+  async function vencerAnunciosViejos() {
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/rpc/vencer_anuncios_viejos`, {
+        method: 'POST',
+        headers: { ...SB_HEADERS, 'Content-Type':'application/json' },
+        body: '{}'
+      });
+    } catch(e) {
+      console.warn('No se pudo ejecutar vencimiento automático de anuncios:', e);
+    }
+  }
+
+  async function initAnunciosPage() {
+    await vencerAnunciosViejos();
     const params = new URLSearchParams(window.location.search)
     const tipoParam = canonicalTipo(params.get('tipo'))
     if (tipoParam && tipoParam !== 'todos') {
