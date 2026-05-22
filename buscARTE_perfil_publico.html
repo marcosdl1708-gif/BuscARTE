@@ -561,45 +561,138 @@
   }
 
 
-  /* CODEO HOTFIX MOBILE PERFIL PUBLICO — ancho/nav */
+
+  /* CODEO HOTFIX FINAL MOBILE — perfil público sin overflow y nav usable */
   @media (max-width:980px) {
     html, body {
       width:100% !important;
       max-width:100% !important;
       overflow-x:hidden !important;
-      touch-action: pan-y;
     }
-    #page-root, .profile-hero, .profile-body, .profile-content, .profile-sidebar,
-    .hero-content, .profile-main, .profile-name-row, .profile-tags,
-    .profile-stats, .section, .videos-list, .redes-list, .referentes-list {
+    body { padding-bottom:108px !important; }
+    body, body * { cursor:auto !important; }
+    .cursor, .cursor-ring { display:none !important; }
+
+    nav:not(.mobile-bottom-nav) {
+      width:100% !important;
+      max-width:100% !important;
+      height:56px !important;
+      padding:.6rem 1rem !important;
+      overflow:hidden !important;
+    }
+    .top-spacer { height:56px !important; }
+    .nav-center, .nav-back { display:none !important; }
+    .nav-logo { font-size:1.35rem !important; min-width:0 !important; }
+    .nav-right { min-width:0 !important; gap:.45rem !important; }
+    .nav-avatar-wrap { padding:.28rem .5rem !important; max-width:132px !important; }
+    .nav-avatar-name { max-width:70px !important; }
+    .nav-dropdown { display:none !important; }
+
+    #page-root,
+    .profile-hero,
+    .profile-body,
+    .profile-content,
+    .profile-sidebar,
+    .hero-content,
+    .profile-main,
+    .profile-name-row,
+    .profile-tags,
+    .profile-stats,
+    .section,
+    .videos-list,
+    .redes-list,
+    .referentes-list,
+    .public-note,
+    .sidebar-card {
+      width:100% !important;
       max-width:100% !important;
       min-width:0 !important;
       overflow-x:hidden !important;
     }
-    .profile-hero, .profile-content, .profile-sidebar {
-      width:100% !important;
+
+    .profile-hero { padding:1.15rem 1rem .9rem !important; }
+    .hero-bg-name { display:none !important; }
+    .hero-content {
+      display:grid !important;
+      grid-template-columns:72px minmax(0,1fr) !important;
+      gap:.9rem !important;
+      align-items:start !important;
     }
-    .profile-name, .profile-instrument, .profile-location, .profile-tagline,
-    .bio-text, .pstat-num, .video-url, .playlist-url, .red-link span {
+    .profile-avatar { width:72px !important; height:72px !important; font-size:1.35rem !important; }
+    .profile-main { min-width:0 !important; }
+    .profile-name { font-size:1.45rem !important; line-height:1.05 !important; max-width:100% !important; overflow-wrap:anywhere !important; }
+    .profile-instrument, .profile-location, .profile-tagline, .bio-text,
+    .video-url, .playlist-url, .red-link span, .pstat-num {
       max-width:100% !important;
       overflow-wrap:anywhere !important;
       word-break:normal !important;
+      white-space:normal !important;
     }
+    .profile-tagline { font-size:.82rem !important; padding-left:.75rem !important; margin-bottom:.75rem !important; }
     .profile-actions {
+      grid-column:1 / -1 !important;
       width:100% !important;
+      min-width:0 !important;
+      flex-direction:column !important;
+      align-items:stretch !important;
+      gap:.5rem !important;
+      margin-top:.25rem !important;
     }
     .profile-actions button, .profile-actions a {
-      min-width:0 !important;
-    }
-    .profile-stats {
       width:100% !important;
-    }
-    .pstat {
       min-width:0 !important;
+      flex:none !important;
+      padding:.72rem .75rem !important;
     }
 
-    /* El bottom nav es un <nav>, así que hay que pisar el nav global */
-    nav.mobile-bottom-nav {
+    .profile-stats {
+      display:grid !important;
+      grid-template-columns:repeat(2, minmax(0, 1fr)) !important;
+      border-top:1px solid #1c1c1c !important;
+      margin-top:1rem !important;
+      gap:0 !important;
+    }
+    .pstat {
+      padding:.85rem .8rem !important;
+      min-width:0 !important;
+      border-right:1px solid #1c1c1c !important;
+      border-bottom:1px solid #1c1c1c !important;
+    }
+    .pstat:nth-child(even) { border-right:none !important; }
+    .pstat:last-child { grid-column:1 / -1 !important; border-right:none !important; }
+    .pstat-num {
+      font-size:.95rem !important;
+      line-height:1.2 !important;
+      overflow:visible !important;
+      text-overflow:clip !important;
+      letter-spacing:-.01em !important;
+    }
+    .pstat-label { font-size:.58rem !important; line-height:1.25 !important; }
+
+    .profile-body { display:flex !important; flex-direction:column !important; }
+    .profile-content, .profile-sidebar {
+      padding:1.2rem 1rem !important;
+      border-right:none !important;
+    }
+    .profile-sidebar { order:2 !important; border-top:1px solid #1c1c1c !important; }
+    .profile-content { order:1 !important; }
+    .section { margin-bottom:1.8rem !important; }
+    .section-title { font-size:.68rem !important; margin-bottom:.85rem !important; }
+
+    .video-link-card { grid-template-columns:auto minmax(0,1fr) auto !important; }
+    .video-platform-pill { display:none !important; }
+
+    .mobile-action-bar {
+      display:flex !important;
+      position:fixed !important;
+      left:0 !important;
+      right:0 !important;
+      bottom:54px !important;
+      width:100% !important;
+      height:54px !important;
+      z-index:880 !important;
+    }
+    .mobile-bottom-nav {
       display:flex !important;
       position:fixed !important;
       top:auto !important;
@@ -610,49 +703,18 @@
       height:54px !important;
       padding:0 !important;
       border-top:1px solid #2a2a2a !important;
-      border-bottom:none !important;
       background:#0f0f0f !important;
-      backdrop-filter:none !important;
-      align-items:stretch !important;
-      justify-content:stretch !important;
       z-index:900 !important;
     }
     .mobile-bottom-nav .mbn-item {
       flex:1 1 0 !important;
       min-width:0 !important;
-      width:auto !important;
       padding:0 !important;
       margin:0 !important;
       border:0 !important;
     }
-    .mobile-bottom-nav .mbn-item.active,
-    .mobile-bottom-nav .mbn-item[data-page="perfil"].active {
-      color:var(--neon) !important;
-    }
-
-    .mobile-action-bar {
-      left:0 !important;
-      right:0 !important;
-      width:100% !important;
-      bottom:54px !important;
-      z-index:880 !important;
-    }
-    .mbn-overlay {
-      z-index:910 !important;
-    }
-    .mbn-panel {
-      z-index:920 !important;
-      width:100% !important;
-      max-width:100% !important;
-    }
-
-    .report-modal-overlay {
-      max-width:100vw !important;
-      overflow-x:hidden !important;
-    }
-    .report-modal {
-      max-width:calc(100vw - 2rem) !important;
-    }
+    .mbn-overlay { z-index:910 !important; }
+    .mbn-panel { z-index:920 !important; width:100% !important; max-width:100% !important; }
   }
 
 </style>
@@ -1270,7 +1332,7 @@
     <span class="mbn-pi-icon">🚪</span> Cerrar sesión
   </a>
 </div>
-<nav class="mobile-bottom-nav" id="mobile-bottom-nav">
+<div class="mobile-bottom-nav" id="mobile-bottom-nav">
   <a href="buscARTE_busqueda.html" class="mbn-item" data-page="busqueda"><span class="mbn-icon">🎵</span><span>Músicos</span></a>
   <a href="buscARTE_anuncios.html" class="mbn-item" data-page="anuncios"><span class="mbn-icon">📋</span><span>Anuncios</span></a>
   <a href="buscARTE_mensajes.html" class="mbn-item" data-page="mensajes"><span class="mbn-icon">💬</span><span>Mensajes</span></a>
