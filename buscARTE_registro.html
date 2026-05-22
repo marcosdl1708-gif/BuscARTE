@@ -513,65 +513,6 @@
   .nav-back:hover { color: var(--blanco); }
 
   .top-spacer { height: 65px; }
-
-  .mobile-stepbar {
-    display: none;
-    margin-bottom: 1.25rem;
-    border: 1px solid #1c1c1c;
-    background: rgba(255,255,255,.02);
-    padding: .75rem;
-  }
-  .mobile-stepbar-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: .75rem;
-    margin-bottom: .55rem;
-  }
-  .mobile-stepbar-label {
-    color: var(--neon);
-    font-size: .68rem;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-  }
-  .mobile-stepbar-title {
-    color: var(--blanco);
-    font-size: .78rem;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-  }
-  .mobile-stepbar-track {
-    height: 3px;
-    background: #222;
-    overflow: hidden;
-  }
-  .mobile-stepbar-fill {
-    width: 25%;
-    height: 100%;
-    background: var(--neon);
-    transition: width .25s ease;
-  }
-  .form-hint {
-    color: var(--gris2);
-    font-size: .76rem;
-    line-height: 1.5;
-    margin-top: -.75rem;
-    margin-bottom: 1.2rem;
-  }
-  .sugerencias-populares {
-    max-height: 220px;
-    overflow: auto;
-    border: 1px solid #1c1c1c;
-    padding: .75rem;
-    background: rgba(255,255,255,.015);
-  }
-  .sugerencias-populares::-webkit-scrollbar { width: 8px; }
-  .sugerencias-populares::-webkit-scrollbar-thumb { background: #2a2a2a; }
-  button:disabled {
-    opacity: .6 !important;
-    pointer-events: none;
-  }
-
   /* NAV LINKS CLICKABLE FIX */
   .nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap { pointer-events:auto !important; }
   nav a, nav button { pointer-events:auto !important; }
@@ -613,11 +554,7 @@
     .btn-back, .btn-next { 
       width: 100% !important; 
       text-align: center !important;
-      justify-content: center !important;
     }
-    .mobile-stepbar { display: block !important; }
-    #step-4 .form-actions > div { width: 100% !important; flex-direction: column !important; }
-    .sugerencias-populares { max-height: 180px !important; }
 
     /* Steps dots */
     .steps-progress { gap: .5rem !important; }
@@ -695,13 +632,6 @@
 
   <!-- PANEL DERECHO -->
   <div class="right-panel">
-    <div class="mobile-stepbar" aria-hidden="true">
-      <div class="mobile-stepbar-top">
-        <span class="mobile-stepbar-label" id="mobile-step-label">Paso 1 de 4</span>
-        <span class="mobile-stepbar-title" id="mobile-step-title">Tu cuenta</span>
-      </div>
-      <div class="mobile-stepbar-track"><div class="mobile-stepbar-fill" id="mobile-step-fill"></div></div>
-    </div>
 
     <!-- STEP 1: Cuenta básica -->
     <div class="form-step active" id="step-1">
@@ -772,7 +702,7 @@
 
       <div class="form-actions">
         <span></span>
-        <button class="btn-next" onclick="goStep(2)">Siguiente → Tu música</button>
+        <button type="button" class="btn-next" onclick="goStep(2)">Siguiente → Tu música</button>
       </div>
       <p class="login-link">¿Ya tenés cuenta? <a href="buscARTE_login.html">Ingresá acá</a></p>
     </div>
@@ -784,73 +714,73 @@
 
       <span class="chips-label">¿Qué instrumento/s tocás?</span>
       <div class="chips" id="chips-instrumentos">
-        <button class="chip" onclick="toggleChip(this)">Guitarra</button>
-        <button class="chip" onclick="toggleChip(this)">Bajo</button>
-        <button class="chip" onclick="toggleChip(this)">Batería</button>
-        <button class="chip" onclick="toggleChip(this)">Teclado / Piano</button>
-        <button class="chip" onclick="toggleChip(this)">Voz / Canto</button>
-        <button class="chip" onclick="toggleChip(this)">Violín</button>
-        <button class="chip" onclick="toggleChip(this)">Cello</button>
-        <button class="chip" onclick="toggleChip(this)">Saxo</button>
-        <button class="chip" onclick="toggleChip(this)">Trompeta</button>
-        <button class="chip" onclick="toggleChip(this)">Flauta</button>
-        <button class="chip" onclick="toggleChip(this)">Percusión</button>
-        <button class="chip" onclick="toggleChip(this)">Bandoneón</button>
-        <button class="chip" onclick="toggleChip(this)">DJ / Productor</button>
-        <button class="chip" onclick="toggleChip(this)">Arpa</button>
-        <button class="chip" onclick="toggleChip(this)">Charango</button>
-        <button class="chip" onclick="toggleChip(this)">Acordeón</button>
-        <button class="chip" onclick="toggleChip(this)">Contrabajo</button>
-        <button class="chip" onclick="toggleChip(this)">Clarinete</button>
-        <button class="chip" onclick="toggleChip(this)">Cajón</button>
-        <button class="chip" onclick="toggleChip(this)">Bombo leguero</button>
-        <button class="chip" onclick="toggleChip(this)">Quena / Zampoña</button>
-        <button class="chip" onclick="toggleChip(this)">Ukelele</button>
-        <button class="chip" onclick="toggleChip(this)">Controlador MIDI</button>
-        <button class="chip" onclick="toggleChip(this)">Técnico de sonido</button>
-        <button class="chip" onclick="toggleChip(this)">Compositor / Arreglador</button>
-        <button class="chip" onclick="toggleChip(this)">Productor</button>
-        <button class="chip" onclick="toggleChip(this)">Mix & Mastering</button>
-        <button class="chip" onclick="toggleChip(this)">Manager</button>
-        <button class="chip" onclick="toggleChip(this)">Otro</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Guitarra</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Bajo</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Batería</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Teclado / Piano</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Voz / Canto</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Violín</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Cello</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Saxo</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Trompeta</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Flauta</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Percusión</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Bandoneón</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">DJ / Productor</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Arpa</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Charango</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Acordeón</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Contrabajo</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Clarinete</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Cajón</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Bombo leguero</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Quena / Zampoña</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Ukelele</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Controlador MIDI</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Técnico de sonido</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Compositor / Arreglador</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Productor</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Mix & Mastering</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Manager</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Otro</button>
       </div>
 
       <span class="chips-label">¿Qué géneros tocás o te interesan?</span>
       <div class="chips" id="chips-generos">
-        <button class="chip" onclick="toggleChip(this)">Rock</button>
-        <button class="chip" onclick="toggleChip(this)">Rock Nacional</button>
-        <button class="chip" onclick="toggleChip(this)">Metal</button>
-        <button class="chip" onclick="toggleChip(this)">Jazz</button>
-        <button class="chip" onclick="toggleChip(this)">Folklore</button>
-        <button class="chip" onclick="toggleChip(this)">Tango</button>
-        <button class="chip" onclick="toggleChip(this)">Cumbia</button>
-        <button class="chip" onclick="toggleChip(this)">Indie</button>
-        <button class="chip" onclick="toggleChip(this)">Pop</button>
-        <button class="chip" onclick="toggleChip(this)">Electrónica</button>
-        <button class="chip" onclick="toggleChip(this)">R&B</button>
-        <button class="chip" onclick="toggleChip(this)">Rap / Hip Hop</button>
-        <button class="chip" onclick="toggleChip(this)">Funk</button>
-        <button class="chip" onclick="toggleChip(this)">Soul</button>
-        <button class="chip" onclick="toggleChip(this)">Reggae</button>
-        <button class="chip" onclick="toggleChip(this)">Tropical</button>
-        <button class="chip" onclick="toggleChip(this)">Punk</button>
-        <button class="chip" onclick="toggleChip(this)">Blues</button>
-        <button class="chip" onclick="toggleChip(this)">Prog</button>
-        <button class="chip" onclick="toggleChip(this)">Bossanova</button>
-        <button class="chip" onclick="toggleChip(this)">Clásica</button>
-        <button class="chip" onclick="toggleChip(this)">House</button>
-        <button class="chip" onclick="toggleChip(this)">Tech House</button>
-        <button class="chip" onclick="toggleChip(this)">Techno</button>
-        <button class="chip" onclick="toggleChip(this)">Trance</button>
-        <button class="chip" onclick="toggleChip(this)">Melodic House & Techno</button>
-        <button class="chip" onclick="toggleChip(this)">Minimal Deep/Tech</button>
-        <button class="chip" onclick="toggleChip(this)">Indie Dance</button>
-        <button class="chip" onclick="toggleChip(this)">Otro</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Rock</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Rock Nacional</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Metal</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Jazz</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Folklore</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Tango</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Cumbia</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Indie</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Pop</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Electrónica</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">R&B</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Rap / Hip Hop</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Funk</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Soul</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Reggae</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Tropical</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Punk</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Blues</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Prog</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Bossanova</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Clásica</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">House</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Tech House</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Techno</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Trance</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Melodic House & Techno</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Minimal Deep/Tech</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Indie Dance</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Otro</button>
       </div>
 
       <div class="form-actions">
-        <button class="btn-back" onclick="goStep(1)">← Atrás</button>
-        <button class="btn-next" onclick="goStep(3)">Siguiente → Tus referentes</button>
+        <button type="button" class="btn-back" onclick="goStep(1)">← Atrás</button>
+        <button type="button" class="btn-next" onclick="goStep(3)">Siguiente → Tus referentes</button>
       </div>
     </div>
 
@@ -865,7 +795,7 @@
           onkeydown="handleArtistKey(event)" 
           oninput="buscarArtistas(this.value)"
           autocomplete="off">
-        <button class="artist-add-btn" onclick="addArtist()">+</button>
+        <button type="button" class="artist-add-btn" onclick="addArtist()">+</button>
         <div id="artist-dropdown" style="
           display:none;position:absolute;top:100%;left:0;right:0;
           background:#1a1a1a;border:1px solid #2a2a2a;
@@ -875,77 +805,60 @@
       <div class="artist-tags" id="artist-tags"></div>
 
       <span class="chips-label">Sugerencias populares — clickeá para agregar</span>
-      <div class="chips sugerencias-populares" id="chips-sugerencias">
-        <button class="chip" onclick="addArtistByName('Soda Stereo', this)">Soda Stereo</button>
-        <button class="chip" onclick="addArtistByName('Los Redondos', this)">Los Redondos</button>
-        <button class="chip" onclick="addArtistByName('Patricio Rey', this)">Patricio Rey</button>
-        <button class="chip" onclick="addArtistByName('Charly García', this)">Charly García</button>
-        <button class="chip" onclick="addArtistByName('Linkin Park', this)">Linkin Park</button>
-        <button class="chip" onclick="addArtistByName('Radiohead', this)">Radiohead</button>
-        <button class="chip" onclick="addArtistByName('Miles Davis', this)">Miles Davis</button>
-        <button class="chip" onclick="addArtistByName('Ataque 77', this)">Ataque 77</button>
-        <button class="chip" onclick="addArtistByName('Los Piojos', this)">Los Piojos</button>
-        <button class="chip" onclick="addArtistByName('Divididos', this)">Divididos</button>
-        <button class="chip" onclick="addArtistByName('Metallica', this)">Metallica</button>
-        <button class="chip" onclick="addArtistByName('Fito Páez', this)">Fito Páez</button>
-        <button class="chip" onclick="addArtistByName('Gustavo Cerati', this)">Gustavo Cerati</button>
-        <button class="chip" onclick="addArtistByName('Spinetta', this)">Spinetta</button>
-        <button class="chip" onclick="addArtistByName('Tool', this)">Tool</button>
-        <button class="chip" onclick="addArtistByName('Pink Floyd', this)">Pink Floyd</button>
-        <button class="chip" onclick="addArtistByName('Boris Brejcha', this)">Boris Brejcha</button>
-        <button class="chip" onclick="addArtistByName('Charlotte de Witte', this)">Charlotte de Witte</button>
-        <button class="chip" onclick="addArtistByName('Anyma', this)">Anyma</button>
-        <button class="chip" onclick="addArtistByName('Sara Landry', this)">Sara Landry</button>
-        <button class="chip" onclick="addArtistByName('Amelie Lens', this)">Amelie Lens</button>
-        <button class="chip" onclick="addArtistByName('Indira Paganotto', this)">Indira Paganotto</button>
-        <button class="chip" onclick="addArtistByName('Reinier Zonneveld', this)">Reinier Zonneveld</button>
-        <button class="chip" onclick="addArtistByName('ARTBAT', this)">ARTBAT</button>
-        <button class="chip" onclick="addArtistByName('Marcel Dettmann', this)">Marcel Dettmann</button>
-        <button class="chip" onclick="addArtistByName('Nina Kraviz', this)">Nina Kraviz</button>
-        <button class="chip" onclick="addArtistByName('Adam Beyer', this)">Adam Beyer</button>
-        <button class="chip" onclick="addArtistByName('Richie Hawtin', this)">Richie Hawtin</button>
-        <button class="chip" onclick="addArtistByName('I Hate Models', this)">I Hate Models</button>
-        <button class="chip" onclick="addArtistByName('Nico Moreno', this)">Nico Moreno</button>
-        <button class="chip" onclick="addArtistByName('Miss Monique', this)">Miss Monique</button>
-        <button class="chip" onclick="addArtistByName('Chris Liebing', this)">Chris Liebing</button>
-        <button class="chip" onclick="addArtistByName('Solomun', this)">Solomun</button>
-        <button class="chip" onclick="addArtistByName('Peggy Gou', this)">Peggy Gou</button>
-        <button class="chip" onclick="addArtistByName('FISHER', this)">FISHER</button>
-        <button class="chip" onclick="addArtistByName('Michael Bibi', this)">Michael Bibi</button>
-        <button class="chip" onclick="addArtistByName('Chris Stussy', this)">Chris Stussy</button>
-        <button class="chip" onclick="addArtistByName('Honey Dijon', this)">Honey Dijon</button>
-        <button class="chip" onclick="addArtistByName('Black Coffee', this)">Black Coffee</button>
-        <button class="chip" onclick="addArtistByName('Keinemusik', this)">Keinemusik</button>
-        <button class="chip" onclick="addArtistByName('Job Jobse', this)">Job Jobse</button>
-        <button class="chip" onclick="addArtistByName('Pawsa', this)">Pawsa</button>
-        <button class="chip" onclick="addArtistByName('Tale Of Us', this)">Tale Of Us</button>
-        <button class="chip" onclick="addArtistByName('BICEP', this)">BICEP</button>
-        <button class="chip" onclick="addArtistByName('Ben Böhm', this)">Ben Böhm</button>
-        <button class="chip" onclick="addArtistByName('Nils Hoffmann', this)">Nils Hoffmann</button>
-        <button class="chip" onclick="addArtistByName('Innellea', this)">Innellea</button>
-        <button class="chip" onclick="addArtistByName('Armin van Buuren', this)">Armin van Buuren</button>
-        <button class="chip" onclick="addArtistByName('Martin Garrix', this)">Martin Garrix</button>
-        <button class="chip" onclick="addArtistByName('David Guetta', this)">David Guetta</button>
-        <button class="chip" onclick="addArtistByName('Alok', this)">Alok</button>
-        <button class="chip" onclick="addArtistByName('Tiësto', this)">Tiësto</button>
-        <button class="chip" onclick="addArtistByName('Calvin Harris', this)">Calvin Harris</button>
-        <button class="chip" onclick="addArtistByName('Afrojack', this)">Afrojack</button>
-        <button class="chip" onclick="addArtistByName('Hardwell', this)">Hardwell</button>
-        <button class="chip" onclick="addArtistByName('Dimitri Vegas & Like Mike', this)">Dimitri Vegas & Like Mike</button>
-        <button class="chip" onclick="addArtistByName('Ricardo Villalobos', this)">Ricardo Villalobos</button>
-        <button class="chip" onclick="addArtistByName('Four Tet', this)">Four Tet</button>
-        <button class="chip" onclick="addArtistByName('Floating Points', this)">Floating Points</button>
-        <button class="chip" onclick="addArtistByName('Jon Hopkins', this)">Jon Hopkins</button>
-        <button class="chip" onclick="addArtistByName('Caribou', this)">Caribou</button>
-        <button class="chip" onclick="addArtistByName('Jamie XX', this)">Jamie XX</button>
-        <button class="chip" onclick="addArtistByName('Modeselektor', this)">Modeselektor</button>
-        <button class="chip" onclick="addArtistByName('Hernán Cattaneo', this)">Hernán Cattaneo</button>
-        <button class="chip" onclick="addArtistByName('Nicola Cruz', this)">Nicola Cruz</button>
+      <div class="chips" id="chips-sugerencias">
+        <button class="chip" type="button" onclick="addArtistByName('Soda Stereo', this)">Soda Stereo</button>
+        <button class="chip" type="button" onclick="addArtistByName('Los Redondos', this)">Los Redondos</button>
+        <button class="chip" type="button" onclick="addArtistByName('Patricio Rey', this)">Patricio Rey</button>
+        <button class="chip" type="button" onclick="addArtistByName('Charly García', this)">Charly García</button>
+        <button class="chip" type="button" onclick="addArtistByName('Gustavo Cerati', this)">Gustavo Cerati</button>
+        <button class="chip" type="button" onclick="addArtistByName('Spinetta', this)">Spinetta</button>
+        <button class="chip" type="button" onclick="addArtistByName('Fito Páez', this)">Fito Páez</button>
+        <button class="chip" type="button" onclick="addArtistByName('Divididos', this)">Divididos</button>
+        <button class="chip" type="button" onclick="addArtistByName('Los Piojos', this)">Los Piojos</button>
+        <button class="chip" type="button" onclick="addArtistByName('La Renga', this)">La Renga</button>
+        <button class="chip" type="button" onclick="addArtistByName('Babasónicos', this)">Babasónicos</button>
+        <button class="chip" type="button" onclick="addArtistByName('Virus', this)">Virus</button>
+        <button class="chip" type="button" onclick="addArtistByName('Serú Girán', this)">Serú Girán</button>
+        <button class="chip" type="button" onclick="addArtistByName('Luis Alberto Spinetta', this)">Luis Alberto Spinetta</button>
+        <button class="chip" type="button" onclick="addArtistByName('Sumo', this)">Sumo</button>
+        <button class="chip" type="button" onclick="addArtistByName('Ataque 77', this)">Ataque 77</button>
+        <button class="chip" type="button" onclick="addArtistByName('Bersuit Vergarabat', this)">Bersuit Vergarabat</button>
+        <button class="chip" type="button" onclick="addArtistByName('Las Pelotas', this)">Las Pelotas</button>
+        <button class="chip" type="button" onclick="addArtistByName('Invisible', this)">Invisible</button>
+        <button class="chip" type="button" onclick="addArtistByName('Almendra', this)">Almendra</button>
+        <button class="chip" type="button" onclick="addArtistByName('Pescado Rabioso', this)">Pescado Rabioso</button>
+        <button class="chip" type="button" onclick="addArtistByName('Cerati', this)">Cerati</button>
+        <button class="chip" type="button" onclick="addArtistByName('Radiohead', this)">Radiohead</button>
+        <button class="chip" type="button" onclick="addArtistByName('The Beatles', this)">The Beatles</button>
+        <button class="chip" type="button" onclick="addArtistByName('Pink Floyd', this)">Pink Floyd</button>
+        <button class="chip" type="button" onclick="addArtistByName('Led Zeppelin', this)">Led Zeppelin</button>
+        <button class="chip" type="button" onclick="addArtistByName('Queen', this)">Queen</button>
+        <button class="chip" type="button" onclick="addArtistByName('Nirvana', this)">Nirvana</button>
+        <button class="chip" type="button" onclick="addArtistByName('Foo Fighters', this)">Foo Fighters</button>
+        <button class="chip" type="button" onclick="addArtistByName('Metallica', this)">Metallica</button>
+        <button class="chip" type="button" onclick="addArtistByName('Tool', this)">Tool</button>
+        <button class="chip" type="button" onclick="addArtistByName('Arctic Monkeys', this)">Arctic Monkeys</button>
+        <button class="chip" type="button" onclick="addArtistByName('Tame Impala', this)">Tame Impala</button>
+        <button class="chip" type="button" onclick="addArtistByName('The Strokes', this)">The Strokes</button>
+        <button class="chip" type="button" onclick="addArtistByName('Miles Davis', this)">Miles Davis</button>
+        <button class="chip" type="button" onclick="addArtistByName('John Coltrane', this)">John Coltrane</button>
+        <button class="chip" type="button" onclick="addArtistByName('Bill Evans', this)">Bill Evans</button>
+        <button class="chip" type="button" onclick="addArtistByName('Herbie Hancock', this)">Herbie Hancock</button>
+        <button class="chip" type="button" onclick="addArtistByName('Ella Fitzgerald', this)">Ella Fitzgerald</button>
+        <button class="chip" type="button" onclick="addArtistByName('Amy Winehouse', this)">Amy Winehouse</button>
+        <button class="chip" type="button" onclick="addArtistByName('Daft Punk', this)">Daft Punk</button>
+        <button class="chip" type="button" onclick="addArtistByName('Massive Attack', this)">Massive Attack</button>
+        <button class="chip" type="button" onclick="addArtistByName('Björk', this)">Björk</button>
+        <button class="chip" type="button" onclick="addArtistByName('Hernán Cattáneo', this)">Hernán Cattáneo</button>
+        <button class="chip" type="button" onclick="addArtistByName('Boris Brejcha', this)">Boris Brejcha</button>
+        <button class="chip" type="button" onclick="addArtistByName('Charlotte de Witte', this)">Charlotte de Witte</button>
+        <button class="chip" type="button" onclick="addArtistByName('Nina Kraviz', this)">Nina Kraviz</button>
+        <button class="chip" type="button" onclick="addArtistByName('Tale Of Us', this)">Tale Of Us</button>
       </div>
 
       <div class="form-actions">
-        <button class="btn-back" onclick="goStep(2)">← Atrás</button>
-        <button class="btn-next" onclick="goStep(4)">Siguiente → Tu perfil</button>
+        <button type="button" class="btn-back" onclick="goStep(2)">← Atrás</button>
+        <button type="button" class="btn-next" onclick="goStep(4)">Siguiente → Tu perfil</button>
       </div>
     </div>
 
@@ -961,22 +874,22 @@
 
       <span class="chips-label">¿Qué estás buscando en buscARTE?</span>
       <div class="objetivo-grid">
-        <button class="objetivo-card" onclick="selectObjetivo(this)">
+        <button type="button" class="objetivo-card" onclick="selectObjetivo(this)">
           <span class="objetivo-icon">🎸</span>
           <span class="objetivo-title">Banda estable</span>
           <span class="objetivo-desc">Quiero formarla o sumarme a una</span>
         </button>
-        <button class="objetivo-card" onclick="selectObjetivo(this)">
+        <button type="button" class="objetivo-card" onclick="selectObjetivo(this)">
           <span class="objetivo-icon">🎤</span>
           <span class="objetivo-title">Proyecto propio</span>
           <span class="objetivo-desc">Busco músicos para mi proyecto</span>
         </button>
-        <button class="objetivo-card" onclick="selectObjetivo(this)">
+        <button type="button" class="objetivo-card" onclick="selectObjetivo(this)">
           <span class="objetivo-icon">🎹</span>
           <span class="objetivo-title">Sesiones / Shows</span>
           <span class="objetivo-desc">Disponible para tocar en vivo o grabar</span>
         </button>
-        <button class="objetivo-card" onclick="selectObjetivo(this)">
+        <button type="button" class="objetivo-card" onclick="selectObjetivo(this)">
           <span class="objetivo-icon">🥁</span>
           <span class="objetivo-title">Zapada / Jam</span>
           <span class="objetivo-desc">Sin compromiso, solo tocar y pasarla bien</span>
@@ -987,14 +900,14 @@
         <input type="file" id="reg-foto-input" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="previewFotoRegistro(this)">
         <span class="photo-icon" id="reg-foto-icon">📷</span>
         <img id="reg-foto-preview" style="display:none;width:80px;height:80px;border-radius:50%;object-fit:cover;margin:0 auto">
-        <p class="photo-text" id="reg-foto-text"><strong>Subí tu foto de perfil</strong><br>JPG, PNG o WebP · optimizamos la imagen automáticamente · Opcional</p>
+        <p class="photo-text" id="reg-foto-text"><strong>Subí tu foto de perfil</strong><br>JPG, PNG o WebP · Máx. 2MB · Opcional</p>
       </div>
 
       <div class="form-actions" style="flex-direction:column;align-items:stretch;gap:1rem">
         <div class="h-captcha" data-sitekey="d314e4d0-234a-4454-bbd2-2bacefee8694" id="hcaptcha-box" style="display:flex;justify-content:center"></div>
         <div style="display:flex;gap:.75rem">
-          <button class="btn-back" onclick="goStep(3)">← Atrás</button>
-          <button class="btn-next" onclick="crearPerfil(this)" style="background: var(--neon); font-size: 1rem; padding: 0.9rem 2.5rem;">🎉 Crear mi perfil</button>
+          <button type="button" class="btn-back" onclick="goStep(3)">← Atrás</button>
+          <button type="button" class="btn-next" onclick="crearPerfil(this)" style="background: var(--neon); font-size: 1rem; padding: 0.9rem 2.5rem;">🎉 Crear mi perfil</button>
         </div>
       </div>
     </div>
@@ -1007,7 +920,7 @@
         <p class="success-sub">Tu perfil está listo. Ya podés explorar músicos, publicar anuncios y conectar con la escena argentina.</p>
         <a href="buscARTE_busqueda.html" class="btn-next" style="display: inline-flex; text-decoration: none; font-size: 1rem; padding: 1rem 2.5rem; margin-bottom: 1rem;">Ver músicos →</a>
         <br>
-        <a href="buscARTE_perfil.html" style="color: var(--gris); font-size: 0.82rem; text-decoration: none;">Completar mi perfil</a>
+        <a href="#" style="color: var(--gris); font-size: 0.82rem; text-decoration: none;">Completar mi perfil más tarde</a>
       </div>
     </div>
 
@@ -1019,16 +932,14 @@
   const cursor = document.getElementById('cursor');
   const ring = document.getElementById('cursor-ring');
   let mx=0,my=0,rx=0,ry=0;
-  if (cursor && ring) {
-    document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
-    function animateCursor() {
-      cursor.style.left=mx+'px'; cursor.style.top=my+'px';
-      rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12;
-      ring.style.left=rx+'px'; ring.style.top=ry+'px';
-      requestAnimationFrame(animateCursor);
-    }
-    animateCursor();
+  document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
+  function animateCursor() {
+    cursor.style.left=mx+'px'; cursor.style.top=my+'px';
+    rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12;
+    ring.style.left=rx+'px'; ring.style.top=ry+'px';
+    requestAnimationFrame(animateCursor);
   }
+  animateCursor();
 
   // STEPS
   const stepContent = [
@@ -1037,7 +948,7 @@
     { label: 'Paso 2 de 4', title: 'TU\nMÚSICA', desc: 'Contanos qué instrumento tocás y qué géneros son los tuyos.', bg: '02' },
     { label: 'Paso 3 de 4', title: 'TUS\nREFERENTES', desc: 'Tus artistas favoritos definen el matching con otros músicos.', bg: '03' },
     { label: 'Paso 4 de 4', title: 'TU\nPERFIL', desc: 'Últimos detalles para que otros músicos te encuentren.', bg: '04' },
-    { label: '¡Listo!', title: 'BIEN\nVE\nNIDO', desc: 'Ya sos parte de la comunidad buscARTE.', bg: '✓' },
+    { label: '¡Listo!', title: 'BIE\nNVE\nNIDO', desc: 'Ya sos parte de la comunidad buscARTE.', bg: '✓' },
   ];
 
   function goStep(n) {
@@ -1047,51 +958,30 @@
       const email = document.getElementById('reg-email').value.trim()
       const pass = document.getElementById('reg-password').value
       const prov = document.getElementById('sel-provincia').value
-      const ciudadField = document.getElementById('field-ciudad')
-      const ciudad = document.getElementById('sel-ciudad')?.value || ''
-      if (!nombre) { alert('Por favor ingresá tu nombre o nombre artístico.'); return }
+      if (!nombre) { alert('Por favor ingresá tu nombre.'); return }
       if (!email || !email.includes('@')) { alert('Por favor ingresá un email válido.'); return }
       if (pass.length < 8) { alert('La contraseña debe tener al menos 8 caracteres.'); return }
       if (!prov || prov === '') { alert('Por favor seleccioná tu provincia.'); return }
-      if (ciudadField && ciudadField.style.display !== 'none' && !ciudad) {
-        alert('Por favor seleccioná tu ciudad o localidad.');
-        return
-      }
     }
     if (n === 3) {
-      const instrumentos = [...document.querySelectorAll('#chips-instrumentos .chip.selected')]
-      const generos = [...document.querySelectorAll('#chips-generos .chip.selected')]
-      if (instrumentos.length === 0) { alert('Por favor seleccioná al menos un instrumento o rol.'); return }
-      if (generos.length === 0) { alert('Por favor seleccioná al menos un género.'); return }
+      const instrumento = [...document.querySelectorAll('#chips-instrumentos .chip.selected')]
+      if (instrumento.length === 0) { alert('Por favor seleccioná al menos un instrumento.'); return }
     }
-
     document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
     document.getElementById('step-' + n).classList.add('active');
 
     // update left panel
     const c = stepContent[n];
     if (c) {
-      const leftLabel = document.getElementById('left-label')
-      const leftTitle = document.getElementById('left-title')
-      const leftDesc = document.getElementById('left-desc')
-      const leftBg = document.getElementById('left-bg')
-      if (leftLabel) leftLabel.textContent = c.label;
-      if (leftTitle) leftTitle.innerHTML = c.title.replace(/\n/g, '<br>');
-      if (leftDesc) leftDesc.textContent = c.desc;
-      if (leftBg) leftBg.textContent = c.bg;
-
-      const mobileLabel = document.getElementById('mobile-step-label')
-      const mobileTitle = document.getElementById('mobile-step-title')
-      const mobileFill = document.getElementById('mobile-step-fill')
-      if (mobileLabel) mobileLabel.textContent = c.label;
-      if (mobileTitle) mobileTitle.textContent = ['','Tu cuenta','Tu música','Tus referentes','Tu perfil','Listo'][n] || '';
-      if (mobileFill) mobileFill.style.width = (n >= 5 ? 100 : Math.max(25, n * 25)) + '%';
+      document.getElementById('left-label').textContent = c.label;
+      document.getElementById('left-title').innerHTML = c.title.replace(/\n/g, '<br>');
+      document.getElementById('left-desc').textContent = c.desc;
+      document.getElementById('left-bg').textContent = c.bg;
     }
 
     // update progress dots
     for (let i = 1; i <= 4; i++) {
       const ps = document.getElementById('ps-' + i);
-      if (!ps) continue;
       ps.classList.remove('active', 'done');
       if (i < n) ps.classList.add('done');
       else if (i === n) ps.classList.add('active');
@@ -1193,93 +1083,31 @@
   }
 
   // FOTO EN REGISTRO
-  let fotoRegistroFile = null
-  let fotoRegistroPreparePromise = null
-
-  function fileToImage(file) {
-    return new Promise((resolve, reject) => {
-      const img = new Image()
-      img.onload = () => resolve(img)
-      img.onerror = reject
-      img.src = URL.createObjectURL(file)
-    })
-  }
-
-  async function prepareImageForUpload(file) {
-    if (!file || !file.type || !file.type.startsWith('image/')) {
-      throw new Error('Formato de imagen no válido')
-    }
-
-    // Si ya viene liviana, la dejamos tal cual.
-    if (file.size <= 2 * 1024 * 1024) return file
-
-    const img = await fileToImage(file)
-    const maxSide = 1400
-    let { width, height } = img
-
-    if (width > height && width > maxSide) {
-      height = Math.round(height * (maxSide / width))
-      width = maxSide
-    } else if (height > maxSide) {
-      width = Math.round(width * (maxSide / height))
-      height = maxSide
-    }
-
-    const canvas = document.createElement('canvas')
-    canvas.width = width
-    canvas.height = height
-    const ctx = canvas.getContext('2d')
-    ctx.drawImage(img, 0, 0, width, height)
-
-    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.82))
-    if (!blob) throw new Error('No se pudo optimizar la imagen')
-
-    return new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' })
-  }
+  let fotoRegistroUrl = null
 
   function previewFotoRegistro(input) {
     if (!input.files || !input.files[0]) return
     const file = input.files[0]
-    if (!file.type || !file.type.startsWith('image/')) {
-      alert('Subí una imagen válida en JPG, PNG o WebP.')
-      input.value = ''
-      return
-    }
-
+    if (file.size > 2 * 1024 * 1024) { alert('La foto no puede superar 2MB.'); return }
     const reader = new FileReader()
     reader.onload = e => {
       const preview = document.getElementById('reg-foto-preview')
       preview.src = e.target.result
       preview.style.display = 'block'
       document.getElementById('reg-foto-icon').style.display = 'none'
-      document.getElementById('reg-foto-text').innerHTML = '<strong>✓ Foto lista</strong><br>La vamos a optimizar y guardar al crear el perfil'
+      document.getElementById('reg-foto-text').innerHTML = '<strong>✓ Foto lista</strong><br>Se guardará al crear el perfil'
     }
     reader.readAsDataURL(file)
-
-    fotoRegistroFile = file
-    fotoRegistroPreparePromise = prepareImageForUpload(file)
-      .then(prepared => {
-        fotoRegistroFile = prepared
-        const sizeMb = (prepared.size / 1024 / 1024).toFixed(1)
-        document.getElementById('reg-foto-text').innerHTML = `<strong>✓ Foto lista</strong><br>Optimizada para subir (${sizeMb}MB)`
-        return prepared
-      })
-      .catch(e => {
-        console.error('Error preparando imagen:', e)
-        document.getElementById('reg-foto-text').innerHTML = '<strong>No pudimos optimizar la foto</strong><br>Podés seguir sin foto y cargarla después desde Configuración.'
-        fotoRegistroFile = null
-      })
+    // Guardar referencia al file para subirlo al crear perfil
+    fotoRegistroUrl = input.files[0]
   }
 
   async function subirFotoRegistro(userId) {
-    if (fotoRegistroPreparePromise) {
-      await fotoRegistroPreparePromise
-    }
-    if (!fotoRegistroFile) return null
+    if (!fotoRegistroUrl) return null
     try {
-      const file = fotoRegistroFile
-      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '')
-      const fileName = `${encodeURIComponent(userId)}-${Date.now()}.${ext || 'jpg'}`
+      const file = fotoRegistroUrl
+      const ext = file.name.split('.').pop()
+      const fileName = `${userId}-${Date.now()}.${ext}`
       const res = await fetch(
         `${SUPABASE_URL}/storage/v1/object/fotos-perfil/${fileName}`,
         {
@@ -1287,82 +1115,42 @@
           headers: {
             'apikey': SUPABASE_KEY,
             'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Content-Type': file.type || 'image/jpeg',
+            'Content-Type': file.type,
             'x-upsert': 'true'
           },
           body: file
         }
       )
-      if (!res.ok) {
-        const err = await res.text()
-        console.error('Error subiendo foto:', res.status, err)
-        return null
-      }
-      return `${SUPABASE_URL}/storage/v1/object/public/fotos-perfil/${fileName}`
+      if (res.ok) return `${SUPABASE_URL}/storage/v1/object/public/fotos-perfil/${fileName}`
     } catch(e) { console.error('Error subiendo foto:', e) }
     return null
   }
   let artists = [];
   let dropdownIdx = -1;
 
-
-  function escapeHtml(value) {
-    return String(value ?? '')
-      .replaceAll('&', '&amp;')
-      .replaceAll('<', '&lt;')
-      .replaceAll('>', '&gt;')
-      .replaceAll('"', '&quot;')
-      .replaceAll("'", '&#039;');
-  }
-
-  function normalizarTexto(value) {
-    return String(value || '').trim().replace(/\s+/g, ' ');
-  }
-
-  function resetCaptchaSafely() {
-    if (window.hcaptcha && typeof window.hcaptcha.reset === 'function') {
-      window.hcaptcha.reset();
-    }
-  }
-
   async function buscarArtistas(query) {
     const dropdown = document.getElementById('artist-dropdown');
-    const q = normalizarTexto(query);
-    if (!dropdown || q.length < 2) {
-      if (dropdown) dropdown.style.display = 'none';
-      return;
-    }
+    if (!query || query.length < 2) { dropdown.style.display = 'none'; return; }
 
     try {
       const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/artistas_sugeridos?nombre=ilike.*${encodeURIComponent(q)}*&order=veces.desc&limit=8`,
+        `${SUPABASE_URL}/rest/v1/artistas_sugeridos?nombre=ilike.*${encodeURIComponent(query)}*&order=veces.desc&limit=8`,
         { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
       );
-      if (!res.ok) throw new Error('No se pudieron cargar sugerencias');
       const sugerencias = await res.json();
       dropdownIdx = -1;
 
-      if (!Array.isArray(sugerencias) || !sugerencias.length) {
-        dropdown.style.display = 'none';
-        return;
-      }
+      if (!sugerencias.length) { dropdown.style.display = 'none'; return; }
 
-      dropdown.innerHTML = '';
-      sugerencias.forEach((s) => {
-        const nombre = normalizarTexto(s.nombre);
-        if (!nombre) return;
-        const option = document.createElement('div');
-        option.className = 'artist-option';
-        option.dataset.nombre = nombre;
-        option.style.cssText = 'padding:.65rem 1rem;cursor:pointer;font-size:.85rem;color:#f2ede4;border-bottom:1px solid #222;transition:background .15s';
-        option.innerHTML = `${escapeHtml(nombre)} <span style="color:#555;font-size:.7rem;margin-left:.4rem">${Number(s.veces || 0)} ${Number(s.veces || 0)===1?'músico':'músicos'}</span>`;
-        option.addEventListener('mousedown', () => selectArtistFromDropdown(nombre));
-        dropdown.appendChild(option);
-      });
-      dropdown.style.display = dropdown.children.length ? 'block' : 'none';
-    } catch(e) {
-      dropdown.style.display = 'none';
-    }
+      dropdown.innerHTML = sugerencias.map((s, i) =>
+        `<div class="artist-option" data-nombre="${s.nombre}" 
+          style="padding:.65rem 1rem;cursor:pointer;font-size:.85rem;color:#f2ede4;border-bottom:1px solid #222;transition:background .15s"
+          onmousedown="selectArtistFromDropdown('${s.nombre.replace(/'/g,"\\'")}')">
+          ${s.nombre} <span style="color:#555;font-size:.7rem;margin-left:.4rem">${s.veces} ${s.veces===1?'músico':'músicos'}</span>
+        </div>`
+      ).join('');
+      dropdown.style.display = 'block';
+    } catch(e) { dropdown.style.display = 'none'; }
   }
 
   function selectArtistFromDropdown(nombre) {
@@ -1428,66 +1216,51 @@
 
   function addArtist() {
     const input = document.getElementById('artist-input');
-    const val = normalizarTexto(input?.value);
+    const val = input.value.trim();
     if (!val) return;
-    if (!artists.some(a => a.toLowerCase() === val.toLowerCase())) {
+    if (!artists.includes(val)) {
       artists.push(val);
       renderArtists();
     }
     input.value = '';
-    const dropdown = document.getElementById('artist-dropdown');
-    if (dropdown) dropdown.style.display = 'none';
+    document.getElementById('artist-dropdown').style.display = 'none';
     input.focus();
   }
 
   function addArtistByName(name, btn) {
-    const val = normalizarTexto(name);
-    if (!val) return;
-    const existing = artists.find(a => a.toLowerCase() === val.toLowerCase());
-    if (!existing) {
-      artists.push(val);
+    if (!artists.includes(name)) {
+      artists.push(name);
       renderArtists();
       if (btn) btn.classList.add('selected');
     } else {
-      artists = artists.filter(a => a.toLowerCase() !== val.toLowerCase());
+      artists = artists.filter(a => a !== name);
       renderArtists();
       if (btn) btn.classList.remove('selected');
     }
   }
 
   function removeArtist(name) {
-    const val = normalizarTexto(name);
-    artists = artists.filter(a => a.toLowerCase() !== val.toLowerCase());
+    artists = artists.filter(a => a !== name);
     renderArtists();
     document.querySelectorAll('#chips-sugerencias .chip').forEach(c => {
-      if (c.textContent.trim().toLowerCase() === val.toLowerCase()) c.classList.remove('selected');
+      if (c.textContent.trim() === name) c.classList.remove('selected');
     });
   }
 
   function renderArtists() {
     const container = document.getElementById('artist-tags');
     if (!container) return;
-    container.innerHTML = '';
-    artists.forEach((artist) => {
-      const tag = document.createElement('span');
-      tag.className = 'artist-tag';
-      const label = document.createElement('span');
-      label.textContent = artist;
-      const removeBtn = document.createElement('button');
-      removeBtn.className = 'artist-tag-remove';
-      removeBtn.type = 'button';
-      removeBtn.textContent = '×';
-      removeBtn.addEventListener('click', () => removeArtist(artist));
-      tag.appendChild(label);
-      tag.appendChild(removeBtn);
-      container.appendChild(tag);
-    });
+    container.innerHTML = artists.map(a =>
+      `<span class="artist-tag">${a}<button type="button" class="artist-tag-remove" onclick="removeArtist('${a.replace(/'/g,"\\'")}')">×</button></span>`
+    ).join('');
   }
   // ═══ SUPABASE ═══
   const SUPABASE_URL = 'https://xiaanchoanxmampegoay.supabase.co'
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68'
 
   async function crearPerfil(btn) {
+    btn = btn || (window.event && window.event.currentTarget) || document.querySelector('.btn-next[onclick*="crearPerfil"]')
+    if (!btn) return
     const email = document.getElementById('reg-email')?.value?.trim()
     const nombre = document.getElementById('reg-nombre')?.value?.trim()
     const apellido = document.getElementById('reg-apellido')?.value?.trim()
@@ -1500,25 +1273,20 @@
     if (!nombre) { alert('Por favor ingresá tu nombre.'); goStep(1); return; }
     if (!email || !email.includes('@')) { alert('Por favor ingresá un email válido.'); goStep(1); return; }
     if (!password || password.length < 8) { alert('La contraseña debe tener al menos 8 caracteres.'); goStep(1); return; }
-    if (!prov) { alert('Por favor seleccioná tu provincia.'); goStep(1); return; }
-    if (document.getElementById('field-ciudad')?.style.display !== 'none' && !ciudad) { alert('Por favor seleccioná tu ciudad o localidad.'); goStep(1); return; }
 
     // Validar captcha
-    if (!window.hcaptcha || typeof window.hcaptcha.getResponse !== 'function') {
-      alert('No se pudo cargar el captcha. Recargá la página e intentá de nuevo.')
-      return
+    let captchaResponse = ''
+    if (window.hcaptcha && typeof window.hcaptcha.getResponse === 'function') {
+      captchaResponse = window.hcaptcha.getResponse()
     }
-    const captchaResponse = window.hcaptcha.getResponse()
     if (!captchaResponse) {
       alert('Por favor completá el captcha para continuar.')
       return
     }
 
     const nombreCompleto = apellido ? `${nombre} ${apellido}` : nombre
-    const instrumentos = [...document.querySelectorAll('#chips-instrumentos .chip.selected')].map(c => c.textContent.trim()).join(', ')
-    const generos = [...document.querySelectorAll('#chips-generos .chip.selected')].map(c => c.textContent.trim()).join(', ')
-    if (!instrumentos) { alert('Por favor seleccioná al menos un instrumento o rol.'); goStep(2); return; }
-    if (!generos) { alert('Por favor seleccioná al menos un género.'); goStep(2); return; }
+    const instrumentos = [...document.querySelectorAll('#chips-instrumentos .chip.selected')].map(c => c.textContent).join(', ')
+    const generos = [...document.querySelectorAll('#chips-generos .chip.selected')].map(c => c.textContent).join(', ')
     const disponibilidad = [...document.querySelectorAll('.objetivo-card.selected')].map(c => c.querySelector('.objetivo-title')?.textContent).join(', ')
     const referentes = artists.join(', ')
     const bio = document.getElementById('bio-text')?.value || ''
@@ -1536,7 +1304,7 @@
           'Authorization': `Bearer ${SUPABASE_KEY}`
         },
         body: JSON.stringify({
-          p_email: email.toLowerCase(),
+          p_email: email,
           p_password: password,
           p_nombre: nombreCompleto,
           p_provincia: provincia,
@@ -1550,20 +1318,18 @@
         })
       })
 
-      const raw = await response.text()
       let data = null
-      try { data = raw ? JSON.parse(raw) : null } catch(e) { data = { error: raw } }
+      try { data = await response.json() } catch(_) { data = null }
 
-      const errorMsg = data?.error || data?.message || (!response.ok ? raw : '')
-      if (!response.ok || errorMsg) {
-        const err = String(errorMsg || 'Error desconocido')
-        if (err.toLowerCase().includes('duplicate') || err.toLowerCase().includes('unique') || err.toLowerCase().includes('already')) {
-          alert('Ese email ya está registrado. Te llevamos al login.')
+      if (!response.ok || data?.error) {
+        const errText = data?.error || data?.message || JSON.stringify(data || {})
+        if (String(errText).toLowerCase().includes('duplicate') || String(errText).toLowerCase().includes('unique') || String(errText).toLowerCase().includes('ya existe')) {
+          alert('Ese email ya está registrado. ¿Querés ingresar?')
           window.location.href = 'buscARTE_login.html'
         } else {
           alert('Hubo un error al guardar tu perfil. Intentá de nuevo.')
-          console.error('Error registrar_usuario:', response.status, err)
-          resetCaptchaSafely()
+          console.error('Registro error:', errText)
+          if (window.hcaptcha && typeof window.hcaptcha.reset === 'function') window.hcaptcha.reset()
         }
         btn.textContent = '🎉 Crear mi perfil'
         btn.style.opacity = '1'
@@ -1572,16 +1338,16 @@
       }
 
       const usuario = Array.isArray(data) ? data[0] : data
-      if (fotoRegistroFile && usuario?.id) {
-        btn.textContent = 'Subiendo foto...'
-        const fotoUrl = await subirFotoRegistro(usuario.id)
-        if (fotoUrl) {
-          await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${encodeURIComponent(usuario.id)}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal' },
-            body: JSON.stringify({ foto_url: fotoUrl })
-          }).catch(e => console.error('Error guardando foto_url:', e))
-        }
+      if (fotoRegistroUrl && usuario?.id) {
+        subirFotoRegistro(usuario.id).then(fotoUrl => {
+          if (fotoUrl) {
+            fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${usuario.id}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal' },
+              body: JSON.stringify({ foto_url: fotoUrl })
+            }).catch(e => console.error('Error guardando foto_url:', e))
+          }
+        }).catch(e => console.error('Error subiendo foto:', e))
       }
       localStorage.setItem('ba_logged', '1')
       localStorage.setItem('ba_name', nombreCompleto)
@@ -1605,7 +1371,7 @@
     } catch (e) {
       alert('No se pudo conectar. Verificá tu conexión e intentá de nuevo.')
       console.error(e)
-      resetCaptchaSafely()
+      if (window.hcaptcha && typeof window.hcaptcha.reset === 'function') window.hcaptcha.reset()
     } finally {
       btn.textContent = '🎉 Crear mi perfil'
       btn.style.opacity = '1'

@@ -997,6 +997,13 @@
     .intent-meta { margin-top:1rem !important; }
   }
 
+
+  @media (max-width:900px) {
+    .home-search .quick-searches { grid-template-columns:1fr 1fr !important; }
+  }
+  @media (max-width:520px) {
+    .home-search .quick-searches { grid-template-columns:1fr !important; }
+  }
 </style>
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0a0a0a">
@@ -1141,67 +1148,23 @@
   <div class="section-title" style="font-family: var(--font-display); font-size: clamp(2.8rem, 5vw, 4.5rem); line-height: 0.92; letter-spacing: -0.02em; margin-bottom: 0;">¿QUÉ<br>BUSCÁS HOY?</div>
   <p class="search-intro">Entrá a mirar primero. El registro aparece cuando quieras publicar, guardar o contactar a alguien.</p>
 
-  <div class="search-box">
-    <input class="search-input" id="index-search" type="text" placeholder="Ej: bajista de rock en Almagro, cantante para funk, jam en Palermo..." onkeydown="if(event.key==='Enter') buscarDesdeIndex()">
-    <button class="search-btn" onclick="buscarDesdeIndex()">BUSCAR</button>
-  </div>
-
-  <div class="filters">
-    <select class="filter-select" id="index-instrumento">
-      <option value="">Todos los instrumentos</option>
-      <option>Guitarra</option>
-      <option>Bajo</option>
-      <option>Batería</option>
-      <option>Teclado / Piano</option>
-      <option>Voz / Cantante</option>
-      <option>Violín</option>
-      <option>Saxo</option>
-      <option>Trompeta</option>
-      <option>Percusión</option>
-      <option>DJ / Productor</option>
-    </select>
-    <select class="filter-select" id="index-genero">
-      <option value="">Todos los géneros</option>
-      <option>Rock Nacional</option>
-      <option>Metal</option>
-      <option>Jazz</option>
-      <option>Folklore</option>
-      <option>Tango</option>
-      <option>Cumbia</option>
-      <option>Indie</option>
-      <option>Pop</option>
-      <option>Electrónica</option>
-      <option>Hip Hop</option>
-      <option>Funk</option>
-      <option>Reggae</option>
-    </select>
-    <select class="filter-select" id="index-provincia">
-      <option value="">Todo el país</option>
-      <option>Buenos Aires (CABA)</option>
-      <option>Gran Buenos Aires</option>
-      <option>Rosario</option>
-      <option>Córdoba</option>
-      <option>Mendoza</option>
-      <option>La Plata</option>
-      <option>Mar del Plata</option>
-      <option>Tucumán</option>
-      <option>Salta</option>
-    </select>
-    <select class="filter-select" id="index-objetivo">
-      <option value="">Cualquier objetivo</option>
-      <option>Banda estable</option>
-      <option>Proyecto propio</option>
-      <option>Sesiones / Shows</option>
-      <option>Zapada / Jam</option>
-      <option>Clases</option>
-    </select>
-  </div>
-
-  <div class="quick-searches" aria-label="Búsquedas rápidas">
-    <button class="quick-chip" onclick="setQuickSearch('bajista para banda de rock')">Bajista para banda</button>
-    <button class="quick-chip" onclick="setQuickSearch('jam este fin de semana')">Jam este finde</button>
-    <button class="quick-chip" onclick="setQuickSearch('clases de guitarra')">Clases de guitarra</button>
-    <button class="quick-chip" onclick="setQuickSearch('vendo amplificador')">Vendo ampli</button>
+  <div class="quick-searches" aria-label="Accesos rápidos" style="margin-top:2rem;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem">
+    <button class="quick-chip" type="button" onclick="window.location.href='buscARTE_busqueda.html'" style="padding:1rem .8rem;text-align:left">
+      <strong style="display:block;color:var(--blanco);font-size:.82rem;margin-bottom:.25rem">🎵 Explorar músicos</strong>
+      <span style="color:var(--gris);font-size:.72rem;line-height:1.4">Ver perfiles por instrumento, género y zona.</span>
+    </button>
+    <button class="quick-chip" type="button" onclick="window.location.href='buscARTE_anuncios.html'" style="padding:1rem .8rem;text-align:left">
+      <strong style="display:block;color:var(--blanco);font-size:.82rem;margin-bottom:.25rem">📋 Ver anuncios</strong>
+      <span style="color:var(--gris);font-size:.72rem;line-height:1.4">Buscos, jams, compra/venta y clases.</span>
+    </button>
+    <button class="quick-chip" type="button" onclick="window.location.href='buscARTE_anuncios.html?publicar=1'" style="padding:1rem .8rem;text-align:left">
+      <strong style="display:block;color:var(--blanco);font-size:.82rem;margin-bottom:.25rem">➕ Publicar algo</strong>
+      <span style="color:var(--gris);font-size:.72rem;line-height:1.4">Buscá músico, ofrecete o subí un evento.</span>
+    </button>
+    <button class="quick-chip" type="button" onclick="window.location.href='buscARTE_generador.html'" style="padding:1rem .8rem;text-align:left">
+      <strong style="display:block;color:var(--blanco);font-size:.82rem;margin-bottom:.25rem">🎲 Generador</strong>
+      <span style="color:var(--gris);font-size:.72rem;line-height:1.4">Probá nombres para tu banda o proyecto.</span>
+    </button>
   </div>
 </section>
 
@@ -1267,7 +1230,7 @@
       <div class="section-label">Entrá por donde necesites</div>
       <div class="section-title">MENOS<br>VUELTAS.<br>MÁS MÚSICA.</div>
     </div>
-    <p class="section-sub">La home tiene que responder rápido: <strong>qué hay</strong>, <strong>para quién sirve</strong> y <strong>qué puedo hacer ahora</strong>.</p>
+    <p class="section-sub">Entrá directo a lo que necesitás: encontrar músicos, mirar anuncios, publicar algo o probar herramientas para tu proyecto.</p>
   </div>
 
   <div class="intent-grid reveal">
