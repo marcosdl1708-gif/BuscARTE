@@ -508,18 +508,34 @@
     .anuncios-intro { flex-direction:column; align-items:flex-start; }
     .anuncios-intro-actions { width:100%; display:grid; grid-template-columns:1fr 1fr; }
     .mini-link { text-align:center; }
+    /* Mobile: mostrar todas las categorías sin scroll horizontal oculto */
     .tipo-tabs {
-      margin-left:-1rem;
-      margin-right:-1rem;
-      padding:0 1rem;
-      border-left:none;
-      border-right:none;
+      display:grid !important;
+      grid-template-columns:repeat(2, minmax(0, 1fr)) !important;
+      margin-left:0 !important;
+      margin-right:0 !important;
+      padding:0 !important;
+      border:1px solid #1c1c1c !important;
       position:sticky;
       top:56px;
       z-index:40;
       background:var(--negro);
+      overflow:visible !important;
+      scrollbar-width:auto !important;
     }
-    .tipo-tab { min-width:118px; flex:0 0 auto; }
+    .tipo-tab {
+      min-width:0 !important;
+      width:100% !important;
+      flex:unset !important;
+      padding:.72rem .35rem !important;
+      border-right:1px solid #1c1c1c !important;
+      border-bottom:1px solid #1c1c1c !important;
+      font-size:.62rem !important;
+      white-space:normal !important;
+      line-height:1.2 !important;
+    }
+    .tipo-tab:nth-child(2n) { border-right:none !important; }
+    .tipo-tab:nth-last-child(-n+2) { border-bottom:none !important; }
     .mobile-filter-btn {
       display:flex !important;
       align-items:center;
@@ -947,8 +963,8 @@
 <a class="nav-dropdown-item" href="buscARTE_perfil.html">⚙️ Configurar perfil</a>
 <a class="nav-dropdown-item" href="buscARTE_mensajes.html">💬 Mensajes <span class="nav-badge" id="nav-msg-badge" style="display:none"></span></a>
 <a class="nav-dropdown-item" href="buscARTE_mis_anuncios.html">📋 Mis anuncios</a>
-<a class="nav-dropdown-item" href="buscARTE_guardados.html">♡ Guardados</a>
 <a class="nav-dropdown-item" href="buscARTE_generador.html">🎲 Generador de nombres</a>
+<a class="nav-dropdown-item" href="buscARTE_guardados.html">♡ Guardados</a>
 <div class="nav-dropdown-divider"></div>
 <button class="nav-dropdown-item nav-logout" onclick="logout()">↩ Cerrar sesión</button>
 </div>
@@ -2021,6 +2037,9 @@
   </a>
 <a class="mbn-panel-item" href="buscARTE_mis_anuncios.html">
 <span class="mbn-pi-icon">📋</span> Mis anuncios
+  </a>
+<a class="mbn-panel-item" href="buscARTE_generador.html">
+<span class="mbn-pi-icon">🎲</span> Generador de nombres
   </a>
 <a class="mbn-panel-item" href="buscARTE_guardados.html">
 <span class="mbn-pi-icon">🔖</span> Guardados / Favoritos
