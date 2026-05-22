@@ -743,39 +743,39 @@
     const oldText = btn ? btn.textContent : '';
     if (btn) { btn.textContent = 'Eliminando...'; btn.disabled = true; }
 
+    // Hotfix: eliminación segura sin DELETE real. Primero lo ocultamos del panel local
+    // y lo pausamos en Supabase para que deje de aparecer en el tablón público.
+    hideIdLocally(id);
+    const cardEl = cardToDelete;
+    if (cardEl) {
+      cardEl.style.transition = 'opacity .22s, transform .22s';
+      cardEl.style.opacity = '0';
+      cardEl.style.transform = 'translateX(-14px)';
+    }
+
     try {
-      // Primero intentamos un soft delete real si la base acepta estado='eliminado'.
-      let res = await fetch(`${SUPABASE_URL}/rest/v1/anuncios?id=eq.${enc(id)}&user_id=eq.${enc(miId)}`, {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/anuncios?id=eq.${enc(id)}&user_id=eq.${enc(miId)}`, {
         method: 'PATCH',
         headers: { ...hdrs, 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ estado: 'eliminado' })
+        body: JSON.stringify({ estado: 'pausado' })
       });
 
       if (!res.ok) {
-        // Fallback seguro: pausar para sacarlo del tablón público y ocultarlo localmente.
-        const errText = await res.text();
-        console.warn('estado=eliminado no disponible. Fallback a pausado:', res.status, errText);
-        res = await fetch(`${SUPABASE_URL}/rest/v1/anuncios?id=eq.${enc(id)}&user_id=eq.${enc(miId)}`, {
-          method: 'PATCH',
-          headers: { ...hdrs, 'Prefer': 'return=minimal' },
-          body: JSON.stringify({ estado: 'pausado' })
-        });
-        if (!res.ok) {
-          const txt = await res.text();
-          throw new Error(`Supabase ${res.status}: ${txt}`);
-        }
-        hideIdLocally(id);
+        const txt = await res.text();
+        throw new Error(`Supabase ${res.status}: ${txt}`);
       }
 
-      cardToDelete.style.transition = 'opacity .25s, transform .25s';
-      cardToDelete.style.opacity = '0';
-      cardToDelete.style.transform = 'translateX(-16px)';
-      setTimeout(() => { closeDeleteModal(); cargarMisAnuncios(); }, 260);
       showToast('Anuncio eliminado del tablón.');
+      setTimeout(() => { closeDeleteModal(); cargarMisAnuncios(); }, 240);
     } catch(e) {
       console.error(e);
+      unhideIdLocally(id);
       showToast('No se pudo eliminar el anuncio. Intentá de nuevo.', 'err');
-      if (btn) { btn.textContent = oldText || 'Sí, ocultar'; btn.disabled = false; }
+      if (cardEl) {
+        cardEl.style.opacity = '1';
+        cardEl.style.transform = '';
+      }
+      if (btn) { btn.textContent = oldText || 'Sí, eliminar'; btn.disabled = false; }
     }
   }
 

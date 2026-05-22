@@ -572,6 +572,32 @@
     .anuncio-titulo { padding-right:0 !important; }
     .anuncio-time { margin-left:0 !important; width:100%; }
   }
+
+
+  /* HOTFIX 2026-05-22 — imágenes menos invasivas + filtros funcionales */
+  @media (min-width:901px) {
+    .anuncio-flyer {
+      width: 220px !important;
+      height: 128px !important;
+      max-height: 128px !important;
+      object-fit: cover !important;
+      float: left !important;
+      margin: .2rem 1rem .75rem 0 !important;
+      border: 1px solid #1c1c1c !important;
+      background: #111 !important;
+    }
+    .anuncio::after { content:''; display:block; clear:both; }
+  }
+  @media (max-width:900px) {
+    .anuncio-flyer {
+      width:100% !important;
+      max-height:150px !important;
+      height:auto !important;
+      object-fit:cover !important;
+      margin:.35rem 0 .75rem !important;
+    }
+  }
+
 </style>
 <link href="/manifest.json" rel="manifest"/>
 <meta content="#0a0a0a" name="theme-color"/>
@@ -1023,7 +1049,7 @@
 <div class="filter-group">
 <span class="filter-group-label">Cuándo</span>
 <div class="filter-chips">
-<button class="fchip on" onclick="this.classList.toggle('on');filtrarJam()">Hoy</button>
+<button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Hoy</button>
 <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Este finde</button>
 <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Esta semana</button>
 <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Este mes</button>
@@ -1664,6 +1690,68 @@
     return `${SUPABASE_URL}/rest/v1/anuncios?select=*&limit=60`
   }
 
+  function getActiveFilterChips(panel) {
+    return [...(panel?.querySelectorAll('.fchip.on') || [])].map(c => c.textContent.trim().toLowerCase())
+  }
+
+  function parseMoney(value) {
+    if (value === null || value === undefined) return null
+    if (typeof value === 'number' && !isNaN(value)) return value
+    const clean = String(value).replace(/[^0-9,.-]/g, '').replace(/\.(?=\d{3}(\D|$))/g, '').replace(',', '.')
+    const n = parseFloat(clean)
+    return isNaN(n) ? null : n
+  }
+
+  function sameDay(a, b) {
+    return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
+  }
+
+  function matchesJamDateFilter(a, chipsOn) {
+    const dateChips = chipsOn.filter(c => ['hoy','este finde','esta semana','este mes'].includes(c))
+    if (!dateChips.length) return true
+    if (!a.fecha_evento) return false
+    const d = new Date(a.fecha_evento)
+    if (isNaN(d)) return false
+    const now = new Date()
+    const end7 = new Date(now); end7.setDate(now.getDate() + 7); end7.setHours(23,59,59,999)
+    const day = d.getDay()
+    return dateChips.some(c => {
+      if (c === 'hoy') return sameDay(d, now)
+      if (c === 'este finde') return d >= now && d <= end7 && (day === 0 || day === 5 || day === 6)
+      if (c === 'esta semana') return d >= now && d <= end7
+      if (c === 'este mes') return d >= now && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+      return true
+    })
+  }
+
+  function matchesEntradaFilter(a, chipsOn) {
+    const entradaChips = chipsOn.filter(c => ['gratis','a la gorra','con costo'].includes(c))
+    if (!entradaChips.length) return true
+    const precio = String(a.precio_entrada || a.precio || '').toLowerCase().trim()
+    const precioNum = parseMoney(a.precio_num || precio)
+    const esGratis = !precio || precio.includes('gratis') || precio === '0' || precioNum === 0
+    const esGorra = precio.includes('gorra')
+    const esConCosto = !esGratis && !esGorra && (precio.length > 0 || (precioNum || 0) > 0)
+    return entradaChips.some(c => {
+      if (c === 'gratis') return esGratis
+      if (c === 'a la gorra') return esGorra
+      if (c === 'con costo') return esConCosto
+      return true
+    })
+  }
+
+  function matchesPriceRange(a) {
+    if (tipoFiltro !== 'vende') return true
+    const min = parseMoney(document.getElementById('precio-min')?.value)
+    const max = parseMoney(document.getElementById('precio-max')?.value)
+    if (min === null && max === null) return true
+    const price = parseMoney(a.precio_num ?? a.precio)
+    if (price === null) return false
+    if (min !== null && price < min) return false
+    if (max !== null && price > max) return false
+    return true
+  }
+
   function anuncioVisibleCliente(a) {
     const estado = String(a.estado || '').toLowerCase().trim()
     // Si no hay estado, no bloqueamos: preferimos mostrar antes que dejar el tablón vacío.
@@ -1678,13 +1766,19 @@
 
     const panelActivo = document.querySelector('.filter-panel.active')
     if (!panelActivo) return true
-    const chipsOn = [...panelActivo.querySelectorAll('.fchip.on')].map(c=>c.textContent.trim().toLowerCase())
+    const chipsOn = getActiveFilterChips(panelActivo)
     const zonaInput = panelActivo.querySelector('input[id^="zona-"]')
     const zonaVal = zonaInput?.value?.trim().toLowerCase()
     if (zonaVal) {
       const zona = String(a.zona || a.lugar || '').toLowerCase()
       if (!zona.includes(zonaVal)) return false
     }
+
+    if (tipoFiltro === 'jam') {
+      if (!matchesJamDateFilter(a, chipsOn)) return false
+      if (!matchesEntradaFilter(a, chipsOn)) return false
+    }
+    if (!matchesPriceRange(a)) return false
 
     if (chipsOn.length) {
       const hayTexto = [a.instrumentos, a.instrumento, a.generos, a.categoria_producto, a.nivel, a.modalidad, a.condicion]
@@ -1694,6 +1788,11 @@
     }
 
     return true
+  }
+
+  function filtrarJam() {
+    anunciosOffset = 0
+    cargarAnuncios(false)
   }
 
   async function cargarAnuncios(append = false) {
