@@ -1652,78 +1652,46 @@
   }
 
   function buildQuery() {
-    const ordenJam = tipoFiltro === 'jam'
-    // HOTFIX: no depender de un único valor exacto de estado. En algunas tablas puede venir activo/Activo.
-    let query = `${SUPABASE_URL}/rest/v1/anuncios?select=*&estado=in.(activo,Activo)&order=${ordenJam ? 'fecha_evento.asc.nullslast,created_at.desc' : 'created_at.desc'}&limit=${ANUNCIOS_PER_PAGE}&offset=${anunciosOffset}`
-    if (tipoFiltro !== 'todos') {
-      if (tipoFiltro === 'vende') query += `&tipo=in.(vende,vendo)`
-      else query += `&tipo=eq.${qs(tipoFiltro)}`
-    }
-
-    const panelActivo = document.querySelector('.filter-panel.active')
-    if (!panelActivo) return query
-    const chipsOn = [...panelActivo.querySelectorAll('.fchip.on')].map(c=>c.textContent.trim())
-    const zonaInput = panelActivo.querySelector('input[id^="zona-"]')
-    const zonaVal = zonaInput?.value?.trim()
-    if (zonaVal) query += `&zona=ilike.*${qs(zonaVal)}*`
-
-    const instrActivos = chipsOn.filter(c => INSTRUMENTOS.includes(c) && !CATEGORIAS_VENTA.includes(c))
-    const generosActivos = chipsOn.filter(c => GENEROS.includes(c) && !['Hoy','Este finde','Esta semana','Este mes','Gratis','A la gorra','Con costo'].includes(c))
-    const catActiva = chipsOn.find(c => CATEGORIAS_VENTA.includes(c))
-    const condActiva = chipsOn.find(c => CONDICIONES.includes(c))
-
-    if (tipoFiltro === 'busco' || tipoFiltro === 'ofrezco' || tipoFiltro === 'todos') {
-      if (instrActivos.length) query += `&instrumentos=ilike.*${qs(instrActivos[0])}*`
-      if (generosActivos.length) query += `&generos=ilike.*${qs(generosActivos[0])}*`
-    }
-    if (tipoFiltro === 'jam') {
-      if (generosActivos.length) query += `&generos=ilike.*${qs(generosActivos[0])}*`
-      const hoy = new Date(); hoy.setHours(0,0,0,0)
-      const manana = new Date(hoy); manana.setDate(manana.getDate()+1)
-      const semana = new Date(hoy); semana.setDate(semana.getDate()+7)
-      const mes = new Date(hoy); mes.setMonth(mes.getMonth()+1)
-      if (chipsOn.includes('Hoy')) query += `&fecha_evento=gte.${hoy.toISOString()}&fecha_evento=lt.${manana.toISOString()}`
-      else if (chipsOn.includes('Este finde')) {
-        const dia = hoy.getDay(); const sab = new Date(hoy); sab.setDate(sab.getDate() + ((6 - dia + 7) % 7)); const lun = new Date(sab); lun.setDate(lun.getDate()+2)
-        query += `&fecha_evento=gte.${sab.toISOString()}&fecha_evento=lt.${lun.toISOString()}`
-      } else if (chipsOn.includes('Esta semana')) query += `&fecha_evento=gte.${hoy.toISOString()}&fecha_evento=lte.${semana.toISOString()}`
-      else if (chipsOn.includes('Este mes')) query += `&fecha_evento=gte.${hoy.toISOString()}&fecha_evento=lte.${mes.toISOString()}`
-      if (chipsOn.includes('Gratis')) query += `&precio_entrada=ilike.*gratis*`
-      else if (chipsOn.includes('A la gorra')) query += `&precio_entrada=ilike.*gorra*`
-    }
-    if (tipoFiltro === 'vende') {
-      if (catActiva) query += `&categoria_producto=ilike.*${qs(catActiva)}*`
-      if (condActiva) query += `&condicion=ilike.*${qs(condActiva)}*`
-      const precioMin = parseFloat(document.getElementById('precio-min')?.value)
-      const precioMax = parseFloat(document.getElementById('precio-max')?.value)
-      if (!isNaN(precioMin) && precioMin > 0) query += `&precio_num=gte.${precioMin}`
-      if (!isNaN(precioMax) && precioMax > 0) query += `&precio_num=lte.${precioMax}`
-    }
-    if (tipoFiltro === 'clases') {
-      const instrActivo = chipsOn.find(c => INSTRUMENTOS.includes(c))
-      const nivelActivo = chipsOn.find(c => ['Principiante','Intermedio','Avanzado','Todos los niveles'].includes(c))
-      const modalActivo = chipsOn.find(c => ['Presencial','Online','Presencial y online'].includes(c))
-      if (instrActivo) query += `&instrumento=ilike.*${qs(instrActivo)}*`
-      if (nivelActivo) query += `&nivel=eq.${qs(nivelActivo)}`
-      if (modalActivo) query += `&modalidad=eq.${qs(modalActivo)}`
-    }
-    return query
+    // HOTFIX SIMPLE: no filtrar por estado ni columnas especiales en Supabase.
+    // Traemos una tanda amplia y filtramos en cliente para evitar errores por enums/filtros/order.
+    const order = 'created_at.desc'
+    return `${SUPABASE_URL}/rest/v1/anuncios?select=*&order=${order}&limit=60&offset=${anunciosOffset}`
   }
 
   function buildFallbackQuery() {
-    // Query mínima: si algún filtro/estado/order rompe, al menos mostramos anuncios y filtramos del lado cliente.
-    return `${SUPABASE_URL}/rest/v1/anuncios?select=*&order=created_at.desc&limit=${ANUNCIOS_PER_PAGE}&offset=${anunciosOffset}`
+    // Fallback ultra mínimo si el order o algún parámetro llegara a fallar.
+    return `${SUPABASE_URL}/rest/v1/anuncios?select=*&limit=60`
   }
 
   function anuncioVisibleCliente(a) {
-    const estado = String(a.estado || '').toLowerCase()
+    const estado = String(a.estado || '').toLowerCase().trim()
+    // Si no hay estado, no bloqueamos: preferimos mostrar antes que dejar el tablón vacío.
     if (estado && !['activo','activa','publicado','publicada'].includes(estado)) return false
+
     if (tipoFiltro !== 'todos') {
       const t = canonicalTipo(a.tipo)
       if (tipoFiltro === 'vende') {
-        if (!(t === 'vende' || a.tipo === 'vendo')) return false
+        if (!(t === 'vende' || t === 'vendo')) return false
       } else if (t !== tipoFiltro) return false
     }
+
+    const panelActivo = document.querySelector('.filter-panel.active')
+    if (!panelActivo) return true
+    const chipsOn = [...panelActivo.querySelectorAll('.fchip.on')].map(c=>c.textContent.trim().toLowerCase())
+    const zonaInput = panelActivo.querySelector('input[id^="zona-"]')
+    const zonaVal = zonaInput?.value?.trim().toLowerCase()
+    if (zonaVal) {
+      const zona = String(a.zona || a.lugar || '').toLowerCase()
+      if (!zona.includes(zonaVal)) return false
+    }
+
+    if (chipsOn.length) {
+      const hayTexto = [a.instrumentos, a.instrumento, a.generos, a.categoria_producto, a.nivel, a.modalidad, a.condicion]
+        .filter(Boolean).join(' ').toLowerCase()
+      const chipsReales = chipsOn.filter(c => !['hoy','este finde','esta semana','este mes','gratis','a la gorra','con costo'].includes(c))
+      if (chipsReales.length && !chipsReales.some(c => hayTexto.includes(c))) return false
+    }
+
     return true
   }
 
@@ -1736,19 +1704,21 @@
     }
 
     try {
-      let res = await fetch(buildQuery(), { headers: { ...SB_HEADERS, 'Prefer':'count=exact' } })
+      let res = await fetch(buildQuery(), { headers: SB_HEADERS, cache: 'no-store' })
       if (!res.ok) {
         const errText = await res.text().catch(()=> '')
-        console.warn('Query principal de anuncios falló, probando fallback:', res.status, errText)
-        res = await fetch(buildFallbackQuery(), { headers: { ...SB_HEADERS, 'Prefer':'count=exact' } })
+        console.warn('Query simple de anuncios falló, probando fallback:', res.status, errText)
+        res = await fetch(buildFallbackQuery(), { headers: SB_HEADERS, cache: 'no-store' })
       }
       if (!res.ok) {
         const errText = await res.text().catch(()=> '')
         throw new Error(`Supabase ${res.status}: ${errText}`)
       }
-      let anuncios = await res.json()
-      anuncios = Array.isArray(anuncios) ? anuncios.filter(anuncioVisibleCliente) : []
-      const totalHeader = res.headers.get('content-range')?.split('/')[1]
+
+      let data = await res.json()
+      if (!Array.isArray(data)) throw new Error('Respuesta inesperada de Supabase en anuncios')
+      let anuncios = data.filter(anuncioVisibleCliente)
+
       if (!append) lista.innerHTML = ''
 
       if (!anuncios.length && !append) {
@@ -1761,33 +1731,50 @@
             <button class="empty-action primary" onclick="openModal('busco')">Publicar gratis</button>
           </div>
         </div>`
-        document.querySelector('.main-title span').textContent = '0'
-        document.getElementById('btn-load-more').style.display = 'none'
+        const n = document.querySelector('.main-title span'); if (n) n.textContent = '0'
+        const btnMore = document.getElementById('btn-load-more'); if (btnMore) btnMore.style.display = 'none'
         return
       }
 
       const userIds = [...new Set(anuncios.map(a=>a.user_id).filter(Boolean))]
       let autores = {}
       if (userIds.length) {
-        const ids = userIds.map(id => String(id).replace(/[^a-zA-Z0-9_-]/g,'')).filter(Boolean).join(',')
+        const ids = userIds.map(id => String(id).replace(/[^0-9]/g,'')).filter(Boolean).join(',')
         if (ids) {
-          const pRes = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=in.(${ids})&select=id,nombre`, { headers: SB_HEADERS })
-          if (pRes.ok) {
-            const perfiles = await pRes.json()
-            perfiles.forEach(p => autores[p.id] = p.nombre)
-          }
+          try {
+            const pRes = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=in.(${ids})&select=id,nombre`, { headers: SB_HEADERS, cache:'no-store' })
+            if (pRes.ok) {
+              const perfiles = await pRes.json()
+              if (Array.isArray(perfiles)) perfiles.forEach(p => autores[p.id] = p.nombre)
+            }
+          } catch(e) { console.warn('No se pudieron cargar autores', e) }
         }
       }
 
-      anuncios.forEach(a => lista.insertAdjacentHTML('beforeend', buildAnuncioCard(a, autores[a.user_id])))
-      const total = totalHeader && totalHeader !== '*' ? totalHeader : String(anunciosOffset + anuncios.length)
-      document.querySelector('.main-title span').textContent = total
-      document.querySelector('.main-sub').textContent = tipoFiltro === 'todos' ? 'explorá todas las categorías' : (filterLabels[tipoFiltro] || 'anuncios activos')
-      anunciosOffset += anuncios.length
-      document.getElementById('btn-load-more').style.display = anuncios.length === ANUNCIOS_PER_PAGE ? 'inline-block' : 'none'
+      let rendered = 0
+      anuncios.forEach(a => {
+        try {
+          lista.insertAdjacentHTML('beforeend', buildAnuncioCard(a, autores[a.user_id]))
+          rendered++
+        } catch(cardErr) {
+          console.warn('Anuncio omitido por error de render:', a && a.id, cardErr)
+        }
+      })
+
+      const titleNum = document.querySelector('.main-title span')
+      if (titleNum) titleNum.textContent = append ? String(anunciosOffset + rendered) : String(rendered)
+      const sub = document.querySelector('.main-sub')
+      if (sub) sub.textContent = tipoFiltro === 'todos' ? 'explorá todas las categorías' : (filterLabels[tipoFiltro] || 'anuncios activos')
+      anunciosOffset += data.length
+      const btnMore = document.getElementById('btn-load-more')
+      if (btnMore) btnMore.style.display = data.length >= 60 ? 'inline-block' : 'none'
     } catch(e) {
-      console.error(e)
-      lista.innerHTML = '<div style="padding:3rem;text-align:center;color:var(--gris)">Error al cargar anuncios. Verificá tu conexión.</div>'
+      console.error('Error real cargando anuncios:', e)
+      lista.innerHTML = `<div style="padding:3rem;text-align:center;color:var(--gris);line-height:1.7">
+        Error al cargar anuncios.<br>
+        <span style="font-size:.75rem;color:#555">${escapeHtml(e.message || String(e))}</span><br>
+        <button class="empty-action" style="margin-top:1rem" onclick="cargarAnuncios(false)">Reintentar</button>
+      </div>`
     }
   }
 
