@@ -1653,8 +1653,12 @@
 
   function buildQuery() {
     const ordenJam = tipoFiltro === 'jam'
-    let query = `${SUPABASE_URL}/rest/v1/anuncios?select=*&estado=eq.activo&order=${ordenJam ? 'fecha_evento.asc.nullslast,created_at.desc' : 'created_at.desc'}&limit=${ANUNCIOS_PER_PAGE}&offset=${anunciosOffset}`
-    if (tipoFiltro !== 'todos') query += `&tipo=eq.${qs(tipoFiltro)}`
+    // HOTFIX: no depender de un único valor exacto de estado. En algunas tablas puede venir activo/Activo.
+    let query = `${SUPABASE_URL}/rest/v1/anuncios?select=*&estado=in.(activo,Activo)&order=${ordenJam ? 'fecha_evento.asc.nullslast,created_at.desc' : 'created_at.desc'}&limit=${ANUNCIOS_PER_PAGE}&offset=${anunciosOffset}`
+    if (tipoFiltro !== 'todos') {
+      if (tipoFiltro === 'vende') query += `&tipo=in.(vende,vendo)`
+      else query += `&tipo=eq.${qs(tipoFiltro)}`
+    }
 
     const panelActivo = document.querySelector('.filter-panel.active')
     if (!panelActivo) return query
@@ -1706,6 +1710,23 @@
     return query
   }
 
+  function buildFallbackQuery() {
+    // Query mínima: si algún filtro/estado/order rompe, al menos mostramos anuncios y filtramos del lado cliente.
+    return `${SUPABASE_URL}/rest/v1/anuncios?select=*&order=created_at.desc&limit=${ANUNCIOS_PER_PAGE}&offset=${anunciosOffset}`
+  }
+
+  function anuncioVisibleCliente(a) {
+    const estado = String(a.estado || '').toLowerCase()
+    if (estado && !['activo','activa','publicado','publicada'].includes(estado)) return false
+    if (tipoFiltro !== 'todos') {
+      const t = canonicalTipo(a.tipo)
+      if (tipoFiltro === 'vende') {
+        if (!(t === 'vende' || a.tipo === 'vendo')) return false
+      } else if (t !== tipoFiltro) return false
+    }
+    return true
+  }
+
   async function cargarAnuncios(append = false) {
     const lista = document.getElementById('anuncios-lista')
     if (!lista) return
@@ -1715,12 +1736,18 @@
     }
 
     try {
-      const res = await fetch(buildQuery(), { headers: { ...SB_HEADERS, 'Prefer':'count=exact' } })
+      let res = await fetch(buildQuery(), { headers: { ...SB_HEADERS, 'Prefer':'count=exact' } })
+      if (!res.ok) {
+        const errText = await res.text().catch(()=> '')
+        console.warn('Query principal de anuncios falló, probando fallback:', res.status, errText)
+        res = await fetch(buildFallbackQuery(), { headers: { ...SB_HEADERS, 'Prefer':'count=exact' } })
+      }
       if (!res.ok) {
         const errText = await res.text().catch(()=> '')
         throw new Error(`Supabase ${res.status}: ${errText}`)
       }
-      const anuncios = await res.json()
+      let anuncios = await res.json()
+      anuncios = Array.isArray(anuncios) ? anuncios.filter(anuncioVisibleCliente) : []
       const totalHeader = res.headers.get('content-range')?.split('/')[1]
       if (!append) lista.innerHTML = ''
 
@@ -1869,7 +1896,13 @@
     }
     cargarStatsSidebar()
   }
-  window.addEventListener('DOMContentLoaded', initAnunciosPage)
+  if (document.readyState === 'loading') window.addEventListener('DOMContentLoaded', initAnunciosPage)
+  else initAnunciosPage()
+  // Safety net por si algún browser/cache raro no dispara el init como esperamos
+  setTimeout(() => {
+    const lista = document.getElementById('anuncios-lista')
+    if (lista && /Cargando anuncios/i.test(lista.textContent || '')) cargarAnuncios(false)
+  }, 1200)
 </script>
 <div class="mbn-overlay" id="mbn-overlay" onclick="closeMbnPanel()"></div>
 <div class="mbn-panel" id="mbn-panel">
