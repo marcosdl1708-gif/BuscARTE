@@ -1898,6 +1898,20 @@
     }
   }
 
+  // Busca el email real del usuario desde Supabase para validar eliminación de cuenta
+  async function cargarEmailParaEliminar() {
+    const miId = localStorage.getItem('ba_user_id');
+    if (!miId) return;
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${encodeURIComponent(miId)}&select=email`, { headers: hdrs });
+      if (!res.ok) return;
+      const data = await res.json();
+      const email = data?.[0]?.email || '';
+      const input = document.getElementById('delete-email-input');
+      if (input && email) input.dataset.realEmail = email;
+    } catch(e) {}
+  }
+
   // Cargar al entrar
   cargarPerfil();
   cargarEmailParaEliminar();
@@ -2088,30 +2102,7 @@ if ('serviceWorker' in navigator) {
     setTimeout(() => input?.focus(), 80);
   }
 
-  function validarDeleteInput() {
-    const miId = localStorage.getItem('ba_user_id');
-    const value = (document.getElementById('delete-email-input')?.value || '').trim().toLowerCase();
-    const btn = document.getElementById('btn-delete-confirm');
-    if (!btn) return;
-    // Necesitamos el email real — lo guardamos en el atributo data del input cuando lo busca Supabase
-    const input = document.getElementById('delete-email-input');
-    const expected = (input?.dataset.realEmail || '').trim().toLowerCase();
-    btn.disabled = expected ? value !== expected : !/^\S+@\S+\.\S+$/.test(value);
-  }
-
-  // Busca el email real del usuario logueado desde Supabase y lo guarda en data-real-email
-  async function cargarEmailParaEliminar() {
-    const miId = localStorage.getItem('ba_user_id');
-    if (!miId) return;
-    try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${encodeURIComponent(miId)}&select=email`, { headers: hdrs });
-      if (!res.ok) return;
-      const data = await res.json();
-      const email = data?.[0]?.email || '';
-      const input = document.getElementById('delete-email-input');
-      if (input && email) input.dataset.realEmail = email;
-    } catch(e) {}
-  }
+  function cerrarEliminar() {
     const overlay = document.getElementById('delete-overlay');
     if (overlay) overlay.classList.remove('open');
     const form = document.getElementById('delete-form');
@@ -2129,11 +2120,11 @@ if ('serviceWorker' in navigator) {
   }
 
   function validarDeleteInput() {
-    const expected = (localStorage.getItem('ba_email') || '').trim().toLowerCase();
-    const value = (document.getElementById('delete-email-input')?.value || '').trim().toLowerCase();
+    const input = document.getElementById('delete-email-input');
+    const expected = (input?.dataset.realEmail || '').trim().toLowerCase();
+    const value = (input?.value || '').trim().toLowerCase();
     const btn = document.getElementById('btn-delete-confirm');
     if (!btn) return;
-    // Si tenemos email guardado, exigimos coincidencia exacta. Si no, exigimos al menos formato de email.
     btn.disabled = expected ? value !== expected : !/^\S+@\S+\.\S+$/.test(value);
   }
 
