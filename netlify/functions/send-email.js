@@ -154,6 +154,66 @@ function buildEmail(tipo, rawDatos = {}) {
     };
   }
 
+  if (tipo === 'novedades') {
+    const nombre = clean(datos.nombre, 80) || 'músico/a';
+    return {
+      subject: '🎸 buscARTE creció — novedades que te van a interesar',
+      html: brandShell(`
+        <h2 style="color:#d4f53c;margin:0 0 16px">Pasaron muchas cosas desde que te sumaste 🎶</h2>
+        <p>Hola <strong>${escapeHtml(nombre)}</strong>, te contamos las novedades de buscARTE porque seguro hay algo que no viste.</p>
+
+        <div style="margin:24px 0;padding:20px;background:#111;border-left:3px solid #d4f53c">
+          <p style="margin:0 0 10px;color:#d4f53c;font-weight:700;font-size:15px">🆕 Lo que hay nuevo</p>
+          <ul style="color:#ccc;padding-left:20px;line-height:2;margin:0">
+            <li><strong>125 músicos nuevos</strong> se sumaron a la red</li>
+            <li><strong>Anuncios de clases</strong> — encontrá o publicá clases de tu instrumento</li>
+            <li><strong>Compra / venta / alquiler</strong> de instrumentos y equipos</li>
+            <li><strong>Jams y eventos</strong> — hay una jam publicada esperando músicos</li>
+            <li>Mejoras en la creación de perfil, mensajería y filtros de búsqueda</li>
+          </ul>
+        </div>
+
+        <div style="margin:24px 0;padding:20px;background:#111;border-left:3px solid #555">
+          <p style="margin:0 0 10px;color:#f2ede4;font-weight:700;font-size:15px">📋 Tu perfil importa</p>
+          <p style="color:#ccc;margin:0">Los músicos con foto y descripción completa aparecen primero en las búsquedas y reciben más mensajes. Si todavía no completaste el tuyo, vale la pena.</p>
+          ${cta('Completar mi perfil →', `${BASE_URL}/buscARTE_perfil.html`)}
+        </div>
+
+        <div style="margin:24px 0;padding:20px;background:#111;border-left:3px solid #555">
+          <p style="margin:0 0 10px;color:#f2ede4;font-weight:700;font-size:15px">💬 Tu opinión nos importa</p>
+          <p style="color:#ccc;margin:0">buscARTE se construye con el feedback de la escena. Si algo no te gusta, no funciona, o se te ocurre algo que falta — contanos. Podés escribirnos desde la página o por Instagram.</p>
+          <p style="margin:10px 0 0">
+            ${cta('Contacto →', `${BASE_URL}/buscARTE_contacto.html`)}
+            <a href="https://instagram.com/buscarte.ba" style="display:inline-block;background:#333;color:#f2ede4;padding:14px 28px;text-decoration:none;font-weight:700;margin-top:18px;margin-left:10px;border-radius:2px">Instagram →</a>
+          </p>
+        </div>
+
+        ${cta('Explorar buscARTE →', `${BASE_URL}/buscARTE_busqueda.html`)}
+        <p style="color:#555;font-size:12px;margin-top:24px">Te mandamos este mail porque sos parte de buscARTE. No vamos a spamear — solo te escribimos cuando hay algo que vale la pena.</p>
+      `)
+    };
+  }
+
+  if (tipo === 'perfil_incompleto') {
+    const nombre = clean(datos.nombre, 80) || 'músico/a';
+    return {
+      subject: 'Tu perfil en buscARTE está casi listo 👀',
+      html: brandShell(`
+        <h2 style="color:#d4f53c;margin:0 0 16px">Te falta poco para estar en el mapa</h2>
+        <p>Hola <strong>${escapeHtml(nombre)}</strong>, tu perfil en buscARTE está creado pero le faltan algunos datos clave.</p>
+        <p style="color:#888;margin:20px 0 8px">Los perfiles completos reciben <strong style="color:#f2ede4">hasta 3 veces más visitas</strong>. En especial:</p>
+        <ul style="color:#ccc;padding-left:22px;line-height:2">
+          <li>📸 <strong>Foto de perfil</strong> — genera confianza y te hace reconocible</li>
+          <li>🎸 <strong>Instrumento y géneros</strong> — para que te encuentren fácil</li>
+          <li>📍 <strong>Zona</strong> — para conectar con músicos cercanos</li>
+          <li>✍️ <strong>Descripción</strong> — contá quién sos y qué buscás</li>
+        </ul>
+        ${cta('Completar mi perfil →', `${BASE_URL}/buscARTE_perfil.html`)}
+        <p style="color:#555;font-size:12px;margin-top:24px">Si ya completaste tu perfil, ignorá este mail.</p>
+      `)
+    };
+  }
+
   return null;
 }
 
