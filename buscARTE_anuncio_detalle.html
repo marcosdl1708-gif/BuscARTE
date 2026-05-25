@@ -1330,6 +1330,7 @@
 
       renderAnuncio(a, autor, id)
       cargarReacciones(id)
+    } catch(e) {
       mostrarError('Error al cargar el anuncio.')
       console.error(e)
     }
