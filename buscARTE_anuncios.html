@@ -131,6 +131,8 @@
   .anuncio-time { font-size:.63rem;color:var(--gris2);margin-left:auto; }
   .anuncio-respond { background:transparent;border:1px solid var(--gris3);color:var(--gris);padding:.28rem .7rem;font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;cursor:none;transition:all .2s;font-family:var(--font-body); }
   .anuncio-respond:hover { border-color:var(--neon);color:var(--neon); }
+  .anuncio-likes { font-size:.65rem;color:var(--gris2);display:inline-flex;align-items:center;gap:.25rem; }
+  .anuncio-likes.has-likes { color:var(--gris); }
 
   .reply-form { display:none;margin-top:1rem;padding-top:1rem;border-top:1px solid #181818;animation:fadeUp .2s ease; }
   .reply-form.open { display:block; }
@@ -1932,6 +1934,7 @@
         ${tagsHTML}
         ${zona ? `<span class="anuncio-location">📍 ${escapeHtml(zona)}</span>` : ''}
         <span class="anuncio-time">${escapeHtml(timeAgo(a.created_at))}</span>
+        <span class="anuncio-likes" id="likes-${id}" style="display:none"></span>
         <a class="anuncio-respond" href="${detalleUrl}" onclick="event.stopPropagation()">${escapeHtml(respondText)}</a>
       </div>
     </div>`
@@ -2122,6 +2125,9 @@
         }
       })
 
+      // Cargar contadores de reacciones en segundo plano
+      cargarContadoresReacciones(anuncios.map(a => a.id).filter(Boolean))
+
       const titleNum = document.querySelector('.main-title span')
       if (titleNum) titleNum.textContent = append ? String(anunciosOffset + rendered) : String(rendered)
       const sub = document.querySelector('.main-sub')
@@ -2242,6 +2248,45 @@
       });
     } catch(e) {
       console.warn('No se pudo ejecutar vencimiento automático de anuncios:', e);
+    }
+  }
+
+  async function cargarContadoresReacciones(ids) {
+    if (!ids || !ids.length) return
+    try {
+      const idsStr = ids.map(id => String(id).replace(/[^0-9]/g,'')).filter(Boolean).join(',')
+      if (!idsStr) return
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/reacciones?anuncio_id=in.(${idsStr})&select=anuncio_id,tipo`,
+        { headers: SB_HEADERS, cache: 'no-store' }
+      )
+      if (!res.ok) return
+      const data = await res.json()
+      if (!Array.isArray(data)) return
+
+      // Agrupar por anuncio_id
+      const contadores = {}
+      data.forEach(r => {
+        if (!contadores[r.anuncio_id]) contadores[r.anuncio_id] = { like: 0, asistire: 0 }
+        if (r.tipo === 'like') contadores[r.anuncio_id].like++
+        if (r.tipo === 'asistire') contadores[r.anuncio_id].asistire++
+      })
+
+      // Actualizar cada card
+      Object.entries(contadores).forEach(([anuncioId, counts]) => {
+        const el = document.getElementById(`likes-${anuncioId}`)
+        if (!el) return
+        const partes = []
+        if (counts.like > 0) partes.push(`♥ ${counts.like}`)
+        if (counts.asistire > 0) partes.push(`🎟 ${counts.asistire}`)
+        if (partes.length) {
+          el.textContent = partes.join('  ')
+          el.style.display = 'inline-flex'
+          el.classList.add('has-likes')
+        }
+      })
+    } catch(e) {
+      console.warn('Error cargando contadores de reacciones:', e)
     }
   }
 

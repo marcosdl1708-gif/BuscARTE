@@ -454,6 +454,8 @@
 </div>
 
 <div class="page-wrap" id="page-wrap">
+<div id="loading-state" style="padding:5rem;text-align:center;color:var(--gris);font-size:.88rem">Cargando anuncio...</div>
+<div id="static-content" style="display:none">
 
   <!-- ══════════ BUSCO MÚSICO ══════════ -->
   <div class="anuncio-view active" id="view-busco">
@@ -905,6 +907,7 @@
     </div>
   </div>
 
+</div><!-- end static-content -->
 </div><!-- end page-wrap -->
 
 <script>
@@ -979,7 +982,7 @@
     if (isNaN(d)) return null
     return {
       fecha: d.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'}),
-      hora: d.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}),
+      hora: d.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',hour12:false}),
       pasado: d < new Date()
     }
   }
@@ -1072,7 +1075,10 @@
             const btn = document.getElementById(`btn-${r.tipo}`)
             if (btn) {
               btn.classList.add('active')
-              if (r.tipo === 'like') btn.innerHTML = btn.innerHTML.replace('♡', '♥')
+              if (r.tipo === 'like') {
+                const labelEl = btn.querySelector('.r-label')
+                if (labelEl) labelEl.textContent = '♥ Me gusta'
+              }
             }
           })
         }
@@ -1099,7 +1105,10 @@
     // Optimistic UI
     reaccionesState[tipo] = !yaActivo
     if (btn) btn.classList.toggle('active', !yaActivo)
-    if (tipo === 'like' && btn) btn.innerHTML = btn.innerHTML.replace(yaActivo ? '♥' : '♡', yaActivo ? '♡' : '♥')
+    if (tipo === 'like' && btn) {
+      const labelEl = btn.querySelector('.r-label')
+      if (labelEl) labelEl.textContent = yaActivo ? '♡ Me gusta' : '♥ Me gusta'
+    }
     if (countEl) countEl.textContent = Math.max(0, parseInt(countEl.textContent || 0) + (yaActivo ? -1 : 1))
 
     try {
@@ -1119,7 +1128,10 @@
       // Revert on error
       reaccionesState[tipo] = yaActivo
       if (btn) btn.classList.toggle('active', yaActivo)
-      if (tipo === 'like' && btn) btn.innerHTML = btn.innerHTML.replace(yaActivo ? '♡' : '♥', yaActivo ? '♥' : '♡')
+      if (tipo === 'like' && btn) {
+        const labelEl = btn.querySelector('.r-label')
+        if (labelEl) labelEl.textContent = yaActivo ? '♥ Me gusta' : '♡ Me gusta'
+      }
       if (countEl) countEl.textContent = Math.max(0, parseInt(countEl.textContent || 0) + (yaActivo ? 1 : -1))
       console.warn('Error guardando reacción:', e)
     }
@@ -1250,7 +1262,7 @@
         ${tipo === 'jam'
           ? `<button class="btn-reaction asistire" id="btn-asistire" onclick="toggleReaccion('asistire')">🎟 Asistiré <span class="r-count" id="count-asistire">0</span></button>`
           : ''}
-        <button class="btn-reaction like" id="btn-like" onclick="toggleReaccion('like')">♡ Me gusta <span class="r-count" id="count-like">0</span></button>
+        <button class="btn-reaction like" id="btn-like" onclick="toggleReaccion('like')"><span class="r-label">♡ Me gusta</span> <span class="r-count" id="count-like">0</span></button>
       </div>
     </section>
 
@@ -1328,6 +1340,8 @@
         body: JSON.stringify({ vistas: (Number(a.vistas) || 0) + 1 })
       }).catch(()=>{})
 
+      const loadingEl = document.getElementById('loading-state')
+      if (loadingEl) loadingEl.style.display = 'none'
       renderAnuncio(a, autor, id)
       cargarReacciones(id)
     } catch(e) {

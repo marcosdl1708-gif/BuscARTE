@@ -1900,6 +1900,7 @@
 
   // Cargar al entrar
   cargarPerfil();
+  cargarEmailParaEliminar();
 
   // Drag & drop de foto en desktop
   (function setupPhotoDrop(){
@@ -2080,15 +2081,37 @@ if ('serviceWorker' in navigator) {
   function abrirEliminarCuenta() {
     const overlay = document.getElementById('delete-overlay');
     if (!overlay) return;
-    const email = localStorage.getItem('ba_email') || '';
     const input = document.getElementById('delete-email-input');
-    if (input) input.value = email;
+    if (input) input.value = '';
     overlay.classList.add('open');
     validarDeleteInput();
     setTimeout(() => input?.focus(), 80);
   }
 
-  function cerrarEliminar() {
+  function validarDeleteInput() {
+    const miId = localStorage.getItem('ba_user_id');
+    const value = (document.getElementById('delete-email-input')?.value || '').trim().toLowerCase();
+    const btn = document.getElementById('btn-delete-confirm');
+    if (!btn) return;
+    // Necesitamos el email real — lo guardamos en el atributo data del input cuando lo busca Supabase
+    const input = document.getElementById('delete-email-input');
+    const expected = (input?.dataset.realEmail || '').trim().toLowerCase();
+    btn.disabled = expected ? value !== expected : !/^\S+@\S+\.\S+$/.test(value);
+  }
+
+  // Busca el email real del usuario logueado desde Supabase y lo guarda en data-real-email
+  async function cargarEmailParaEliminar() {
+    const miId = localStorage.getItem('ba_user_id');
+    if (!miId) return;
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${encodeURIComponent(miId)}&select=email`, { headers: hdrs });
+      if (!res.ok) return;
+      const data = await res.json();
+      const email = data?.[0]?.email || '';
+      const input = document.getElementById('delete-email-input');
+      if (input && email) input.dataset.realEmail = email;
+    } catch(e) {}
+  }
     const overlay = document.getElementById('delete-overlay');
     if (overlay) overlay.classList.remove('open');
     const form = document.getElementById('delete-form');
