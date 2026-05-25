@@ -1,14 +1,8 @@
 /**
  * resumen-mensual.js
  * Netlify Scheduled Function — corre el día 1 de cada mes a las 10:00 AM ART
- *
- * Recolecta stats del mes anterior (músicos nuevos, anuncios, próximos eventos)
- * y manda el resumen a todos los usuarios con email.
- *
- * Schedule: "0 13 1 * *"  →  día 1 de cada mes, 10:00 AM ART (13:00 UTC)
+ * Schedule: "0 13 1 * *"
  */
-
-const { schedule } = require('@netlify/functions');
 
 const SUPABASE_URL   = process.env.SUPABASE_URL || 'https://xiaanchoanxmampegoay.supabase.co';
 const SUPABASE_KEY   = process.env.SUPABASE_SERVICE_KEY;
@@ -18,7 +12,6 @@ const SEND_EMAIL_URL = process.env.URL
 
 const DELAY_MS = 400;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-
 const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 
 function getMesAnterior() {
@@ -32,22 +25,16 @@ function getMesAnterior() {
 
 async function getStats(desde, hasta) {
   const sbHeaders = { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` };
-
-  // Músicos nuevos
   const rMusicos = await fetch(
     `${SUPABASE_URL}/rest/v1/perfiles?select=id&created_at=gte.${encodeURIComponent(desde)}&created_at=lt.${encodeURIComponent(hasta)}`,
-    { headers: { ...sbHeaders, 'Prefer': 'count=exact', 'Range-Unit': 'items', 'Range': '0-0' } }
+    { headers: { ...sbHeaders, 'Prefer':'count=exact','Range-Unit':'items','Range':'0-0' } }
   );
   const totalMusicos = parseInt(rMusicos.headers.get('content-range')?.split('/')[1] || '0');
-
-  // Anuncios nuevos (excluye jam)
   const rAnuncios = await fetch(
     `${SUPABASE_URL}/rest/v1/anuncios?select=id&tipo=neq.jam&created_at=gte.${encodeURIComponent(desde)}&created_at=lt.${encodeURIComponent(hasta)}`,
-    { headers: { ...sbHeaders, 'Prefer': 'count=exact', 'Range-Unit': 'items', 'Range': '0-0' } }
+    { headers: { ...sbHeaders, 'Prefer':'count=exact','Range-Unit':'items','Range':'0-0' } }
   );
   const totalAnuncios = parseInt(rAnuncios.headers.get('content-range')?.split('/')[1] || '0');
-
-  // Próximos eventos/jams (fecha futura, activos)
   const ahora = new Date().toISOString();
   const en30dias = new Date(Date.now() + 30 * 24 * 3600 * 1000).toISOString();
   const rEventos = await fetch(
@@ -56,13 +43,11 @@ async function getStats(desde, hasta) {
     { headers: sbHeaders }
   );
   const eventos = rEventos.ok ? await rEventos.json() : [];
-
   const proximosEventos = eventos.map(e => ({
     titulo: e.titulo || 'Jam / Evento',
     fecha: e.fecha_evento ? new Date(e.fecha_evento).toLocaleDateString('es-AR', { weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }) : '',
     lugar: e.lugar || ''
   }));
-
   return { totalMusicos, totalAnuncios, proximosEventos };
 }
 
@@ -83,13 +68,7 @@ async function sendResumen(user, stats, mes) {
     body: JSON.stringify({
       tipo: 'resumen_mensual',
       destinatario: user.email,
-      datos: {
-        nombre: user.nombre || 'músico/a',
-        mes,
-        nuevosMusicos: stats.totalMusicos,
-        nuevosAnuncios: stats.totalAnuncios,
-        proximosEventos: stats.proximosEventos
-      }
+      datos: { nombre: user.nombre || 'músico/a', mes, nuevosMusicos: stats.totalMusicos, nuevosAnuncios: stats.totalAnuncios, proximosEventos: stats.proximosEventos }
     })
   });
   if (!res.ok) {
@@ -98,48 +77,33 @@ async function sendResumen(user, stats, mes) {
   }
 }
 
-const handler = schedule('0 13 1 * *', async () => {
+exports.handler = async function(event) {
   console.log('[resumen-mensual] Iniciando...');
-
   if (!SUPABASE_KEY) {
     console.error('[resumen-mensual] Falta SUPABASE_SERVICE_KEY');
     return { statusCode: 500 };
   }
-
   const { desde, hasta, nombre: mes } = getMesAnterior();
-  console.log(`[resumen-mensual] Período: ${mes} (${desde} → ${hasta})`);
-
   let stats, users;
   try {
     [stats, users] = await Promise.all([getStats(desde, hasta), getAllUsers()]);
-  } catch (e) {
-    console.error('[resumen-mensual] Error obteniendo datos:', e.message);
+  } catch(e) {
+    console.error('[resumen-mensual] Error:', e.message);
     return { statusCode: 500 };
   }
-
-  console.log(`[resumen-mensual] Stats — músicos:${stats.totalMusicos} anuncios:${stats.totalAnuncios} eventos:${stats.proximosEventos.length}`);
-  console.log(`[resumen-mensual] Usuarios a notificar: ${users.length}`);
-
-  // Mandamos en tandas de 90 para respetar el límite diario de Resend
-  // Si hay más de 90 usuarios, los que queden se notificarán el próximo ciclo.
-  // Para la base actual esto alcanza; si crece, migrar a Resend pago.
   const tanda = users.slice(0, 90);
-
   let ok = 0, errores = 0;
   for (let i = 0; i < tanda.length; i++) {
     try {
       await sendResumen(tanda[i], stats, mes);
       console.log(`[resumen-mensual] ✅ ${tanda[i].email}`);
       ok++;
-    } catch (e) {
+    } catch(e) {
       console.error(`[resumen-mensual] ❌ ${tanda[i].email}: ${e.message}`);
       errores++;
     }
     if (i < tanda.length - 1) await sleep(DELAY_MS);
   }
-
-  console.log(`[resumen-mensual] Fin — ok:${ok} errores:${errores} de ${users.length} usuarios`);
+  console.log(`[resumen-mensual] Fin — ok:${ok} errores:${errores}`);
   return { statusCode: 200 };
-});
-
-module.exports = { handler };
+};
