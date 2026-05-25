@@ -900,6 +900,49 @@
         <div class="char-count"><span id="bio-count">0</span> / 300 caracteres</div>
       </div>
 
+      <div class="field">
+        <label>Provincia</label>
+        <select id="perfil-provincia" onchange="perfilUpdateCiudades()" oninput="showSaveBar()">
+          <option value="" disabled selected>¿En qué provincia estás?</option>
+          <option>Buenos Aires</option>
+          <option>CABA</option>
+          <option>Córdoba</option>
+          <option>Santa Fe</option>
+          <option>Mendoza</option>
+          <option>Tucumán</option>
+          <option>Salta</option>
+          <option>Entre Ríos</option>
+          <option>Misiones</option>
+          <option>Chaco</option>
+          <option>Corrientes</option>
+          <option>Santiago del Estero</option>
+          <option>San Juan</option>
+          <option>Jujuy</option>
+          <option>Río Negro</option>
+          <option>Neuquén</option>
+          <option>Formosa</option>
+          <option>Chubut</option>
+          <option>San Luis</option>
+          <option>Catamarca</option>
+          <option>La Rioja</option>
+          <option>La Pampa</option>
+          <option>Santa Cruz</option>
+          <option>Tierra del Fuego</option>
+        </select>
+      </div>
+      <div class="field" id="perfil-field-ciudad" style="display:none">
+        <label>Ciudad / Localidad</label>
+        <select id="perfil-ciudad" onchange="perfilUpdateBarrios()" oninput="showSaveBar()">
+          <option value="" disabled selected>¿En qué ciudad?</option>
+        </select>
+      </div>
+      <div class="field" id="perfil-field-barrio" style="display:none">
+        <label>Barrio / Zona <span class="optional">opcional</span></label>
+        <select id="perfil-barrio" oninput="showSaveBar()">
+          <option value="" disabled selected>¿En qué barrio?</option>
+        </select>
+      </div>
+
       <div class="field-row">
         <div class="field">
           <label>Edad <span class="optional">opcional</span></label>
@@ -1610,6 +1653,26 @@
         btn.classList.toggle('on', perfReferentes.includes(btn.textContent.trim()));
       });
 
+      // Provincia / Ciudad / Barrio
+      if (p.provincia) {
+        const selProv = document.getElementById('perfil-provincia');
+        if (selProv) {
+          selProv.value = p.provincia;
+          perfilUpdateCiudades();
+          if (p.ciudad) {
+            const selCiudad = document.getElementById('perfil-ciudad');
+            if (selCiudad) {
+              selCiudad.value = p.ciudad;
+              perfilUpdateBarrios();
+              if (p.barrio) {
+                const selBarrio = document.getElementById('perfil-barrio');
+                if (selBarrio) selBarrio.value = p.barrio;
+              }
+            }
+          }
+        }
+      }
+
       // Preview avatar
       const img = document.getElementById('preview-img');
       const initials = document.getElementById('avatar-initials');
@@ -1719,7 +1782,10 @@
         referentes: perfReferentes.join(', '),
         experiencia: parseInt(document.getElementById('exp-slider')?.value || 0, 10),
         edad: parseInt(document.getElementById('edad-input')?.value || 0, 10) || null,
-        genero_principal: document.getElementById('genero-principal')?.value || null
+        genero_principal: document.getElementById('genero-principal')?.value || null,
+        provincia: document.getElementById('perfil-provincia')?.value || null,
+        ciudad: document.getElementById('perfil-ciudad')?.value || null,
+        barrio: document.getElementById('perfil-barrio')?.value || null
       };
 
       const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${encodeURIComponent(miIdActual)}`, {
@@ -1759,6 +1825,76 @@
       console.error(e);
       if (btn) { btn.textContent = 'Guardar cambios'; btn.disabled = false; }
       saveBar?.classList.remove('saving');
+    }
+  }
+
+  // UBICACIONES
+  const ubicacionesPerfil = {
+    'CABA': {
+      ciudades: ['Buenos Aires (CABA)'],
+      barrios: { 'Buenos Aires (CABA)': ['Agronomía','Almagro','Balvanera','Barracas','Belgrano','Boedo','Caballito','Chacarita','Coghlan','Colegiales','Constitución','Floresta','Flores','La Boca','La Paternal','Liniers','Mataderos','Montserrat','Nueva Pompeya','Núñez','Palermo','Parque Avellaneda','Parque Chacabuco','Parque Chas','Parque Patricios','Puerto Madero','Recoleta','Retiro','Saavedra','San Cristóbal','San Nicolás','San Telmo','Versalles','Villa Crespo','Villa del Parque','Villa Devoto','Villa General Mitre','Villa Lugano','Villa Luro','Villa Ortúzar','Villa Pueyrredón','Villa Real','Villa Riachuelo','Villa Santa Rita','Villa Soldati','Villa Urquiza','Otro barrio'] }
+    },
+    'Buenos Aires': {
+      ciudades: ['— GBA Zona Norte —','San Isidro','Vicente López','Tigre','San Fernando','Pilar','Escobar','Malvinas Argentinas','José C. Paz','San Miguel','Moreno','Zárate','Campana','— GBA Zona Oeste —','Morón','Tres de Febrero','Hurlingham','Ituzaingó','Merlo','General San Martín','La Matanza','— GBA Zona Sur —','Lanús','Lomas de Zamora','Quilmes','Avellaneda','Berazategui','Florencio Varela','Almirante Brown','Ezeiza','Esteban Echeverría','Presidente Perón','— Interior Provincia —','La Plata','Mar del Plata','Bahía Blanca','Tandil','Junín','Pergamino','Necochea','Olavarría','Azul','San Nicolás de los Arroyos','Luján','Mercedes','Chivilcoy','Tres Arroyos','Otra localidad'],
+      barrios: { 'La Plata':['Centro','Altos de San Lorenzo','City Bell','El Mondongo','Gonnet','La Loma','Parque Castelli','Villa Elvira','Villa Elisa','Tolosa','Otro barrio'],'Mar del Plata':['Centro','La Perla','Güemes','Punta Mogotes','Puerto','Stella Maris','Camet','Otro barrio'],'Bahía Blanca':['Centro','Villa Mitre','Barrio Universitario','Palihue','Napostá','Otro barrio'],'San Isidro':['San Isidro centro','Martínez','Acassuso','Beccar','La Horqueta','Otro barrio'],'Vicente López':['Olivos','Florida','Munro','Villa Martelli','La Lucila','Otro barrio'],'Morón':['Morón centro','Castelar','El Palomar','Haedo','Ituzaingó centro','Otro barrio'],'Lanús':['Lanús Este','Lanús Oeste','Monte Chingolo','Remedios de Escalada','Otro barrio'],'Lomas de Zamora':['Lomas centro','Banfield','Temperley','Turdera','Ingeniería','Otro barrio'],'Quilmes':['Quilmes centro','Bernal','Ezpeleta','Berazategui centro','Otro barrio'],'Avellaneda':['Avellaneda centro','Dock Sud','Sarandí','Villa Domínico','Otro barrio'],'Tigre':['Tigre centro','Don Torcuato','El Talar','General Pacheco','Rincón de Milberg','Otro barrio'],'General San Martín':['San Martín centro','Villa Lynch','Villa Ballester','José León Suárez','Otro barrio'],'La Matanza':['Ramos Mejía','San Justo','Tapiales','Ciudad Evita','González Catán','Laferrere','Otro barrio'] }
+    },
+    'Córdoba': { ciudades:['Córdoba Capital','Villa Carlos Paz','Río Cuarto','San Francisco','Villa María','Cosquín','Alta Gracia','Jesús María','Río Tercero','Bell Ville','Marcos Juárez','Otra localidad'], barrios:{ 'Córdoba Capital':['Alberdi','Argüello','Barrio Jardín','Centro','Cerro de las Rosas','Güemes','General Paz','Juniors','Nueva Córdoba','Palermo','San Vicente','Villa Cabrera','Villa del Prado','Villa Warcalde','Otro barrio'] } },
+    'Santa Fe': { ciudades:['Rosario','Santa Fe Capital','Rafaela','Venado Tuerto','Reconquista','Villa Gobernador Gálvez','San Lorenzo','Casilda','Esperanza','Otra localidad'], barrios:{ 'Rosario':['Centro','Echesortu','Fisherton','Abasto','Las Delicias','Pichincha','Alberdi','República de la Sexta','Tablada','Belgrano','Otro barrio'],'Santa Fe Capital':['Centro','Alto Verde','Barrio El Pozo','Candioti','Centenario','Otro barrio'] } },
+    'Mendoza': { ciudades:['Mendoza Capital','Godoy Cruz','Guaymallén','Las Heras','Maipú','Luján de Cuyo','San Rafael','General Alvear','Rivadavia','Junín','Otra localidad'], barrios:{ 'Mendoza Capital':['Centro','5ta Sección','6ta Sección','Dorrego','El Challao','Otro barrio'] } },
+    'Tucumán': { ciudades:['San Miguel de Tucumán','Tafí Viejo','Banda del Río Salí','Yerba Buena','Concepción','Famaillá','Monteros','Otra localidad'], barrios:{ 'San Miguel de Tucumán':['Centro','Barrio Norte','San Javier','Villa Urquiza','Otro barrio'] } },
+    'Salta': { ciudades:['Salta Capital','San Ramón de la Nueva Orán','Tartagal','Güemes','Cafayate','Metán','Otra localidad'], barrios:{ 'Salta Capital':['Centro','Tres Cerritos','Limache','San Bernardo','Otro barrio'] } },
+    'Entre Ríos': { ciudades:['Paraná','Concordia','Gualeguaychú','Gualeguay','Colón','Federación','Concepción del Uruguay','Otra localidad'], barrios:{ 'Paraná':['Centro','Thompson','General Racedo','Bajada Grande','Otro barrio'] } },
+    'Misiones': { ciudades:['Posadas','Oberá','Eldorado','Puerto Iguazú','Apóstoles','Otra localidad'], barrios:{ 'Posadas':['Centro','Villa Cabello','Itaembé Miní','Otro barrio'] } },
+    'Chaco': { ciudades:['Resistencia','Presidencia Roque Sáenz Peña','Villa Ángela','Barranqueras','Otra localidad'], barrios:{ 'Resistencia':['Centro','Barranqueras','Puerto Vilelas','Otro barrio'] } },
+    'Corrientes': { ciudades:['Corrientes Capital','Goya','Paso de los Libres','Mercedes','Curuzú Cuatiá','Otra localidad'], barrios:{ 'Corrientes Capital':['Centro','Laguna Seca','Tres de Abril','Otro barrio'] } },
+    'Santiago del Estero': { ciudades:['Santiago del Estero Capital','La Banda','Termas de Río Hondo','Frías','Otra localidad'], barrios:{} },
+    'San Juan': { ciudades:['San Juan Capital','Rivadavia','Chimbas','Santa Lucía','Pocito','Rawson','Otra localidad'], barrios:{ 'San Juan Capital':['Centro','Trinidad','Concepción','Otro barrio'] } },
+    'Jujuy': { ciudades:['San Salvador de Jujuy','Palpalá','San Pedro de Jujuy','Libertador General San Martín','Tilcara','Otra localidad'], barrios:{ 'San Salvador de Jujuy':['Centro','Alto Comedero','Gorriti','Otro barrio'] } },
+    'Río Negro': { ciudades:['Viedma','Bariloche','Cipolletti','General Roca','Allen','El Bolsón','Otra localidad'], barrios:{ 'Bariloche':['Centro','Melipal','Altos del Nahuel','Güemes','Otro barrio'] } },
+    'Neuquén': { ciudades:['Neuquén Capital','Zapala','San Martín de los Andes','Villa La Angostura','Cutral Có','Otra localidad'], barrios:{ 'Neuquén Capital':['Centro','Alta Barda','Confluencia','Progreso','Otro barrio'] } },
+    'Formosa': { ciudades:['Formosa Capital','Clorinda','Pirané','Otra localidad'], barrios:{} },
+    'Chubut': { ciudades:['Rawson','Trelew','Comodoro Rivadavia','Puerto Madryn','Esquel','Otra localidad'], barrios:{ 'Comodoro Rivadavia':['Centro','Km 3','Rada Tilly','Otro barrio'] } },
+    'San Luis': { ciudades:['San Luis Capital','Villa Mercedes','Merlo','Otra localidad'], barrios:{} },
+    'Catamarca': { ciudades:['San Fernando del Valle de Catamarca','Andalgalá','Tinogasta','Santa María','Otra localidad'], barrios:{} },
+    'La Rioja': { ciudades:['La Rioja Capital','Chilecito','Otra localidad'], barrios:{} },
+    'La Pampa': { ciudades:['Santa Rosa','General Pico','Otra localidad'], barrios:{} },
+    'Santa Cruz': { ciudades:['Río Gallegos','Caleta Olivia','El Calafate','Otra localidad'], barrios:{} },
+    'Tierra del Fuego': { ciudades:['Ushuaia','Río Grande','Tolhuin','Otra localidad'], barrios:{} }
+  };
+
+  function perfilUpdateCiudades() {
+    const prov = document.getElementById('perfil-provincia').value;
+    const data = ubicacionesPerfil[prov] || { ciudades:['Otra localidad'], barrios:{} };
+    const sel = document.getElementById('perfil-ciudad');
+    sel.innerHTML = '<option value="" disabled selected>¿En qué ciudad?</option>';
+    data.ciudades.forEach(c => {
+      if (c.startsWith('—')) {
+        const og = document.createElement('optgroup');
+        og.label = c.replace(/—/g,'').trim();
+        sel.appendChild(og);
+      } else {
+        const opt = document.createElement('option');
+        opt.textContent = c;
+        sel.appendChild(opt);
+      }
+    });
+    document.getElementById('perfil-field-ciudad').style.display = 'block';
+    document.getElementById('perfil-field-barrio').style.display = 'none';
+    document.getElementById('perfil-barrio').innerHTML = '<option value="" disabled selected>¿En qué barrio?</option>';
+  }
+
+  function perfilUpdateBarrios() {
+    const prov = document.getElementById('perfil-provincia').value;
+    const ciudad = document.getElementById('perfil-ciudad').value;
+    const data = ubicacionesPerfil[prov] || { barrios:{} };
+    const barrios = data.barrios[ciudad];
+    const fieldBarrio = document.getElementById('perfil-field-barrio');
+    const selBarrio = document.getElementById('perfil-barrio');
+    if (barrios && barrios.length) {
+      selBarrio.innerHTML = '<option value="" disabled selected>¿En qué barrio?</option>' + barrios.map(b=>`<option>${b}</option>`).join('');
+      fieldBarrio.style.display = 'block';
+    } else {
+      fieldBarrio.style.display = 'none';
     }
   }
 

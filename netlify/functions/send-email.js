@@ -194,6 +194,55 @@ function buildEmail(tipo, rawDatos = {}) {
     };
   }
 
+  if (tipo === 'resumen_mensual') {
+    const nombre = clean(datos.nombre, 80) || 'músico/a';
+    const nuevosMusicos = parseInt(datos.nuevosMusicos) || 0;
+    const nuevosAnuncios = parseInt(datos.nuevosAnuncios) || 0;
+    const proximosEventos = datos.proximosEventos || [];
+    const mes = clean(datos.mes, 40) || 'este mes';
+
+    const eventosHTML = proximosEventos.length
+      ? `<div style="margin:24px 0;padding:20px;background:#111;border-left:3px solid #d4f53c">
+          <p style="margin:0 0 12px;color:#d4f53c;font-weight:700;font-size:15px">🥁 Próximos jams y eventos</p>
+          ${proximosEventos.map(e => `
+            <div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid #222">
+              <p style="margin:0;color:#f2ede4;font-weight:500">${escapeHtml(e.titulo)}</p>
+              <p style="margin:3px 0 0;color:#888;font-size:13px">${escapeHtml(e.fecha)}${e.lugar ? ' · ' + escapeHtml(e.lugar) : ''}</p>
+            </div>
+          `).join('')}
+         </div>`
+      : '';
+
+    return {
+      subject: `🎸 buscARTE en ${mes} — ${nuevosMusicos} músicos nuevos, ${nuevosAnuncios} anuncios`,
+      html: brandShell(`
+        <h2 style="color:#d4f53c;margin:0 0 16px">Lo que pasó en buscARTE ${escapeHtml(mes)}</h2>
+        <p>Hola <strong>${escapeHtml(nombre)}</strong>, acá va el resumen del mes para que no te pierdas nada de la escena.</p>
+
+        <div style="display:flex;gap:12px;margin:24px 0">
+          <div style="flex:1;background:#111;padding:18px;text-align:center">
+            <div style="font-size:32px;font-weight:700;color:#d4f53c">${nuevosMusicos}</div>
+            <div style="font-size:13px;color:#888;margin-top:4px">músicos nuevos</div>
+          </div>
+          <div style="flex:1;background:#111;padding:18px;text-align:center">
+            <div style="font-size:32px;font-weight:700;color:#d4f53c">${nuevosAnuncios}</div>
+            <div style="font-size:13px;color:#888;margin-top:4px">anuncios publicados</div>
+          </div>
+        </div>
+
+        ${eventosHTML}
+
+        <div style="margin:24px 0;padding:20px;background:#111;border-left:3px solid #555">
+          <p style="margin:0 0 10px;color:#f2ede4;font-weight:700;font-size:15px">📋 ¿Tenés algo para publicar?</p>
+          <p style="color:#ccc;margin:0">Podés publicar anuncios gratis — busco músico, me ofrezco, jams, clases o compra/venta de equipos.</p>
+          ${cta('Ver anuncios →', `${BASE_URL}/buscARTE_anuncios.html`)}
+        </div>
+
+        <p style="color:#555;font-size:12px;margin-top:24px">Recibís este resumen mensual porque sos parte de buscARTE. Si no querés recibirlo más, respondé este mail.</p>
+      `)
+    };
+  }
+
   if (tipo === 'perfil_incompleto') {
     const nombre = clean(datos.nombre, 80) || 'músico/a';
     return {

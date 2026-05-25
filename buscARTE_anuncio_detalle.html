@@ -290,6 +290,19 @@
     color:#fff; cursor:pointer; line-height:1; background:none; border:none;
   }
 
+  /* Galería múltiple fotos venta */
+  .foto-gallery { display:grid; gap:4px; margin-bottom:1.5rem; }
+  .foto-gallery.fotos-1 { grid-template-columns:1fr; }
+  .foto-gallery.fotos-2 { grid-template-columns:1fr 1fr; }
+  .foto-gallery.fotos-3 { grid-template-columns:2fr 1fr; grid-template-rows:1fr 1fr; }
+  .foto-gallery .foto-main { overflow:hidden; background:#111; }
+  .foto-gallery .foto-main img { width:100%; height:100%; object-fit:cover; display:block; transition:opacity .2s; }
+  .foto-gallery .foto-main:hover img { opacity:.88; }
+  .foto-gallery.fotos-1 .foto-main { height:320px; }
+  .foto-gallery.fotos-2 .foto-main { height:260px; }
+  .foto-gallery.fotos-3 .foto-main:first-child { grid-row:span 2; height:280px; }
+  .foto-gallery.fotos-3 .foto-main:not(:first-child) { height:138px; }
+
 
   /* ── MOBILE: dropdown del avatar accesible ── */
   @media (max-width: 900px) {
@@ -358,6 +371,14 @@
   .contact-anchor-offset { scroll-margin-top:86px; }
   .mobile-sticky-action { display:none; }
   .sidebar-card.is-contact { border-color:rgba(212,245,60,.22);box-shadow:0 0 0 1px rgba(212,245,60,.03) inset; }
+
+  /* Botones de reacción */
+  .reaction-bar { display:flex;gap:.6rem;margin:1rem 0 0;flex-wrap:wrap; }
+  .btn-reaction { display:inline-flex;align-items:center;gap:.45rem;padding:.5rem 1rem;border:1px solid var(--gris3);background:transparent;color:var(--gris);font-family:var(--font-body);font-size:.78rem;letter-spacing:.06em;cursor:none;transition:all .2s;white-space:nowrap; }
+  .btn-reaction:hover { border-color:var(--gris);color:var(--blanco); }
+  .btn-reaction.active { border-color:var(--neon);color:var(--neon);background:rgba(212,245,60,.06); }
+  .btn-reaction.asistire.active { border-color:#5b9fff;color:#5b9fff;background:rgba(91,159,255,.06); }
+  .btn-reaction .r-count { font-size:.72rem;opacity:.8; }
   .detail-desc { background:rgba(255,255,255,.015);border:1px solid #171717;padding:1.15rem 1.25rem; }
   .foto-main { min-height:220px; }
   .ficha { border-color:#242424; }
@@ -1016,6 +1037,94 @@
     } catch(e) {}
   }
 
+  // ── REACCIONES (me gusta / asistiré) ──────────────────────────────────────
+  let reaccionesState = { like: false, asistire: false }
+
+  async function cargarReacciones(anuncioId) {
+    if (!anuncioId) return
+    const miId = localStorage.getItem('ba_user_id')
+    try {
+      // Contadores totales
+      const rTotales = await fetch(
+        `${SUPABASE_URL}/rest/v1/reacciones?anuncio_id=eq.${encodeURIComponent(anuncioId)}&select=tipo`,
+        { headers: hdrs }
+      )
+      if (rTotales.ok) {
+        const todas = await rTotales.json()
+        const likes = todas.filter(r => r.tipo === 'like').length
+        const asistencias = todas.filter(r => r.tipo === 'asistire').length
+        const elLike = document.getElementById('count-like')
+        const elAsistire = document.getElementById('count-asistire')
+        if (elLike) elLike.textContent = likes || 0
+        if (elAsistire) elAsistire.textContent = asistencias || 0
+      }
+
+      // Estado del usuario actual
+      if (miId) {
+        const rMias = await fetch(
+          `${SUPABASE_URL}/rest/v1/reacciones?anuncio_id=eq.${encodeURIComponent(anuncioId)}&user_id=eq.${encodeURIComponent(miId)}&select=tipo`,
+          { headers: hdrs }
+        )
+        if (rMias.ok) {
+          const mias = await rMias.json()
+          mias.forEach(r => {
+            reaccionesState[r.tipo] = true
+            const btn = document.getElementById(`btn-${r.tipo}`)
+            if (btn) {
+              btn.classList.add('active')
+              if (r.tipo === 'like') btn.innerHTML = btn.innerHTML.replace('♡', '♥')
+            }
+          })
+        }
+      }
+    } catch(e) { console.warn('Error cargando reacciones:', e) }
+  }
+
+  async function toggleReaccion(tipo) {
+    const miId = localStorage.getItem('ba_user_id')
+    const logged = localStorage.getItem('ba_logged') === '1'
+    if (!logged || !miId) {
+      if (confirm('Para reaccionar necesitás una cuenta gratis. ¿Querés ingresar?')) {
+        window.location.href = 'buscARTE_login.html?next=' + encodeURIComponent(location.pathname + location.search)
+      }
+      return
+    }
+    const anuncioId = new URLSearchParams(location.search).get('id')
+    if (!anuncioId) return
+
+    const btn = document.getElementById(`btn-${tipo}`)
+    const countEl = document.getElementById(`count-${tipo}`)
+    const yaActivo = reaccionesState[tipo]
+
+    // Optimistic UI
+    reaccionesState[tipo] = !yaActivo
+    if (btn) btn.classList.toggle('active', !yaActivo)
+    if (tipo === 'like' && btn) btn.innerHTML = btn.innerHTML.replace(yaActivo ? '♥' : '♡', yaActivo ? '♡' : '♥')
+    if (countEl) countEl.textContent = Math.max(0, parseInt(countEl.textContent || 0) + (yaActivo ? -1 : 1))
+
+    try {
+      if (yaActivo) {
+        await fetch(
+          `${SUPABASE_URL}/rest/v1/reacciones?anuncio_id=eq.${encodeURIComponent(anuncioId)}&user_id=eq.${encodeURIComponent(miId)}&tipo=eq.${tipo}`,
+          { method:'DELETE', headers: hdrs }
+        )
+      } else {
+        await fetch(`${SUPABASE_URL}/rest/v1/reacciones`, {
+          method:'POST',
+          headers: { ...hdrs, 'Content-Type':'application/json', 'Prefer':'return=minimal' },
+          body: JSON.stringify({ anuncio_id: parseInt(anuncioId), user_id: parseInt(miId), tipo })
+        })
+      }
+    } catch(e) {
+      // Revert on error
+      reaccionesState[tipo] = yaActivo
+      if (btn) btn.classList.toggle('active', yaActivo)
+      if (tipo === 'like' && btn) btn.innerHTML = btn.innerHTML.replace(yaActivo ? '♡' : '♥', yaActivo ? '♥' : '♡')
+      if (countEl) countEl.textContent = Math.max(0, parseInt(countEl.textContent || 0) + (yaActivo ? 1 : -1))
+      console.warn('Error guardando reacción:', e)
+    }
+  }
+
   function autorSidebar(a, autor) {
     const i = initials(autor.nombre)
     return `<div class="sidebar-card">
@@ -1035,7 +1144,12 @@
   function renderEspecial(a) {
     const tipo = normalizarTipo(a.tipo)
     if (tipo === 'vende') {
-      const foto = a.foto_url ? `<div class="foto-section"><div class="foto-main" onclick="openLightbox('${escapeAttr(a.foto_url)}')"><img src="${escapeAttr(a.foto_url)}" alt="Foto del anuncio"></div></div>` : ''
+      const fotos = [a.foto_url, a.foto_url_2, a.foto_url_3].filter(Boolean)
+      const foto = fotos.length > 0
+        ? `<div class="foto-gallery fotos-${fotos.length}">${fotos.map(url =>
+            `<div class="foto-main" onclick="openLightbox('${escapeAttr(url)}')"><img src="${escapeAttr(url)}" alt="Foto del anuncio" loading="lazy"></div>`
+          ).join('')}</div>`
+        : ''
       const rows = [
         a.precio ? ['Precio', String(a.precio).startsWith('$') ? a.precio : '$'+a.precio, 'price'] : null,
         a.categoria_producto ? ['Categoría', a.categoria_producto, ''] : null,
@@ -1132,6 +1246,12 @@
         <button class="btn-primary-hero" onclick="focusContact()">${escapeHtml(actionTitle)} →</button>
         <a class="btn-share" href="buscARTE_anuncios.html?tipo=${encodeURIComponent(tipoParam)}">Ver más de esta categoría</a>
       </div>
+      <div class="reaction-bar" id="reaction-bar">
+        ${tipo === 'jam'
+          ? `<button class="btn-reaction asistire" id="btn-asistire" onclick="toggleReaccion('asistire')">🎟 Asistiré <span class="r-count" id="count-asistire">0</span></button>`
+          : ''}
+        <button class="btn-reaction like" id="btn-like" onclick="toggleReaccion('like')">♡ Me gusta <span class="r-count" id="count-like">0</span></button>
+      </div>
     </section>
 
     ${quickHTML ? `<div class="quick-info-grid">${quickHTML}</div>` : ''}
@@ -1209,7 +1329,7 @@
       }).catch(()=>{})
 
       renderAnuncio(a, autor, id)
-    } catch(e) {
+      cargarReacciones(id)
       mostrarError('Error al cargar el anuncio.')
       console.error(e)
     }

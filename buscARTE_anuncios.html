@@ -1119,11 +1119,23 @@
 </div>
 <div class="mfield"><label>Descripción</label><textarea placeholder="Modelo exacto, estado, qué incluye, si tiene caja, si aceptás permuta..."></textarea></div>
 <div class="mfield">
-<label>Foto <span class="opt">muy recomendada — genera más consultas</span></label>
-<div class="foto-upload" id="foto-venta-zone" onclick="document.getElementById('foto-venta-input').click()" style="cursor:pointer">
-<input accept="image/jpeg,image/png,image/webp" id="foto-venta-input" onchange="subirFotoVenta(this)" style="display:none" type="file"/>
-<img id="foto-venta-preview" style="display:none;width:100%;max-height:200px;object-fit:cover"/>
-<p class="foto-upload-text" id="foto-venta-text"><strong>Hacé click para subir una foto</strong><br/>JPG, PNG o WebP · Máx. 2MB</p>
+<label>Fotos <span class="opt">hasta 3 — muy recomendadas, generan más consultas</span></label>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.6rem">
+  <div class="foto-upload" id="foto-venta-zone-1" onclick="document.getElementById('foto-venta-input-1').click()" style="cursor:pointer;min-height:90px">
+    <input accept="image/jpeg,image/png,image/webp" id="foto-venta-input-1" onchange="subirFotoVenta(this,1)" style="display:none" type="file"/>
+    <img id="foto-venta-preview-1" style="display:none;width:100%;height:90px;object-fit:cover"/>
+    <p class="foto-upload-text" id="foto-venta-text-1" style="font-size:.7rem;padding:.5rem"><strong>📷 Foto 1</strong><br/>Principal</p>
+  </div>
+  <div class="foto-upload" id="foto-venta-zone-2" onclick="document.getElementById('foto-venta-input-2').click()" style="cursor:pointer;min-height:90px">
+    <input accept="image/jpeg,image/png,image/webp" id="foto-venta-input-2" onchange="subirFotoVenta(this,2)" style="display:none" type="file"/>
+    <img id="foto-venta-preview-2" style="display:none;width:100%;height:90px;object-fit:cover"/>
+    <p class="foto-upload-text" id="foto-venta-text-2" style="font-size:.7rem;padding:.5rem"><strong>📷 Foto 2</strong><br/>Opcional</p>
+  </div>
+  <div class="foto-upload" id="foto-venta-zone-3" onclick="document.getElementById('foto-venta-input-3').click()" style="cursor:pointer;min-height:90px">
+    <input accept="image/jpeg,image/png,image/webp" id="foto-venta-input-3" onchange="subirFotoVenta(this,3)" style="display:none" type="file"/>
+    <img id="foto-venta-preview-3" style="display:none;width:100%;height:90px;object-fit:cover"/>
+    <p class="foto-upload-text" id="foto-venta-text-3" style="font-size:.7rem;padding:.5rem"><strong>📷 Foto 3</strong><br/>Opcional</p>
+  </div>
 </div>
 </div>
 </div>
@@ -1456,8 +1468,12 @@
   const SB_HEADERS = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
 
   let fotoVentaUrl = null
+  let fotoVentaUrl2 = null
+  let fotoVentaUrl3 = null
   let fotoJamUrl = null
   let uploadVentaPromise = null
+  let uploadVentaPromise2 = null
+  let uploadVentaPromise3 = null
   let uploadJamPromise = null
   let currentTipo = 'busco'
   let sidebarTipo = 'busco'
@@ -1608,8 +1624,12 @@
       btn.classList.toggle('on', buttons.indexOf(btn) === 0)
     })
     fotoVentaUrl = null
+    fotoVentaUrl2 = null
+    fotoVentaUrl3 = null
     fotoJamUrl = null
     uploadVentaPromise = null
+    uploadVentaPromise2 = null
+    uploadVentaPromise3 = null
     uploadJamPromise = null
     resetFotoUI('jam')
     resetFotoUI('venta')
@@ -1644,14 +1664,23 @@
 
   // IMÁGENES: comprime fotos grandes de celular antes de subir
   function resetFotoUI(tipo) {
-    const preview = document.getElementById(tipo === 'jam' ? 'foto-jam-preview' : 'foto-venta-preview')
-    const text = document.getElementById(tipo === 'jam' ? 'foto-jam-text' : 'foto-venta-text')
-    if (preview) { preview.style.display = 'none'; preview.src = '' }
-    if (text) {
-      text.style.display = 'block'
-      text.innerHTML = tipo === 'jam'
-        ? '<strong>📸 Subir flyer del evento</strong><br>JPG, PNG o WebP · se optimiza automático'
-        : '<strong>Hacé click para subir una foto</strong><br>JPG, PNG o WebP · se optimiza automático'
+    if (tipo === 'jam') {
+      const preview = document.getElementById('foto-jam-preview')
+      const text = document.getElementById('foto-jam-text')
+      if (preview) { preview.style.display = 'none'; preview.src = '' }
+      if (text) { text.style.display = 'block'; text.innerHTML = '<strong>📸 Subir flyer del evento</strong><br>JPG, PNG o WebP · se optimiza automático' }
+    } else {
+      [1,2,3].forEach(n => {
+        const preview = document.getElementById(`foto-venta-preview-${n}`)
+        const text = document.getElementById(`foto-venta-text-${n}`)
+        if (preview) { preview.style.display = 'none'; preview.src = '' }
+        if (text) {
+          text.style.display = 'block'
+          text.innerHTML = n === 1
+            ? '<strong>📷 Foto 1</strong><br/>Principal'
+            : `<strong>📷 Foto ${n}</strong><br/>Opcional`
+        }
+      })
     }
   }
 
@@ -1689,11 +1718,14 @@
     return new File([blob], safeName + '.jpg', { type: 'image/jpeg' })
   }
 
-  async function uploadAnuncioImage(input, tipo) {
+  async function uploadAnuncioImage(input, tipo, slot) {
     if (!input.files || !input.files[0]) return null
     const original = input.files[0]
-    const preview = document.getElementById(tipo === 'jam' ? 'foto-jam-preview' : 'foto-venta-preview')
-    const text = document.getElementById(tipo === 'jam' ? 'foto-jam-text' : 'foto-venta-text')
+    const slotN = slot || 1
+    const previewId = tipo === 'jam' ? 'foto-jam-preview' : `foto-venta-preview-${slotN}`
+    const textId    = tipo === 'jam' ? 'foto-jam-text'    : `foto-venta-text-${slotN}`
+    const preview = document.getElementById(previewId)
+    const text = document.getElementById(textId)
     try {
       const dataUrl = await fileToDataURL(original)
       if (preview) { preview.src = dataUrl; preview.style.display = 'block' }
@@ -1724,8 +1756,17 @@
   function subirFotoJam(input) {
     uploadJamPromise = uploadAnuncioImage(input, 'jam').then(url => { fotoJamUrl = url; return url })
   }
-  function subirFotoVenta(input) {
-    uploadVentaPromise = uploadAnuncioImage(input, 'venta').then(url => { fotoVentaUrl = url; return url })
+  function subirFotoVenta(input, n) {
+    const slot = n || 1
+    const promise = uploadAnuncioImage(input, 'venta', slot).then(url => {
+      if (slot === 1) fotoVentaUrl = url
+      else if (slot === 2) fotoVentaUrl2 = url
+      else if (slot === 3) fotoVentaUrl3 = url
+      return url
+    })
+    if (slot === 1) uploadVentaPromise = promise
+    else if (slot === 2) uploadVentaPromise2 = promise
+    else if (slot === 3) uploadVentaPromise3 = promise
   }
 
   function getSelectedTexts(root, selector = '.mchip.on') {
@@ -1794,6 +1835,10 @@
       datos.titulo = datos.categoria_producto ? `Vendo ${datos.categoria_producto}${datos.marca ? ' ' + datos.marca : ''}` : 'Vendo instrumento'
       if (uploadVentaPromise) datos.foto_url = await uploadVentaPromise
       else datos.foto_url = fotoVentaUrl || null
+      if (uploadVentaPromise2) datos.foto_url_2 = await uploadVentaPromise2
+      else datos.foto_url_2 = fotoVentaUrl2 || null
+      if (uploadVentaPromise3) datos.foto_url_3 = await uploadVentaPromise3
+      else datos.foto_url_3 = fotoVentaUrl3 || null
     }
 
     if (!datos.titulo) { alert('Completá el título del anuncio.'); return }

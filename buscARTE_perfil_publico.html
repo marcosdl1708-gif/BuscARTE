@@ -799,6 +799,7 @@
       </div>
       <button class="btn-contact" onclick="document.querySelector('.contact-form textarea').focus()">Contactar →</button>
       <button class="btn-save" id="save-btn" onclick="toggleSave()">♡ Guardar perfil</button>
+      <button class="btn-save" id="share-btn" onclick="compartirPerfil()" style="border-color:var(--gris2)">↗ Compartir perfil</button>
     </div>
 
   </div>
@@ -929,6 +930,32 @@
       btn.style.background = 'rgba(255,85,85,.15)'
       btn.style.color = '#ff5555'
     }
+  }
+
+  async function compartirPerfil() {
+    const url = location.href
+    const nombre = document.querySelector('.profile-name, h1')?.textContent?.trim() || 'Músico'
+    const btn = document.getElementById('share-btn')
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: `${nombre} en buscARTE`, text: `Mirá el perfil de ${nombre} en buscARTE`, url })
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(url)
+        if (btn) {
+          const orig = btn.textContent
+          btn.textContent = '✓ Link copiado'
+          btn.style.borderColor = 'var(--neon)'
+          btn.style.color = 'var(--neon)'
+          setTimeout(() => {
+            btn.textContent = orig
+            btn.style.borderColor = ''
+            btn.style.color = ''
+          }, 2000)
+        }
+      } else {
+        prompt('Copiá el link del perfil:', url)
+      }
+    } catch(e) {}
   }
 
   async function verificarGuardado(perfilId) {
