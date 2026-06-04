@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# Páginas privadas / utilitarias
+Disallow: /buscARTE_mensajes.html
+Disallow: /buscARTE_guardados.html
+Disallow: /buscARTE_mis_anuncios.html
+Disallow: /buscARTE_perfil.html
+Disallow: /buscARTE_reset.html
+Disallow: /buscARTE_recuperar.html
+
+Sitemap: https://buscarte.com.ar/sitemap.xml
