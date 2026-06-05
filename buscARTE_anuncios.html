@@ -965,24 +965,8 @@
 <div class="mrow">
 <div class="mfield">
 <label>Categoría</label>
-<select>
+<select id="vende-categoria">
 <option disabled="" selected="">¿Qué es?</option>
-<option>Guitarra eléctrica</option><option>Guitarra acústica</option><option>Guitarra clásica</option>
-<option>Bajo eléctrico</option><option>Bajo acústico</option>
-<option>Batería acústica</option><option>Batería electrónica</option><option>Percusión</option>
-<option>Teclado / Piano</option><option>Piano acústico</option>
-<option>Saxo</option><option>Trompeta</option><option>Trombón</option><option>Flauta</option><option>Clarinete</option>
-<option>Violín</option><option>Cello</option><option>Viola</option>
-<option>Bandoneón / Acordeón</option><option>Charango / Guitarra folk</option>
-<option>Amplificador guitarra</option><option>Amplificador bajo</option>
-<option>Pedalera multiefectos</option><option>Pedal individual</option>
-<option>Micrófono</option><option>Interfaz de audio</option>
-<option>Equipo PA / Sonido</option><option>Monitores / Parlantes</option>
-<option>Home Studio / Grabación</option>
-<option>Sala de ensayo</option>
-<option>Cuerdas / Púas / Accesorios</option>
-<option>Estuche / Funda</option>
-<option>Otro</option>
 </select>
 </div>
 <div class="mfield"><label>Marca</label><input placeholder="Ej: Fender, Boss, Otra..." type="text"/></div>
@@ -1325,12 +1309,15 @@
     modelaje:'Modelaje', diseno:'Diseño & artes', tatuaje:'Tatuaje',
     danza:'Danza', maquillaje:'Maquillaje & vestuario', circo:'Circo & escénicas', escritura:'Escritura & guión'
   }
-  if (rubroFiltro && RUBRO_COLORS[rubroFiltro]) {
-    document.documentElement.style.setProperty('--neon', RUBRO_COLORS[rubroFiltro])
+  // Rubro inicial: el de la URL, o el rubro de la cuenta (si es un rubro artístico válido), o ninguno (todos)
+  const _rubroCuenta = localStorage.getItem('ba_rubro')
+  const rubroInicial = rubroFiltro || (RUBRO_COLORS[_rubroCuenta] ? _rubroCuenta : null)
+  if (rubroInicial && RUBRO_COLORS[rubroInicial]) {
+    document.documentElement.style.setProperty('--neon', RUBRO_COLORS[rubroInicial])
   }
 
-  // Rubro seleccionado en el modal "busco artista"
-  let buscoRubroSeleccionado = rubroFiltro || 'musica'
+  // Rubro seleccionado en el modal "busco artista" — por defecto, tu propia disciplina
+  let buscoRubroSeleccionado = rubroInicial || 'musica'
 
   let fotoVentaUrl = null
   let fotoVentaUrl2 = null
@@ -1356,6 +1343,10 @@
       diseno:'diseñador/artista', tatuaje:'tatuador/a', danza:'bailarín/a',
       maquillaje:'maquillador/a', circo:'artista de circo', escritura:'escritor/guionista' }
     return `🔍 Busco ${names[rubro] || RUBROS_LABELS[rubro] || 'artista'}`
+  }
+  function getLabelJam(a) {
+    // "Jam" es término musical; para otros rubros mostramos "Evento"
+    return (a.rubro || 'musica') === 'musica' ? '📅 Jam / Evento' : '📅 Evento'
   }
   const LABELS = {
     busco: '🔍 Busco artista',
@@ -1390,7 +1381,16 @@
 
   const INSTRUMENTOS = ['Guitarra','Bajo','Batería','Teclado','Teclado / Piano','Voz / Canto','Saxo','Violín','Trompeta','Flauta','Percusión','DJ','DJ / Productor','Bandoneón','Charango','Cello','Arpa','Acordeón','Contrabajo','Clarinete','Cajón','Bombo leguero','Quena / Zampoña','Ukelele','Controlador MIDI','Técnico de sonido','Compositor / Arreglador','Productor','Mix & Mastering','Manager','Otro']
   const GENEROS = ['Rock','Rock Nacional','Metal','Jazz','Folklore','Tango','Cumbia','Indie','Pop','Electrónica','Funk','Punk','Blues','Prog','R&B','Rap / Hip Hop','Reggae','Tropical','Clásica','Bossanova','Soul','House','Tech House','Techno','Trance','Melodic House & Techno','Minimal Deep/Tech','Indie Dance','Variado','Otro']
-  const CATEGORIAS_VENTA = ['Guitarra','Bajo','Batería','Teclado','Vientos','Cuerdas','Amplificador','Pedalera','Micrófono','Equipo PA','Home Studio','Sala ensayo','Accesorios','Otro']
+  const CATEGORIAS_VENTA_POR_RUBRO = {
+    musica: ['Guitarra eléctrica','Guitarra acústica','Guitarra clásica','Bajo eléctrico','Bajo acústico','Batería acústica','Batería electrónica','Percusión','Teclado / Piano','Piano acústico','Saxo','Trompeta','Trombón','Flauta','Clarinete','Violín','Cello','Viola','Bandoneón / Acordeón','Charango / Guitarra folk','Amplificador guitarra','Amplificador bajo','Pedalera multiefectos','Pedal individual','Micrófono','Interfaz de audio','Equipo PA / Sonido','Monitores / Parlantes','Home Studio / Grabación','Sala de ensayo','Cuerdas / Púas / Accesorios','Estuche / Funda','Otro'],
+    audiovisual: ['Cámara réflex / DSLR','Cámara mirrorless','Cámara de video','Cámara de acción / GoPro','Lente / Objetivo','Estabilizador / Gimbal','Trípode / Monopié','Iluminación / Flash','Micrófono / Audio','Drone','Monitor / Grabador externo','Tarjetas / Almacenamiento','Batería / Cargador','Bolso / Mochila','Filtros / Accesorios','Otro'],
+  }
+  function renderVendeCategorias(rubro) {
+    const sel = document.getElementById('vende-categoria')
+    if (!sel) return
+    const cats = CATEGORIAS_VENTA_POR_RUBRO[rubro] || CATEGORIAS_VENTA_POR_RUBRO.musica
+    sel.innerHTML = '<option disabled selected>¿Qué es?</option>' + cats.map(c => `<option>${c}</option>`).join('')
+  }
   const CONDICIONES = ['Nuevo','Usado','Para reparar']
 
   function escapeHtml(value) {
@@ -1547,6 +1547,7 @@
     if (tipo === 'ofrezco') renderOfrecerChips(miRubro)
     if (tipo === 'clases') renderClasesChips(miRubro)
     if (tipo === 'jam') renderJamChips(miRubro)
+    if (tipo === 'vende') renderVendeCategorias(miRubro)
 
     // Actualizar título del modal según el tipo seleccionado
     actualizarTituloModal(tipo)
@@ -1723,10 +1724,10 @@
       datos.descripcion = document.getElementById('clases-desc')?.value?.trim()
       datos.precio = document.getElementById('clases-precio')?.value?.trim()
       datos.zona = document.getElementById('clases-zona')?.value?.trim()
-      datos.instrumento = getSelectedTexts(form, '.mchip.on:not(.nivel-chip):not(.modalidad-chip)').join(', ')
+      datos.instrumentos = getSelectedTexts(form, '.mchip.on:not(.nivel-chip):not(.modalidad-chip)').join(', ')
       datos.nivel = form.querySelector('.nivel-chip.on')?.textContent?.trim() || null
       datos.modalidad = form.querySelector('.modalidad-chip.on')?.textContent?.trim() || null
-      if (!datos.titulo) datos.titulo = datos.instrumento ? `Clases de ${datos.instrumento.split(',')[0].trim()}` : 'Doy clases'
+      if (!datos.titulo) datos.titulo = datos.instrumentos ? `Clases de ${datos.instrumentos.split(',')[0].trim()}` : 'Doy clases'
     }
 
     if (tipo === 'jam') {
@@ -1756,7 +1757,7 @@
       datos.precio = datos.precio_num ? `$${Math.round(datos.precio_num).toLocaleString('es-AR')}` : ''
       datos.zona = form.querySelector('input[placeholder*="Caballito"]')?.value?.trim()
       datos.descripcion = form.querySelector('textarea')?.value?.trim()
-      datos.titulo = datos.categoria_producto ? `Vendo ${datos.categoria_producto}${datos.marca ? ' ' + datos.marca : ''}` : 'Vendo instrumento'
+      datos.titulo = datos.categoria_producto ? `Vendo ${datos.categoria_producto}${datos.marca ? ' ' + datos.marca : ''}` : 'Vendo equipo'
       if (uploadVentaPromise) datos.foto_url = await uploadVentaPromise
       else datos.foto_url = fotoVentaUrl || null
       if (uploadVentaPromise2) datos.foto_url_2 = await uploadVentaPromise2
@@ -1827,7 +1828,7 @@
     const tipo = canonicalTipo(a.tipo)
     const badge = BADGES[tipo] || 'badge-busco'
     // Para "busco": mostrar el rubro buscado dinámicamente
-    const label = tipo === 'busco' ? getLabelBusco(a) : (LABELS[tipo] || escapeHtml(tipo))
+    const label = tipo === 'busco' ? getLabelBusco(a) : tipo === 'jam' ? getLabelJam(a) : (LABELS[tipo] || escapeHtml(tipo))
     const respondText = RESPOND_TEXT[tipo] || 'Ver anuncio →'
     const tags = [a.instrumentos, a.instrumento, a.generos, a.categoria_producto, a.nivel, a.modalidad]
       .filter(Boolean).join(',').split(',').map(t=>t.trim()).filter(Boolean).slice(0,4)
@@ -2032,18 +2033,18 @@
         { tipo:'jam', icon:'📅', label:'Evento / Muestra', desc:'Función, ensayo abierto...' },
       ]
     },
-    // 🎬 Tipos: Busco videomaker/fotógrafo | Busco editor | Colaboración
+    // 🎬 Tipos: Busco foto/video | Me ofrezco | Vendo equipo
     audiovisual: {
       tabs: [
         { label:'Todos', tipo:'todos' },
         { label:'Busco foto/video', tipo:'musico' },
         { label:'Me ofrezco', tipo:'ofrezco' },
-        { label:'Colaboración', tipo:'jam' },
+        { label:'Vendo equipo', tipo:'vende' },
       ],
       sidebar: [
         { tipo:'busco', icon:'🎬', label:'Busco foto / video', desc:'Para proyecto, sesión, videoclip...' },
         { tipo:'ofrezco', icon:'🎨', label:'Me ofrezco', desc:'Disponible para proyectos' },
-        { tipo:'jam', icon:'📅', label:'Colaboración', desc:'Proyecto conjunto, collab' },
+        { tipo:'vende', icon:'🛒', label:'Vendo equipo', desc:'Cámaras, lentes, luces, drones...' },
       ]
     },
     // 👗 Tipos: Busco modelo
@@ -2067,13 +2068,11 @@
         { label:'Busco diseñador', tipo:'musico' },
         { label:'Me ofrezco', tipo:'ofrezco' },
         { label:'Clases', tipo:'clases' },
-        { label:'Colaboración', tipo:'jam' },
       ],
       sidebar: [
         { tipo:'busco', icon:'✏️', label:'Busco diseñador/artista', desc:'Para proyecto, editorial, web...' },
         { tipo:'ofrezco', icon:'🎨', label:'Me ofrezco', desc:'Disponible para encargos' },
         { tipo:'clases', icon:'🎓', label:'Doy clases', desc:'Diseño, ilustración, arte...' },
-        { tipo:'jam', icon:'📅', label:'Colaboración', desc:'Proyecto conjunto, colectivo' },
       ]
     },
     // 🖋️ Tipos: Busco tatuador | Tatuador/a visitante | Convención
@@ -2112,12 +2111,10 @@
         { label:'Todos', tipo:'todos' },
         { label:'Busco maquillador', tipo:'musico' },
         { label:'Me ofrezco', tipo:'ofrezco' },
-        { label:'Colaboración', tipo:'jam' },
       ],
       sidebar: [
         { tipo:'busco', icon:'💄', label:'Busco maquillador/a', desc:'Para producción, evento, teatro...' },
         { tipo:'ofrezco', icon:'🎨', label:'Me ofrezco', desc:'Disponible para proyectos' },
-        { tipo:'jam', icon:'📅', label:'Colaboración', desc:'Proyecto conjunto, producción' },
       ]
     },
     // 🎪 Tipos: Busco artista | Doy clases
@@ -2142,12 +2139,10 @@
         { label:'Todos', tipo:'todos' },
         { label:'Busco guionista', tipo:'musico' },
         { label:'Me ofrezco', tipo:'ofrezco' },
-        { label:'Colaboración', tipo:'jam' },
       ],
       sidebar: [
         { tipo:'busco', icon:'✍️', label:'Busco escritor/guionista', desc:'Para obra, guion, letras...' },
         { tipo:'ofrezco', icon:'🎨', label:'Me ofrezco para proyecto', desc:'Disponible para encargos' },
-        { tipo:'jam', icon:'📅', label:'Colaboración', desc:'Proyecto conjunto, co-autoría' },
       ]
     },
   }
@@ -2445,7 +2440,7 @@
   }
 
   // ─── FILTRO POR RUBRO EN PANEL IZQUIERDO ───
-  let rubroFiltroActivo = rubroFiltro || null
+  let rubroFiltroActivo = rubroInicial || null
   function filtrarPorRubro(btn) {
     const rubro = btn.dataset.rubro
     const yaActivo = btn.classList.contains('on')
@@ -2474,19 +2469,19 @@
 
   // Inicializar el selector de rubro en el modal
   window.addEventListener('DOMContentLoaded', function() {
-    // Inicializar tabs, sidebar y modal con el rubro activo (URL param o músicos por defecto)
-    actualizarTabsYSidebar(rubroFiltro || 'musica')
-    renderFiltrosPanel(rubroFiltro || 'musica')
+    // Arrancar tabs y filtros en el rubro inicial (URL param, o el rubro de la cuenta)
+    actualizarTabsYSidebar(rubroInicial || 'musica')
+    renderFiltrosPanel(rubroInicial || 'musica')
 
-    // Pre-seleccionar rubro en modal busco si viene de URL
-    if (rubroFiltro) {
-      const btn = document.querySelector('#busco-rubro-chips .mchip[onclick*="' + rubroFiltro + '"]')
-      if (btn) seleccionarRubroBusco(rubroFiltro, btn)
-      else seleccionarRubroBusco(rubroFiltro, null)
+    // Pre-seleccionar rubro buscado en el modal según el rubro inicial
+    if (rubroInicial) {
+      const btn = document.querySelector('#busco-rubro-chips .mchip[onclick*="' + rubroInicial + '"]')
+      if (btn) seleccionarRubroBusco(rubroInicial, btn)
+      else seleccionarRubroBusco(rubroInicial, null)
     }
-    // Pre-seleccionar chip en el selector de rubro global
-    if (rubroFiltro) {
-      const fp = document.querySelector('#fp-rubro-global .fchip[data-rubro="' + rubroFiltro + '"]')
+    // Marcar el chip del rubro inicial en el selector de rubro global
+    if (rubroInicial) {
+      const fp = document.querySelector('#fp-rubro-global .fchip[data-rubro="' + rubroInicial + '"]')
       if (fp) {
         document.querySelectorAll('#fp-rubro-global .fchip[data-rubro]').forEach(c => c.classList.remove('on'))
         fp.classList.add('on')
@@ -2571,7 +2566,8 @@
       const titleNum = document.getElementById('anuncios-count') || document.querySelector('.main-title span')
       if (titleNum) titleNum.textContent = append ? String(anunciosOffset + rendered) : String(rendered)
       const sub = document.getElementById('main-sub-text') || document.querySelector('.main-sub')
-      const rubroLabel = rubroFiltro ? (RUBROS_LABELS[rubroFiltro] || rubroFiltro) : null
+      const efRubro = getRubroFiltroEfectivo()
+      const rubroLabel = efRubro ? (RUBROS_LABELS[efRubro] || efRubro) : null
       if (sub) {
         if (rubroLabel && tipoFiltro === 'todos') sub.textContent = `anuncios de ${rubroLabel}`
         else if (tipoFiltro === 'todos') sub.textContent = 'explorá todas las categorías'

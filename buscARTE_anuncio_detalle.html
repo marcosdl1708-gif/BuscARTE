@@ -1192,7 +1192,7 @@
     if (tipo === 'clases') {
       const precioHora = a.precio ? `${String(a.precio).startsWith('$') ? a.precio : '$'+a.precio} / hora` : ''
       return `<div class="evento-hero" style="border-color:rgba(0,210,200,.2)">
-        <div class="evento-fecha-row">${a.instrumento ? `<span class="evento-fecha-grande" style="color:#00d4c8">🎓 Clases de ${escapeHtml(String(a.instrumento).split(',')[0])}</span>` : `<span class="evento-fecha-grande" style="color:#00d4c8">🎓 Doy clases</span>`}</div>
+        <div class="evento-fecha-row">${(a.instrumentos || a.instrumento) ? `<span class="evento-fecha-grande" style="color:#00d4c8">🎓 Clases de ${escapeHtml(String(a.instrumentos || a.instrumento).split(',')[0])}</span>` : `<span class="evento-fecha-grande" style="color:#00d4c8">🎓 Doy clases</span>`}</div>
         ${a.nivel ? `<div class="evento-lugar">📊 Nivel: <strong>${escapeHtml(a.nivel)}</strong></div>` : ''}
         ${a.modalidad ? `<div class="evento-lugar">📍 Modalidad: <strong>${escapeHtml(a.modalidad)}</strong></div>` : ''}
         ${a.zona ? `<div class="evento-lugar">📌 Zona: <strong>${escapeHtml(a.zona)}</strong></div>` : ''}
@@ -1250,7 +1250,7 @@
     const quickItems = []
     if (tipo === 'vende' && precio) quickItems.push(['Precio', precio, 'strong'])
     if (tipo === 'jam' && f) quickItems.push(['Fecha', `${f.fecha} · ${f.hora} hs`, 'strong'])
-    if (tipo === 'clases' && a.instrumento) quickItems.push(['Clase', String(a.instrumento).split(',')[0], 'strong'])
+    if (tipo === 'clases' && (a.instrumentos || a.instrumento)) quickItems.push(['Clase', String(a.instrumentos || a.instrumento).split(',')[0], 'strong'])
     if (zona) quickItems.push([tipo === 'jam' ? 'Lugar' : 'Zona', zona, ''])
     if (tipo === 'vende' && a.condicion) quickItems.push(['Estado', a.condicion, ''])
     if (tipo === 'clases' && a.modalidad) quickItems.push(['Modalidad', a.modalidad, ''])
