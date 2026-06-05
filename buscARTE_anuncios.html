@@ -922,7 +922,7 @@
 </div>
 <!-- DOY CLASES -->
 <div class="modal-form" id="form-clases">
-<div class="mfield"><label>Título <span class="opt">— opcional, se genera automático</span></label><input id="clases-titulo" id="clases-titulo-input" placeholder="Ej: Clases de guitarra para principiantes — Palermo" type="text"/></div>
+<div class="mfield"><label>Título <span class="opt">— opcional, se genera automático</span></label><input id="clases-titulo" placeholder="Ej: Clases de guitarra para principiantes — Palermo" type="text"/></div>
 <div class="mrow">
 <div class="mfield" id="clases-disciplina-mfield">
 <!-- Se rellena dinámicamente por renderClasesChips() -->
@@ -1534,29 +1534,32 @@
     const form = document.getElementById('form-' + tipo)
     if (form) form.classList.add('active')
 
+    const miRubro = localStorage.getItem('ba_rubro') || 'musica'
+
     if (tipo === 'busco') {
-      const rubro = rubroFiltroActivo || buscoRubroSeleccionado || 'musica'
-      seleccionarRubroBusco(rubro, null)
-      // Si hay un rubro activo en el panel, ocultamos el selector de rubro en el modal
-      // — el rubro ya está determinado por el contexto (ej: si estás en Actuación, es Casting para actores)
+      // "Busco" deja elegir a quién buscás (cualquier rubro). Siempre mostramos el selector.
+      seleccionarRubroBusco(buscoRubroSeleccionado || 'musica', null)
       const rubroField = document.getElementById('busco-rubro-field')
-      if (rubroField) rubroField.style.display = rubroFiltroActivo ? 'none' : ''
+      if (rubroField) rubroField.style.display = ''
     }
 
-    if (tipo === 'ofrezco') renderOfrecerChips(rubroFiltroActivo || buscoRubroSeleccionado || 'musica')
-    if (tipo === 'clases') renderClasesChips(rubroFiltroActivo || buscoRubroSeleccionado || 'musica')
-    if (tipo === 'jam') renderJamChips(rubroFiltroActivo || buscoRubroSeleccionado || 'musica')
+    // ofrezco / clases / jam: tu propia disciplina (lo que publicás es de tu rubro)
+    if (tipo === 'ofrezco') renderOfrecerChips(miRubro)
+    if (tipo === 'clases') renderClasesChips(miRubro)
+    if (tipo === 'jam') renderJamChips(miRubro)
 
-    // Actualizar título del modal según el tipo seleccionado y el rubro activo
+    // Actualizar título del modal según el tipo seleccionado
     actualizarTituloModal(tipo)
   }
 
   function actualizarTituloModal(tipo) {
     const titleEl = document.querySelector('.modal-title')
     if (!titleEl) return
-    const rubro = rubroFiltroActivo || 'musica'
+    const t = canonicalTipo(tipo)
+    if (t === 'busco') { titleEl.textContent = 'Busco artista'; return }
+    const rubro = localStorage.getItem('ba_rubro') || 'musica'
     const config = RUBROS_ANUNCIO_CONFIG[rubro] || RUBROS_ANUNCIO_CONFIG.musica
-    const sidebarItem = config.sidebar.find(s => s.tipo === canonicalTipo(tipo))
+    const sidebarItem = config.sidebar.find(s => s.tipo === t)
     titleEl.textContent = sidebarItem ? sidebarItem.label : 'Publicar anuncio'
   }
   function selectNivel(btn) {
@@ -2151,9 +2154,14 @@
 
   // ─── FUNCIÓN CENTRAL: actualiza tabs + sidebar + modal según rubro ───
   function actualizarTabsYSidebar(rubro) {
+    // Las TABS de navegación reflejan el tablón que estás mirando (rubro navegado).
     const config = RUBROS_ANUNCIO_CONFIG[rubro] || RUBROS_ANUNCIO_CONFIG.musica
+    // La UI de PUBLICAR (sidebar + modal) refleja TU rubro de perfil, no el tablón navegado:
+    // publicás siempre en tu disciplina. "Busco" deja elegir a quién buscás (cualquier rubro).
+    const pubRubro = localStorage.getItem('ba_rubro') || 'musica'
+    const pubConfig = RUBROS_ANUNCIO_CONFIG[pubRubro] || RUBROS_ANUNCIO_CONFIG.musica
 
-    // 1. Tipo-tabs — sin íconos para que entren mejor
+    // 1. Tipo-tabs (navegación) — sin íconos para que entren mejor
     const tabsEl = document.querySelector('.tipo-tabs')
     if (tabsEl) {
       tabsEl.innerHTML = config.tabs.map((tab, i) => {
@@ -2162,22 +2170,22 @@
       }).join('')
     }
 
-    // 2. Sidebar derecha — tipos de publicación
+    // 2. Sidebar derecha — tipos de publicación (según TU rubro)
     const publishEl = document.querySelector('.publish-types')
     if (publishEl) {
-      publishEl.innerHTML = config.sidebar.map((item, i) =>
+      publishEl.innerHTML = pubConfig.sidebar.map((item, i) =>
         `<button class="publish-type${i === 0 ? ' selected' : ''}" onclick="selectPublishType(this,'${item.tipo}')">` +
         `<span class="ptype-icon">${item.icon}</span>` +
         `<div><span class="ptype-label">${item.label}</span><span class="ptype-desc">${item.desc}</span></div>` +
         `</button>`
       ).join('')
-      sidebarTipo = config.sidebar[0].tipo
+      sidebarTipo = pubConfig.sidebar[0].tipo
     }
 
-    // 3. Modal — botones de tipo de anuncio
+    // 3. Modal — botones de tipo de anuncio (según TU rubro)
     const modalTipoEl = document.querySelector('.modal-tipo-selector')
     if (modalTipoEl) {
-      modalTipoEl.innerHTML = config.sidebar.map((item, i) =>
+      modalTipoEl.innerHTML = pubConfig.sidebar.map((item, i) =>
         `<button class="modal-tipo-btn${i === 0 ? ' selected' : ''}" onclick="selectTipo('${item.tipo}',this)">` +
         `<span class="modal-tipo-icon">${item.icon}</span>` +
         `<span class="modal-tipo-label">${item.label}</span>` +
