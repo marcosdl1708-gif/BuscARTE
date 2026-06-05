@@ -5,15 +5,15 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <!-- SEO -->
-<meta content="busco músico argentina, busco guitarrista, busco baterista, jam session buenos aires, zapada palermo, vendo guitarra argentina, anuncios musicales" name="keywords"/>
-<meta content="Publicá y encontrá anuncios musicales en Argentina. Busco músico para banda, me ofrezco para proyectos, jams y zapadas abiertas, vendo instrumentos. Todo gratis en buscARTE." name="description"/>
+<meta content="busco artista argentina, anuncios artísticos, busco músico actor fotógrafo diseñador bailarín, casting teatro, jam session, vendo instrumentos equipos arte" name="keywords"/>
+<meta content="Publicá y encontrá anuncios artísticos en Argentina. Busco músico, actor, fotógrafo, diseñador, bailarín. Castings, jams, clases y marketplace. Todo gratis en buscARTE." name="description"/>
 <meta content="index, follow" name="robots"/>
 <meta content="buscARTE" name="author"/>
-<link rel="canonical" href="https://buscarte.com.ar/anuncios">
+<link href="https://buscarte.com.ar/buscARTE_anuncios.html" rel="canonical"/>
 <!-- Open Graph (WhatsApp, Facebook, Instagram) -->
 <meta content="website" property="og:type"/>
 <meta content="https://buscarte.com.ar/buscARTE_anuncios.html" property="og:url"/>
-<meta content="Anuncios musicales Argentina — Busco músico, jam sessions, vendo instrumentos | buscARTE" property="og:title"/>
+<meta content="Anuncios artísticos Argentina — Busco artista, castings, jams, marketplace | buscARTE" property="og:title"/>
 <meta content="Publicá y encontrá anuncios musicales en Argentina. Busco músico para banda, me ofrezco para proyectos, jams y zapadas abiertas, vendo instrumentos. Todo gratis en buscARTE." property="og:description"/>
 <meta content="https://buscarte.com.ar/og-image.jpg" property="og:image"/>
 <meta content="1200" property="og:image:width"/>
@@ -26,7 +26,7 @@
 <meta content="Publicá y encontrá anuncios musicales en Argentina. Busco músico para banda, me ofrezco para proyectos, jams y zapadas abiertas, vendo instrumentos. Todo gratis en buscARTE." name="twitter:description"/>
 <meta content="https://buscarte.com.ar/og-image.jpg" name="twitter:image"/>
 <!-- HOTFIX APIKEY CORRECTED 2026-05-22 -->
-<title>Anuncios musicales Argentina — Busco músico, jam sessions, vendo instrumentos | buscARTE</title>
+<title>Anuncios artísticos Argentina — Busco artista, castings, eventos, marketplace | buscARTE</title>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&amp;family=Archivo:ital,wght@0,300;0,400;0,500;1,300&amp;display=swap" rel="stylesheet"/>
 <style>
   *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
@@ -101,7 +101,7 @@
   .btn-publish:hover { opacity:.85; }
 
   .tipo-tabs { display:flex;gap:0;margin-bottom:1.5rem;border:1px solid #1c1c1c; }
-  .tipo-tab { flex:1;padding:.56rem .3rem;font-size:.67rem;letter-spacing:.07em;text-transform:uppercase;background:transparent;border:none;color:var(--gris);cursor:none;transition:all .15s;font-family:var(--font-body);border-right:1px solid #1c1c1c;text-align:center;white-space:nowrap; }
+  .tipo-tab { flex:1;padding:.56rem .3rem;font-size:.67rem;letter-spacing:.07em;text-transform:uppercase;background:transparent;border:none;color:var(--gris);cursor:none;transition:all .15s;font-family:var(--font-body);border-right:1px solid #1c1c1c;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
   .tipo-tab:last-child { border-right:none; }
   .tipo-tab:hover { color:var(--blanco);background:rgba(255,255,255,.03); }
   .tipo-tab.active { color:var(--negro);background:var(--neon);font-weight:500; }
@@ -749,11 +749,11 @@
     }
     .tipo-tab:nth-child(even) { border-right:none !important; }
     .tipo-tab:nth-last-child(-n+2) { border-bottom:none !important; }
-
-    .anuncio {
-      padding:1rem !important;
-      border-left:none !important;
-    }
+    /* Tab solitario en última fila (5 tabs) → full width */
+    .tipo-tabs > .tipo-tab:last-child:nth-child(odd) { grid-column:1/-1 !important; border-right:none !important; }
+    /* Chips de rubro en modal busco → 2 columnas para mejor legibilidad */
+    #busco-rubro-chips { display:grid !important; grid-template-columns:1fr 1fr !important; gap:.3rem !important; }
+    #busco-rubro-chips .mchip { width:100% !important; text-align:center !important; white-space:normal !important; line-height:1.3 !important; padding:.45rem .4rem !important; }
     .anuncio-titulo {
       padding-right:0 !important;
       font-size:.98rem !important;
@@ -829,17 +829,33 @@
 <button class="modal-close" onclick="closeModal()">×</button>
 </div>
 <div class="modal-tipo-selector">
-<button class="modal-tipo-btn selected" onclick="selectTipo('busco',this)"><span class="modal-tipo-icon">🔍</span><span class="modal-tipo-label">Busco músico</span></button>
-<button class="modal-tipo-btn" onclick="selectTipo('ofrezco',this)"><span class="modal-tipo-icon">🎸</span><span class="modal-tipo-label">Me ofrezco</span></button>
-<button class="modal-tipo-btn" onclick="selectTipo('jam',this)"><span class="modal-tipo-icon">🥁</span><span class="modal-tipo-label">Jam / Zapada</span></button>
+<button class="modal-tipo-btn selected" onclick="selectTipo('busco',this)"><span class="modal-tipo-icon">🔍</span><span class="modal-tipo-label">Busco artista</span></button>
+<button class="modal-tipo-btn" onclick="selectTipo('ofrezco',this)"><span class="modal-tipo-icon">🎨</span><span class="modal-tipo-label">Me ofrezco</span></button>
+<button class="modal-tipo-btn" onclick="selectTipo('jam',this)"><span class="modal-tipo-icon">📅</span><span class="modal-tipo-label">Jam / Evento</span></button>
 <button class="modal-tipo-btn" onclick="selectTipo('vende',this)"><span class="modal-tipo-icon">🎛️</span><span class="modal-tipo-label">Vendo / Alquilo</span></button>
 <button class="modal-tipo-btn" onclick="selectTipo('clases',this)"><span class="modal-tipo-icon">🎓</span><span class="modal-tipo-label">Doy clases</span></button>
 </div>
-<!-- BUSCO MÚSICO -->
+<!-- BUSCO ARTISTA -->
 <div class="modal-form active" id="form-busco">
+<div class="mfield" id="busco-rubro-field">
+<label>¿Qué tipo de artista buscás?</label>
+<div class="mchips" id="busco-rubro-chips">
+<button class="mchip on" onclick="seleccionarRubroBusco('musica',this)">🎵 Música</button>
+<button class="mchip" onclick="seleccionarRubroBusco('actuacion',this)">🎭 Actuación</button>
+<button class="mchip" onclick="seleccionarRubroBusco('audiovisual',this)">🎬 Audiovisual & foto</button>
+<button class="mchip" onclick="seleccionarRubroBusco('modelaje',this)">👗 Modelaje</button>
+<button class="mchip" onclick="seleccionarRubroBusco('diseno',this)">✏️ Diseño & artes</button>
+<button class="mchip" onclick="seleccionarRubroBusco('tatuaje',this)">🖋️ Tatuaje</button>
+<button class="mchip" onclick="seleccionarRubroBusco('danza',this)">💃 Danza</button>
+<button class="mchip" onclick="seleccionarRubroBusco('maquillaje',this)">💄 Maquillaje & FX</button>
+<button class="mchip" onclick="seleccionarRubroBusco('circo',this)">🎪 Circo & escénicas</button>
+<button class="mchip" onclick="seleccionarRubroBusco('escritura',this)">✍️ Escritura & guión</button>
+</div>
+</div>
 <div class="mfield"><label>Título</label><input placeholder="Ej: Busco bajista para banda de rock en CABA" type="text"/></div>
-<div class="mfield"><label>Descripción</label><textarea placeholder="Qué buscás, experiencia requerida, frecuencia de ensayo, si tenés sala..."></textarea></div>
-<div class="mfield">
+<div class="mfield"><label>Descripción</label><textarea placeholder="Qué buscás, experiencia requerida, frecuencia de ensayo..."></textarea></div>
+<div class="mfield" id="busco-chips-especificos">
+<!-- Se rellena dinámicamente por seleccionarRubroBusco() -->
 <label>Instrumento/s buscado/s <span class="opt">— podés elegir varios</span></label>
 <div class="mchips">
 <button class="mchip" onclick="this.classList.toggle('on')">Guitarra</button>
@@ -860,12 +876,6 @@
 <button class="mchip" onclick="this.classList.toggle('on')">Acordeón</button>
 <button class="mchip" onclick="this.classList.toggle('on')">Contrabajo</button>
 <button class="mchip" onclick="this.classList.toggle('on')">Clarinete</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Cajón</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Bombo leguero</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Quena / Zampoña</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Ukelele</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Controlador MIDI</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Técnico de sonido</button>
 <button class="mchip" onclick="this.classList.toggle('on')">Compositor / Arreglador</button>
 <button class="mchip" onclick="this.classList.toggle('on')">Productor</button>
 <button class="mchip" onclick="this.classList.toggle('on')">Mix &amp; Mastering</button>
@@ -873,135 +883,23 @@
 <button class="mchip" onclick="this.classList.toggle('on')">Otro</button>
 </div>
 </div>
-<div class="mfield">
-<label>Género/s musicales <span class="opt">— podés elegir varios</span></label>
-<div class="mchips">
-<button class="mchip on" onclick="this.classList.toggle('on')">Rock</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Rock Nacional</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Metal</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Jazz</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Folklore</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Tango</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Cumbia</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Indie</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Pop</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Electrónica</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Funk</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Punk</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Blues</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Prog</button>
-<button class="mchip" onclick="this.classList.toggle('on')">R&amp;B</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Rap / Hip Hop</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Reggae</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Tropical</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Clásica</button>
-<button class="mchip" onclick="this.classList.toggle('on')">House</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Tech House</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Techno</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Trance</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Melodic House &amp; Techno</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Minimal Deep/Tech</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Indie Dance</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Bossanova</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Soul</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Otro</button>
-</div>
-</div>
-<div class="mfield"><label>Zona / barrio</label><input placeholder="Ej: Almagro, CABA" type="text"/></div>
+<div class="mfield"><label>Zona / barrio</label><input id="busco-zona" placeholder="Ej: Almagro, CABA" type="text"/></div>
 </div>
 <!-- ME OFREZCO -->
 <div class="modal-form" id="form-ofrezco">
-<div class="mfield"><label>Título</label><input placeholder="Ej: Guitarrista disponible para sesiones y shows — CABA" type="text"/></div>
-<div class="mfield"><label>Descripción</label><textarea placeholder="Quién sos, tu experiencia, qué ofrecés, si cobrás, disponibilidad horaria..."></textarea></div>
-<div class="mfield">
-<label>Instrumento/s que tocás <span class="opt">— podés elegir varios</span></label>
-<div class="mchips">
-<button class="mchip on" onclick="this.classList.toggle('on')">Guitarra</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Bajo</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Batería</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Teclado / Piano</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Voz / Canto</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Saxo</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Violín</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Trompeta</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Percusión</button>
-<button class="mchip" onclick="this.classList.toggle('on')">DJ / Productor</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Bandoneón</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Charango</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Flauta</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Cello</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Arpa</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Acordeón</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Contrabajo</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Clarinete</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Cajón</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Bombo leguero</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Quena / Zampoña</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Ukelele</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Controlador MIDI</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Técnico de sonido</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Compositor / Arreglador</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Productor</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Mix &amp; Mastering</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Manager</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Otro</button>
+<div class="mfield"><label>Título <span class="opt">— opcional, se genera automático</span></label><input id="ofrezco-titulo" placeholder="Ej: Guitarrista disponible para sesiones — CABA" type="text"/></div>
+<div class="mfield"><label>Descripción</label><textarea placeholder="Quién sos, tu experiencia, qué ofrecés, disponibilidad..."></textarea></div>
+<div class="mfield" id="ofrezco-chips-especificos">
+<!-- Se rellena dinámicamente al abrir el modal según rubro activo -->
 </div>
-</div>
-<div class="mfield">
-<label>Género/s musicales <span class="opt">— podés elegir varios</span></label>
-<div class="mchips">
-<button class="mchip" onclick="this.classList.toggle('on')">Rock</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Rock Nacional</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Metal</button>
-<button class="mchip on" onclick="this.classList.toggle('on')">Jazz</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Folklore</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Tango</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Cumbia</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Indie</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Pop</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Electrónica</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Funk</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Punk</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Blues</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Prog</button>
-<button class="mchip" onclick="this.classList.toggle('on')">R&amp;B</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Rap / Hip Hop</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Reggae</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Tropical</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Clásica</button>
-<button class="mchip" onclick="this.classList.toggle('on')">House</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Tech House</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Techno</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Trance</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Melodic House &amp; Techno</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Minimal Deep/Tech</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Indie Dance</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Bossanova</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Soul</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Otro</button>
-</div>
-</div>
-<div class="mfield"><label>Zona / barrio</label><input placeholder="Ej: Palermo, CABA" type="text"/></div>
+<div class="mfield"><label>Zona / barrio</label><input id="ofrezco-zona" placeholder="Ej: Palermo, CABA" type="text"/></div>
 </div>
 <!-- JAM / ZAPADA -->
 <div class="modal-form" id="form-jam">
 <div class="mfield"><label>Nombre del evento</label><input id="jam-titulo" placeholder="Ej: Jam de jazz abierta — Parque Centenario" type="text"/></div>
 <div class="mfield"><label>Descripción</label><textarea placeholder="De qué se trata, géneros, quién puede venir, qué llevar, cómo confirmar asistencia..."></textarea></div>
-<div class="mfield">
-<label>Género/s musicales <span class="opt">— opcional</span></label>
-<div class="mchips" id="jam-generos">
-<button class="mchip on" onclick="this.classList.toggle('on')">Jazz</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Rock</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Blues</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Folklore</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Funk</button>
-<button class="mchip" onclick="this.classList.toggle('on')">R&amp;B</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Bossanova</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Tango</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Pop</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Cumbia</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Variado</button>
-</div>
+<div class="mfield" id="jam-tipo-field">
+<!-- Se rellena dinámicamente por renderJamChips() -->
 </div>
 <div class="mrow">
 <div class="mfield"><label>Fecha</label><input type="date"/></div>
@@ -1024,27 +922,10 @@
 </div>
 <!-- DOY CLASES -->
 <div class="modal-form" id="form-clases">
-<div class="mfield"><label>Título <span class="opt">— opcional, se genera automático</span></label><input id="clases-titulo" placeholder="Ej: Clases de guitarra para principiantes — Palermo" type="text"/></div>
+<div class="mfield"><label>Título <span class="opt">— opcional, se genera automático</span></label><input id="clases-titulo" id="clases-titulo-input" placeholder="Ej: Clases de guitarra para principiantes — Palermo" type="text"/></div>
 <div class="mrow">
-<div class="mfield">
-<label>Instrumento que enseñás</label>
-<div class="mchips">
-<button class="mchip on" onclick="this.classList.toggle('on')">Guitarra</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Bajo</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Batería</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Teclado / Piano</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Voz / Canto</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Saxo</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Violín</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Trompeta</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Percusión</button>
-<button class="mchip" onclick="this.classList.toggle('on')">DJ / Productor</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Bandoneón</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Flauta</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Acordeón</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Ukelele</button>
-<button class="mchip" onclick="this.classList.toggle('on')">Contrabajo</button>
-</div>
+<div class="mfield" id="clases-disciplina-mfield">
+<!-- Se rellena dinámicamente por renderClasesChips() -->
 </div>
 <div class="mfield">
 <label>Nivel que enseñás</label>
@@ -1151,7 +1032,7 @@
 <nav>
 <a class="nav-logo" href="index.html">busc<span>ARTE</span></a>
 <ul class="nav-links">
-<li><a href="buscARTE_busqueda.html">Músicos</a></li>
+<li><a href="buscARTE_busqueda.html">Artistas</a></li>
 <li><a class="active" href="#">Anuncios</a></li>
 <li><a class="nav-link" href="buscARTE_mensajes.html">Mensajes</a></li>
 </ul>
@@ -1186,81 +1067,30 @@
 <div class="filter-header">
 <div class="filter-title-wrap">
 <div class="filter-title">Filtros</div>
-<div class="filter-category-label" id="filter-category-label">Busco músico · Me ofrezco</div>
+<div class="filter-category-label" id="filter-category-label">Todos los anuncios</div>
 </div>
 <button class="filter-clear" onclick="clearFilters()">Limpiar</button>
 </div>
 <!-- FILTROS: BUSCO / OFREZCO -->
 <div class="filter-panel active" id="fp-musico">
 <div class="filter-group">
-<span class="filter-group-label">Instrumento</span>
+<span class="filter-group-label">Rubro buscado</span>
 <div class="filter-chips">
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Guitarra</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Bajo</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Batería</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Teclado</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Voz / Canto</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Saxo</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Violín</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Trompeta</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Percusión</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">DJ</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Bandoneón</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Charango</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Flauta</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Cello</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Arpa</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Acordeón</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Contrabajo</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Clarinete</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Cajón</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Bombo leguero</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Quena / Zampoña</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Ukelele</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Controlador MIDI</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Técnico de sonido</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Compositor / Arreglador</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Productor</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Mix &amp; Mastering</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Manager</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Otro</button>
+<button class="fchip" data-rubro="musica" onclick="filtrarPorRubro(this)">🎵 Música</button>
+<button class="fchip" data-rubro="actuacion" onclick="filtrarPorRubro(this)">🎭 Actuación</button>
+<button class="fchip" data-rubro="audiovisual" onclick="filtrarPorRubro(this)">🎬 Audiovisual</button>
+<button class="fchip" data-rubro="modelaje" onclick="filtrarPorRubro(this)">👗 Modelaje</button>
+<button class="fchip" data-rubro="diseno" onclick="filtrarPorRubro(this)">✏️ Diseño & artes</button>
+<button class="fchip" data-rubro="tatuaje" onclick="filtrarPorRubro(this)">🖋️ Tatuaje</button>
+<button class="fchip" data-rubro="danza" onclick="filtrarPorRubro(this)">💃 Danza</button>
+<button class="fchip" data-rubro="maquillaje" onclick="filtrarPorRubro(this)">💄 Maquillaje</button>
+<button class="fchip" data-rubro="circo" onclick="filtrarPorRubro(this)">🎪 Circo</button>
+<button class="fchip" data-rubro="escritura" onclick="filtrarPorRubro(this)">✍️ Escritura</button>
 </div>
 </div>
 <div class="filter-divider"></div>
-<div class="filter-group">
-<span class="filter-group-label">Género</span>
-<div class="filter-chips">
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Rock</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Rock Nacional</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Metal</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Jazz</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Folklore</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Tango</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Cumbia</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Indie</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Pop</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Electrónica</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Funk</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Punk</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Blues</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Prog</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">R&amp;B</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Rap / Hip Hop</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Reggae</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Tropical</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Clásica</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Bossanova</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Soul</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">House</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Tech House</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Techno</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Trance</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Melodic House &amp; Techno</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Minimal Deep/Tech</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Indie Dance</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Otro</button>
-</div>
-</div>
+<!-- Filtros específicos por rubro — dinámicos via renderFiltrosPanel() -->
+<div id="fp-rubro-campos"></div>
 <div class="filter-divider"></div>
 <div class="filter-group">
 <span class="filter-group-label">Zona</span>
@@ -1363,7 +1193,7 @@
 <!-- FILTROS: DOY CLASES -->
 <div class="filter-panel" id="fp-clases">
 <div class="filter-group">
-<span class="filter-group-label">Instrumento</span>
+<span class="filter-group-label">Disciplina</span>
 <div class="filter-chips">
 <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Guitarra</button>
 <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Bajo</button>
@@ -1380,6 +1210,19 @@
 <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Ukelele</button>
 <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Contrabajo</button>
 <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Flauta</button>
+<!-- Danza -->
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Tango</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Contemporáneo</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Ballet</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Hip-hop / Urbano</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Salsa / Ritmos</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Pole dance</button>
+<!-- Arte / otros -->
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Actuación</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Dibujo / Ilustración</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Diseño gráfico</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Fotografía</button>
+<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Maquillaje artístico</button>
 </div>
 </div>
 <div class="filter-divider"></div>
@@ -1410,18 +1253,18 @@
 <div class="anuncios-main">
 <div class="main-header">
 <div>
-<div class="main-title"><span>142</span> anuncios</div>
-<div class="main-sub">en Buenos Aires · hoy</div>
+<div class="main-title"><span id="anuncios-count">—</span> anuncios</div>
+<div class="main-sub" id="main-sub-text">cargando...</div>
 </div>
 <button class="btn-publish" onclick="openModal('busco')">+ Publicar anuncio</button>
 </div>
 <div class="anuncios-intro">
 <div>
 <div class="anuncios-intro-title">Anuncios de la escena</div>
-<div class="anuncios-intro-copy">Buscá músicos, ofrecete, encontrá jams, clases o equipos. Navegar es abierto; para publicar o responder necesitás cuenta.</div>
+<div class="anuncios-intro-copy">Buscá artistas, ofrecete, encontrá eventos, clases o equipos. Navegar es abierto; para publicar o responder necesitás cuenta.</div>
 </div>
 <div class="anuncios-intro-actions">
-<a class="mini-link" href="buscARTE_busqueda.html">🎵 Músicos</a>
+<a class="mini-link" href="buscARTE_busqueda.html">🎨 Artistas</a>
 <a class="mini-link" href="buscARTE_registro.html">+ Crear perfil</a>
 </div>
 </div>
@@ -1429,9 +1272,9 @@
 
 <div class="tipo-tabs">
 <button class="tipo-tab active" onclick="setTab(this,'todos')">Todos</button>
-<button class="tipo-tab" onclick="setTab(this,'musico')">Busco músico</button>
+<button class="tipo-tab" onclick="setTab(this,'musico')">Busco artista</button>
 <button class="tipo-tab" onclick="setTab(this,'ofrezco')">Me ofrezco</button>
-<button class="tipo-tab" onclick="setTab(this,'jam')">Jam / Zapada</button>
+<button class="tipo-tab" onclick="setTab(this,'jam')">Jam / Evento</button>
 <button class="tipo-tab" onclick="setTab(this,'vende')">Vendo / Alquilo</button>
 <button class="tipo-tab" onclick="setTab(this,'clases')">Doy clases</button>
 </div>
@@ -1448,18 +1291,18 @@
 <div class="sidebar-card-title">Publicar anuncio</div>
 <div class="sidebar-card-sub">¿Buscás alguien, te ofrecés, querés organizar una jam o vender algo?</div>
 <div class="publish-types">
-<button class="publish-type selected" onclick="selectPublishType(this,'busco')"><span class="ptype-icon">🔍</span><div><span class="ptype-label">Busco músico</span><span class="ptype-desc">Guitarrista, cantante, baterista...</span></div></button>
-<button class="publish-type" onclick="selectPublishType(this,'ofrezco')"><span class="ptype-icon">🎸</span><div><span class="ptype-label">Me ofrezco</span><span class="ptype-desc">Estoy disponible para proyectos</span></div></button>
-<button class="publish-type" onclick="selectPublishType(this,'jam')"><span class="ptype-icon">🥁</span><div><span class="ptype-label">Jam / Zapada</span><span class="ptype-desc">Organizá una jam abierta</span></div></button>
+<button class="publish-type selected" onclick="selectPublishType(this,'busco')"><span class="ptype-icon">🔍</span><div><span class="ptype-label">Busco artista</span><span class="ptype-desc">Músico, actor, fotógrafo, bailarín...</span></div></button>
+<button class="publish-type" onclick="selectPublishType(this,'ofrezco')"><span class="ptype-icon">🎨</span><div><span class="ptype-label">Me ofrezco</span><span class="ptype-desc">Estoy disponible para proyectos</span></div></button>
+<button class="publish-type" onclick="selectPublishType(this,'jam')"><span class="ptype-icon">📅</span><div><span class="ptype-label">Jam / Evento</span><span class="ptype-desc">Jam, muestra, casting abierto</span></div></button>
 <button class="publish-type" onclick="selectPublishType(this,'vende')"><span class="ptype-icon">🎛️</span><div><span class="ptype-label">Vendo / Alquilo</span><span class="ptype-desc">Instrumentos, equipos, sala</span></div></button>
-<button class="publish-type" onclick="selectPublishType(this,'clases')"><span class="ptype-icon">🎓</span><div><span class="ptype-label">Doy clases</span><span class="ptype-desc">Enseñá tu instrumento</span></div></button>
+<button class="publish-type" onclick="selectPublishType(this,'clases')"><span class="ptype-icon">🎓</span><div><span class="ptype-label">Doy clases</span><span class="ptype-desc">Música, danza, actuación, arte...</span></div></button>
 </div>
 <button class="btn-publish-full" onclick="openModalFromSidebar()">Publicar gratis →</button>
 </div>
 <div class="sidebar-card">
 <div style="font-size:.63rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gris2);margin-bottom:1rem;">Actividad en buscARTE</div>
 <div class="stats-row"><span class="stats-label">Anuncios activos</span><span class="stats-val" id="sidebar-stat-anuncios">—</span></div>
-<div class="stats-row"><span class="stats-label">Músicos registrados</span><span class="stats-val" id="sidebar-stat-musicos">—</span></div>
+<div class="stats-row"><span class="stats-label">Artistas registrados</span><span class="stats-val" id="sidebar-stat-musicos">—</span></div>
 </div>
 </aside>
 </div>
@@ -1468,6 +1311,25 @@
   const SUPABASE_URL = 'https://xiaanchoanxmampegoay.supabase.co'
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68'
   const SB_HEADERS = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+
+  // ─── RUBRO DESDE URL + COLORES ───
+  const rubroFiltro = new URLSearchParams(window.location.search).get('rubro') || null
+  const RUBRO_COLORS = {
+    musica:'#d4f53c', actuacion:'#ff6b5b', audiovisual:'#5b9fff',
+    modelaje:'#4de8c4', diseno:'#ffaa5b', tatuaje:'#c45bff',
+    danza:'#5bd4ff', maquillaje:'#e8a84a', circo:'#ffdd5b', escritura:'#a0d47b'
+  }
+  const RUBROS_LABELS = {
+    musica:'Música', actuacion:'Actuación & escena', audiovisual:'Audiovisual & foto',
+    modelaje:'Modelaje', diseno:'Diseño & artes', tatuaje:'Tatuaje',
+    danza:'Danza', maquillaje:'Maquillaje & vestuario', circo:'Circo & escénicas', escritura:'Escritura & guión'
+  }
+  if (rubroFiltro && RUBRO_COLORS[rubroFiltro]) {
+    document.documentElement.style.setProperty('--neon', RUBRO_COLORS[rubroFiltro])
+  }
+
+  // Rubro seleccionado en el modal "busco artista"
+  let buscoRubroSeleccionado = rubroFiltro || 'musica'
 
   let fotoVentaUrl = null
   let fotoVentaUrl2 = null
@@ -1484,15 +1346,32 @@
   const ANUNCIOS_PER_PAGE = 10
 
   const BADGES = { busco:'badge-busco', ofrezco:'badge-ofrezco', jam:'badge-jam', vende:'badge-vendo', vendo:'badge-vendo', clases:'badge-clases' }
-  const LABELS = { busco:'🔍 Busco músico', ofrezco:'🎸 Me ofrezco', jam:'🥁 Jam / Zapada', vende:'🎛️ Vendo / Alquilo', vendo:'🎛️ Vendo / Alquilo', clases:'🎓 Doy clases' }
+
+  // Labels dinámicos — buildAnuncioCard los enriquece con rubro_buscado
+  function getLabelBusco(a) {
+    const rubro = a.rubro_buscado
+    if (!rubro || rubro === 'musica') return '🔍 Busco músico'
+    const names = { actuacion:'actor/actriz', audiovisual:'videomaker/fotógrafo', modelaje:'modelo',
+      diseno:'diseñador/artista', tatuaje:'tatuador/a', danza:'bailarín/a',
+      maquillaje:'maquillador/a', circo:'artista de circo', escritura:'escritor/guionista' }
+    return `🔍 Busco ${names[rubro] || RUBROS_LABELS[rubro] || 'artista'}`
+  }
+  const LABELS = {
+    busco: '🔍 Busco artista',
+    ofrezco: '🎨 Me ofrezco',
+    jam: '📅 Jam / Evento',
+    vende: '🛒 Vendo / Alquilo',
+    vendo: '🛒 Vendo / Alquilo',
+    clases: '🎓 Doy clases'
+  }
   const RESPOND_TEXT = { busco:'Ver / responder →', ofrezco:'Ver / responder →', jam:'Ver / asistir →', vende:'Ver / consultar →', vendo:'Ver / consultar →', clases:'Ver / consultar →' }
 
   const filterLabels = {
     todos: 'Todos los anuncios',
-    musico: 'Busco músico',
-    busco: 'Busco músico',
+    musico: 'Busco artista',
+    busco: 'Busco artista',
     ofrezco: 'Me ofrezco',
-    jam: 'Jam / Zapada',
+    jam: 'Jam / Evento',
     vende: 'Vendo / Alquilo',
     vendo: 'Vendo / Alquilo',
     clases: 'Doy clases'
@@ -1585,6 +1464,14 @@
     document.querySelectorAll('.filters-panel .fchip.on').forEach(c=>c.classList.remove('on'))
     document.querySelectorAll('.filters-panel input').forEach(i => { i.value = '' })
     document.querySelectorAll('.filters-panel select').forEach(s => { s.selectedIndex = 0 })
+    // Resetear el filtro de rubro interno (vuelve al rubro de la URL, o a "todos")
+    rubroFiltroActivo = null
+    const ef = rubroFiltro
+    document.documentElement.style.setProperty('--neon', (ef && RUBRO_COLORS[ef]) ? RUBRO_COLORS[ef] : '#d4f53c')
+    if (ef) {
+      const fp = document.querySelector('#fp-musico .fchip[data-rubro="' + ef + '"]')
+      if (fp) fp.classList.add('on')
+    }
     if (opts.reload !== false) {
       anunciosOffset = 0
       cargarAnuncios(false)
@@ -1645,11 +1532,37 @@
     if (el) el.classList.add('selected')
     showForm(currentTipo)
   }
+
   function showForm(tipo) {
     tipo = canonicalTipo(tipo)
-    document.querySelectorAll('.modal-form').forEach(f=>f.classList.remove('active'))
+    document.querySelectorAll('.modal-form').forEach(f => f.classList.remove('active'))
     const form = document.getElementById('form-' + tipo)
     if (form) form.classList.add('active')
+
+    if (tipo === 'busco') {
+      const rubro = rubroFiltroActivo || buscoRubroSeleccionado || 'musica'
+      seleccionarRubroBusco(rubro, null)
+      // Si hay un rubro activo en el panel, ocultamos el selector de rubro en el modal
+      // — el rubro ya está determinado por el contexto (ej: si estás en Actuación, es Casting para actores)
+      const rubroField = document.getElementById('busco-rubro-field')
+      if (rubroField) rubroField.style.display = rubroFiltroActivo ? 'none' : ''
+    }
+
+    if (tipo === 'ofrezco') renderOfrecerChips(rubroFiltroActivo || buscoRubroSeleccionado || 'musica')
+    if (tipo === 'clases') renderClasesChips(rubroFiltroActivo || buscoRubroSeleccionado || 'musica')
+    if (tipo === 'jam') renderJamChips(rubroFiltroActivo || buscoRubroSeleccionado || 'musica')
+
+    // Actualizar título del modal según el tipo seleccionado y el rubro activo
+    actualizarTituloModal(tipo)
+  }
+
+  function actualizarTituloModal(tipo) {
+    const titleEl = document.querySelector('.modal-title')
+    if (!titleEl) return
+    const rubro = rubroFiltroActivo || 'musica'
+    const config = RUBROS_ANUNCIO_CONFIG[rubro] || RUBROS_ANUNCIO_CONFIG.musica
+    const sidebarItem = config.sidebar.find(s => s.tipo === canonicalTipo(tipo))
+    titleEl.textContent = sidebarItem ? sidebarItem.label : 'Publicar anuncio'
   }
   function selectNivel(btn) {
     btn.closest('.mchips').querySelectorAll('.nivel-chip').forEach(b=>b.classList.remove('on'))
@@ -1733,7 +1646,8 @@
       if (preview) { preview.src = dataUrl; preview.style.display = 'block' }
       if (text) { text.style.display = 'block'; text.innerHTML = '⏳ Optimizando y subiendo...' }
       const file = await optimizeImage(original)
-      const ext = file.type === 'image/webp' ? 'webp' : 'jpg'
+      const extMap = { 'image/png':'png', 'image/webp':'webp', 'image/jpeg':'jpg' }
+      const ext = extMap[file.type] || 'jpg'
       const random = (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now())
       const fileName = `${tipo}-${random}.${ext}`
       const res = await fetch(`${SUPABASE_URL}/storage/v1/object/fotos-anuncios/${fileName}`, {
@@ -1782,6 +1696,9 @@
     const tipo = canonicalTipo(formActivo?.id?.replace('form-', '') || currentTipo)
     const miId = normalizeId(localStorage.getItem('ba_user_id'))
     let datos = { tipo, estado:'activo', user_id: miId }
+    // Rubro de quien publica (su disciplina). Define el tablón para ofrezco/clases/jam.
+    // El marketplace (vende) es transversal y se muestra en todos los rubros.
+    datos.rubro = localStorage.getItem('ba_rubro') || 'musica'
 
     if (tipo === 'busco' || tipo === 'ofrezco') {
       const form = document.getElementById('form-' + tipo)
@@ -1791,8 +1708,15 @@
       const chips = getSelectedTexts(form)
       datos.instrumentos = chips.filter(c => INSTRUMENTOS.includes(c)).join(', ')
       datos.generos = chips.filter(c => GENEROS.includes(c) && !INSTRUMENTOS.includes(c)).join(', ')
+      // Chips específicos de rubros no musicales (rol, estilo, etc.) → tags
+      datos.tags = chips.filter(c => !INSTRUMENTOS.includes(c) && !GENEROS.includes(c)).join(', ')
       datos.zona = inputs[inputs.length - 1]?.value?.trim()
-      if (!datos.titulo && tipo === 'ofrezco') datos.titulo = datos.instrumentos ? `Me ofrezco: ${datos.instrumentos}` : 'Me ofrezco como músico'
+      if (!datos.titulo && tipo === 'ofrezco') datos.titulo = datos.instrumentos ? `Me ofrezco: ${datos.instrumentos}` : 'Me ofrezco como artista'
+      // rubro_buscado — determina en qué tablón aparece el anuncio
+      if (tipo === 'busco') {
+        datos.rubro_buscado = buscoRubroSeleccionado || rubroFiltro || 'musica'
+        if (!datos.titulo) datos.titulo = `Busco ${RUBROS_LABELS[datos.rubro_buscado] || 'artista'}`
+      }
     }
 
     if (tipo === 'clases') {
@@ -1904,7 +1828,8 @@
   function buildAnuncioCard(a, autorNombre) {
     const tipo = canonicalTipo(a.tipo)
     const badge = BADGES[tipo] || 'badge-busco'
-    const label = LABELS[tipo] || escapeHtml(tipo)
+    // Para "busco": mostrar el rubro buscado dinámicamente
+    const label = tipo === 'busco' ? getLabelBusco(a) : (LABELS[tipo] || escapeHtml(tipo))
     const respondText = RESPOND_TEXT[tipo] || 'Ver anuncio →'
     const tags = [a.instrumentos, a.instrumento, a.generos, a.categoria_producto, a.nivel, a.modalidad]
       .filter(Boolean).join(',').split(',').map(t=>t.trim()).filter(Boolean).slice(0,4)
@@ -1953,7 +1878,8 @@
   }
 
   function getActiveFilterChips(panel) {
-    return [...(panel?.querySelectorAll('.fchip.on') || [])].map(c => c.textContent.trim().toLowerCase())
+    // Excluir chips de rubro ([data-rubro]): son filtro de tablón, no de texto
+    return [...(panel?.querySelectorAll('.fchip.on:not([data-rubro])') || [])].map(c => c.textContent.trim().toLowerCase())
   }
 
   function parseMoney(value) {
@@ -2018,8 +1944,24 @@
     if (getHiddenAnuncioIds().includes(String(a.id))) return false
     if (a.oculto === true || String(a.oculto || '').toLowerCase() === 'true') return false
     const estado = String(a.estado || '').toLowerCase().trim()
-    // Si no hay estado, no bloqueamos: preferimos mostrar antes que dejar el tablón vacío.
     if (estado && !['activo','activa','publicado','publicada'].includes(estado)) return false
+
+    // Filtrar por rubro del tablón activo
+    const rfActivo = getRubroFiltroEfectivo ? getRubroFiltroEfectivo() : rubroFiltro
+    if (rfActivo) {
+      const tipo = canonicalTipo(a.tipo)
+      if (tipo === 'busco') {
+        // "Busco" aparece en el tablón del rubro que busca
+        const rb = a.rubro_buscado || 'musica'
+        if (rb !== rfActivo) return false
+      } else if (tipo === 'vende' || tipo === 'vendo') {
+        // Marketplace: visible en todos los rubros (no se filtra por rubro)
+      } else {
+        // ofrezco / clases / jam: aparecen en el tablón del rubro que publica
+        const rp = a.rubro || 'musica'
+        if (rp !== rfActivo) return false
+      }
+    }
 
     if (tipoFiltro !== 'todos') {
       const t = canonicalTipo(a.tipo)
@@ -2045,7 +1987,7 @@
     if (!matchesPriceRange(a)) return false
 
     if (chipsOn.length) {
-      const hayTexto = [a.instrumentos, a.instrumento, a.generos, a.categoria_producto, a.nivel, a.modalidad, a.condicion]
+      const hayTexto = [a.instrumentos, a.instrumento, a.generos, a.categoria_producto, a.nivel, a.modalidad, a.condicion, a.tags]
         .filter(Boolean).join(' ').toLowerCase()
       const chipsReales = chipsOn.filter(c => !['hoy','este finde','esta semana','este mes','gratis','a la gorra','con costo'].includes(c))
       if (chipsReales.length && !chipsReales.some(c => hayTexto.includes(c))) return false
@@ -2053,6 +1995,502 @@
 
     return true
   }
+
+  // ═══════════════════════════════════════
+  // CONFIG DE TIPOS DE ANUNCIO POR RUBRO
+  // Fuente: buscARTE_expansion_plan.md
+  // Tabs + sidebar + modal se renderizan desde acá
+  // ═══════════════════════════════════════
+  const RUBROS_ANUNCIO_CONFIG = {
+    // 🎵 Tipos: Busco músico | Jam/evento | Clases | Vendo equipo
+    musica: {
+      tabs: [
+        { label:'Todos', tipo:'todos' },
+        { label:'Busco músico', tipo:'musico' },
+        { label:'Me ofrezco', tipo:'ofrezco' },
+        { label:'Jam / Evento', tipo:'jam' },
+        { label:'Vendo equipo', tipo:'vende' },
+        { label:'Clases', tipo:'clases' },
+      ],
+      sidebar: [
+        { tipo:'busco', icon:'🔍', label:'Busco músico', desc:'Guitarrista, cantante, baterista...' },
+        { tipo:'ofrezco', icon:'🎸', label:'Me ofrezco', desc:'Disponible para proyectos y bandas' },
+        { tipo:'jam', icon:'📅', label:'Jam / Evento', desc:'Jam, muestra, evento abierto' },
+        { tipo:'vende', icon:'🛒', label:'Vendo equipo', desc:'Instrumentos, equipos, sala' },
+        { tipo:'clases', icon:'🎓', label:'Doy clases', desc:'Enseñá tu instrumento' },
+      ]
+    },
+    // 🎭 Tipos: Casting | Clases de actuación | Busco colaboración
+    actuacion: {
+      tabs: [
+        { label:'Todos', tipo:'todos' },
+        { label:'Casting', tipo:'musico' },
+        { label:'Me ofrezco', tipo:'ofrezco' },
+        { label:'Clases', tipo:'clases' },
+        { label:'Evento / Muestra', tipo:'jam' },
+      ],
+      sidebar: [
+        { tipo:'busco', icon:'🎭', label:'Casting', desc:'Busco actor/actriz para proyecto' },
+        { tipo:'ofrezco', icon:'🎨', label:'Me ofrezco', desc:'Disponible para obra o proyecto' },
+        { tipo:'clases', icon:'🎓', label:'Clases', desc:'Enseñá teatro o actuación' },
+        { tipo:'jam', icon:'📅', label:'Evento / Muestra', desc:'Función, ensayo abierto...' },
+      ]
+    },
+    // 🎬 Tipos: Busco videomaker/fotógrafo | Busco editor | Colaboración
+    audiovisual: {
+      tabs: [
+        { label:'Todos', tipo:'todos' },
+        { label:'Busco foto/video', tipo:'musico' },
+        { label:'Me ofrezco', tipo:'ofrezco' },
+        { label:'Colaboración', tipo:'jam' },
+      ],
+      sidebar: [
+        { tipo:'busco', icon:'🎬', label:'Busco foto / video', desc:'Para proyecto, sesión, videoclip...' },
+        { tipo:'ofrezco', icon:'🎨', label:'Me ofrezco', desc:'Disponible para proyectos' },
+        { tipo:'jam', icon:'📅', label:'Colaboración', desc:'Proyecto conjunto, collab' },
+      ]
+    },
+    // 👗 Tipos: Busco modelo
+    modelaje: {
+      tabs: [
+        { label:'Todos', tipo:'todos' },
+        { label:'Busco modelo', tipo:'musico' },
+        { label:'Me ofrezco', tipo:'ofrezco' },
+        { label:'Shooting abierto', tipo:'jam' },
+      ],
+      sidebar: [
+        { tipo:'busco', icon:'👗', label:'Busco modelo', desc:'Para sesión, editorial, evento...' },
+        { tipo:'ofrezco', icon:'🎨', label:'Me ofrezco', desc:'Disponible para sesiones' },
+        { tipo:'jam', icon:'📅', label:'Shooting abierto', desc:'Sesión TFP, casting abierto' },
+      ]
+    },
+    // ✏️ Tipos: Busco diseñador/artista | Doy clases | Colaboración
+    diseno: {
+      tabs: [
+        { label:'Todos', tipo:'todos' },
+        { label:'Busco diseñador', tipo:'musico' },
+        { label:'Me ofrezco', tipo:'ofrezco' },
+        { label:'Clases', tipo:'clases' },
+        { label:'Colaboración', tipo:'jam' },
+      ],
+      sidebar: [
+        { tipo:'busco', icon:'✏️', label:'Busco diseñador/artista', desc:'Para proyecto, editorial, web...' },
+        { tipo:'ofrezco', icon:'🎨', label:'Me ofrezco', desc:'Disponible para encargos' },
+        { tipo:'clases', icon:'🎓', label:'Doy clases', desc:'Diseño, ilustración, arte...' },
+        { tipo:'jam', icon:'📅', label:'Colaboración', desc:'Proyecto conjunto, colectivo' },
+      ]
+    },
+    // 🖋️ Tipos: Busco tatuador | Tatuador/a visitante | Convención
+    tatuaje: {
+      tabs: [
+        { label:'Todos', tipo:'todos' },
+        { label:'Busco tatuador', tipo:'musico' },
+        { label:'Tatuador/a visitante', tipo:'ofrezco' },
+        { label:'Convención', tipo:'jam' },
+      ],
+      sidebar: [
+        { tipo:'busco', icon:'🖋️', label:'Busco tatuador/a', desc:'Estilo, zona, presupuesto...' },
+        { tipo:'ofrezco', icon:'🏠', label:'Tatuador/a visitante', desc:'Me ofrezco a tatuar en tu estudio por unos días' },
+        { tipo:'jam', icon:'📅', label:'Convención / Evento', desc:'Participo en convenciones' },
+      ]
+    },
+    // 💃 Tipos: Busco bailarín | Doy clases | Busco colaboración
+    danza: {
+      tabs: [
+        { label:'Todos', tipo:'todos' },
+        { label:'Busco bailarín', tipo:'musico' },
+        { label:'Me ofrezco', tipo:'ofrezco' },
+        { label:'Clases', tipo:'clases' },
+        { label:'Evento / Muestra', tipo:'jam' },
+      ],
+      sidebar: [
+        { tipo:'busco', icon:'💃', label:'Busco bailarín/a', desc:'Para compañía, show, proyecto...' },
+        { tipo:'ofrezco', icon:'🎨', label:'Me ofrezco', desc:'Disponible para proyectos' },
+        { tipo:'clases', icon:'🎓', label:'Doy clases', desc:'Tango, contemporáneo, ballet...' },
+        { tipo:'jam', icon:'📅', label:'Evento / Muestra', desc:'Función, muestra, ensayo abierto' },
+      ]
+    },
+    // 💄 Tipos: Busco maquillador/vestuarista | Colaboración
+    maquillaje: {
+      tabs: [
+        { label:'Todos', tipo:'todos' },
+        { label:'Busco maquillador', tipo:'musico' },
+        { label:'Me ofrezco', tipo:'ofrezco' },
+        { label:'Colaboración', tipo:'jam' },
+      ],
+      sidebar: [
+        { tipo:'busco', icon:'💄', label:'Busco maquillador/a', desc:'Para producción, evento, teatro...' },
+        { tipo:'ofrezco', icon:'🎨', label:'Me ofrezco', desc:'Disponible para proyectos' },
+        { tipo:'jam', icon:'📅', label:'Colaboración', desc:'Proyecto conjunto, producción' },
+      ]
+    },
+    // 🎪 Tipos: Busco artista | Doy clases
+    circo: {
+      tabs: [
+        { label:'Todos', tipo:'todos' },
+        { label:'Busco artista', tipo:'musico' },
+        { label:'Me ofrezco', tipo:'ofrezco' },
+        { label:'Clases', tipo:'clases' },
+        { label:'Evento / Show', tipo:'jam' },
+      ],
+      sidebar: [
+        { tipo:'busco', icon:'🎪', label:'Busco artista de circo', desc:'Para show, festival, evento...' },
+        { tipo:'ofrezco', icon:'🎨', label:'Me ofrezco', desc:'Disponible para shows y eventos' },
+        { tipo:'clases', icon:'🎓', label:'Doy clases', desc:'Malabares, acrobacia, circo...' },
+        { tipo:'jam', icon:'📅', label:'Evento / Show', desc:'Actuación abierta, festival' },
+      ]
+    },
+    // ✍️ Tipos: Busco escritor/guionista | Me ofrezco para proyecto
+    escritura: {
+      tabs: [
+        { label:'Todos', tipo:'todos' },
+        { label:'Busco guionista', tipo:'musico' },
+        { label:'Me ofrezco', tipo:'ofrezco' },
+        { label:'Colaboración', tipo:'jam' },
+      ],
+      sidebar: [
+        { tipo:'busco', icon:'✍️', label:'Busco escritor/guionista', desc:'Para obra, guion, letras...' },
+        { tipo:'ofrezco', icon:'🎨', label:'Me ofrezco para proyecto', desc:'Disponible para encargos' },
+        { tipo:'jam', icon:'📅', label:'Colaboración', desc:'Proyecto conjunto, co-autoría' },
+      ]
+    },
+  }
+
+  // ─── FUNCIÓN CENTRAL: actualiza tabs + sidebar + modal según rubro ───
+  function actualizarTabsYSidebar(rubro) {
+    const config = RUBROS_ANUNCIO_CONFIG[rubro] || RUBROS_ANUNCIO_CONFIG.musica
+
+    // 1. Tipo-tabs — sin íconos para que entren mejor
+    const tabsEl = document.querySelector('.tipo-tabs')
+    if (tabsEl) {
+      tabsEl.innerHTML = config.tabs.map((tab, i) => {
+        const active = i === 0 ? ' active' : ''
+        return `<button class="tipo-tab${active}" onclick="setTab(this,'${tab.tipo}')">${tab.label}</button>`
+      }).join('')
+    }
+
+    // 2. Sidebar derecha — tipos de publicación
+    const publishEl = document.querySelector('.publish-types')
+    if (publishEl) {
+      publishEl.innerHTML = config.sidebar.map((item, i) =>
+        `<button class="publish-type${i === 0 ? ' selected' : ''}" onclick="selectPublishType(this,'${item.tipo}')">` +
+        `<span class="ptype-icon">${item.icon}</span>` +
+        `<div><span class="ptype-label">${item.label}</span><span class="ptype-desc">${item.desc}</span></div>` +
+        `</button>`
+      ).join('')
+      sidebarTipo = config.sidebar[0].tipo
+    }
+
+    // 3. Modal — botones de tipo de anuncio
+    const modalTipoEl = document.querySelector('.modal-tipo-selector')
+    if (modalTipoEl) {
+      modalTipoEl.innerHTML = config.sidebar.map((item, i) =>
+        `<button class="modal-tipo-btn${i === 0 ? ' selected' : ''}" onclick="selectTipo('${item.tipo}',this)">` +
+        `<span class="modal-tipo-icon">${item.icon}</span>` +
+        `<span class="modal-tipo-label">${item.label}</span>` +
+        `</button>`
+      ).join('')
+    }
+
+    // Resetear tab activo a Todos
+    tipoFiltro = 'todos'
+  }
+
+  // ─── RUBRO EN MODAL BUSCO ARTISTA ───
+  // ─── FILTROS PANEL IZQUIERDO POR RUBRO ───
+  // ─── FILTROS PANEL IZQUIERDO POR RUBRO ───
+  // Principio: superset de todos los chips posibles en los forms (busco+clases+jam)
+  // para que todo lo que se guarda en DB sea filtrable desde el panel izquierdo.
+  // Incluye ambas formas cuando el naming difiere entre forms (ej: Malabarista/Malabares).
+  const RUBROS_FILTROS_PANEL = {
+    musica: [
+      { label:'Instrumento / Rol',
+        chips:['Guitarra','Bajo','Batería','Teclado / Piano','Voz / Canto','Saxo','Violín','Trompeta','Percusión','DJ / Productor','Bandoneón','Charango','Flauta','Cello','Arpa','Acordeón','Contrabajo','Clarinete','Cajón','Ukelele','Compositor / Arreglador','Producción musical','Técnico de sonido','Mix & Mastering','Manager'] },
+      { label:'Género',
+        chips:['Rock','Rock Nacional','Metal','Jazz','Folklore','Tango','Cumbia','Indie','Pop','Electrónica','Funk','R&B','Rap / Hip Hop','Blues','Punk','Prog','Reggae','Bossanova','Soul','Clásica','House','Techno','Variado','Otro'] },
+    ],
+    actuacion: [
+      { label:'Rol',
+        chips:['Actor/Actriz','Actor de voz','Director','Dramaturgo','Productor teatral','Asistente de dirección'] },
+      { label:'Tipo / Disciplina',
+        chips:['Drama','Comedia','Teatro musical','Stand-up','Impro','Infantil','Experimental','Terror','Monólogo','Función / Obra','Ensayo abierto','Audición','Muestra de elenco','Lectura dramatizada','Voz actoral','Doblaje','Dirección teatral'] },
+    ],
+    audiovisual: [
+      { label:'Perfil',
+        chips:['Videomaker','Fotógrafo','Editor','Creador de contenido','Operador de drone','Sonidista'] },
+      { label:'Especialidad / Tipo',
+        chips:['Publicidad','Cine / Ficción','Videoclip','Documental','YouTube / Podcast','TikTok / Reels','Sesiones musicales','Moda','Retrato','Eventos','Producto','Prensa','Artística','Edición de video','Iluminación','Producción audiovisual','Rodaje colaborativo','Sesión fotográfica','Producción conjunta','Workshop / Taller'] },
+    ],
+    modelaje: [
+      { label:'Tipo de trabajo / producción',
+        chips:['Editorial','Publicidad','Pasarela','Artístico','Eventos','Contenido para redes','Plus size','Shooting grupal','Desfile','Casting abierto','Evento de moda','Actuación para cámara','Posar para fotos'] },
+      { label:'Género',
+        chips:['Hombre','Mujer','No binario'] },
+    ],
+    diseno: [
+      { label:'Rol',
+        chips:['Ilustrador / Dibujante','Diseñador gráfico','Diseñador UX/UI','Animador 2D/3D','Concept artist','Pintor','Muralista'] },
+      { label:'Estilo / Tipo de proyecto',
+        chips:['Realismo','Cartoon','Manga','Vectorial','Pixel art','Acuarela','Street art','Abstracto','Minimalismo','Arte digital','Dibujo / Ilustración','Animación 2D / 3D','Pintura','Exposición colectiva','Taller abierto','Proyecto colaborativo','Open studio'] },
+    ],
+    tatuaje: [
+      { label:'Estilo',
+        chips:['Realismo','Blackwork','Tradicional','Japonés','Acuarela','Geométrico','Fine line','Lettering','Neo-traditional','Chicano','Tribal','Neojaponés','Trash polka','Ignorant style','Ilustración para tattoo'] },
+      { label:'Color / Tipo de evento',
+        chips:['Blanco y negro','Color','Ambos','Convención','Flash day','Jornada de tatuaje','Evento de tatuaje'] },
+    ],
+    danza: [
+      { label:'Rol',
+        chips:['Bailarín/a','Coreógrafo','Profesor de danza'] },
+      { label:'Disciplina / Tipo de evento',
+        chips:['Contemporáneo','Tango','Folclore','Ballet','Danza clásica','Urbano / Hip-hop','Salsa / Ritmos latinos','Flamenco','Danza árabe','Danza aérea','Swing','Pole dance','Expresión corporal','Milonga / Práctica','Clase abierta','Muestra / Función','Ensayo abierto','Festival de danza'] },
+    ],
+    maquillaje: [
+      { label:'Rol',
+        chips:['Maquillador artístico','Maquillador FX','Peluquero artístico','Vestuarista','Estilista','Diseñador de disfraz / Cosplay'] },
+      { label:'Especialidad / Tipo',
+        chips:['Artístico','Eventos','FX','Teatro / Cine','Cosplay','Maquillaje artístico','Maquillaje FX','Peluquería artística','Caracterización','Producción conjunta','Evento artístico','Exposición','Workshop'] },
+    ],
+    circo: [
+      { label:'Especialidad',
+        chips:['Acróbata','Malabarista','Payaso','Equilibrista','Trapecista','Artista de fuego','Mago / Ilusionista','Contorsionista','Zanquero','Titiritero','Acrobacia','Malabares','Equilibrismo','Trapecio','Artística de fuego','Contorsionismo','Circo en general'] },
+      { label:'Modalidad / Tipo de evento',
+        chips:['Calle','Teatro','Eventos privados','Festivales','Jam de circo','Muestra artística','Evento en la calle','Trabajo conjunto'] },
+    ],
+    escritura: [
+      { label:'Rol',
+        chips:['Guionista','Letrista','Escritor','Ghostwriter','Poeta','Libretista teatral'] },
+      { label:'Formato / Tipo',
+        chips:['Guion cine/TV','Letra de canción','Obra teatral','Novela / Cuento','Poesía','Dramaturgia','Escritura creativa','Narrativa','Letras de canciones','Lectura abierta','Open mic','Taller de escritura','Proyecto conjunto'] },
+    ],
+  }
+
+  function renderFiltrosPanel(rubro) {
+    const container = document.getElementById('fp-rubro-campos')
+    if (!container) return
+    const grupos = RUBROS_FILTROS_PANEL[rubro] || RUBROS_FILTROS_PANEL.musica
+    let html = ''
+    grupos.forEach((grupo, i) => {
+      if (i > 0) html += '<div class="filter-divider"></div>'
+      html += '<div class="filter-group long-filter">' +
+        '<span class="filter-group-label">' + grupo.label + '</span>' +
+        '<div class="filter-chips">' +
+        grupo.chips.map(chip => '<button class="fchip" onclick="this.classList.toggle(\'on\');anunciosOffset=0;cargarAnuncios(false)">' + chip + '</button>').join('') +
+        '</div></div>'
+    })
+    container.innerHTML = html
+  }
+
+  // ─── CLASES: chips de disciplina por rubro ───
+  const RUBROS_CLASES_CHIPS = {
+    musica:     { label:'Disciplina / Instrumento que enseñás', chips:['Guitarra','Bajo','Batería','Teclado / Piano','Voz / Canto','Saxo','Violín','Trompeta','Percusión','DJ / Productor','Bandoneón','Flauta','Acordeón','Ukelele','Contrabajo','Cello','Charango','Producción musical'] },
+    actuacion:  { label:'Qué enseñás', chips:['Actuación','Teatro', 'Comedia','Impro','Voz actoral','Stand-up','Doblaje','Dirección teatral'] },
+    danza:      { label:'Disciplina que enseñás', chips:['Contemporáneo','Tango','Ballet','Danza clásica','Urbano / Hip-hop','Salsa / Ritmos latinos','Flamenco','Folklore','Danza árabe','Danza aérea','Swing','Pole dance','Expresión corporal'] },
+    diseno:     { label:'Qué enseñás', chips:['Dibujo / Ilustración','Diseño gráfico','Diseño UX/UI','Animación 2D / 3D','Fotografía','Pintura','Arte digital','Concept art'] },
+    circo:      { label:'Especialidad que enseñás', chips:['Malabares','Acrobacia','Equilibrismo','Trapecio','Artística de fuego','Contorsionismo','Circo en general'] },
+    audiovisual:{ label:'Qué enseñás', chips:['Fotografía','Edición de video','Iluminación','Dirección de cine','Podcast','Producción audiovisual'] },
+    maquillaje: { label:'Qué enseñás', chips:['Maquillaje artístico','Maquillaje FX','Caracterización','Vestuario','Peluquería artística'] },
+    circo:      { label:'Especialidad que enseñás', chips:['Malabares','Acrobacia','Equilibrismo','Trapecio','Artística de fuego','Circo en general'] },
+    modelaje:   { label:'Qué enseñás', chips:['Pasarela','Posar para fotos','Actuación para cámara','Postura y presencia'] },
+    escritura:  { label:'Qué enseñás', chips:['Escritura creativa','Guion','Dramaturgia','Poesía','Narrativa','Letras de canciones'] },
+    tatuaje:    { label:'Qué enseñás', chips:['Tatuaje en general','Fine line','Blackwork','Realismo','Ilustración para tattoo'] },
+  }
+
+  const CLASES_PLACEHOLDERS = {
+    musica:'Ej: Clases de guitarra para principiantes — Palermo',
+    actuacion:'Ej: Clases de actuación para todos los niveles — CABA',
+    danza:'Ej: Clases de tango y folklore — Almagro',
+    diseno:'Ej: Taller de ilustración digital — online y presencial',
+    circo:'Ej: Clases de malabares — Caballito, CABA',
+    audiovisual:'Ej: Taller de fotografía — todos los niveles',
+    maquillaje:'Ej: Curso de maquillaje artístico — CABA',
+    modelaje:'Ej: Taller de pasarela y posado — CABA',
+    escritura:'Ej: Taller de escritura creativa y guion',
+    tatuaje:'Ej: Curso de tatuaje — técnica fine line',
+  }
+
+  function renderClasesChips(rubro) {
+    const container = document.getElementById('clases-disciplina-mfield')
+    if (!container) return
+    const config = RUBROS_CLASES_CHIPS[rubro] || RUBROS_CLASES_CHIPS.musica
+    const tituloInput = document.getElementById('clases-titulo-input') || document.getElementById('clases-titulo')
+    if (tituloInput) tituloInput.placeholder = CLASES_PLACEHOLDERS[rubro] || CLASES_PLACEHOLDERS.musica
+    container.innerHTML = '<label>' + config.label + '</label>' +
+      '<div class="mchips">' +
+      config.chips.map(chip => '<button class="mchip" onclick="this.classList.toggle(\'on\')">' + chip + '</button>').join('') +
+      '</div>'
+  }
+
+  // ─── EVENTOS/JAM: chips de tipo por rubro ───
+  const RUBROS_JAM_CHIPS = {
+    musica:     { label:'Género/s musicales', chips:['Jazz','Rock','Blues','Folklore','Funk','R&B','Bossanova','Tango','Pop','Cumbia','Electrónica','Variado'] },
+    actuacion:  { label:'Tipo de evento', chips:['Función / Obra','Ensayo abierto','Lectura dramatizada','Improvisación abierta','Audición','Muestra de elenco'] },
+    danza:      { label:'Tipo de evento', chips:['Milonga / Práctica','Clase abierta','Muestra / Función','Ensayo abierto','Festival de danza'] },
+    circo:      { label:'Tipo de evento', chips:['Jam de circo','Muestra artística','Festival','Evento en la calle','Trabajo conjunto'] },
+    audiovisual:{ label:'Tipo de evento', chips:['Rodaje colaborativo','Sesión fotográfica','Producción conjunta','Workshop / Taller'] },
+    diseno:     { label:'Tipo de evento', chips:['Exposición colectiva','Taller abierto','Proyecto colaborativo','Open studio'] },
+    tatuaje:    { label:'Tipo de evento', chips:['Convención','Flash day','Jornada de tatuaje','Evento de tatuaje'] },
+    modelaje:   { label:'Tipo de evento', chips:['Shooting grupal','Desfile','Casting abierto','Evento de moda'] },
+    maquillaje: { label:'Tipo de evento', chips:['Producción conjunta','Evento artístico','Exposición','Workshop'] },
+    escritura:  { label:'Tipo de evento', chips:['Lectura abierta','Taller de escritura','Open mic','Proyecto conjunto'] },
+  }
+
+  const JAM_PLACEHOLDERS = {
+    musica:'Ej: Jam de jazz abierta — Parque Centenario',
+    actuacion:'Ej: Ensayo abierto de impro — Sala El Cubo',
+    danza:'Ej: Milonga de práctica — Club Social Palermo',
+    circo:'Ej: Jam de circo — Parque Rivadavia',
+    audiovisual:'Ej: Rodaje colaborativo — corto experimental',
+    diseno:'Ej: Exposición colectiva de ilustradores — CABA',
+    tatuaje:'Ej: Convención de tatuaje — Centro Cultural',
+    modelaje:'Ej: Shooting grupal — estilo editorial',
+    maquillaje:'Ej: Producción artística colaborativa',
+    escritura:'Ej: Open mic de poesía — Bar La Tribu',
+  }
+
+  function renderJamChips(rubro) {
+    const container = document.getElementById('jam-tipo-field')
+    if (!container) return
+    const config = RUBROS_JAM_CHIPS[rubro] || RUBROS_JAM_CHIPS.musica
+    const tituloInput = document.getElementById('jam-titulo-input') || document.getElementById('jam-titulo')
+    if (tituloInput) tituloInput.placeholder = JAM_PLACEHOLDERS[rubro] || JAM_PLACEHOLDERS.musica
+    container.innerHTML = '<label>' + config.label + ' <span class="opt">— opcional</span></label>' +
+      '<div class="mchips" id="jam-generos">' +
+      config.chips.map((chip, i) => '<button class="mchip' + (i === 0 ? ' on' : '') + '" onclick="this.classList.toggle(\'on\')">' + chip + '</button>').join('') +
+      '</div>'
+  }
+
+  const OFREZCO_PLACEHOLDERS = {
+    musica:'Ej: Guitarrista disponible para sesiones y shows — CABA',
+    actuacion:'Ej: Actor disponible para obras y castings',
+    audiovisual:'Ej: Fotógrafo disponible para sesiones y eventos',
+    modelaje:'Ej: Modelo disponible para editoriales y eventos',
+    diseno:'Ej: Ilustrador disponible para proyectos y encargos',
+    tatuaje:'Ej: Tatuador disponible para tatuar en estudios — estilo realismo',
+    danza:'Ej: Bailarín/a disponible para proyectos y compañías',
+    maquillaje:'Ej: Maquilladora FX disponible para producciones',
+    circo:'Ej: Malabarista disponible para eventos y festivales',
+    escritura:'Ej: Guionista disponible para proyectos audiovisuales',
+  }
+
+  function renderOfrecerChips(rubro) {
+    const container = document.getElementById('ofrezco-chips-especificos')
+    if (!container) return
+    const config = BUSCO_RUBRO_CHIPS[rubro] || BUSCO_RUBRO_CHIPS.musica
+    const tituloInput = document.getElementById('ofrezco-titulo')
+    if (tituloInput) tituloInput.placeholder = OFREZCO_PLACEHOLDERS[rubro] || 'Título del anuncio...'
+    container.innerHTML = '<label>' + config.label + '</label>' +
+      '<div class="mchips">' +
+      config.chips.map(chip => '<button class="mchip" onclick="this.classList.toggle(\'on\')">' + chip + '</button>').join('') +
+      '</div>'
+  }
+
+  const BUSCO_RUBRO_CHIPS = {
+    musica: {
+      label: 'Instrumento/s buscado/s <span class="opt">— podés elegir varios</span>',
+      chips: ['Guitarra','Bajo','Batería','Teclado / Piano','Voz / Canto','Saxo','Violín','Trompeta','Percusión','DJ / Productor','Bandoneón','Charango','Flauta','Cello','Acordeón','Contrabajo','Compositor / Arreglador','Productor','Mix & Mastering','Manager','Otro']
+    },
+    actuacion: {
+      label: 'Rol buscado',
+      chips: ['Actor/Actriz','Actor de voz / Doblajista','Director','Dramaturgo','Productor teatral']
+    },
+    audiovisual: {
+      label: 'Perfil buscado',
+      chips: ['Videomaker','Fotógrafo','Editor','Creador de contenido','Operador de drone','Sonidista']
+    },
+    modelaje: {
+      label: 'Tipo de trabajo',
+      chips: ['Editorial','Publicidad','Pasarela','Artístico','Eventos','Contenido para redes','Plus size']
+    },
+    diseno: {
+      label: 'Perfil buscado',
+      chips: ['Ilustrador / Dibujante','Diseñador gráfico','Diseñador UX/UI','Animador 2D/3D','Concept artist','Pintor','Muralista']
+    },
+    tatuaje: {
+      label: 'Estilo buscado',
+      chips: ['Realismo','Blackwork','Tradicional','Japonés','Acuarela','Geométrico','Fine line','Lettering','Neo-traditional']
+    },
+    danza: {
+      label: 'Disciplina buscada',
+      chips: ['Contemporáneo','Tango','Folclore','Ballet','Urbano / Hip-hop','Salsa / Ritmos latinos','Flamenco','Danza aérea','Pole dance']
+    },
+    maquillaje: {
+      label: 'Perfil buscado',
+      chips: ['Maquillador artístico','Maquillador FX / Caracterización','Peluquero artístico','Vestuarista','Estilista']
+    },
+    circo: {
+      label: 'Especialidad buscada',
+      chips: ['Acróbata','Malabarista','Payaso','Equilibrista','Trapecista','Artista de fuego','Mago / Ilusionista']
+    },
+    escritura: {
+      label: 'Perfil buscado',
+      chips: ['Guionista','Letrista','Escritor','Ghostwriter','Poeta','Libretista teatral']
+    }
+  }
+
+  function seleccionarRubroBusco(rubro, btn) {
+    buscoRubroSeleccionado = rubro
+    document.querySelectorAll('#busco-rubro-chips .mchip').forEach(c => c.classList.remove('on'))
+    if (btn) btn.classList.add('on')
+    // Actualizar chips del campo específico
+    const config = BUSCO_RUBRO_CHIPS[rubro] || BUSCO_RUBRO_CHIPS.musica
+    const container = document.getElementById('busco-chips-especificos')
+    if (container) {
+      container.innerHTML = `<label>${config.label}</label>
+        <div class="mchips">${config.chips.map(chip =>
+          `<button class="mchip" onclick="this.classList.toggle('on')">${chip}</button>`
+        ).join('')}</div>`
+    }
+  }
+
+  // ─── FILTRO POR RUBRO EN PANEL IZQUIERDO ───
+  let rubroFiltroActivo = rubroFiltro || null
+  function filtrarPorRubro(btn) {
+    const rubro = btn.dataset.rubro
+    const yaActivo = btn.classList.contains('on')
+    document.querySelectorAll('#fp-musico .fchip[data-rubro]').forEach(c => c.classList.remove('on'))
+    if (!yaActivo) {
+      btn.classList.add('on')
+      rubroFiltroActivo = rubro
+      if (RUBRO_COLORS[rubro]) document.documentElement.style.setProperty('--neon', RUBRO_COLORS[rubro])
+    } else {
+      rubroFiltroActivo = null
+      document.documentElement.style.setProperty('--neon', '#d4f53c')
+    }
+    // Adaptar tabs, sidebar, modal y filtros al rubro seleccionado
+    actualizarTabsYSidebar(rubroFiltroActivo || 'musica')
+    renderFiltrosPanel(rubroFiltroActivo || 'musica')
+    anunciosOffset = 0
+    cargarAnuncios(false)
+  }
+
+  // HOTFIX: filtrarPorRubroActivo en anuncioVisibleCliente
+  // (reemplaza la lógica de rubroFiltro URL con rubroFiltroActivo más flexible)
+  function getRubroFiltroEfectivo() {
+    return rubroFiltroActivo || rubroFiltro || null
+  }
+
+  // Inicializar el selector de rubro en el modal
+  window.addEventListener('DOMContentLoaded', function() {
+    // Inicializar tabs, sidebar y modal con el rubro activo (URL param o músicos por defecto)
+    actualizarTabsYSidebar(rubroFiltro || 'musica')
+    renderFiltrosPanel(rubroFiltro || 'musica')
+
+    // Pre-seleccionar rubro en modal busco si viene de URL
+    if (rubroFiltro) {
+      const btn = document.querySelector('#busco-rubro-chips .mchip[onclick*="' + rubroFiltro + '"]')
+      if (btn) seleccionarRubroBusco(rubroFiltro, btn)
+      else seleccionarRubroBusco(rubroFiltro, null)
+    }
+    // Pre-seleccionar chip en filtro panel
+    if (rubroFiltro) {
+      const fp = document.querySelector('#fp-musico .fchip[data-rubro="' + rubroFiltro + '"]')
+      if (fp) {
+        document.querySelectorAll('#fp-musico .fchip[data-rubro]').forEach(c => c.classList.remove('on'))
+        fp.classList.add('on')
+      }
+    }
+  })
 
   function filtrarJam() {
     anunciosOffset = 0
@@ -2128,10 +2566,15 @@
       // Cargar contadores de reacciones en segundo plano
       cargarContadoresReacciones(anuncios.map(a => a.id).filter(Boolean))
 
-      const titleNum = document.querySelector('.main-title span')
+      const titleNum = document.getElementById('anuncios-count') || document.querySelector('.main-title span')
       if (titleNum) titleNum.textContent = append ? String(anunciosOffset + rendered) : String(rendered)
-      const sub = document.querySelector('.main-sub')
-      if (sub) sub.textContent = tipoFiltro === 'todos' ? 'explorá todas las categorías' : (filterLabels[tipoFiltro] || 'anuncios activos')
+      const sub = document.getElementById('main-sub-text') || document.querySelector('.main-sub')
+      const rubroLabel = rubroFiltro ? (RUBROS_LABELS[rubroFiltro] || rubroFiltro) : null
+      if (sub) {
+        if (rubroLabel && tipoFiltro === 'todos') sub.textContent = `anuncios de ${rubroLabel}`
+        else if (tipoFiltro === 'todos') sub.textContent = 'explorá todas las categorías'
+        else sub.textContent = filterLabels[tipoFiltro] || 'anuncios activos'
+      }
       anunciosOffset += data.length
       const btnMore = document.getElementById('btn-load-more')
       if (btnMore) btnMore.style.display = data.length >= 60 ? 'inline-block' : 'none'
@@ -2333,7 +2776,7 @@
   </a>
 </div>
 <div class="mobile-bottom-nav" id="mobile-bottom-nav">
-<a class="mbn-item" data-page="busqueda" href="buscARTE_busqueda.html"><span class="mbn-icon">🎵</span><span>Músicos</span></a>
+<a class="mbn-item" data-page="busqueda" href="buscARTE_busqueda.html"><span class="mbn-icon">🎨</span><span>Artistas</span></a>
 <a class="mbn-item" data-page="anuncios" href="buscARTE_anuncios.html"><span class="mbn-icon">📋</span><span>Anuncios</span></a>
 <a class="mbn-item" data-page="mensajes" href="buscARTE_mensajes.html"><span class="mbn-icon">💬</span><span>Mensajes</span></a>
 <button class="mbn-item" data-page="perfil" onclick="toggleMbnPanel()" style="background:none;border:none;flex:1;padding:0;"><span class="mbn-icon">👤</span><span>Mi perfil</span></button>

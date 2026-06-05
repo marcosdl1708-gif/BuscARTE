@@ -807,11 +807,11 @@
   <div class="profile-stats">
     <div class="pstat">
       <div class="pstat-num" id="stat-instrumento" style="font-size:.9rem">—</div>
-      <div class="pstat-label">Instrumento</div>
+      <div class="pstat-label" id="stat-label-1">Instrumento</div>
     </div>
     <div class="pstat">
       <div class="pstat-num" id="stat-genero" style="font-size:.9rem">—</div>
-      <div class="pstat-label">Género</div>
+      <div class="pstat-label" id="stat-label-2">Género</div>
     </div>
     <div class="pstat">
       <div class="pstat-num" id="stat-exp">—</div>
@@ -840,17 +840,17 @@
     </div>
 
     <div class="section">
-      <div class="section-title"><span class="icon">🎵</span> Géneros</div>
+      <div class="section-title" id="section-title-generos"><span class="icon">🎵</span> Géneros</div>
       <div class="generos-grid" id="perfil-generos">—</div>
     </div>
 
-    <div class="section">
-      <div class="section-title"><span class="icon">🎸</span> Referentes musicales</div>
+    <div class="section" id="section-referentes">
+      <div class="section-title" id="section-title-referentes"><span class="icon">🎸</span> Referentes musicales</div>
       <div class="referentes-list" id="perfil-referentes">—</div>
     </div>
 
     <div class="section">
-      <div class="section-title"><span class="icon">🎬</span> Videos tocando</div>
+      <div class="section-title" id="section-title-portfolio"><span class="icon">🎬</span> Videos tocando</div>
       <div class="videos-grid" id="perfil-videos"><div class="video-item-empty">Sin videos cargados</div></div>
     </div>
 
@@ -869,29 +869,24 @@
   <!-- SIDEBAR -->
   <div class="profile-sidebar">
 
-    <div class="sidebar-card">
+    <div class="sidebar-card" id="contact-card">
       <div class="sidebar-card-title">Enviar mensaje</div>
       <div class="contact-form">
         <textarea placeholder="Escribí tu mensaje..."></textarea>
         <button class="btn-send" onclick="sendMessage()">Enviar →</button>
-        <p class="login-note">¿No tenés cuenta? <a href="buscARTE_registro.html">Registrate gratis</a> para contactar músicos.</p>
+        <p class="login-note">¿No tenés cuenta? <a href="buscARTE_registro.html">Registrate gratis</a> para contactar artistas.</p>
       </div>
     </div>
 
-    <a href="#" class="report-link" onclick="abrirReporte();return false">⚑ Reportar perfil</a>
+    <a href="#" class="report-link" id="report-link" onclick="abrirReporte();return false">⚑ Reportar perfil</a>
 
   </div>
 </div>
 
 <script>
-  // PROTECCIÓN: redirigir si no está logueado
-  (function() {
-    try {
-      if (localStorage.getItem('ba_logged') !== '1') {
-        window.location.replace('index.html');
-      }
-    } catch(e) {}
-  })();
+  // PROTECCIÓN: solo verificamos login para acciones, no para ver el perfil
+  // Los visitantes pueden ver perfiles sin registrarse (ver plan de arquitectura)
+  // Las acciones (contactar, guardar) verifican login en sus propias funciones
   window.addEventListener('DOMContentLoaded', function() {
     const cursor=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
     if (!cursor || !ring) return;
@@ -934,7 +929,7 @@
 
   async function compartirPerfil() {
     const url = location.href
-    const nombre = document.querySelector('.profile-name, h1')?.textContent?.trim() || 'Músico'
+    const nombre = document.querySelector('.profile-name, h1')?.textContent?.trim() || 'Artista'
     const btn = document.getElementById('share-btn')
     try {
       if (navigator.share) {
@@ -982,6 +977,204 @@
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68'
   const hdrs = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }
 
+  // ─── SEGURIDAD: sanitizar todo dato del usuario antes de inyectarlo con innerHTML ───
+  function escapeHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  // Devuelve una URL segura para usar en href/src, o '' si es peligrosa (javascript:, data:, etc.)
+  function safeUrl(raw) {
+    const v = String(raw || '').trim();
+    if (!v) return '';
+    const withProto = /^https?:\/\//i.test(v) ? v : 'https://' + v;
+    try {
+      const u = new URL(withProto);
+      if (u.protocol !== 'http:' && u.protocol !== 'https:') return '';
+      return u.href;
+    } catch (e) { return ''; }
+  }
+
+  // ─── RUBRO CONFIG PARA PERFIL PÚBLICO ───
+  const RUBRO_COLORS = {
+    musica:'#d4f53c', actuacion:'#ff6b5b', audiovisual:'#5b9fff',
+    modelaje:'#4de8c4', diseno:'#ffaa5b', tatuaje:'#c45bff',
+    danza:'#5bd4ff', maquillaje:'#e8a84a', circo:'#ffdd5b', escritura:'#a0d47b'
+  }
+
+  const RUBROS_PERFIL_CONFIG = {
+    musica:     { rolLabel:'Instrumento', generoLabel:'Género', fallbackRol:'Músico',
+                  secGeneros:{icon:'🎵',title:'Géneros'}, secRef:{show:true,icon:'🎸',title:'Referentes musicales'},
+                  secPortfolio:{icon:'🎬',title:'Videos tocando'} },
+    actuacion:  { rolLabel:'Rol', generoLabel:'Disciplina', fallbackRol:'Actor/Actriz',
+                  secGeneros:{icon:'🎭',title:'Disciplina / Escena'}, secRef:{show:false},
+                  secPortfolio:{icon:'🎬',title:'Reel / Demo'} },
+    audiovisual:{ rolLabel:'Perfil', generoLabel:'Especialidad', fallbackRol:'Artista audiovisual',
+                  secGeneros:{icon:'🎬',title:'Especialidades'}, secRef:{show:false},
+                  secPortfolio:{icon:'🎬',title:'Portfolio / Reel'} },
+    modelaje:   { rolLabel:'Tipo de trabajo', generoLabel:'Género', fallbackRol:'Modelo',
+                  secGeneros:{icon:'👗',title:'Tipo de trabajo'}, secRef:{show:false},
+                  secPortfolio:{icon:'📸',title:'Portfolio / Fotos'} },
+    diseno:     { rolLabel:'Rol', generoLabel:'Estilo', fallbackRol:'Diseñador/a',
+                  secGeneros:{icon:'✏️',title:'Estilo / Técnica'}, secRef:{show:false},
+                  secPortfolio:{icon:'🖼️',title:'Portfolio'} },
+    tatuaje:    { rolLabel:'Rol', generoLabel:'Estilo', fallbackRol:'Tatuador/a',
+                  secGeneros:{icon:'🖋️',title:'Estilo de trabajo'}, secRef:{show:false},
+                  secPortfolio:{icon:'📸',title:'Portfolio / Trabajos'} },
+    danza:      { rolLabel:'Rol', generoLabel:'Disciplina', fallbackRol:'Bailarín/a',
+                  secGeneros:{icon:'💃',title:'Disciplina'}, secRef:{show:false},
+                  secPortfolio:{icon:'🎬',title:'Videos / Demo'} },
+    maquillaje: { rolLabel:'Rol', generoLabel:'Especialidad', fallbackRol:'Artista de maquillaje',
+                  secGeneros:{icon:'💄',title:'Especialidad'}, secRef:{show:false},
+                  secPortfolio:{icon:'📸',title:'Portfolio / Trabajos'} },
+    circo:      { rolLabel:'Especialidad', generoLabel:'Modalidad', fallbackRol:'Artista de circo',
+                  secGeneros:{icon:'🎪',title:'Especialidad / Modalidad'}, secRef:{show:false},
+                  secPortfolio:{icon:'🎬',title:'Videos / Demo'} },
+    escritura:  { rolLabel:'Rol', generoLabel:'Formato', fallbackRol:'Escritor/Guionista',
+                  secGeneros:{icon:'✍️',title:'Formato / Especialidad'}, secRef:{show:false},
+                  secPortfolio:{icon:'📄',title:'Portfolio / Publicaciones'} },
+  }
+
+  function getCampoEspecifico(p, secId) {
+    if (!p.campos_especificos) return ''
+    try {
+      const c = typeof p.campos_especificos === 'string' ? JSON.parse(p.campos_especificos) : p.campos_especificos
+      return (c[secId] && c[secId][0]) || ''
+    } catch(e) { return '' }
+  }
+  function getCamposEspecificosArray(p, secId) {
+    if (!p.campos_especificos || !secId) return []
+    try {
+      const c = typeof p.campos_especificos === 'string' ? JSON.parse(p.campos_especificos) : p.campos_especificos
+      return Array.isArray(c[secId]) ? c[secId] : (c[secId] ? [c[secId]] : [])
+    } catch(e) { return [] }
+  }
+  // Claves canónicas de campos_especificos que escribe el REGISTRO, por rubro.
+  // rol = campo principal (header/stat), gen = campo secundario (sección).
+  const CAMPO_KEYS = {
+    musica:     { rol:'',             gen:'' },
+    actuacion:  { rol:'rol',          gen:'tipo_escena' },
+    audiovisual:{ rol:'rol',          gen:'especialidad' },
+    modelaje:   { rol:'tipo_trabajo', gen:'genero' },
+    diseno:     { rol:'rol',          gen:'estilo' },
+    tatuaje:    { rol:'rol',          gen:'estilo' },
+    danza:      { rol:'rol',          gen:'disciplina' },
+    maquillaje: { rol:'rol',          gen:'especialidad' },
+    circo:      { rol:'especialidad', gen:'modalidad' },
+    escritura:  { rol:'rol',          gen:'formato' },
+  }
+
+  // ─── UI del rubro: no depende del perfil, se aplica inmediatamente ───
+  function inicializarRubroUI(rubro) {
+    const config = RUBROS_PERFIL_CONFIG[rubro] || RUBROS_PERFIL_CONFIG.musica
+    document.documentElement.style.setProperty('--neon', RUBRO_COLORS[rubro] || '#d4f53c')
+    const sl1 = document.getElementById('stat-label-1')
+    const sl2 = document.getElementById('stat-label-2')
+    if (sl1) sl1.textContent = config.rolLabel
+    if (sl2) sl2.textContent = config.generoLabel
+    const sgEl = document.getElementById('section-title-generos')
+    if (sgEl) sgEl.innerHTML = `<span class="icon">${config.secGeneros.icon}</span> ${config.secGeneros.title}`
+    const spEl = document.getElementById('section-title-portfolio')
+    if (spEl) spEl.innerHTML = `<span class="icon">${config.secPortfolio.icon}</span> ${config.secPortfolio.title}`
+    const srSec = document.getElementById('section-referentes')
+    if (srSec) srSec.style.display = config.secRef.show ? '' : 'none'
+    // Actualizar el stat-instrumento label también
+    const si = document.getElementById('stat-instrumento')
+    if (si && rubro !== 'musica') si.textContent = config.fallbackRol
+  }
+
+  // Aplicar rubro UI apenas carga la página, antes del fetch async
+  ;(function() {
+    const urlRubro = new URLSearchParams(window.location.search).get('rubro')
+    const rubro = urlRubro || localStorage.getItem('ba_rubro') || 'musica'
+    inicializarRubroUI(rubro)
+  })()
+
+  function aplicarRubroPerfil(rubro, p) {
+    const config = RUBROS_PERFIL_CONFIG[rubro] || RUBROS_PERFIL_CONFIG.musica
+    // Aplicar UI (por si no se llamó antes o el rubro cambió)
+    inicializarRubroUI(rubro)
+
+    // ── Contenido dependiente del perfil ──
+
+    // Instrumento / rol principal
+    const instEl = document.getElementById('perfil-instrumento')
+    if (instEl) {
+      if (rubro === 'musica') {
+        const instrList = (p.instrumento||'').split(',').map(i=>i.trim()).filter(Boolean)
+        instEl.textContent = instrList.join(' · ') || 'Músico'
+      } else {
+        instEl.textContent = getCampoEspecifico(p, (CAMPO_KEYS[rubro]||{}).rol) || config.fallbackRol
+      }
+    }
+
+    // Stat — rol principal
+    const si = document.getElementById('stat-instrumento')
+    if (si) {
+      si.textContent = rubro === 'musica'
+        ? ((p.instrumento||'').split(',')[0]?.trim() || '—')
+        : (getCampoEspecifico(p, (CAMPO_KEYS[rubro]||{}).rol) || config.fallbackRol)
+    }
+
+    // Stat — género / disciplina
+    const sg = document.getElementById('stat-genero')
+    if (sg) {
+      sg.textContent = rubro === 'musica'
+        ? ((p.generos||'').split(',')[0]?.trim() || '—')
+        : (getCampoEspecifico(p, (CAMPO_KEYS[rubro]||{}).gen) || '—')
+    }
+
+    // Sección géneros / disciplinas
+    const genEl = document.getElementById('perfil-generos')
+    if (genEl) {
+      if (rubro === 'musica') {
+        const generos = (p.generos||'').split(',').map(g=>g.trim()).filter(Boolean)
+        genEl.innerHTML = generos.length
+          ? generos.map(g=>`<span class="genero-chip primary">${escapeHtml(g)}</span>`).join('')
+          : '—'
+      } else {
+        const secVals = getCamposEspecificosArray(p, (CAMPO_KEYS[rubro]||{}).gen)
+        genEl.innerHTML = secVals.length
+          ? secVals.map(v=>`<span class="genero-chip primary">${escapeHtml(v)}</span>`).join('')
+          : '—'
+      }
+    }
+
+    // Sección referentes (solo música)
+    if (config.secRef.show) {
+      const srTitle = document.getElementById('section-title-referentes')
+      if (srTitle) srTitle.innerHTML = `<span class="icon">${config.secRef.icon}</span> ${config.secRef.title}`
+      const refEl = document.getElementById('perfil-referentes')
+      if (refEl) {
+        refEl.innerHTML = p.referentes
+          ? p.referentes.split(',').map(r=>`<span class="ref-chip"><span class="ref-icon">${config.secRef.icon}</span>${escapeHtml(r.trim())}</span>`).join('')
+          : '—'
+      }
+    }
+
+    // Tagline
+    const tagline = document.getElementById('perfil-tagline')
+    if (tagline) {
+      let frase = ''
+      if (p.bio) {
+        frase = p.bio.split('.')[0]
+      } else if (rubro === 'musica') {
+        const instr = (p.instrumento||'').split(',')[0]?.trim() || 'Músico'
+        const gen = (p.generos||'').split(',')[0]?.trim() || ''
+        const loc = p.barrio || p.ciudad || ''
+        const busca = (p.disponibilidad||'').split(',')[0]?.trim() || ''
+        frase = `${instr}${gen ? ' de ' + gen : ''}${loc ? ' en ' + loc : ''}${busca ? '. Busca ' + busca.toLowerCase() : ''}`
+      } else {
+        const rol = getCampoEspecifico(p, (CAMPO_KEYS[rubro]||{}).rol) || config.fallbackRol
+        const loc = p.barrio || p.ciudad || ''
+        frase = `${rol}${loc ? ' en ' + loc : ''}`
+      }
+      tagline.textContent = `"${frase}"`
+      tagline.style.color = ''
+      tagline.style.fontStyle = ''
+    }
+  }
+
   // CARGAR PERFIL REAL DESDE URL
   async function cargarPerfilPublico() {
     const params = new URLSearchParams(window.location.search)
@@ -1009,6 +1202,26 @@
       const instrumento = (p.instrumento||'').split(',').map(i=>i.trim()).filter(Boolean)
       const ubicacion = [p.barrio, p.ciudad].filter(Boolean).join(', ')
 
+      // Detectar rubro con cadena de prioridad:
+      // 1. URL param ?rubro=X (pasado desde busqueda.html al clickear "Ver perfil →")
+      // 2. p.rubro de Supabase (disponible el 14/6 tras la migración)
+      // 3. localStorage.ba_rubro (útil para testing con dev_login)
+      // 4. 'musica' como fallback final
+      const urlRubro = new URLSearchParams(window.location.search).get('rubro')
+      const rubro = urlRubro || p.rubro || localStorage.getItem('ba_rubro') || 'musica'
+
+      // Aplicar color, secciones y labels según rubro
+      aplicarRubroPerfil(rubro, p)
+
+      // ¿Estoy viendo mi propio perfil? (sin id en la URL = se cargó mi perfil, o el id coincide con el mío)
+      const esPropio = !params.get('id') || String(p.id) === String(localStorage.getItem('ba_user_id'))
+      if (esPropio) {
+        const cc = document.getElementById('contact-card')
+        if (cc) cc.style.display = 'none'
+        const rl = document.getElementById('report-link')
+        if (rl) rl.style.display = 'none'
+      }
+
       // Hero background name
       const heroBg = document.getElementById('hero-bg-name')
       if (heroBg) heroBg.textContent = (p.nombre||'').split(' ')[0].toUpperCase()
@@ -1016,8 +1229,9 @@
       // Actualizar elementos por ID
       const av = document.getElementById('perfil-avatar')
       if (av) {
-        if (p.foto_url) {
-          av.innerHTML = `<img src="${p.foto_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`
+        const fotoSafe = safeUrl(p.foto_url)
+        if (fotoSafe) {
+          av.innerHTML = `<img src="${escapeHtml(fotoSafe)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`
         } else {
           av.textContent = initials
         }
@@ -1035,43 +1249,24 @@
         }
       }
 
-      const inst = document.getElementById('perfil-instrumento')
-      if (inst) inst.textContent = instrumento.join(' · ') || 'Músico'
-
       const ubi = document.getElementById('perfil-ubicacion')
       if (ubi) ubi.textContent = ubicacion ? '📍 ' + ubicacion : ''
 
       // Bio
       const bioEl = document.getElementById('perfil-bio-text') || document.getElementById('perfil-bio')
-      if (bioEl) bioEl.innerHTML = p.bio ? p.bio.replace(/\n/g,'<br>') : '—'
+      if (bioEl) bioEl.innerHTML = p.bio ? escapeHtml(p.bio).replace(/\n/g,'<br>') : '—'
 
-      // Géneros
-      const generosEl = document.getElementById('perfil-generos')
-      if (generosEl) {
-        generosEl.innerHTML = generos.length
-          ? generos.map(g=>`<span class="genero-chip primary">${g}</span>`).join('')
-          : '—'
-      }
-
-      // Tags (hero)
+      // Tags (hero) — primeros 3 géneros/disciplinas del perfil
       const tags = document.getElementById('perfil-tags')
       if (tags) {
-        tags.innerHTML = generos.slice(0,3).map(g=>`<span class="ptag">${g}</span>`).join('')
-      }
-
-      // Referentes
-      const refsEl = document.getElementById('perfil-referentes') || document.getElementById('perfil-refs')
-      if (refsEl) {
-        refsEl.innerHTML = p.referentes
-          ? p.referentes.split(',').map(r=>`<span class="ref-chip"><span class="ref-icon">🎸</span>${r.trim()}</span>`).join('')
-          : '—'
+        tags.innerHTML = generos.slice(0,3).map(g=>`<span class="ptag">${escapeHtml(g)}</span>`).join('')
       }
 
       // Disponibilidad
       const dispEl = document.getElementById('perfil-disponibilidad')
       if (dispEl) {
         dispEl.innerHTML = p.disponibilidad
-          ? p.disponibilidad.split(',').map(d=>`<span class="disp-chip active">${d.trim()}</span>`).join('')
+          ? p.disponibilidad.split(',').map(d=>`<span class="disp-chip active">${escapeHtml(d.trim())}</span>`).join('')
           : '—'
       }
 
@@ -1079,12 +1274,13 @@
       const videosEl = document.getElementById('perfil-videos')
       if (videosEl && p.videos) {
         const links = p.videos.split(',').map(v=>v.trim()).filter(Boolean)
+          .map(v=>({ url: safeUrl(v), raw: v })).filter(x=>x.url)
         if (links.length) {
-          videosEl.innerHTML = links.map(link=>`
-            <a href="${link}" target="_blank" class="video-item">
+          videosEl.innerHTML = links.map(({url, raw})=>`
+            <a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="video-item">
               <div class="play-btn">▶</div>
-              <div class="video-platform">${link.includes('youtube') ? 'YouTube' : link.includes('instagram') ? 'Instagram' : 'Video'}</div>
-              <div class="video-label">${link}</div>
+              <div class="video-platform">${/youtube|youtu\.be/i.test(url) ? 'YouTube' : /instagram/i.test(url) ? 'Instagram' : 'Video'}</div>
+              <div class="video-label">${escapeHtml(raw)}</div>
             </a>`).join('') + '<div class="video-item-empty">+ Espacio disponible</div>'
         }
       }
@@ -1096,33 +1292,22 @@
         // WhatsApp/celular primero si existe
         if (p.celular) {
           const numeroLimpio = p.celular.replace(/\D/g,'')
-          redesHtml += `<a href="https://wa.me/${numeroLimpio}" target="_blank" class="red-link" style="background:rgba(37,211,102,.1);border-color:rgba(37,211,102,.3);color:#25d366">💬 WhatsApp</a>`
+          redesHtml += `<a href="https://wa.me/${numeroLimpio}" target="_blank" rel="noopener noreferrer" class="red-link" style="background:rgba(37,211,102,.1);border-color:rgba(37,211,102,.3);color:#25d366">💬 WhatsApp</a>`
         }
         if (p.redes) {
           try {
             const redes = JSON.parse(p.redes)
-            const links = Object.entries(redes).filter(([,v])=>v).map(([k,v])=>
-              `<a href="${v.startsWith('http')?v:'https://'+v}" target="_blank" class="red-link">${k} ${v}</a>`
-            )
+            const links = Object.entries(redes).filter(([,v])=>v).map(([k,v])=>{
+              const url = safeUrl(v)
+              if (!url) return ''
+              return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="red-link">${escapeHtml(k)} ${escapeHtml(v)}</a>`
+            })
             redesHtml += links.join('')
           } catch(e) {}
         }
         redesEl.innerHTML = redesHtml || '—'
       }
 
-      // Stats — datos útiles
-      // Instrumento principal
-      const statInstr = document.getElementById('stat-instrumento')
-      if (statInstr) {
-        const instrList = (p.instrumento||'').split(',').map(s=>s.trim()).filter(Boolean)
-        statInstr.textContent = instrList[0] || '—'
-      }
-      // Género principal
-      const statGen = document.getElementById('stat-genero')
-      if (statGen) {
-        const genList = (p.generos||'').split(',').map(s=>s.trim()).filter(Boolean)
-        statGen.textContent = genList[0] || '—'
-      }
       // Años de experiencia
       const statExp = document.getElementById('stat-exp')
       if (statExp) {
@@ -1181,20 +1366,6 @@
       const textarea = document.querySelector('.contact-form textarea')
       if (textarea) textarea.placeholder = `Hola ${p.nombre?.split(' ')[0]}, vi tu perfil y me interesa conectar...`
 
-      // Resumen — usar bio del usuario o generar uno básico
-      const tagline = document.getElementById('perfil-tagline')
-      if (tagline) {
-        const instr = instrumento[0] || 'Músico'
-        const gen = generos[0] || ''
-        const loc = p.barrio || p.ciudad || ''
-        const busca = p.disponibilidad?.split(',')?.[0]?.trim() || ''
-        const frase = p.bio
-          ? p.bio.split('.')[0]  // Primera oración de la bio
-          : `${instr}${gen ? ' de ' + gen : ''}${loc ? ' en ' + loc : ''}${busca ? '. Busca ' + busca.toLowerCase() : ''}.`
-        tagline.textContent = `"${frase}"`
-        tagline.style.color = ''
-        tagline.style.fontStyle = ''
-      }
     } catch(e) { console.error('Error cargando perfil:', e) }
   }
 
@@ -1227,11 +1398,11 @@
       const paraId = params.get('id')
 
       if (!paraId) {
-        // Sin ID en URL, solo mostrar confirmación visual
-        btn.textContent = '✓ Mensaje enviado'
-        btn.style.background = '#a8c832'
-        ta.value = ''
-        setTimeout(()=>{ btn.textContent='Enviar →'; btn.style.background=''; btn.style.opacity='1'; btn.disabled=false }, 2000)
+        // Sin ID en la URL no hay destinatario: no fingir que se envió
+        btn.textContent = 'Enviar →'
+        btn.style.opacity = '1'
+        btn.disabled = false
+        alert('No se pudo identificar el perfil a contactar. Volvé a abrir el perfil desde la búsqueda e intentá de nuevo.')
         return
       }
 
@@ -1339,6 +1510,59 @@
   });
   function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');window.location.href='index.html';}
 
+  // ─── REPORTAR PERFIL ───
+  let reportMotivo = '';
+  function abrirReporte() {
+    const ov = document.getElementById('report-overlay');
+    if (ov) ov.classList.add('open');
+  }
+  function cerrarReporte() {
+    const ov = document.getElementById('report-overlay');
+    if (ov) ov.classList.remove('open');
+  }
+  function selectMotivo(btn, motivo) {
+    reportMotivo = motivo;
+    document.querySelectorAll('.report-option').forEach(b => b.classList.remove('selected'));
+    if (btn) btn.classList.add('selected');
+    const send = document.getElementById('btn-send-report');
+    if (send) send.disabled = false;
+  }
+  async function enviarReporte() {
+    if (!reportMotivo) return;
+    const send = document.getElementById('btn-send-report');
+    const detalle = document.getElementById('report-detail')?.value?.trim() || '';
+    const params = new URLSearchParams(window.location.search);
+    const perfilId = params.get('id') || '';
+    const perfilNombre = (document.getElementById('perfil-nombre')?.textContent || '').replace(/\s+/g, ' ').trim();
+    if (send) { send.textContent = 'Enviando...'; send.disabled = true; }
+    try {
+      await fetch('/.netlify/functions/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tipo: 'reporte',
+          datos: {
+            perfil_id: perfilId,
+            perfil_nombre: perfilNombre,
+            motivo: reportMotivo,
+            detalle: detalle,
+            reportado_por: localStorage.getItem('ba_user_id') || 'anónimo',
+            url: window.location.href
+          }
+        })
+      });
+    } catch (e) {
+      console.error('Error enviando reporte:', e);
+    }
+    // El reporte es best-effort: confirmamos al usuario aunque el email falle del lado del servidor
+    const formC = document.getElementById('report-form-content');
+    const successC = document.getElementById('report-success');
+    if (formC) formC.style.display = 'none';
+    if (successC) successC.style.display = 'block';
+    setTimeout(cerrarReporte, 2500);
+  }
+
+
 </script>
 <div class="mbn-overlay" id="mbn-overlay" onclick="closeMbnPanel()"></div>
 <div class="mbn-panel" id="mbn-panel">
@@ -1360,11 +1584,11 @@
   </a>
 </div>
 <div class="mobile-bottom-nav" id="mobile-bottom-nav">
-  <a href="buscARTE_busqueda.html" class="mbn-item" data-page="busqueda"><span class="mbn-icon">🎵</span><span>Músicos</span></a>
+  <a href="buscARTE_busqueda.html" class="mbn-item" data-page="busqueda"><span class="mbn-icon">🎨</span><span>Artistas</span></a>
   <a href="buscARTE_anuncios.html" class="mbn-item" data-page="anuncios"><span class="mbn-icon">📋</span><span>Anuncios</span></a>
   <a href="buscARTE_mensajes.html" class="mbn-item" data-page="mensajes"><span class="mbn-icon">💬</span><span>Mensajes</span></a>
   <button class="mbn-item" onclick="toggleMbnPanel()" style="background:none;border:none;flex:1;padding:0;" data-page="perfil"><span class="mbn-icon">👤</span><span>Mi perfil</span></button>
-</nav>
+</div>
 <script>
 (function(){
   var uid = localStorage.getItem('ba_user_id');

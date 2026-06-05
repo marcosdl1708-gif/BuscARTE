@@ -218,7 +218,7 @@
 
   @media (max-width:900px) {
     .mobile-bottom-nav {
-      display:flex; position:fixed; bottom:0; left:0; right:0;
+      display:flex; position:fixed; top:auto; bottom:0; left:0; right:0;
       background:#0f0f0f; border-top:1px solid #2a2a2a;
       z-index:500; height:54px;
     }
@@ -446,9 +446,9 @@
 <div class="demo-bar" id="demo-bar" style="display:none">
   <span class="demo-label">✦ Vista previa</span>
   <div class="demo-tabs">
-    <button class="demo-tab active" onclick="showView('busco',this)">Busco músico</button>
+    <button class="demo-tab active" onclick="showView('busco',this)">Busco artista</button>
     <button class="demo-tab" onclick="showView('ofrezco',this)">Me ofrezco</button>
-    <button class="demo-tab" onclick="showView('jam',this)">Jam / Zapada</button>
+    <button class="demo-tab" onclick="showView('jam',this)">Jam / Evento</button>
     <button class="demo-tab" onclick="showView('vende',this)">Vendo / Alquilo</button>
   </div>
 </div>
@@ -929,9 +929,22 @@
   const hdrs = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }
 
   const BADGES = { busco:'badge-busco', ofrezco:'badge-ofrezco', jam:'badge-jam', vende:'badge-vendo', vendo:'badge-vendo', clases:'badge-clases' }
-  const LABELS = { busco:'🔍 Busco músico', ofrezco:'🎸 Me ofrezco', jam:'🥁 Jam / Zapada', vende:'🎛️ Vendo / Alquilo', vendo:'🎛️ Vendo / Alquilo', clases:'🎓 Doy clases' }
+  const LABELS = { busco:'🔍 Busco artista', ofrezco:'🙋 Me ofrezco', jam:'📅 Jam / Evento', vende:'🛒 Vendo / Alquilo', vendo:'🛒 Vendo / Alquilo', clases:'🎓 Doy clases' }
   const ACTION_TITLES = { busco:'Responder al anuncio', ofrezco:'Contactar', jam:'Me apunto', vende:'Consultar al vendedor', vendo:'Consultar al vendedor', clases:'Consultar por clases' }
   const ACTION_BTNS = { busco:'Enviar respuesta →', ofrezco:'Enviar mensaje →', jam:'Confirmar asistencia →', vende:'Enviar consulta →', vendo:'Enviar consulta →', clases:'Enviar consulta →' }
+
+  const RUBRO_COLORS = {
+    musica:     { bg:'#0d2010', text:'#d4f53c' },
+    actuacion:  { bg:'#2a0a08', text:'#ff6b5b' },
+    audiovisual:{ bg:'#080d2a', text:'#5b9fff' },
+    modelaje:   { bg:'#051f1a', text:'#4de8c4' },
+    diseno:     { bg:'#1f1208', text:'#ffaa5b' },
+    tatuaje:    { bg:'#1a0525', text:'#c45bff' },
+    danza:      { bg:'#051520', text:'#5bd4ff' },
+    maquillaje: { bg:'#1f1008', text:'#e8a84a' },
+    circo:      { bg:'#1f1a05', text:'#ffdd5b' },
+    escritura:  { bg:'#0f1f08', text:'#a0d47b' },
+  }
 
   function normalizarTipo(tipo) {
     return tipo === 'vendo' ? 'vende' : (tipo || 'busco')
@@ -1012,7 +1025,7 @@
 
     return `<div class="sidebar-card is-contact contact-anchor-offset" id="contact-card">
       <div class="sidebar-card-title">${escapeHtml(title)}</div>
-      <div class="sidebar-card-sub">${tipo === 'jam' ? 'Confirmá asistencia y contale al organizador qué instrumento traés.' : tipo === 'vende' ? 'Consultá antes de coordinar una compra, prueba o retiro.' : tipo === 'clases' ? 'Preguntá horarios, modalidad y disponibilidad.' : 'Contale quién sos y por qué te interesa.'}</div>
+      <div class="sidebar-card-sub">${tipo === 'jam' ? 'Confirmá asistencia y contale al organizador cómo participás.' : tipo === 'vende' ? 'Consultá antes de coordinar una compra, prueba o retiro.' : tipo === 'clases' ? 'Preguntá horarios, modalidad y disponibilidad.' : 'Contale quién sos y por qué te interesa.'}</div>
       <div class="contact-form">${loginBlock}</div>
     </div>`
   }
@@ -1112,18 +1125,20 @@
     if (countEl) countEl.textContent = Math.max(0, parseInt(countEl.textContent || 0) + (yaActivo ? -1 : 1))
 
     try {
+      let res
       if (yaActivo) {
-        await fetch(
+        res = await fetch(
           `${SUPABASE_URL}/rest/v1/reacciones?anuncio_id=eq.${encodeURIComponent(anuncioId)}&user_id=eq.${encodeURIComponent(miId)}&tipo=eq.${tipo}`,
           { method:'DELETE', headers: hdrs }
         )
       } else {
-        await fetch(`${SUPABASE_URL}/rest/v1/reacciones`, {
+        res = await fetch(`${SUPABASE_URL}/rest/v1/reacciones`, {
           method:'POST',
           headers: { ...hdrs, 'Content-Type':'application/json', 'Prefer':'return=minimal' },
           body: JSON.stringify({ anuncio_id: parseInt(anuncioId), user_id: parseInt(miId), tipo })
         })
       }
+      if (!res.ok) throw new Error('reaccion ' + res.status)
     } catch(e) {
       // Revert on error
       reaccionesState[tipo] = yaActivo
@@ -1139,16 +1154,17 @@
 
   function autorSidebar(a, autor) {
     const i = initials(autor.nombre)
+    const rc = RUBRO_COLORS[autor.rubro || 'musica'] || RUBRO_COLORS.musica
     return `<div class="sidebar-card">
       <div class="sidebar-card-title">Publicado por</div>
-      <a href="buscARTE_perfil_publico.html?id=${encodeURIComponent(a.user_id || '')}" class="autor-card">
-        <div class="autor-avatar-big" style="background:#0d2010;color:var(--neon)">${escapeHtml(i)}</div>
+      <a href="buscARTE_perfil_publico.html?id=${encodeURIComponent(a.user_id || '')}${autor.rubro ? '&rubro=' + encodeURIComponent(autor.rubro) : ''}" class="autor-card">
+        <div class="autor-avatar-big" style="background:${rc.bg};color:${rc.text}">${escapeHtml(i)}</div>
         <div class="autor-info">
           <div class="autor-nombre">${escapeHtml(autor.nombre || 'Usuario')}</div>
-          <div class="autor-meta">${escapeHtml(autor.instrumento || 'Usuario de buscARTE')}${autor.ciudad ? ' · '+escapeHtml(autor.ciudad) : ''}</div>
+          <div class="autor-meta">${escapeHtml(autor.instrumento || 'Artista en buscARTE')}${autor.ciudad ? ' · '+escapeHtml(autor.ciudad) : ''}</div>
         </div>
       </a>
-      ${a.user_id ? `<a href="buscARTE_perfil_publico.html?id=${encodeURIComponent(a.user_id)}" class="btn-ver-perfil">Ver perfil →</a>` : ''}
+      ${a.user_id ? `<a href="buscARTE_perfil_publico.html?id=${encodeURIComponent(a.user_id)}${autor.rubro ? '&rubro=' + encodeURIComponent(autor.rubro) : ''}" class="btn-ver-perfil">Ver perfil →</a>` : ''}
       <a href="buscARTE_contacto.html" class="report-link">⚑ Reportar anuncio</a>
     </div>`
   }
@@ -1212,11 +1228,23 @@
     const badge = BADGES[tipo] || 'badge-busco'
     const i = initials(autor.nombre)
     const zona = a.zona || a.lugar || ''
+
+    // ── Aplicar color del rubro ──
+    // Para "busco", el color es el del rubro buscado (tablón donde aparece); si no, el del autor.
+    const rubroColorKey = (tipo === 'busco' && a.rubro_buscado) ? a.rubro_buscado : (autor.rubro || a.rubro || 'musica')
+    const rc = RUBRO_COLORS[rubroColorKey] || RUBRO_COLORS.musica
+    document.documentElement.style.setProperty('--neon', rc.text)
+    const prevStyle = document.getElementById('rubro-detail-style')
+    if (prevStyle) prevStyle.remove()
+    const rubroStyle = document.createElement('style')
+    rubroStyle.id = 'rubro-detail-style'
+    rubroStyle.textContent = `.detail-hero-card { background: linear-gradient(135deg, ${rc.text}0B, rgba(255,255,255,.015) 38%, rgba(0,0,0,.02)) !important; } .detail-hero-card::after { background: radial-gradient(circle, ${rc.text}13, transparent 65%) !important; }`
+    document.head.appendChild(rubroStyle)
     const tags = [a.instrumentos, a.instrumento, a.generos, a.categoria_producto, a.nivel, a.modalidad].filter(Boolean).join(',').split(',').map(t=>t.trim()).filter(Boolean)
     const tagsHTML = [...new Set(tags)].map(t=>`<span class="dtag dtag-neon">${escapeHtml(t)}</span>`).join('')
     const tipoParam = tipo === 'vende' ? 'vende' : tipo
     const actionTitle = ACTION_TITLES[tipo] || 'Contactar'
-    const statusLabel = tipo === 'jam' ? 'Evento publicado' : tipo === 'vende' ? 'Marketplace musical' : tipo === 'clases' ? 'Clases disponibles' : 'Anuncio activo'
+    const statusLabel = tipo === 'jam' ? 'Evento publicado' : tipo === 'vende' ? 'Marketplace' : tipo === 'clases' ? 'Clases disponibles' : 'Anuncio activo'
     const precio = a.precio ? (String(a.precio).startsWith('$') ? a.precio : '$'+a.precio) : ''
     const f = tipo === 'jam' ? formatFechaEvento(a.fecha_evento) : null
     const quickItems = []
@@ -1282,9 +1310,9 @@
               <div class="similar-meta">Tablón de anuncios</div>
             </a>
             <a href="buscARTE_busqueda.html" class="similar-item">
-              <span class="similar-badge badge-jam" style="background:rgba(212,245,60,.08);color:var(--neon);border:1px solid rgba(212,245,60,.18);">🎵 Músicos</span>
-              <div class="similar-titulo">Explorar músicos de la comunidad</div>
-              <div class="similar-meta">Búsqueda por instrumento y zona</div>
+              <span class="similar-badge badge-jam" style="background:rgba(212,245,60,.08);color:var(--neon);border:1px solid rgba(212,245,60,.18);">🎨 Artistas</span>
+              <div class="similar-titulo">Explorar artistas de la comunidad</div>
+              <div class="similar-meta">Búsqueda por rubro, zona y especialidad</div>
             </a>
           </div>
         </div>
@@ -1324,9 +1352,20 @@
       const a = Array.isArray(arr) ? arr[0] : null
       if (!a) { mostrarError('Anuncio no encontrado.'); return }
 
+      // No mostrar anuncios pausados/vencidos/eliminados/ocultos por link directo (salvo al dueño)
+      const miIdView = localStorage.getItem('ba_user_id')
+      const esDueno = miIdView && String(a.user_id) === String(miIdView)
+      const estadoA = String(a.estado || '').toLowerCase().trim()
+      const ocultoA = a.oculto === true || String(a.oculto || '').toLowerCase() === 'true'
+      const inactivo = ocultoA || (estadoA && !['activo','activa','publicado','publicada'].includes(estadoA))
+      if (inactivo && !esDueno) {
+        mostrarError('Este anuncio ya no está disponible.')
+        return
+      }
+
       let autor = { nombre: 'Usuario', instrumento: 'Usuario de buscARTE', ciudad: '' }
       if (a.user_id) {
-        const pRes = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${encodeURIComponent(a.user_id)}&select=id,nombre,instrumento,ciudad`, { headers: hdrs })
+        const pRes = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${encodeURIComponent(a.user_id)}&select=id,nombre,instrumento,ciudad,rubro`, { headers: hdrs })
         if (pRes.ok) {
           const perfiles = await pRes.json()
           if (Array.isArray(perfiles) && perfiles[0]) autor = perfiles[0]
@@ -1411,7 +1450,7 @@
       const msgRes = await fetch(`${SUPABASE_URL}/rest/v1/mensajes`, {
         method: 'POST',
         headers: { ...hdrs, 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ de_user_id: dbId(miId), para_user_id: dbId(paraId), contenido: texto })
+        body: JSON.stringify({ de_user_id: dbId(miId), para_user_id: dbId(paraId), anuncio_id: dbId(anuncioId), contenido: texto })
       })
       if (!msgRes.ok) throw new Error(await msgRes.text())
 
@@ -1539,7 +1578,7 @@
   </a>
 </div>
 <nav class="mobile-bottom-nav" id="mobile-bottom-nav">
-  <a href="buscARTE_busqueda.html" class="mbn-item" data-page="busqueda"><span class="mbn-icon">🎵</span><span>Músicos</span></a>
+  <a href="buscARTE_busqueda.html" class="mbn-item" data-page="busqueda"><span class="mbn-icon">🎨</span><span>Artistas</span></a>
   <a href="buscARTE_anuncios.html" class="mbn-item" data-page="anuncios"><span class="mbn-icon">📋</span><span>Anuncios</span></a>
   <a href="buscARTE_mensajes.html" class="mbn-item" data-page="mensajes"><span class="mbn-icon">💬</span><span>Mensajes</span></a>
   <button class="mbn-item" onclick="toggleMbnPanel()" style="background:none;border:none;flex:1;padding:0;" data-page="perfil"><span class="mbn-icon">👤</span><span>Mi perfil</span></button>

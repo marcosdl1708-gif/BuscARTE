@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex, nofollow">
 <title>buscARTE — Configurar perfil</title>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
@@ -732,6 +731,36 @@
     .nav-dropdown { display: none !important; }
   }
 
+  /* RUBRO SWITCHER MODAL */
+  .rubro-modal-overlay {
+    position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:600;
+    display:none;align-items:center;justify-content:center;padding:1rem;
+  }
+  .rubro-modal-overlay.open { display:flex; }
+  .rubro-modal {
+    background:var(--negro2);border:1px solid #2a2a2a;
+    padding:2rem;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;
+    position:relative;
+  }
+  .rubro-modal-title { font-family:var(--font-display);font-size:1.3rem;margin-bottom:.4rem;letter-spacing:-.02em; }
+  .rubro-modal-sub { color:var(--gris);font-size:.82rem;margin-bottom:1.5rem;line-height:1.5; }
+  .rubro-modal-grid { display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:1.2rem; }
+  .rubro-modal-btn {
+    border:1px solid #2a2a2a;background:transparent;color:var(--gris);
+    padding:.85rem 1rem;display:flex;align-items:center;gap:.6rem;
+    font-family:var(--font-body);font-size:.82rem;cursor:pointer;
+    transition:all .15s;text-align:left;width:100%;
+  }
+  .rubro-modal-btn:hover { border-color:#555;color:var(--blanco); }
+  .rubro-modal-btn.current { border-color:var(--neon);color:var(--neon);background:rgba(212,245,60,.05); }
+  .rubro-modal-btn .rmb-emoji { font-size:1.2rem;flex-shrink:0; }
+  .rubro-modal-close {
+    position:absolute;top:.8rem;right:.8rem;background:none;border:none;
+    color:var(--gris);font-size:1.2rem;cursor:pointer;padding:.3rem .5rem;transition:color .15s;
+  }
+  .rubro-modal-close:hover { color:var(--blanco); }
+  .rubro-modal-note { font-size:.75rem;color:var(--gris2);line-height:1.5;padding-top:.8rem;border-top:1px solid #1c1c1c; }
+
   /* CODEO perfil fixes */
   .form-status {
     display:none;
@@ -760,6 +789,9 @@
     .photo-upload-zone { width:100% !important; }
     .redes-grid { grid-template-columns:1fr !important; }
     .disponibilidad-grid { grid-template-columns:1fr !important; }
+    /* Mi rubro section */
+    #mi-rubro { padding-bottom: 1.5rem; }
+    #mi-rubro-contenido .chips { gap: .35rem !important; }
     .save-bar {
       bottom:54px !important;
       padding:.85rem 1rem !important;
@@ -786,7 +818,7 @@
 <nav>
   <a href="index.html" class="nav-logo">busc<span>ARTE</span></a>
   <ul class="nav-links" style="list-style:none;display:flex;gap:2rem">
-    <li><a href="buscARTE_busqueda.html" class="nav-link">Músicos</a></li>
+    <li><a href="buscARTE_busqueda.html" class="nav-link" id="nav-link-tablón">Artistas</a></li>
     <li><a href="buscARTE_anuncios.html" class="nav-link">Anuncios</a></li>
     <li><a href="buscARTE_mensajes.html" class="nav-link">Mensajes</a></li>
   </ul>
@@ -824,7 +856,7 @@
       <div class="preview-label">Tu perfil</div>
       <div class="preview-avatar" id="sidebar-avatar">?</div>
       <div class="preview-name" id="sidebar-nombre">Tu nombre</div>
-      <div class="preview-meta" id="sidebar-meta">Músico · —</div>
+      <div class="preview-meta" id="sidebar-meta">Artista · —</div>
       <div class="preview-complete">
         <span>45%</span>
         <div class="complete-bar"><div class="complete-fill" id="complete-fill"></div></div>
@@ -832,15 +864,30 @@
       </div>
     </div>
 
+    <div class="sidebar-section" id="sidebar-rubro-section">
+      <div class="sidebar-label">Perfil activo</div>
+      <div id="sidebar-rubro-display" style="padding:.4rem .5rem .8rem;display:flex;align-items:center;gap:.5rem;">
+        <span id="sidebar-rubro-emoji-display" style="font-size:1.1rem">🎵</span>
+        <span id="sidebar-rubro-nombre-display" style="font-size:.82rem;color:var(--blanco)">Música</span>
+      </div>
+      <button class="sidebar-link" onclick="abrirSelectorRubro()" style="width:100%;background:none;border:none;font-family:var(--font-body);text-align:left;cursor:pointer">
+        <span class="icon">🔄</span> Cambiar rubro
+      </button>
+      <button class="sidebar-link" onclick="agregarRubro()" style="display:none;width:100%;background:none;border:none;font-family:var(--font-body);text-align:left;cursor:pointer">
+        <span class="icon">➕</span> Agregar otro rubro
+      </button>
+    </div>
+
     <div class="sidebar-section">
       <div class="sidebar-label">Configuración</div>
       <a href="#foto" class="sidebar-link active" onclick="setActive(this)"><span class="icon">📷</span> Foto y bio</a>
-      <a href="#musica" class="sidebar-link" onclick="setActive(this)"><span class="icon">🎸</span> Mi música</a>
+      <a href="#mi-rubro" class="sidebar-link" id="sidebar-link-mi-rubro" style="display:none" onclick="setActive(this)"><span class="icon" id="sidebar-rubro-icon">🎨</span> <span id="sidebar-rubro-label">Mi rubro</span></a>
+      <a href="#musica" class="sidebar-link" id="sidebar-link-musica" onclick="setActive(this)"><span class="icon">🎸</span> Mi música</a>
       <a href="#disponibilidad" class="sidebar-link" onclick="setActive(this)"><span class="icon">📅</span> Disponibilidad</a>
-      <a href="#ensayo" class="sidebar-link" onclick="setActive(this)"><span class="icon">📍</span> Dónde ensayar</a>
+      <a href="#ensayo" class="sidebar-link" id="sidebar-link-ensayo" onclick="setActive(this)"><span class="icon">📍</span> Dónde ensayar</a>
       <a href="#redes" class="sidebar-link" onclick="setActive(this)"><span class="icon">🔗</span> Redes y links</a>
-      <a href="#videos" class="sidebar-link" onclick="setActive(this)"><span class="icon">🎬</span> Mis videos</a>
-      <a href="#referentes-section" class="sidebar-link" onclick="setActive(this)"><span class="icon">🎵</span> Mis referentes</a>
+      <a href="#videos" class="sidebar-link" onclick="setActive(this)"><span class="icon">🎬</span> <span id="sidebar-videos-label">Portfolio / videos</span></a>
+      <a href="#referentes-section" class="sidebar-link" id="sidebar-link-referentes" onclick="setActive(this)"><span class="icon">🎵</span> Mis referentes</a>
     </div>
 
     <div class="sidebar-section">
@@ -857,11 +904,11 @@
     <div class="page-header">
       <div class="page-label">Tu espacio en buscARTE</div>
       <div class="page-title">CONFIGURAR<br>PERFIL</div>
-      <p class="page-sub">Completá tu perfil para aparecer en más búsquedas y conectar con músicos afines. Cuanto más completo, mejor el matching.</p>
+      <p class="page-sub">Completá tu perfil para aparecer en más búsquedas y conectar con artistas afines. Cuanto más completo, mejor el matching.</p>
       <div class="profile-coach">
         <div>
           <div class="coach-kicker">Prioridad buscARTE</div>
-          <div class="coach-text">Foto, bio, instrumentos, géneros, referentes y al menos un video hacen que tu perfil sea mucho más fácil de entender y contactar.</div>
+          <div class="coach-text" id="coach-text">Foto, bio y completar tu rubro hacen que tu perfil sea mucho más fácil de entender y contactar.</div>
         </div>
         <div class="coach-actions">
           <a href="buscARTE_perfil_publico.html" class="coach-link primary" id="quick-public-link">Ver perfil público</a>
@@ -944,46 +991,22 @@
         </select>
       </div>
 
-      <div class="field-row">
-        <div class="field">
-          <label>Edad <span class="optional">opcional</span></label>
-          <input type="number" id="edad-input" placeholder="Ej: 26" min="15" max="80" oninput="showSaveBar()">
-        </div>
-        <div class="field">
-          <label>Género musical principal</label>
-          <select id="genero-principal" oninput="showSaveBar()">
-            <option value="">Seleccioná uno</option>
-            <option>Rock Nacional</option>
-            <option>Jazz</option>
-            <option>Metal</option>
-            <option>Folklore</option>
-            <option>Tango</option>
-            <option>Indie</option>
-            <option>Pop</option>
-            <option>Cumbia</option>
-            <option>Electrónica</option>
-            <option>House</option>
-            <option>Tech House</option>
-            <option>Techno</option>
-            <option>Trance</option>
-            <option>Melodic House</option>
-            <option>Blues</option>
-            <option>Funk</option>
-            <option>Soul</option>
-            <option>R&amp;B</option>
-            <option>Reggae</option>
-            <option>Hip Hop</option>
-            <option>Clásica</option>
-            <option>Fusión</option>
-            <option>Bossanova</option>
-            <option>Variado</option>
-            <option>Otro</option>
-          </select>
-        </div>
+      <div class="field">
+        <label>Edad <span class="optional">opcional</span></label>
+        <input type="number" id="edad-input" placeholder="Ej: 26" min="15" max="80" oninput="showSaveBar()">
       </div>
     </div>
 
-    <!-- MI MÚSICA -->
+    <!-- MI RUBRO (rubros no musicales — se muestra/oculta vía JS) -->
+    <div class="config-section" id="mi-rubro" style="display:none">
+      <div class="section-title"><span class="s-icon" id="mi-rubro-icon">🎨</span> <span id="mi-rubro-titulo">Mi rubro</span></div>
+      <p class="section-desc" id="mi-rubro-desc">Completá los datos de tu disciplina artística para aparecer en las búsquedas correctas.</p>
+      <div id="mi-rubro-contenido">
+        <!-- Se rellena dinámicamente según el rubro -->
+      </div>
+    </div>
+
+    <!-- MI MÚSICA (solo para músicos) -->
     <div class="config-section" id="musica">
       <div class="section-title"><span class="s-icon">🎸</span> Mi música</div>
       <p class="section-desc">Cuanto más detallado, mejor el matching. Esto es lo que la IA de buscARTE usa para conectarte con músicos afines.</p>
@@ -1116,38 +1139,8 @@
     <div class="config-section" id="disponibilidad">
       <div class="section-title"><span class="s-icon">📅</span> Disponibilidad</div>
       <p class="section-desc">¿Para qué estás disponible? Podés elegir varias opciones.</p>
-
-      <div class="disponibilidad-grid">
-        <button class="disp-card" onclick="toggleDisp(this)">
-          <span class="disp-icon">🎸</span>
-          <span class="disp-title">Banda estable</span>
-          <span class="disp-desc">Busco o me sumo a una banda con proyección</span>
-        </button>
-        <button class="disp-card" onclick="toggleDisp(this)">
-          <span class="disp-icon">🎤</span>
-          <span class="disp-title">Proyecto propio</span>
-          <span class="disp-desc">Tengo un proyecto y busco músicos</span>
-        </button>
-        <button class="disp-card" onclick="toggleDisp(this)">
-          <span class="disp-icon">🎹</span>
-          <span class="disp-title">Sesiones</span>
-          <span class="disp-desc">Disponible para grabar o tocar en shows</span>
-        </button>
-        <button class="disp-card" onclick="toggleDisp(this)">
-          <span class="disp-icon">🥁</span>
-          <span class="disp-title">Zapada / Jam</span>
-          <span class="disp-desc">Sin compromiso, tocar y pasarla bien</span>
-        </button>
-        <button class="disp-card" onclick="toggleDisp(this)">
-          <span class="disp-icon">🎓</span>
-          <span class="disp-title">Clases</span>
-          <span class="disp-desc">Doy o busco clases de mi instrumento</span>
-        </button>
-        <button class="disp-card" onclick="toggleDisp(this)">
-          <span class="disp-icon">🎙️</span>
-          <span class="disp-title">Producción</span>
-          <span class="disp-desc">Busco productor o colaboro en estudio</span>
-        </button>
+      <div class="disponibilidad-grid" id="disponibilidad-grid">
+        <!-- Siempre se rellena vía renderDisponibilidad() en initPerfil() -->
       </div>
     </div>
 
@@ -1235,10 +1228,10 @@
       </div>
     </div>
 
-    <!-- VIDEOS -->
+    <!-- VIDEOS / PORTFOLIO -->
     <div class="config-section" id="videos">
-      <div class="section-title"><span class="s-icon">🎬</span> Mis videos tocando</div>
-      <p class="section-desc">Esta es tu vidriera. Mostrá cómo tocás y diferenciarte del resto.</p>
+      <div class="section-title"><span class="s-icon">🎬</span> <span id="videos-section-title">Portfolio / videos</span></div>
+      <p class="section-desc" id="videos-section-desc">Esta es tu vidriera. Mostrá tu trabajo y diferenciarte del resto.</p>
 
       <div class="videos-highlight">
         <div class="videos-highlight-header">
@@ -1262,15 +1255,15 @@
       <div id="video-links">
         <div class="video-link-row">
           <div class="video-num">01</div>
-          <input class="video-link-input" type="url" placeholder="Pegá acá el link de tu video tocando..." oninput="onVideoInput(this)">
+          <input class="video-link-input" type="url" placeholder="Pegá acá el link de tu video o portfolio..." oninput="onVideoInput(this)">
         </div>
         <div class="video-link-row">
           <div class="video-num">02</div>
-          <input class="video-link-input" type="url" placeholder="Pegá acá el link de tu video tocando..." oninput="onVideoInput(this)">
+          <input class="video-link-input" type="url" placeholder="Pegá acá el link de tu video o portfolio..." oninput="onVideoInput(this)">
         </div>
         <div class="video-link-row">
           <div class="video-num">03</div>
-          <input class="video-link-input" type="url" placeholder="Pegá acá el link de tu video tocando..." oninput="onVideoInput(this)">
+          <input class="video-link-input" type="url" placeholder="Pegá acá el link de tu video o portfolio..." oninput="onVideoInput(this)">
         </div>
       </div>
       <p class="hint">💡 Tip: los perfiles con al menos un video reciben 3 veces más mensajes. Vale la pena subir aunque sea uno.</p>
@@ -1287,6 +1280,21 @@
     </div>
 
   </main>
+</div>
+
+<!-- MODAL SELECTOR DE RUBRO -->
+<div class="rubro-modal-overlay" id="rubro-modal-overlay" onclick="if(event.target===this)cerrarSelectorRubro()">
+  <div class="rubro-modal">
+    <button class="rubro-modal-close" onclick="cerrarSelectorRubro()">✕</button>
+    <div class="rubro-modal-title">¿Qué perfil querés configurar?</div>
+    <p class="rubro-modal-sub">Cada rubro tiene su propio perfil, campos y tablón. Elegí cuál querés editar ahora.</p>
+    <div class="rubro-modal-grid" id="rubro-modal-grid">
+      <!-- Se rellena por JS -->
+    </div>
+    <div class="rubro-modal-note">
+      💡 Podés tener tantos perfiles como rubros quieras. Los cambios se guardan por separado para cada uno. La actualización completa de perfiles múltiples llega el 14 de junio.
+    </div>
+  </div>
 </div>
 
 <!-- SAVE BAR -->
@@ -1313,7 +1321,315 @@
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68'
   const hdrs = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }
 
+  // DETECCIÓN DE RUBRO
+  const rubroActivo = localStorage.getItem('ba_rubro') || 'musica';
+  const tipoCuentaActivo = localStorage.getItem('ba_tipo_cuenta') || 'artista';
+
   let isLoadingProfile = true;
+
+  // ═══════════════════════════════════════
+  // INIT PERFIL — adapta la página al rubro
+  // ═══════════════════════════════════════
+  const RUBROS_PERFIL_CONFIG = {
+    musica: {
+      emoji: '🎸', label: 'Música',
+      sidebarLabel: 'Mi música',
+      coachText: 'Foto, bio, instrumentos, géneros, referentes y al menos un video hacen que tu perfil sea mucho más fácil de entender y contactar.',
+      videosTitle: 'Mis videos tocando',
+      videosDesc: 'Esta es tu vidriera. Mostrá cómo tocás y diferenciarte del resto.',
+      disponibilidad: [
+        { icon:'🎸', title:'Banda estable', desc:'Busco o me sumo a una banda con proyección' },
+        { icon:'🎤', title:'Proyecto propio', desc:'Tengo un proyecto y busco músicos' },
+        { icon:'🎹', title:'Sesiones', desc:'Disponible para grabar o tocar en shows' },
+        { icon:'🥁', title:'Zapada / Jam', desc:'Sin compromiso, tocar y pasarla bien' },
+        { icon:'🎓', title:'Clases', desc:'Doy o busco clases de mi instrumento' },
+        { icon:'🎙️', title:'Producción', desc:'Busco productor o colaboro en estudio' },
+      ],
+    },
+    actuacion: {
+      emoji: '🎭', label: 'Actuación & escena',
+      coachText: 'Foto, bio, tu rol y al menos un reel hacen que tu perfil destaque en castings y proyectos.',
+      videosTitle: 'Mi reel / portfolio',
+      videosDesc: 'Mostrá tu trabajo. Un reel o video de actuación multiplica tus contactos.',
+      disponibilidad: [
+        { icon:'🎭', title:'Busco obra/proyecto', desc:'Quiero sumarme a un proyecto teatral' },
+        { icon:'🎬', title:'Proyecto propio', desc:'Tengo mi propio proyecto' },
+        { icon:'🎯', title:'Disponible para castings', desc:'Abierto/a a propuestas puntuales' },
+        { icon:'🎓', title:'Doy clases', desc:'Doy clases de actuación' },
+        { icon:'🤝', title:'Colaboración', desc:'Busco colaborar con otros artistas' },
+      ],
+      secciones: [
+        { label:'¿Cuál es tu rol?', id:'chips-rol-act', chips:['Actor/Actriz','Actor de voz / Doblajista','Director','Dramaturgo','Productor teatral','Asistente de dirección'] },
+        { label:'Tipo de escena', id:'chips-escena', chips:['Drama','Comedia','Teatro musical','Stand-up','Impro','Infantil','Experimental','Terror','Monólogo','Circo-teatro'] },
+      ]
+    },
+    audiovisual: {
+      emoji: '🎬', label: 'Audiovisual & fotografía',
+      coachText: 'Foto, bio, tu especialidad y un buen reel o portfolio son tu carta de presentación.',
+      videosTitle: 'Mi reel / portfolio',
+      videosDesc: 'Pegá links de tus mejores trabajos. Un reel vale más que mil palabras.',
+      disponibilidad: [
+        { icon:'🎬', title:'Busco proyectos', desc:'Quiero colaborar en producciones' },
+        { icon:'📽️', title:'Proyecto propio', desc:'Tengo mi propio proyecto' },
+        { icon:'📸', title:'Disponible por sesión', desc:'Abierto/a a trabajos puntuales' },
+        { icon:'🤝', title:'Colaboraciones', desc:'Busco co-crear con otros artistas' },
+      ],
+      secciones: [
+        { label:'¿Cuál es tu rol?', id:'chips-rol-av', chips:['Videomaker','Fotógrafo','Editor','Creador de contenido','Operador de drone','Sonidista'] },
+        { label:'Especialidad', id:'chips-esp-av', chips:['Publicidad','Cine / Ficción','Videoclip','Documental','YouTube / Podcast','TikTok / Reels','Sesiones musicales','Eventos','Moda','Retrato','Producto','Prensa','Toma aérea / Drone'] },
+        { label:'Formato de edición', id:'chips-formato-av', chips:['Reels / TikTok','Largo metraje','Podcast / YouTube','Corporativo'] },
+      ]
+    },
+    modelaje: {
+      emoji: '👗', label: 'Modelaje',
+      coachText: 'Foto, bio, tipo de trabajo y un buen portfolio definen tu perfil de modelo.',
+      videosTitle: 'Mi portfolio',
+      videosDesc: 'Pegá links de tus mejores trabajos, book o sesiones fotográficas.',
+      disponibilidad: [
+        { icon:'📸', title:'Disponible para sesiones', desc:'Abierto/a a trabajos fotográficos' },
+        { icon:'👗', title:'Desfiles / Pasarela', desc:'Disponible para desfiles' },
+        { icon:'📱', title:'Contenido para redes', desc:'Disponible para contenido digital' },
+        { icon:'🎬', title:'Publicidad', desc:'Disponible para campañas publicitarias' },
+      ],
+      secciones: [
+        { label:'Tipo de trabajo', id:'chips-tipo-modelo', chips:['Editorial','Publicidad','Pasarela','Artístico','Eventos','Contenido para redes','Plus size'] },
+        { label:'Género', id:'chips-genero-modelo', chips:['Hombre','Mujer','No binario'] },
+      ]
+    },
+    diseno: {
+      emoji: '✏️', label: 'Diseño & artes visuales',
+      coachText: 'Foto, bio, tu rol y un portfolio claro multiplican tus posibilidades de ser contactado/a.',
+      videosTitle: 'Mi portfolio',
+      videosDesc: 'Pegá links de tu portfolio, Behance, Artstation o cualquier muestra de tu trabajo.',
+      disponibilidad: [
+        { icon:'💼', title:'Proyectos freelance', desc:'Disponible para encargos' },
+        { icon:'🤝', title:'Colaboraciones', desc:'Busco co-crear con otros artistas' },
+        { icon:'🎓', title:'Doy clases', desc:'Doy clases de diseño o arte' },
+        { icon:'🖼️', title:'Comisiones abiertas', desc:'Acepto encargos de obra' },
+      ],
+      secciones: [
+        { label:'¿Cuál es tu rol?', id:'chips-rol-dis', chips:['Ilustrador / Dibujante','Diseñador gráfico','Diseñador UX/UI','Animador 2D/3D','Concept artist','Pintor','Muralista','Escultor'] },
+        { label:'Estilo', id:'chips-estilo-dis', chips:['Realismo','Cartoon','Manga','Vectorial','Pixel art','Acuarela','Lineal','Tipográfico','Collage','Surrealista','Figurativo','Abstracto','Street art / Graffiti','Hiperrealismo','Pop art'] },
+        { label:'Soporte', id:'chips-soporte-dis', chips:['Digital','Físico','Ambos'] },
+      ]
+    },
+    tatuaje: {
+      emoji: '🖋️', label: 'Tatuaje & arte corporal',
+      coachText: 'Foto, bio, tus estilos y un portfolio de trabajos hacen tu perfil atractivo para clientes.',
+      videosTitle: 'Mi portfolio',
+      videosDesc: 'Pegá links de tu Instagram, portfolio o fotos de trabajos realizados.',
+      disponibilidad: [
+        { icon:'📅', title:'Agenda abierta', desc:'Acepto turnos nuevos' },
+        { icon:'✈️', title:'Guest spots', desc:'Disponible para tatuar en otros estudios' },
+        { icon:'🎪', title:'Convenciones', desc:'Participo en convenciones de tatuaje' },
+      ],
+      secciones: [
+        { label:'¿Cuál es tu rol?', id:'chips-rol-tatu', chips:['Tatuador','Piercer'] },
+        { label:'Estilo', id:'chips-estilo-tatu', chips:['Realismo','Blackwork','Tradicional','Japonés','Acuarela','Geométrico','Neo-traditional','Fine line','Trash polka','Lettering','Ignorant style','Chicano','Tribal','Neojaponés'] },
+        { label:'Color', id:'chips-color-tatu', chips:['Blanco y negro','Color','Ambos'] },
+        { label:'Promos <span style="color:var(--gris2);font-size:.7rem;font-weight:300;text-transform:none">— opcional, solo se muestra si lo completás</span>', id:'promo-field', type:'textarea', placeholder:'Ej: Tatuajes de hasta 10cm a $8.000 durante junio...' },
+      ]
+    },
+    danza: {
+      emoji: '💃', label: 'Danza',
+      coachText: 'Foto, bio, tu disciplina y al menos un video de tu trabajo marcan la diferencia.',
+      videosTitle: 'Mis videos / portfolio',
+      videosDesc: 'Pegá links de videos de presentaciones, clases o cualquier muestra de tu trabajo.',
+      disponibilidad: [
+        { icon:'💃', title:'Busco proyecto/compañía', desc:'Quiero sumarme a un proyecto' },
+        { icon:'🎬', title:'Sesiones / Shows', desc:'Disponible para presentaciones' },
+        { icon:'🎓', title:'Doy clases', desc:'Disponible para enseñar' },
+        { icon:'🤝', title:'Colaboraciones', desc:'Busco co-crear con otros artistas' },
+      ],
+      secciones: [
+        { label:'¿Cuál es tu rol?', id:'chips-rol-dan', chips:['Bailarín/a','Coreógrafo','Profesor de danza','Bailarín de sesión'] },
+        { label:'Disciplina', id:'chips-disc-dan', chips:['Contemporáneo','Urbano / Hip-hop','Tango','Folclore','Ballet','Danza clásica','Salsa / Ritmos latinos','Flamenco','Danza árabe','Danza aérea','Swing','Pole dance','Expresión corporal'] },
+        { label:'Nivel', id:'chips-nivel-dan', chips:['Amateur','Semiprofesional','Profesional'] },
+      ]
+    },
+    maquillaje: {
+      emoji: '💄', label: 'Maquillaje, vestuario & FX',
+      coachText: 'Foto, bio, tu especialidad y un portfolio claro son tu mejor presentación.',
+      videosTitle: 'Mi portfolio',
+      videosDesc: 'Pegá links de tu Instagram, portfolio o fotos de trabajos realizados.',
+      disponibilidad: [
+        { icon:'📸', title:'Sesiones foto/video', desc:'Disponible para producciones' },
+        { icon:'🎭', title:'Teatro / Cine', desc:'Disponible para proyectos escénicos' },
+        { icon:'🎉', title:'Eventos', desc:'Disponible para eventos sociales' },
+        { icon:'🤝', title:'Colaboraciones', desc:'Busco co-crear con artistas' },
+      ],
+      secciones: [
+        { label:'¿Cuál es tu rol?', id:'chips-rol-maq', chips:['Maquillador artístico','Maquillador FX / Caracterización','Peluquero artístico','Vestuarista','Diseñador de disfraz / Cosplay','Estilista'] },
+        { label:'Especialidad', id:'chips-esp-maq', chips:['Artístico','Eventos','FX','Teatro / Cine','Cosplay'] },
+      ]
+    },
+    circo: {
+      emoji: '🎪', label: 'Circo & artes escénicas',
+      coachText: 'Foto, bio, tu especialidad y al menos un video de tu trabajo hacen tu perfil irresistible.',
+      videosTitle: 'Mis videos / portfolio',
+      videosDesc: 'Pegá links de videos de tus actuaciones o presentaciones.',
+      disponibilidad: [
+        { icon:'🎪', title:'Espectáculos', desc:'Disponible para shows y eventos' },
+        { icon:'🤝', title:'Colaboraciones', desc:'Busco armar propuesta con otros artistas' },
+        { icon:'🎓', title:'Doy clases', desc:'Disponible para enseñar' },
+        { icon:'🌆', title:'Arte callejero', desc:'Hago arte en espacios públicos' },
+      ],
+      secciones: [
+        { label:'¿Cuál es tu especialidad?', id:'chips-rol-cir', chips:['Acróbata','Malabarista','Payaso','Equilibrista','Trapecista','Titiritero','Zanquero','Mago / Ilusionista','Contorsionista','Artista de fuego'] },
+        { label:'Modalidad', id:'chips-mod-cir', chips:['Calle','Teatro','Eventos privados','Festivales'] },
+      ]
+    },
+    escritura: {
+      emoji: '✍️', label: 'Escritura & guión',
+      coachText: 'Foto, bio, tu rol y links a publicaciones o trabajos completan tu perfil.',
+      videosTitle: 'Publicaciones / portfolio',
+      videosDesc: 'Pegá links a publicaciones, guiones publicados, portfolios o perfiles en plataformas de escritura.',
+      disponibilidad: [
+        { icon:'💼', title:'Proyectos freelance', desc:'Disponible para encargos de escritura' },
+        { icon:'🤝', title:'Colaboraciones', desc:'Busco proyectos conjuntos' },
+        { icon:'📝', title:'Proyecto propio', desc:'Trabajo en mi propio proyecto' },
+      ],
+      secciones: [
+        { label:'¿Cuál es tu rol?', id:'chips-rol-esc', chips:['Guionista','Letrista','Escritor','Libretista teatral','Ghostwriter','Poeta'] },
+        { label:'Formato', id:'chips-formato-esc', chips:['Guion cine / TV','Letra de canción','Obra teatral','Novela / Cuento','Poesía'] },
+      ]
+    },
+  };
+
+  // COLORES POR RUBRO
+  const RUBRO_COLORS = {
+    musica:'#d4f53c', actuacion:'#ff6b5b', audiovisual:'#5b9fff',
+    modelaje:'#4de8c4', diseno:'#ffaa5b', tatuaje:'#c45bff',
+    danza:'#5bd4ff', maquillaje:'#e8a84a', circo:'#ffdd5b', escritura:'#a0d47b'
+  };
+
+  // Traduce los id de sección de esta página a las claves canónicas que escribe el REGISTRO
+  // y que leen búsqueda y el perfil público. SIN esto, editar un perfil rompe su visualización.
+  const SECTION_KEYS = {
+    'chips-rol-act':'rol',         'chips-escena':'tipo_escena',
+    'chips-rol-av':'rol',          'chips-esp-av':'especialidad',      'chips-formato-av':'formato',
+    'chips-tipo-modelo':'tipo_trabajo', 'chips-genero-modelo':'genero',
+    'chips-rol-dis':'rol',         'chips-estilo-dis':'estilo',        'chips-soporte-dis':'soporte',
+    'chips-rol-tatu':'rol',        'chips-estilo-tatu':'estilo',       'chips-color-tatu':'color',  'promo-field':'promo',
+    'chips-rol-dan':'rol',         'chips-disc-dan':'disciplina',      'chips-nivel-dan':'nivel',
+    'chips-rol-maq':'rol',         'chips-esp-maq':'especialidad',
+    'chips-rol-cir':'especialidad','chips-mod-cir':'modalidad',
+    'chips-rol-esc':'rol',         'chips-formato-esc':'formato'
+  };
+
+  function initPerfil(rubro) {
+    const config = RUBROS_PERFIL_CONFIG[rubro] || RUBROS_PERFIL_CONFIG.musica;
+
+    // Cambiar paleta de colores según rubro
+    document.documentElement.style.setProperty('--neon', RUBRO_COLORS[rubro] || '#d4f53c');
+    const esMusica = rubro === 'musica';
+
+    // Sidebar links
+    const linkMusica = document.getElementById('sidebar-link-musica');
+    const linkMiRubro = document.getElementById('sidebar-link-mi-rubro');
+    const linkEnsayo = document.getElementById('sidebar-link-ensayo');
+    const linkReferentes = document.getElementById('sidebar-link-referentes');
+
+    if (esMusica) {
+      if (linkMusica) linkMusica.style.display = '';
+      if (linkMiRubro) linkMiRubro.style.display = 'none';
+      if (linkEnsayo) linkEnsayo.style.display = '';
+      if (linkReferentes) linkReferentes.style.display = '';
+    } else {
+      if (linkMusica) linkMusica.style.display = 'none';
+      if (linkMiRubro) {
+        linkMiRubro.style.display = '';
+        const icon = linkMiRubro.querySelector('#sidebar-rubro-icon');
+        const label = linkMiRubro.querySelector('#sidebar-rubro-label');
+        if (icon) icon.textContent = config.emoji;
+        if (label) label.textContent = config.label;
+      }
+      if (linkEnsayo) linkEnsayo.style.display = 'none';
+      if (linkReferentes) linkReferentes.style.display = 'none';
+    }
+
+    // Secciones principales
+    const secMusica = document.getElementById('musica');
+    const secReferentes = document.getElementById('referentes-section');
+    const secEnsayo = document.getElementById('ensayo');
+    const secMiRubro = document.getElementById('mi-rubro');
+
+
+    if (esMusica) {
+      if (secMusica) secMusica.style.display = '';
+      if (secReferentes) secReferentes.style.display = '';
+      if (secEnsayo) secEnsayo.style.display = '';
+      if (secMiRubro) secMiRubro.style.display = 'none';
+    } else {
+      if (secMusica) secMusica.style.display = 'none';
+      if (secReferentes) secReferentes.style.display = 'none';
+      if (secEnsayo) secEnsayo.style.display = 'none';
+      if (secMiRubro) {
+        secMiRubro.style.display = '';
+        const icon = document.getElementById('mi-rubro-icon');
+        const titulo = document.getElementById('mi-rubro-titulo');
+        if (icon) icon.textContent = config.emoji;
+        if (titulo) titulo.textContent = config.label;
+        renderMiRubroFields(config.secciones || []);
+      }
+    }
+
+    // Coach text
+    const coachEl = document.getElementById('coach-text');
+    if (coachEl && config.coachText) coachEl.textContent = config.coachText;
+
+    // Videos section
+    const videosTitle = document.getElementById('videos-section-title');
+    const videosDesc = document.getElementById('videos-section-desc');
+    const sidebarVideos = document.getElementById('sidebar-videos-label');
+    if (videosTitle) videosTitle.textContent = config.videosTitle || 'Portfolio / videos';
+    if (videosDesc) videosDesc.textContent = config.videosDesc || 'Esta es tu vidriera.';
+    if (sidebarVideos) sidebarVideos.textContent = config.videosTitle || 'Portfolio / videos';
+
+    // Actualizar display del rubro en el sidebar
+    actualizarSidebarRubro(rubro);
+
+    // Disponibilidad — rerender con opciones del rubro
+    renderDisponibilidad(config.disponibilidad || []);
+
+    // Nav label
+    const navLabel = document.getElementById('nav-link-tablón');
+    if (navLabel && !esMusica) navLabel.textContent = 'Artistas';
+  }
+
+  function renderMiRubroFields(secciones) {
+    const contenedor = document.getElementById('mi-rubro-contenido');
+    if (!contenedor) return;
+    let html = '';
+    secciones.forEach(sec => {
+      if (sec.type === 'textarea') {
+        html += `<div class="field" style="margin-top:1.2rem">
+          <label>${sec.label}</label>
+          <textarea id="${sec.id}" placeholder="${sec.placeholder || ''}" oninput="showSaveBar()" style="min-height:70px"></textarea>
+        </div>`;
+      } else {
+        html += `<div class="field" style="margin-bottom:.5rem"><label>${sec.label}</label></div>`;
+        html += `<div class="chips" id="${sec.id}">`;
+        (sec.chips || []).forEach(chip => {
+          html += `<button class="chip" onclick="toggleChip(this)">${chip}</button>`;
+        });
+        html += `</div>`;
+      }
+    });
+    contenedor.innerHTML = html;
+  }
+
+  function renderDisponibilidad(opciones) {
+    const grid = document.getElementById('disponibilidad-grid');
+    if (!grid || !opciones.length) return;
+    grid.innerHTML = opciones.map(o => `
+      <button class="disp-card" onclick="toggleDisp(this)">
+        <span class="disp-icon">${o.icon}</span>
+        <span class="disp-title">${o.title}</span>
+        <span class="disp-desc">${o.desc}</span>
+      </button>
+    `).join('');
+  }
 
   function escapeHtml(value) {
     return String(value ?? '')
@@ -1554,6 +1870,9 @@
     isLoadingProfile = true;
     resetFormSelections();
 
+    // Adaptar UI al rubro ANTES de cargar datos
+    initPerfil(rubroActivo);
+
     try {
       const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${encodeURIComponent(miId)}&select=*`, { headers: hdrs });
       if (!res.ok) {
@@ -1581,25 +1900,65 @@
         countBio(false);
       }
 
-      // Marcar chips de instrumentos
-      if (p.instrumento) {
-        const insts = p.instrumento.split(',').map(s => s.trim()).filter(Boolean);
-        document.querySelectorAll('#chips-inst .chip').forEach(c => {
-          if (insts.includes(c.textContent.trim())) c.classList.add('selected');
+      // Cargar campos de música (solo si rubro es música)
+      if (rubroActivo === 'musica') {
+        if (p.instrumento) {
+          const insts = p.instrumento.split(',').map(s => s.trim()).filter(Boolean);
+          document.querySelectorAll('#chips-inst .chip').forEach(c => {
+            if (insts.includes(c.textContent.trim())) c.classList.add('selected');
+          });
+        }
+        if (p.generos) {
+          const gens = p.generos.split(',').map(s => s.trim()).filter(Boolean);
+          document.querySelectorAll('#chips-gen .chip').forEach(c => {
+            if (gens.includes(c.textContent.trim())) c.classList.add('selected');
+          });
+        }
+        const expSlider = document.getElementById('exp-slider');
+        if (expSlider) {
+          expSlider.value = p.experiencia != null ? p.experiencia : 0;
+          updateExp(expSlider, false);
+        }
+        perfReferentes = p.referentes ? p.referentes.split(',').map(s => s.trim()).filter(Boolean) : [];
+        perfRenderTags(false);
+        document.querySelectorAll('#perf-chips-suger .ref-suger-chip').forEach(btn => {
+          btn.classList.toggle('on', perfReferentes.includes(btn.textContent.trim()));
         });
-      }
-
-      // Marcar chips de géneros
-      if (p.generos) {
-        const gens = p.generos.split(',').map(s => s.trim()).filter(Boolean);
-        document.querySelectorAll('#chips-gen .chip').forEach(c => {
-          if (gens.includes(c.textContent.trim())) c.classList.add('selected');
-        });
+        if (p.donde_ensaya) {
+          document.querySelectorAll('#ensayo .disp-card').forEach(c => {
+            if (c.querySelector('.disp-title')?.textContent?.trim() === p.donde_ensaya) c.classList.add('selected');
+          });
+        }
+      } else {
+        // Cargar campos_especificos (claves canónicas) en las secciones del rubro activo
+        if (p.campos_especificos) {
+          try {
+            const campos = typeof p.campos_especificos === 'string'
+              ? JSON.parse(p.campos_especificos)
+              : p.campos_especificos;
+            const secciones = (RUBROS_PERFIL_CONFIG[rubroActivo] || {}).secciones || [];
+            secciones.forEach(sec => {
+              const key = SECTION_KEYS[sec.id] || sec.id;
+              // canónica primero; fallback al id de sección por si quedó algún dato viejo
+              const values = (campos[key] != null) ? campos[key] : campos[sec.id];
+              if (values == null) return;
+              if (sec.type === 'textarea') {
+                const ta = document.getElementById(sec.id);
+                if (ta) ta.value = Array.isArray(values) ? values.join(', ') : String(values);
+              } else {
+                const arr = Array.isArray(values) ? values : [values];
+                document.querySelectorAll(`#${sec.id} .chip`).forEach(chip => {
+                  if (arr.includes(chip.textContent.trim())) chip.classList.add('selected');
+                });
+              }
+            });
+          } catch(e) { console.error('Error cargando campos_especificos:', e); }
+        }
       }
 
       // Experiencia
       const expSlider = document.getElementById('exp-slider');
-      if (expSlider) {
+      if (expSlider && rubroActivo !== 'musica') {
         expSlider.value = p.experiencia != null ? p.experiencia : 0;
         updateExp(expSlider, false);
       }
@@ -1608,9 +1967,8 @@
       const edadInput = document.getElementById('edad-input');
       if (edadInput) edadInput.value = p.edad || '';
 
-      // Género principal
-      const genSel = document.getElementById('genero-principal');
-      if (genSel) genSel.value = p.genero_principal || '';
+      // Género principal (solo para música)
+
 
       // Videos
       if (p.videos) {
@@ -1632,13 +1990,6 @@
         } catch(e) {}
       }
 
-      // Donde ensaya
-      if (p.donde_ensaya) {
-        document.querySelectorAll('#ensayo .disp-card').forEach(c => {
-          if (c.querySelector('.disp-title')?.textContent?.trim() === p.donde_ensaya) c.classList.add('selected');
-        });
-      }
-
       // Disponibilidad
       if (p.disponibilidad) {
         const disps = p.disponibilidad.split(',').map(s => s.trim()).filter(Boolean);
@@ -1646,13 +1997,6 @@
           if (disps.includes(c.querySelector('.disp-title')?.textContent?.trim())) c.classList.add('selected');
         });
       }
-
-      // Referentes
-      perfReferentes = p.referentes ? p.referentes.split(',').map(s => s.trim()).filter(Boolean) : [];
-      perfRenderTags(false);
-      document.querySelectorAll('#perf-chips-suger .ref-suger-chip').forEach(btn => {
-        btn.classList.toggle('on', perfReferentes.includes(btn.textContent.trim()));
-      });
 
       // Provincia / Ciudad / Barrio
       if (p.provincia) {
@@ -1691,7 +2035,8 @@
       const sideMeta = document.getElementById('sidebar-meta');
       if (sideAvatar) sideAvatar.textContent = (p.nombre || '?').slice(0,1).toUpperCase();
       if (sideNombre) sideNombre.textContent = p.nombre || 'Tu nombre';
-      if (sideMeta) sideMeta.textContent = `${(p.instrumento || 'Músico').split(',')[0]} · ${p.ciudad || '—'}`;
+      const rubroLabel = (RUBROS_PERFIL_CONFIG[rubroActivo] || {}).label || 'Artista';
+      if (sideMeta) sideMeta.textContent = `${rubroActivo === 'musica' ? (p.instrumento || 'Músico').split(',')[0] : rubroLabel} · ${p.ciudad || '—'}`;
 
       actualizarCompletitud(p);
       hideSaveBar();
@@ -1704,17 +2049,18 @@
   }
 
   function actualizarCompletitud(p = {}) {
-    const checks = [
-      !!p.nombre,
-      !!p.foto_url,
-      !!p.bio,
-      !!p.instrumento,
-      !!p.generos,
-      !!p.disponibilidad,
-      !!p.referentes,
-      !!p.videos,
-      !!p.redes
-    ];
+    let checks;
+    if (rubroActivo === 'musica') {
+      checks = [
+        !!p.nombre, !!p.foto_url, !!p.bio, !!p.instrumento,
+        !!p.generos, !!p.disponibilidad, !!p.referentes, !!p.videos, !!p.redes
+      ];
+    } else {
+      checks = [
+        !!p.nombre, !!p.foto_url, !!p.bio, !!p.campos_especificos,
+        !!p.disponibilidad, !!p.videos, !!p.redes
+      ];
+    }
     const pct = Math.round((checks.filter(Boolean).length / checks.length) * 100);
     const fill = document.getElementById('complete-fill');
     const text = document.querySelector('.preview-complete span:first-child');
@@ -1738,10 +2084,33 @@
     // Recolectar datos
     const nombre = (document.getElementById('reg-nombre-perfil') || document.querySelector('#foto input[type=text]'))?.value?.trim() || '';
     const bio = document.getElementById('bio-text')?.value?.trim() || '';
-    const instrumento = [...document.querySelectorAll('#chips-inst .chip.selected')].map(c => c.textContent.trim()).join(', ');
-    const generos = [...document.querySelectorAll('#chips-gen .chip.selected')].map(c => c.textContent.trim()).join(', ');
+
+    // Campos según rubro
+    let instrumento = '', generos = '', referentes_str = '';
+    let campos_especificos = null;
+
+    if (rubroActivo === 'musica') {
+      instrumento = [...document.querySelectorAll('#chips-inst .chip.selected')].map(c => c.textContent.trim()).join(', ');
+      generos = [...document.querySelectorAll('#chips-gen .chip.selected')].map(c => c.textContent.trim()).join(', ');
+      referentes_str = perfReferentes.join(', ');
+    } else {
+      // Recolectar campos de mi-rubro como JSON, con claves canónicas (rol, estilo, etc.)
+      const camposObj = {};
+      document.querySelectorAll('#mi-rubro-contenido .chips').forEach(chipsDiv => {
+        const key = SECTION_KEYS[chipsDiv.id] || chipsDiv.id;
+        const selected = [...chipsDiv.querySelectorAll('.chip.selected')].map(c => c.textContent.trim());
+        if (key && selected.length) camposObj[key] = selected;
+      });
+      // Textareas dentro de mi-rubro (ej: promo)
+      document.querySelectorAll('#mi-rubro-contenido textarea').forEach(ta => {
+        const key = SECTION_KEYS[ta.id] || ta.id;
+        if (key && ta.value.trim()) camposObj[key] = ta.value.trim();
+      });
+      if (Object.keys(camposObj).length) campos_especificos = JSON.stringify(camposObj);
+    }
+
     const disponibilidad = [...document.querySelectorAll('#disponibilidad .disp-card.selected')].map(c => c.querySelector('.disp-title')?.textContent?.trim()).filter(Boolean).join(', ');
-    const donde_ensaya = document.querySelector('#ensayo .disp-card.selected .disp-title')?.textContent?.trim() || '';
+    const donde_ensaya = rubroActivo === 'musica' ? (document.querySelector('#ensayo .disp-card.selected .disp-title')?.textContent?.trim() || '') : '';
     const videos = [...document.querySelectorAll('.video-link-input')].map(i => normalizeUrl(i.value)).filter(Boolean).join(', ');
 
     if (!nombre) {
@@ -1780,13 +2149,17 @@
         videos,
         redes: JSON.stringify(redesObj),
         celular: document.getElementById('celular-input')?.value?.trim() || null,
-        referentes: perfReferentes.join(', '),
+        referentes: referentes_str,
         experiencia: parseInt(document.getElementById('exp-slider')?.value || 0, 10),
         edad: parseInt(document.getElementById('edad-input')?.value || 0, 10) || null,
-        genero_principal: document.getElementById('genero-principal')?.value || null,
+
         provincia: document.getElementById('perfil-provincia')?.value || null,
         ciudad: document.getElementById('perfil-ciudad')?.value || null,
-        barrio: document.getElementById('perfil-barrio')?.value || null
+        barrio: document.getElementById('perfil-barrio')?.value || null,
+        // Nuevos campos — se activan con la actualización de Supabase el 14/6
+        tipo_cuenta: tipoCuentaActivo,
+        rubro: rubroActivo,
+        ...(campos_especificos ? { campos_especificos } : {})
       };
 
       const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${encodeURIComponent(miIdActual)}`, {
@@ -1913,11 +2286,71 @@
     } catch(e) {}
   }
 
+  // ═══════════════════════════════════════
+  // SELECTOR DE RUBRO — sidebar
+  // ═══════════════════════════════════════
+  const RUBROS_LISTA = [
+    { key:'musica',     emoji:'🎵', label:'Música' },
+    { key:'actuacion',  emoji:'🎭', label:'Actuación & escena' },
+    { key:'audiovisual',emoji:'🎬', label:'Audiovisual & foto' },
+    { key:'modelaje',   emoji:'👗', label:'Modelaje' },
+    { key:'diseno',     emoji:'✏️', label:'Diseño & artes' },
+    { key:'tatuaje',    emoji:'🖋️', label:'Tatuaje' },
+    { key:'danza',      emoji:'💃', label:'Danza' },
+    { key:'maquillaje', emoji:'💄', label:'Maquillaje & vestuario' },
+    { key:'circo',      emoji:'🎪', label:'Circo & escénicas' },
+    { key:'escritura',  emoji:'✍️', label:'Escritura & guión' },
+  ];
+
+  function actualizarSidebarRubro(rubro) {
+    const config = RUBROS_PERFIL_CONFIG[rubro] || RUBROS_PERFIL_CONFIG.musica;
+    const emojiEl = document.getElementById('sidebar-rubro-emoji-display');
+    const nombreEl = document.getElementById('sidebar-rubro-nombre-display');
+    if (emojiEl) emojiEl.textContent = config.emoji;
+    if (nombreEl) nombreEl.textContent = config.label;
+  }
+
+  function abrirSelectorRubro() {
+    const grid = document.getElementById('rubro-modal-grid');
+    if (grid) {
+      grid.innerHTML = RUBROS_LISTA.map(r => `
+        <button class="rubro-modal-btn${r.key === rubroActivo ? ' current' : ''}"
+                onclick="cambiarRubro('${r.key}')">
+          <span class="rmb-emoji">${r.emoji}</span>
+          <span>${r.label}</span>
+        </button>
+      `).join('');
+    }
+    document.getElementById('rubro-modal-overlay')?.classList.add('open');
+  }
+
+  function cerrarSelectorRubro() {
+    document.getElementById('rubro-modal-overlay')?.classList.remove('open');
+  }
+
+  function cambiarRubro(nuevoRubro) {
+    if (nuevoRubro === rubroActivo) {
+      cerrarSelectorRubro();
+      return;
+    }
+    // Guardar cambios pendientes antes de cambiar
+    if (document.getElementById('save-bar')?.classList.contains('visible')) {
+      if (!confirm('Tenés cambios sin guardar. ¿Cambiar de rubro sin guardar?')) return;
+    }
+    localStorage.setItem('ba_rubro', nuevoRubro);
+    cerrarSelectorRubro();
+    // Recargar la página con el nuevo rubro activo
+    location.reload();
+  }
+
+  function agregarRubro() {
+    // Multi-perfil (varios rubros por cuenta) todavía no está disponible.
+    alert('Pronto vas a poder tener más de un rubro en la misma cuenta. Por ahora podés cambiar el rubro de tu perfil con "Cambiar rubro".');
+  }
+
   // Cargar al entrar
   cargarPerfil();
   cargarEmailParaEliminar();
-
-  // Drag & drop de foto en desktop
   (function setupPhotoDrop(){
     const zone = document.getElementById('upload-zone');
     const input = document.getElementById('foto-input');
@@ -1940,7 +2373,7 @@
     });
   })();
   window.addEventListener('scroll', () => {
-    const sections = ['foto','musica','referentes-section','disponibilidad','ensayo','redes','videos','peligro'];
+    const sections = ['foto','mi-rubro','musica','referentes-section','disponibilidad','ensayo','redes','videos','peligro'];
     let current = 'foto';
     sections.forEach(id => {
       const el = document.getElementById(id);
@@ -2026,7 +2459,7 @@
   </a>
 </div>
 <nav class="mobile-bottom-nav" id="mobile-bottom-nav">
-  <a href="buscARTE_busqueda.html" class="mbn-item" data-page="busqueda"><span class="mbn-icon">🎵</span><span>Músicos</span></a>
+  <a href="buscARTE_busqueda.html" class="mbn-item" data-page="busqueda"><span class="mbn-icon">🎨</span><span>Artistas</span></a>
   <a href="buscARTE_anuncios.html" class="mbn-item" data-page="anuncios"><span class="mbn-icon">📋</span><span>Anuncios</span></a>
   <a href="buscARTE_mensajes.html" class="mbn-item" data-page="mensajes"><span class="mbn-icon">💬</span><span>Mensajes</span></a>
   <button class="mbn-item" onclick="toggleMbnPanel()" style="background:none;border:none;flex:1;padding:0;" data-page="perfil"><span class="mbn-icon">👤</span><span>Mi perfil</span></button>
