@@ -896,7 +896,7 @@
 </div>
 <!-- JAM / ZAPADA -->
 <div class="modal-form" id="form-jam">
-<div class="mfield"><label>Nombre del evento</label><input id="jam-titulo" placeholder="Ej: Jam de jazz abierta — Parque Centenario" type="text"/></div>
+<div class="mfield"><label>Nombre del evento</label><input id="jam-titulo" id="jam-titulo-input" placeholder="Ej: Jam de jazz abierta — Parque Centenario" type="text"/></div>
 <div class="mfield"><label>Descripción</label><textarea placeholder="De qué se trata, géneros, quién puede venir, qué llevar, cómo confirmar asistencia..."></textarea></div>
 <div class="mfield" id="jam-tipo-field">
 <!-- Se rellena dinámicamente por renderJamChips() -->
@@ -1076,7 +1076,7 @@
 <div class="filter-group">
 <span class="filter-group-label">Rubro buscado</span>
 <div class="filter-chips">
-<button class="fchip" data-rubro="musica" onclick="filtrarPorRubro(this)">🎵 Música</button>
+<button class="fchip on" data-rubro="musica" onclick="filtrarPorRubro(this)">🎵 Música</button>
 <button class="fchip" data-rubro="actuacion" onclick="filtrarPorRubro(this)">🎭 Actuación</button>
 <button class="fchip" data-rubro="audiovisual" onclick="filtrarPorRubro(this)">🎬 Audiovisual</button>
 <button class="fchip" data-rubro="modelaje" onclick="filtrarPorRubro(this)">👗 Modelaje</button>
@@ -1464,14 +1464,6 @@
     document.querySelectorAll('.filters-panel .fchip.on').forEach(c=>c.classList.remove('on'))
     document.querySelectorAll('.filters-panel input').forEach(i => { i.value = '' })
     document.querySelectorAll('.filters-panel select').forEach(s => { s.selectedIndex = 0 })
-    // Resetear el filtro de rubro interno (vuelve al rubro de la URL, o a "todos")
-    rubroFiltroActivo = null
-    const ef = rubroFiltro
-    document.documentElement.style.setProperty('--neon', (ef && RUBRO_COLORS[ef]) ? RUBRO_COLORS[ef] : '#d4f53c')
-    if (ef) {
-      const fp = document.querySelector('#fp-musico .fchip[data-rubro="' + ef + '"]')
-      if (fp) fp.classList.add('on')
-    }
     if (opts.reload !== false) {
       anunciosOffset = 0
       cargarAnuncios(false)
@@ -1646,8 +1638,7 @@
       if (preview) { preview.src = dataUrl; preview.style.display = 'block' }
       if (text) { text.style.display = 'block'; text.innerHTML = '⏳ Optimizando y subiendo...' }
       const file = await optimizeImage(original)
-      const extMap = { 'image/png':'png', 'image/webp':'webp', 'image/jpeg':'jpg' }
-      const ext = extMap[file.type] || 'jpg'
+      const ext = file.type === 'image/webp' ? 'webp' : 'jpg'
       const random = (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now())
       const fileName = `${tipo}-${random}.${ext}`
       const res = await fetch(`${SUPABASE_URL}/storage/v1/object/fotos-anuncios/${fileName}`, {
@@ -1696,9 +1687,6 @@
     const tipo = canonicalTipo(formActivo?.id?.replace('form-', '') || currentTipo)
     const miId = normalizeId(localStorage.getItem('ba_user_id'))
     let datos = { tipo, estado:'activo', user_id: miId }
-    // Rubro de quien publica (su disciplina). Define el tablón para ofrezco/clases/jam.
-    // El marketplace (vende) es transversal y se muestra en todos los rubros.
-    datos.rubro = localStorage.getItem('ba_rubro') || 'musica'
 
     if (tipo === 'busco' || tipo === 'ofrezco') {
       const form = document.getElementById('form-' + tipo)
@@ -1708,8 +1696,6 @@
       const chips = getSelectedTexts(form)
       datos.instrumentos = chips.filter(c => INSTRUMENTOS.includes(c)).join(', ')
       datos.generos = chips.filter(c => GENEROS.includes(c) && !INSTRUMENTOS.includes(c)).join(', ')
-      // Chips específicos de rubros no musicales (rol, estilo, etc.) → tags
-      datos.tags = chips.filter(c => !INSTRUMENTOS.includes(c) && !GENEROS.includes(c)).join(', ')
       datos.zona = inputs[inputs.length - 1]?.value?.trim()
       if (!datos.titulo && tipo === 'ofrezco') datos.titulo = datos.instrumentos ? `Me ofrezco: ${datos.instrumentos}` : 'Me ofrezco como artista'
       // rubro_buscado — determina en qué tablón aparece el anuncio
@@ -1878,8 +1864,7 @@
   }
 
   function getActiveFilterChips(panel) {
-    // Excluir chips de rubro ([data-rubro]): son filtro de tablón, no de texto
-    return [...(panel?.querySelectorAll('.fchip.on:not([data-rubro])') || [])].map(c => c.textContent.trim().toLowerCase())
+    return [...(panel?.querySelectorAll('.fchip.on') || [])].map(c => c.textContent.trim().toLowerCase())
   }
 
   function parseMoney(value) {
@@ -1946,20 +1931,13 @@
     const estado = String(a.estado || '').toLowerCase().trim()
     if (estado && !['activo','activa','publicado','publicada'].includes(estado)) return false
 
-    // Filtrar por rubro del tablón activo
+    // Filtrar por rubro URL param — solo anuncios de ese rubro
     const rfActivo = getRubroFiltroEfectivo ? getRubroFiltroEfectivo() : rubroFiltro
     if (rfActivo) {
       const tipo = canonicalTipo(a.tipo)
       if (tipo === 'busco') {
-        // "Busco" aparece en el tablón del rubro que busca
         const rb = a.rubro_buscado || 'musica'
         if (rb !== rfActivo) return false
-      } else if (tipo === 'vende' || tipo === 'vendo') {
-        // Marketplace: visible en todos los rubros (no se filtra por rubro)
-      } else {
-        // ofrezco / clases / jam: aparecen en el tablón del rubro que publica
-        const rp = a.rubro || 'musica'
-        if (rp !== rfActivo) return false
       }
     }
 
@@ -1987,7 +1965,7 @@
     if (!matchesPriceRange(a)) return false
 
     if (chipsOn.length) {
-      const hayTexto = [a.instrumentos, a.instrumento, a.generos, a.categoria_producto, a.nivel, a.modalidad, a.condicion, a.tags]
+      const hayTexto = [a.instrumentos, a.instrumento, a.generos, a.categoria_producto, a.nivel, a.modalidad, a.condicion]
         .filter(Boolean).join(' ').toLowerCase()
       const chipsReales = chipsOn.filter(c => !['hoy','este finde','esta semana','este mes','gratis','a la gorra','con costo'].includes(c))
       if (chipsReales.length && !chipsReales.some(c => hayTexto.includes(c))) return false
