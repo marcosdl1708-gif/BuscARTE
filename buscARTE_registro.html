@@ -4,580 +4,221 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- SEO -->
-  <meta name="keywords" content="registro músico argentina, perfil músico gratis, red social músicos, conectar músicos argentina">
-  <meta name="description" content="Creá tu perfil gratuito en buscARTE, la red de músicos argentinos. Conectá con músicos de Buenos Aires, Córdoba, Rosario y de todo el país. 100% gratis.">
+  <meta name="keywords" content="registro artista argentina, perfil artista gratis, red social artistas, conectar artistas argentina, músicos actores fotógrafos diseñadores">
+  <meta name="description" content="Creá tu perfil gratuito en buscARTE, la red de artistas y creativos argentinos. Músicos, actores, fotógrafos, diseñadores y más. 100% gratis.">
   <meta name="robots" content="index, follow">
   <meta name="author" content="buscARTE">
-  <link rel="canonical" href="https://buscarte.com.ar/registro">
-
-  <!-- Open Graph (WhatsApp, Facebook, Instagram) -->
+  <link rel="canonical" href="https://buscarte.com.ar/buscARTE_registro.html">
+  <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://buscarte.com.ar/buscARTE_registro.html">
-  <meta property="og:title" content="Registrate gratis — Creá tu perfil de músico | buscARTE">
-  <meta property="og:description" content="Creá tu perfil gratuito en buscARTE, la red de músicos argentinos. Conectá con músicos de Buenos Aires, Córdoba, Rosario y de todo el país. 100% gratis.">
+  <meta property="og:title" content="Registrate gratis — Creá tu perfil artístico | buscARTE">
+  <meta property="og:description" content="Creá tu perfil gratuito en buscARTE, la red de artistas y creativos argentinos. 100% gratis.">
   <meta property="og:image" content="https://buscarte.com.ar/og-image.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:locale" content="es_AR">
   <meta property="og:site_name" content="buscARTE">
-
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Registrate gratis — Creá tu perfil de músico | buscARTE">
-  <meta name="twitter:description" content="Creá tu perfil gratuito en buscARTE, la red de músicos argentinos. Conectá con músicos de Buenos Aires, Córdoba, Rosario y de todo el país. 100% gratis.">
+  <meta name="twitter:title" content="Registrate gratis — Creá tu perfil artístico | buscARTE">
+  <meta name="twitter:description" content="Creá tu perfil gratuito en buscARTE, la red de artistas y creativos argentinos. 100% gratis.">
   <meta name="twitter:image" content="https://buscarte.com.ar/og-image.jpg">
-<title>Registrate gratis — Creá tu perfil de músico | buscARTE</title>
+<title>Registrate gratis — buscARTE</title>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
   :root {
-    --negro: #080808;
-    --negro2: #111111;
-    --negro3: #1a1a1a;
-    --blanco: #f2ede4;
-    --neon: #d4f53c;
-    --rojo: #e8311a;
-    --gris: #888;
-    --gris2: #444;
+    --negro: #080808; --negro2: #111111; --negro3: #1a1a1a;
+    --blanco: #f2ede4; --neon: #d4f53c; --rojo: #e8311a;
+    --gris: #888; --gris2: #444;
     --font-display: 'Archivo Black', sans-serif;
     --font-body: 'Archivo', sans-serif;
   }
-
   html { scroll-behavior: smooth; }
   body {
-    background: var(--negro);
-    color: var(--blanco);
-    font-family: var(--font-body);
-    font-weight: 300;
-    min-height: 100vh;
-    overflow-x: hidden;
-    cursor: none;
+    background: var(--negro); color: var(--blanco);
+    font-family: var(--font-body); font-weight: 300;
+    min-height: 100vh; overflow-x: hidden; cursor: none;
   }
-
   /* CURSOR */
   .cursor { width:10px;height:10px;background:var(--neon);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .2s,height .2s; }
   .cursor-ring { width:36px;height:36px;border:1px solid rgba(212,245,60,0.4);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .15s ease; }
-
   /* GRAIN */
   body::before {
     content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;
     background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
     opacity:0.03;pointer-events:none;z-index:1000;
   }
-
   /* LAYOUT */
-  .page {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    min-height: 100vh;
-  }
-
-  /* PANEL IZQUIERDO — decorativo */
+  .page { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
+  /* PANEL IZQUIERDO */
   .left-panel {
-    background: var(--negro2);
-    border-right: 1px solid #1c1c1c;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 2.5rem 3rem;
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    overflow: hidden;
+    background: var(--negro2); border-right: 1px solid #1c1c1c;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 2.5rem 3rem; position: sticky; top: 0; height: 100vh; overflow: hidden;
   }
-  .left-logo {
-    font-family: var(--font-display);
-    font-size: 1.5rem;
-    letter-spacing: -0.01em;
-    text-decoration: none;
-    color: var(--blanco);
-  }
+  .left-logo { font-family: var(--font-display); font-size: 1.5rem; letter-spacing: -0.01em; text-decoration: none; color: var(--blanco); }
   .left-logo span { color: var(--neon); }
-
-  .left-bg-text {
-    position: absolute;
-    bottom: -3rem; left: -1rem;
-    font-family: var(--font-display);
-    font-size: 14rem;
-    color: transparent;
-    -webkit-text-stroke: 1px #1e1e1e;
-    line-height: 1;
-    pointer-events: none;
-    user-select: none;
-    letter-spacing: -0.04em;
-  }
-
-  .left-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-  .left-step-label {
-    font-size: 0.72rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--neon);
-    margin-bottom: 1rem;
-  }
-  .left-title {
-    font-family: var(--font-display);
-    font-size: clamp(3rem, 5vw, 4.5rem);
-    line-height: 0.9;
-    letter-spacing: -0.02em;
-    margin-bottom: 1.5rem;
-    transition: all 0.4s ease;
-  }
-  .left-desc {
-    color: var(--gris);
-    font-size: 0.92rem;
-    line-height: 1.75;
-    max-width: 340px;
-    transition: all 0.4s ease;
-  }
-
+  .left-bg-text { position: absolute; bottom: -3rem; left: -1rem; font-family: var(--font-display); font-size: 14rem; color: transparent; -webkit-text-stroke: 1px #1e1e1e; line-height: 1; pointer-events: none; user-select: none; letter-spacing: -0.04em; }
+  .left-content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  .left-step-label { font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--neon); margin-bottom: 1rem; }
+  .left-title { font-family: var(--font-display); font-size: clamp(3rem, 5vw, 4.5rem); line-height: 0.9; letter-spacing: -0.02em; margin-bottom: 1.5rem; transition: all 0.4s ease; }
+  .left-desc { color: var(--gris); font-size: 0.92rem; line-height: 1.75; max-width: 340px; transition: all 0.4s ease; }
   /* PROGRESS STEPS */
-  .progress-steps {
-    display: flex;
-    flex-direction: column;
-    gap: 0.8rem;
-  }
-  .progress-step {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    opacity: 0.35;
-    transition: opacity 0.3s;
-  }
+  .progress-steps { display: flex; flex-direction: column; gap: 0.8rem; }
+  .progress-step { display: flex; align-items: center; gap: 1rem; opacity: 0.35; transition: opacity 0.3s; }
   .progress-step.active { opacity: 1; }
   .progress-step.done { opacity: 0.6; }
-  .step-dot {
-    width: 28px; height: 28px;
-    border: 1px solid var(--gris2);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.7rem;
-    letter-spacing: 0.05em;
-    flex-shrink: 0;
-    transition: all 0.3s;
-  }
-  .progress-step.active .step-dot {
-    border-color: var(--neon);
-    background: var(--neon);
-    color: var(--negro);
-    font-weight: 700;
-  }
-  .progress-step.done .step-dot {
-    border-color: var(--neon);
-    color: var(--neon);
-  }
-  .step-dot-label {
-    font-size: 0.8rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  /* PANEL DERECHO — formulario */
-  .right-panel {
-    padding: 2.5rem 4rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-height: 100vh;
-  }
-
-  .form-step {
-    display: none;
-    animation: fadeIn 0.4s ease;
-  }
+  .step-dot { width: 28px; height: 28px; border: 1px solid var(--gris2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; letter-spacing: 0.05em; flex-shrink: 0; transition: all 0.3s; }
+  .progress-step.active .step-dot { border-color: var(--neon); background: var(--neon); color: var(--negro); font-weight: 700; }
+  .progress-step.done .step-dot { border-color: var(--neon); color: var(--neon); }
+  .step-dot-label { font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; }
+  /* PANEL DERECHO */
+  .right-panel { padding: 2.5rem 4rem; display: flex; flex-direction: column; justify-content: center; min-height: 100vh; }
+  .form-step { display: none; animation: fadeIn 0.4s ease; }
   .form-step.active { display: block; }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(16px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .form-title {
-    font-family: var(--font-display);
-    font-size: 2.2rem;
-    letter-spacing: -0.02em;
-    margin-bottom: 0.5rem;
-  }
-  .form-subtitle {
-    color: var(--gris);
-    font-size: 0.9rem;
-    margin-bottom: 2.5rem;
-    line-height: 1.6;
-  }
-
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .form-title { font-family: var(--font-display); font-size: 2.2rem; letter-spacing: -0.02em; margin-bottom: 0.5rem; }
+  .form-subtitle { color: var(--gris); font-size: 0.9rem; margin-bottom: 2.5rem; line-height: 1.6; }
   /* CAMPOS */
-  .field {
-    margin-bottom: 1.4rem;
-  }
-  .field label {
-    display: block;
-    font-size: 0.75rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--gris);
-    margin-bottom: 0.5rem;
-  }
-  .field input, .field select, .field textarea {
-    width: 100%;
-    background: var(--negro2);
-    border: 1px solid #2a2a2a;
-    color: var(--blanco);
-    padding: 0.9rem 1.1rem;
-    font-family: var(--font-body);
-    font-size: 0.95rem;
-    font-weight: 300;
-    outline: none;
-    transition: border-color 0.2s;
-    appearance: none;
-    border-radius: 0;
-  }
-  .field input:focus, .field select:focus, .field textarea:focus {
-    border-color: var(--neon);
-  }
-  .field input::placeholder, .field textarea::placeholder {
-    color: var(--gris2);
-  }
+  .field { margin-bottom: 1.4rem; }
+  .field label { display: block; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gris); margin-bottom: 0.5rem; }
+  .field input, .field select, .field textarea { width: 100%; background: var(--negro2); border: 1px solid #2a2a2a; color: var(--blanco); padding: 0.9rem 1.1rem; font-family: var(--font-body); font-size: 0.95rem; font-weight: 300; outline: none; transition: border-color 0.2s; appearance: none; border-radius: 0; }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--neon); }
+  .field input::placeholder, .field textarea::placeholder { color: var(--gris2); }
   .field textarea { resize: vertical; min-height: 90px; }
-
-  .field-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-  }
-
-  /* CHIPS SELECTOR (instrumentos, géneros, etc.) */
-  .chips-label {
-    font-size: 0.75rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--gris);
-    margin-bottom: 0.8rem;
-    display: block;
-  }
-  .chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1.4rem;
-  }
-  .chip {
-    padding: 0.45rem 1rem;
-    border: 1px solid #2a2a2a;
-    color: var(--gris);
-    font-size: 0.78rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    cursor: none;
-    transition: all 0.15s;
-    user-select: none;
-    font-family: var(--font-body);
-    background: transparent;
-  }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  /* CHIPS */
+  .chips-label { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gris); margin-bottom: 0.8rem; display: block; }
+  .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.4rem; }
+  .chip { padding: 0.45rem 1rem; border: 1px solid #2a2a2a; color: var(--gris); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; cursor: none; transition: all 0.15s; user-select: none; font-family: var(--font-body); background: transparent; }
   .chip:hover { border-color: #555; color: var(--blanco); }
-  .chip.selected {
-    border-color: var(--neon);
-    color: var(--neon);
-    background: rgba(212,245,60,0.06);
-  }
-
+  .chip.selected { border-color: var(--neon); color: var(--neon); background: rgba(212,245,60,0.06); }
   /* ARTISTAS REFERENTES */
-  .artist-input-wrap {
-    display: flex;
-    gap: 0;
-    margin-bottom: 0.8rem;
-  }
-  .artist-input-wrap input {
-    flex: 1;
-    background: var(--negro2);
-    border: 1px solid #2a2a2a;
-    border-right: none;
-    color: var(--blanco);
-    padding: 0.8rem 1rem;
-    font-family: var(--font-body);
-    font-size: 0.9rem;
-    font-weight: 300;
-    outline: none;
-    transition: border-color 0.2s;
-  }
+  .artist-input-wrap { display: flex; gap: 0; margin-bottom: 0.8rem; }
+  .artist-input-wrap input { flex: 1; background: var(--negro2); border: 1px solid #2a2a2a; border-right: none; color: var(--blanco); padding: 0.8rem 1rem; font-family: var(--font-body); font-size: 0.9rem; font-weight: 300; outline: none; transition: border-color 0.2s; }
   .artist-input-wrap input:focus { border-color: var(--neon); }
   .artist-input-wrap input::placeholder { color: var(--gris2); }
-  .artist-add-btn {
-    background: var(--negro3);
-    border: 1px solid #2a2a2a;
-    color: var(--neon);
-    padding: 0 1.2rem;
-    font-size: 1.2rem;
-    cursor: none;
-    transition: background 0.2s;
-    font-family: var(--font-body);
-  }
+  .artist-add-btn { background: var(--negro3); border: 1px solid #2a2a2a; color: var(--neon); padding: 0 1.2rem; font-size: 1.2rem; cursor: none; transition: background 0.2s; font-family: var(--font-body); }
   .artist-add-btn:hover { background: #222; }
-  .artist-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1.4rem;
-    min-height: 2rem;
-  }
-  .artist-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.3rem 0.8rem;
-    background: rgba(212,245,60,0.08);
-    border: 1px solid rgba(212,245,60,0.3);
-    color: var(--neon);
-    font-size: 0.78rem;
-    letter-spacing: 0.05em;
-  }
-  .artist-tag-remove {
-    cursor: none;
-    color: rgba(212,245,60,0.5);
-    font-size: 0.9rem;
-    transition: color 0.15s;
-    background: none;
-    border: none;
-    font-family: var(--font-body);
-    padding: 0;
-  }
+  .artist-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.4rem; min-height: 2rem; }
+  .artist-tag { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.8rem; background: rgba(212,245,60,0.08); border: 1px solid rgba(212,245,60,0.3); color: var(--neon); font-size: 0.78rem; letter-spacing: 0.05em; }
+  .artist-tag-remove { cursor: none; color: rgba(212,245,60,0.5); font-size: 0.9rem; transition: color 0.15s; background: none; border: none; font-family: var(--font-body); padding: 0; }
   .artist-tag-remove:hover { color: var(--neon); }
-
   /* OBJETIVO CARDS */
-  .objetivo-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.7rem;
-    margin-bottom: 1.4rem;
-  }
-  .objetivo-card {
-    border: 1px solid #2a2a2a;
-    padding: 1.2rem;
-    cursor: none;
-    transition: all 0.2s;
-    background: transparent;
-    text-align: left;
-    color: var(--blanco);
-    font-family: var(--font-body);
-  }
+  .objetivo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; margin-bottom: 1.4rem; }
+  .objetivo-card { border: 1px solid #2a2a2a; padding: 1.2rem; cursor: none; transition: all 0.2s; background: transparent; text-align: left; color: var(--blanco); font-family: var(--font-body); }
   .objetivo-card:hover { border-color: #444; background: var(--negro2); }
-  .objetivo-card.selected {
-    border-color: var(--neon);
-    background: rgba(212,245,60,0.04);
-  }
+  .objetivo-card.selected { border-color: var(--neon); background: rgba(212,245,60,0.04); }
   .objetivo-icon { font-size: 1.4rem; display: block; margin-bottom: 0.5rem; }
   .objetivo-title { font-size: 0.85rem; font-weight: 500; display: block; margin-bottom: 0.2rem; }
   .objetivo-desc { font-size: 0.75rem; color: var(--gris); line-height: 1.4; }
-
   /* FOTO UPLOAD */
-  .photo-upload {
-    border: 1px dashed #2a2a2a;
-    padding: 2.5rem;
-    text-align: center;
-    cursor: none;
-    transition: border-color 0.2s, background 0.2s;
-    margin-bottom: 1.4rem;
-    position: relative;
-  }
+  .photo-upload { border: 1px dashed #2a2a2a; padding: 2.5rem; text-align: center; cursor: none; transition: border-color 0.2s, background 0.2s; margin-bottom: 1.4rem; position: relative; }
   .photo-upload:hover { border-color: var(--neon); background: rgba(212,245,60,0.02); }
-  .photo-upload input[type=file] {
-    position: absolute; inset: 0; opacity: 0; cursor: none; width: 100%; height: 100%;
-  }
+  .photo-upload input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: none; width: 100%; height: 100%; }
   .photo-icon { font-size: 2rem; display: block; margin-bottom: 0.8rem; }
   .photo-text { font-size: 0.85rem; color: var(--gris); line-height: 1.6; }
   .photo-text strong { color: var(--blanco); font-weight: 400; }
-
   /* BOTONES */
-  .form-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid #1c1c1c;
-  }
-  .btn-back {
-    background: transparent;
-    border: 1px solid var(--gris2);
-    color: var(--gris);
-    padding: 0.8rem 1.8rem;
-    font-family: var(--font-body);
-    font-size: 0.82rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    cursor: none;
-    transition: all 0.2s;
-  }
+  .form-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #1c1c1c; }
+  .btn-back { background: transparent; border: 1px solid var(--gris2); color: var(--gris); padding: 0.8rem 1.8rem; font-family: var(--font-body); font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase; cursor: none; transition: all 0.2s; }
   .btn-back:hover { border-color: var(--blanco); color: var(--blanco); }
-  .btn-next {
-    background: var(--neon);
-    border: none;
-    color: var(--negro);
-    padding: 0.8rem 2.2rem;
-    font-family: var(--font-display);
-    font-size: 0.9rem;
-    letter-spacing: 0.06em;
-    cursor: none;
-    transition: opacity 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
+  .btn-next { background: var(--neon); border: none; color: var(--negro); padding: 0.8rem 2.2rem; font-family: var(--font-display); font-size: 0.9rem; letter-spacing: 0.06em; cursor: none; transition: opacity 0.2s; display: flex; align-items: center; gap: 0.5rem; }
   .btn-next:hover { opacity: 0.85; }
-
-  .login-link {
-    text-align: center;
-    margin-top: 1.5rem;
-    font-size: 0.82rem;
-    color: var(--gris);
-  }
+  .login-link { text-align: center; margin-top: 1.5rem; font-size: 0.82rem; color: var(--gris); }
   .login-link a { color: var(--neon); text-decoration: none; }
   .login-link a:hover { text-decoration: underline; }
-
-  /* SOCIAL LOGIN */
-  .social-divider {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin: 1.5rem 0;
-    color: var(--gris2);
-    font-size: 0.75rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-  .social-divider::before, .social-divider::after {
-    content: ''; flex: 1; height: 1px; background: #2a2a2a;
-  }
-  .btn-google {
-    width: 100%;
-    background: var(--negro2);
-    border: 1px solid #2a2a2a;
-    color: var(--blanco);
-    padding: 0.85rem;
-    font-family: var(--font-body);
-    font-size: 0.88rem;
-    letter-spacing: 0.05em;
-    cursor: none;
-    transition: border-color 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.8rem;
-  }
+  /* SOCIAL */
+  .social-divider { display: flex; align-items: center; gap: 1rem; margin: 1.5rem 0; color: var(--gris2); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; }
+  .social-divider::before, .social-divider::after { content: ''; flex: 1; height: 1px; background: #2a2a2a; }
+  .btn-google { width: 100%; background: var(--negro2); border: 1px solid #2a2a2a; color: var(--blanco); padding: 0.85rem; font-family: var(--font-body); font-size: 0.88rem; letter-spacing: 0.05em; cursor: none; transition: border-color 0.2s; display: flex; align-items: center; justify-content: center; gap: 0.8rem; }
   .btn-google:hover { border-color: #444; }
-
-  /* STEP FINAL */
-  .success-screen {
-    text-align: center;
-    padding: 3rem 0;
-  }
-  .success-icon {
-    width: 80px; height: 80px;
-    border: 2px solid var(--neon);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 2rem;
-    margin: 0 auto 2rem;
-    animation: pulse 2s infinite;
-  }
-  @keyframes pulse {
-    0%,100% { box-shadow: 0 0 0 0 rgba(212,245,60,0.3); }
-    50% { box-shadow: 0 0 0 16px rgba(212,245,60,0); }
-  }
-  .success-title {
-    font-family: var(--font-display);
-    font-size: 2.8rem;
-    letter-spacing: -0.02em;
-    margin-bottom: 0.8rem;
-  }
+  /* SUCCESS */
+  .success-screen { text-align: center; padding: 3rem 0; }
+  .success-icon { width: 80px; height: 80px; border: 2px solid var(--neon); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 2rem; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(212,245,60,0.3); } 50% { box-shadow: 0 0 0 16px rgba(212,245,60,0); } }
+  .success-title { font-family: var(--font-display); font-size: 2.8rem; letter-spacing: -0.02em; margin-bottom: 0.8rem; }
   .success-title span { color: var(--neon); }
   .success-sub { color: var(--gris); font-size: 0.95rem; line-height: 1.7; margin-bottom: 2.5rem; }
-
-  /* NAV minimal */
-  nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 1.2rem 3rem;
-    border-bottom: 1px solid #1c1c1c;
-    background: rgba(8,8,8,0.95);
-    backdrop-filter: blur(12px);
-  }
+  /* NAV */
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 1.2rem 3rem; border-bottom: 1px solid #1c1c1c; background: rgba(8,8,8,0.95); backdrop-filter: blur(12px); }
   .nav-logo { font-family: var(--font-display); font-size: 1.4rem; color: var(--blanco); text-decoration: none; }
   .nav-logo span { color: var(--neon); }
   .nav-back { color: var(--gris); text-decoration: none; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; transition: color 0.2s; }
   .nav-back:hover { color: var(--blanco); }
-
   .top-spacer { height: 65px; }
-  /* NAV LINKS CLICKABLE FIX */
-  .nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap { pointer-events:auto !important; }
   nav a, nav button { pointer-events:auto !important; }
+
+  /* ═══ NUEVOS ESTILOS — TIPO DE CUENTA ═══ */
+  .tipo-grid {
+    display: flex; flex-direction: column; gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .tipo-card {
+    border: 1px solid #2a2a2a; padding: 1.4rem 1.6rem;
+    cursor: none; transition: all 0.2s; background: transparent;
+    text-align: left; color: var(--blanco); font-family: var(--font-body);
+    display: flex; align-items: center; gap: 1.2rem; width: 100%;
+  }
+  .tipo-card:hover { border-color: var(--neon); background: rgba(212,245,60,0.03); }
+  .tipo-card.selected { border-color: var(--neon); background: rgba(212,245,60,0.06); }
+  .tipo-card-emoji { font-size: 2rem; flex-shrink: 0; }
+  .tipo-card-info {}
+  .tipo-card-title { font-family: var(--font-display); font-size: 1rem; letter-spacing: 0.01em; display: block; margin-bottom: 0.2rem; }
+  .tipo-card-desc { font-size: 0.78rem; color: var(--gris); line-height: 1.4; }
+
+  /* ═══ NUEVOS ESTILOS — RUBRO ═══ */
+  .rubro-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 0.6rem; margin-bottom: 1.5rem;
+  }
+  .rubro-card {
+    border: 1px solid #2a2a2a; padding: 1rem 1.1rem;
+    cursor: none; transition: all 0.2s; background: transparent;
+    text-align: left; color: var(--blanco); font-family: var(--font-body);
+    display: flex; align-items: center; gap: 0.7rem; width: 100%;
+  }
+  .rubro-card:hover { border-color: #555; background: var(--negro2); }
+  .rubro-card.selected { border-color: var(--neon); background: rgba(212,245,60,0.06); color: var(--neon); }
+  .rubro-card-emoji { font-size: 1.3rem; flex-shrink: 0; }
+  .rubro-card-label { font-size: 0.82rem; letter-spacing: 0.04em; }
+
+  /* CHIPS fix */
+  .fchip, .chip, .mchip, .ref-suger-chip { white-space: normal !important; line-height: 1.3 !important; text-align: center !important; max-width: 160px !important; }
+
+  /* RESPONSIVE */
   @media (max-width: 768px) {
     .cursor, .cursor-ring { display: none !important; }
     body { cursor: auto !important; }
-
-    /* Layout de 2 col → 1 col */
     .page { grid-template-columns: 1fr !important; }
     .left-panel { display: none !important; }
-    .right-panel { 
-      padding: 1.5rem 1.25rem !important;
-      min-height: 100vh !important;
-    }
-
-    /* Form */
+    .right-panel { padding: 1.5rem 1.25rem !important; min-height: 100vh !important; }
     .form-title { font-size: 1.5rem !important; }
     .form-subtitle { font-size: .85rem !important; }
     .field-row { grid-template-columns: 1fr !important; gap: 0 !important; }
-    .field input, .field select, .field textarea { 
-      font-size: 1rem !important; 
-      padding: .85rem .9rem !important;
-    }
-
-    /* Chips */
+    .field input, .field select, .field textarea { font-size: 1rem !important; padding: .85rem .9rem !important; }
     .chips { gap: .4rem !important; }
     .chip { font-size: .78rem !important; padding: .4rem .7rem !important; }
-
-    /* Objetivos */
     .objetivo-grid { grid-template-columns: 1fr 1fr !important; gap: .5rem !important; }
     .objetivo-card { padding: .75rem !important; }
     .objetivo-title { font-size: .8rem !important; }
-
-    /* Botones navegación */
-    .form-actions { 
-      flex-direction: column !important; 
-      gap: .5rem !important; 
-    }
-    .btn-back, .btn-next { 
-      width: 100% !important; 
-      text-align: center !important;
-    }
-
-    /* Steps dots */
-    .steps-progress { gap: .5rem !important; }
-
-    /* Artistas */
-    .artist-input-wrap { flex-direction: column !important; gap: .5rem !important; }
-    .artist-input-wrap input { font-size: 1rem !important; }
-    .artist-input-wrap button { width: 100% !important; }
-
-    /* hCaptcha */
-    #hcaptcha-box { transform: scale(0.9); transform-origin: left center; }
+    .form-actions { flex-direction: column !important; gap: .5rem !important; }
+    .btn-back, .btn-next { width: 100% !important; text-align: center !important; }
+    .rubro-grid { grid-template-columns: 1fr !important; }
+    /* Tipo de cuenta cards */
+    .tipo-card { padding: 1rem 1.1rem !important; }
+    .tipo-card-emoji { font-size: 1.6rem !important; }
+    .tipo-card-title { font-size: .92rem !important; }
+    .tipo-card-desc { font-size: .74rem !important; line-height: 1.4 !important; }
+    /* Rubro cards */
+    .rubro-card { padding: .85rem 1rem !important; }
+    .rubro-card-label { font-size: .8rem !important; }
+    .h-captcha { transform: scale(0.92); transform-origin: center center; }
   }
-
-  /* Chips largos — permitir wrap en lugar de ensanchar */
-  .fchip, .chip, .mchip, .ref-suger-chip {
-    white-space: normal !important;
-    line-height: 1.3 !important;
-    text-align: center !important;
-    max-width: 160px !important;
-  }
-
 </style>
-  <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+  <script src="https://js.hcaptcha.com/1/api.js?render=explicit" async defer></script>
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0a0a0a">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -598,49 +239,82 @@
 
 <div class="page">
 
-  <!-- PANEL IZQUIERDO -->
+  <!-- ═══ PANEL IZQUIERDO ═══ -->
   <div class="left-panel">
     <a href="index.html" class="left-logo">busc<span>ARTE</span></a>
-
     <div class="left-content">
-      <div class="left-step-label" id="left-label">Paso 1 de 4</div>
-      <div class="left-title" id="left-title">CREÁ<br>TU<br>CUENTA</div>
-      <p class="left-desc" id="left-desc">Empezá con lo básico. Solo te lleva un minuto y es completamente gratis.</p>
+      <div class="left-step-label" id="left-label">Paso 1</div>
+      <div class="left-title" id="left-title">¿QUIÉN<br>SOS?</div>
+      <p class="left-desc" id="left-desc">Elegí cómo querés usar buscARTE. Esto determina qué tipo de perfil vas a crear.</p>
     </div>
-
-    <div class="progress-steps">
+    <div class="progress-steps" id="progress-steps">
       <div class="progress-step active" id="ps-1">
         <div class="step-dot">01</div>
-        <div class="step-dot-label">Tu cuenta</div>
+        <div class="step-dot-label">Tipo de cuenta</div>
       </div>
       <div class="progress-step" id="ps-2">
         <div class="step-dot">02</div>
-        <div class="step-dot-label">Tu música</div>
+        <div class="step-dot-label" id="ps-2-label">Tus datos</div>
       </div>
       <div class="progress-step" id="ps-3">
         <div class="step-dot">03</div>
-        <div class="step-dot-label">Tus referentes</div>
+        <div class="step-dot-label" id="ps-3-label">Tu arte</div>
       </div>
       <div class="progress-step" id="ps-4">
         <div class="step-dot">04</div>
-        <div class="step-dot-label">Tu perfil</div>
+        <div class="step-dot-label" id="ps-4-label">Tu perfil</div>
       </div>
     </div>
-
     <div class="left-bg-text" id="left-bg">01</div>
   </div>
 
-  <!-- PANEL DERECHO -->
+  <!-- ═══ PANEL DERECHO ═══ -->
   <div class="right-panel">
 
-    <!-- STEP 1: Cuenta básica -->
-    <div class="form-step active" id="step-1">
+    <!-- ─── STEP TIPO: ¿Quién sos? ─── -->
+    <div class="form-step active" id="step-tipo">
+      <div class="form-title">¿Cómo querés usar buscARTE?</div>
+      <p class="form-subtitle">Elegí una opción para empezar. Esto determina qué tipo de perfil vas a crear.</p>
+
+      <div class="tipo-grid">
+        <button type="button" class="tipo-card" id="tipo-artista" onclick="seleccionarTipo('artista')">
+          <span class="tipo-card-emoji">🎨</span>
+          <span class="tipo-card-info">
+            <span class="tipo-card-title">Soy artista</span>
+            <span class="tipo-card-desc">Músico, actor, fotógrafo, bailarín, diseñador, tatuador y más. Creás un perfil visible en el tablón de tu rubro.</span>
+          </span>
+        </button>
+        <button type="button" class="tipo-card" id="tipo-negocio" onclick="seleccionarTipo('negocio')">
+          <span class="tipo-card-emoji">🏢</span>
+          <span class="tipo-card-info">
+            <span class="tipo-card-title">Soy un espacio o negocio</span>
+            <span class="tipo-card-desc">Sala de ensayo, estudio, teatro, agencia, marca. Tenés tu propio directorio y podés publicar anuncios.</span>
+          </span>
+        </button>
+        <button type="button" class="tipo-card" id="tipo-visitante" onclick="seleccionarTipo('visitante')">
+          <span class="tipo-card-emoji">🛒</span>
+          <span class="tipo-card-info">
+            <span class="tipo-card-title">Solo quiero comprar / vender / publicar algo</span>
+            <span class="tipo-card-desc">Accedé al marketplace, publicá un evento o anuncio puntual. Sin perfil artístico.</span>
+          </span>
+        </button>
+      </div>
+
+      <div class="form-actions">
+        <span></span>
+        <button type="button" class="btn-next" onclick="avanzarDesdeTipo()">Siguiente →</button>
+      </div>
+      <p class="login-link">¿Ya tenés cuenta? <a href="buscARTE_login.html">Ingresá acá</a></p>
+    </div>
+
+    <!-- ─── STEP CUENTA: Datos básicos (igual para todos) ─── -->
+    <div class="form-step" id="step-cuenta">
       <div class="form-title">Bienvenido/a 👋</div>
       <p class="form-subtitle">Creá tu cuenta en buscARTE. Es gratis y siempre lo será.</p>
 
       <div class="field-row">
         <div class="field">
-          <label>Nombre artístico o cómo querés aparecer</label>
+          <label id="label-nombre">Nombre artístico o cómo querés aparecer</label>
           <input type="text" id="reg-nombre" placeholder="Ej: Lucía Moreno, La Maga, Los Piojos...">
         </div>
         <div class="field">
@@ -661,30 +335,14 @@
         <label>Provincia</label>
         <select id="sel-provincia" onchange="updateCiudades()">
           <option value="" disabled selected>¿En qué provincia estás?</option>
-          <option>Buenos Aires</option>
-          <option>CABA</option>
-          <option>Córdoba</option>
-          <option>Santa Fe</option>
-          <option>Mendoza</option>
-          <option>Tucumán</option>
-          <option>Salta</option>
-          <option>Entre Ríos</option>
-          <option>Misiones</option>
-          <option>Chaco</option>
-          <option>Corrientes</option>
-          <option>Santiago del Estero</option>
-          <option>San Juan</option>
-          <option>Jujuy</option>
-          <option>Río Negro</option>
-          <option>Neuquén</option>
-          <option>Formosa</option>
-          <option>Chubut</option>
-          <option>San Luis</option>
-          <option>Catamarca</option>
-          <option>La Rioja</option>
-          <option>La Pampa</option>
-          <option>Santa Cruz</option>
-          <option>Tierra del Fuego</option>
+          <option>Buenos Aires</option><option>CABA</option><option>Córdoba</option>
+          <option>Santa Fe</option><option>Mendoza</option><option>Tucumán</option>
+          <option>Salta</option><option>Entre Ríos</option><option>Misiones</option>
+          <option>Chaco</option><option>Corrientes</option><option>Santiago del Estero</option>
+          <option>San Juan</option><option>Jujuy</option><option>Río Negro</option>
+          <option>Neuquén</option><option>Formosa</option><option>Chubut</option>
+          <option>San Luis</option><option>Catamarca</option><option>La Rioja</option>
+          <option>La Pampa</option><option>Santa Cruz</option><option>Tierra del Fuego</option>
         </select>
       </div>
       <div class="field" id="field-ciudad" style="display:none">
@@ -701,18 +359,72 @@
       </div>
 
       <div class="form-actions">
-        <span></span>
-        <button type="button" class="btn-next" onclick="goStep(2)">Siguiente → Tu música</button>
+        <button type="button" class="btn-back" onclick="goStep('tipo')">← Atrás</button>
+        <button type="button" class="btn-next" id="btn-desde-cuenta" onclick="avanzarDesdeCuenta()">Siguiente →</button>
       </div>
       <p class="login-link">¿Ya tenés cuenta? <a href="buscARTE_login.html">Ingresá acá</a></p>
     </div>
 
-    <!-- STEP 2: Instrumento y géneros -->
-    <div class="form-step" id="step-2">
+    <!-- ─── STEP RUBRO: Elegí tu rubro (solo artistas) ─── -->
+    <div class="form-step" id="step-rubro">
+      <div class="form-title">¿En qué rubro sos artista? 🎨</div>
+      <p class="form-subtitle">Elegí tu disciplina principal. Después vas a poder agregar más perfiles desde tu cuenta.</p>
+
+      <div class="rubro-grid" id="rubro-grid">
+        <button type="button" class="rubro-card" onclick="seleccionarRubro('musica', this)">
+          <span class="rubro-card-emoji">🎵</span>
+          <span class="rubro-card-label">Música</span>
+        </button>
+        <button type="button" class="rubro-card" onclick="seleccionarRubro('actuacion', this)">
+          <span class="rubro-card-emoji">🎭</span>
+          <span class="rubro-card-label">Actuación & escena</span>
+        </button>
+        <button type="button" class="rubro-card" onclick="seleccionarRubro('audiovisual', this)">
+          <span class="rubro-card-emoji">🎬</span>
+          <span class="rubro-card-label">Audiovisual & fotografía</span>
+        </button>
+        <button type="button" class="rubro-card" onclick="seleccionarRubro('modelaje', this)">
+          <span class="rubro-card-emoji">👗</span>
+          <span class="rubro-card-label">Modelaje</span>
+        </button>
+        <button type="button" class="rubro-card" onclick="seleccionarRubro('diseno', this)">
+          <span class="rubro-card-emoji">✏️</span>
+          <span class="rubro-card-label">Diseño & artes visuales</span>
+        </button>
+        <button type="button" class="rubro-card" onclick="seleccionarRubro('tatuaje', this)">
+          <span class="rubro-card-emoji">🖋️</span>
+          <span class="rubro-card-label">Tatuaje & arte corporal</span>
+        </button>
+        <button type="button" class="rubro-card" onclick="seleccionarRubro('danza', this)">
+          <span class="rubro-card-emoji">💃</span>
+          <span class="rubro-card-label">Danza</span>
+        </button>
+        <button type="button" class="rubro-card" onclick="seleccionarRubro('maquillaje', this)">
+          <span class="rubro-card-emoji">💄</span>
+          <span class="rubro-card-label">Maquillaje, vestuario & FX</span>
+        </button>
+        <button type="button" class="rubro-card" onclick="seleccionarRubro('circo', this)">
+          <span class="rubro-card-emoji">🎪</span>
+          <span class="rubro-card-label">Circo & artes escénicas</span>
+        </button>
+        <button type="button" class="rubro-card" onclick="seleccionarRubro('escritura', this)">
+          <span class="rubro-card-emoji">✍️</span>
+          <span class="rubro-card-label">Escritura & guión</span>
+        </button>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-back" onclick="goStep('cuenta')">← Atrás</button>
+        <button type="button" class="btn-next" onclick="avanzarDesdeRubro()">Siguiente →</button>
+      </div>
+    </div>
+
+    <!-- ─── STEP MUSICA: Instrumento y géneros ─── -->
+    <div class="form-step" id="step-musica">
       <div class="form-title">Tu música 🎸</div>
       <p class="form-subtitle">Contanos qué tocás y qué géneros son los tuyos. Podés elegir varios.</p>
 
-      <span class="chips-label">¿Qué instrumento/s tocás?</span>
+      <span class="chips-label">¿Qué instrumento/s tocás o cuál es tu rol?</span>
       <div class="chips" id="chips-instrumentos">
         <button type="button" class="chip" onclick="toggleChip(this)">Guitarra</button>
         <button type="button" class="chip" onclick="toggleChip(this)">Bajo</button>
@@ -779,28 +491,24 @@
       </div>
 
       <div class="form-actions">
-        <button type="button" class="btn-back" onclick="goStep(1)">← Atrás</button>
-        <button type="button" class="btn-next" onclick="goStep(3)">Siguiente → Tus referentes</button>
+        <button type="button" class="btn-back" onclick="goStep('rubro')">← Atrás</button>
+        <button type="button" class="btn-next" onclick="avanzarDesdeMusica()">Siguiente → Tus referentes</button>
       </div>
     </div>
 
-    <!-- STEP 3: Artistas referentes -->
-    <div class="form-step" id="step-3">
+    <!-- ─── STEP REFERENTES (solo música) ─── -->
+    <div class="form-step" id="step-referentes">
       <div class="form-title">Tus referentes 🎵</div>
       <p class="form-subtitle">¿Qué artistas o bandas te influencian? Esto nos permite encontrarte músicos con gustos similares — el corazón del matching de buscARTE.</p>
 
       <span class="chips-label">Agregá tus artistas y bandas favoritas</span>
       <div class="artist-input-wrap" style="position:relative">
-        <input type="text" id="artist-input" placeholder="Escribí el nombre de un artista o banda..." 
-          onkeydown="handleArtistKey(event)" 
+        <input type="text" id="artist-input" placeholder="Escribí el nombre de un artista o banda..."
+          onkeydown="handleArtistKey(event)"
           oninput="buscarArtistas(this.value)"
           autocomplete="off">
         <button type="button" class="artist-add-btn" onclick="addArtist()">+</button>
-        <div id="artist-dropdown" style="
-          display:none;position:absolute;top:100%;left:0;right:0;
-          background:#1a1a1a;border:1px solid #2a2a2a;
-          z-index:100;max-height:200px;overflow-y:auto;
-        "></div>
+        <div id="artist-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:#1a1a1a;border:1px solid #2a2a2a;z-index:100;max-height:200px;overflow-y:auto;"></div>
       </div>
       <div class="artist-tags" id="artist-tags"></div>
 
@@ -819,81 +527,144 @@
         <button class="chip" type="button" onclick="addArtistByName('Babasónicos', this)">Babasónicos</button>
         <button class="chip" type="button" onclick="addArtistByName('Virus', this)">Virus</button>
         <button class="chip" type="button" onclick="addArtistByName('Serú Girán', this)">Serú Girán</button>
-        <button class="chip" type="button" onclick="addArtistByName('Luis Alberto Spinetta', this)">Luis Alberto Spinetta</button>
         <button class="chip" type="button" onclick="addArtistByName('Sumo', this)">Sumo</button>
         <button class="chip" type="button" onclick="addArtistByName('Ataque 77', this)">Ataque 77</button>
         <button class="chip" type="button" onclick="addArtistByName('Bersuit Vergarabat', this)">Bersuit Vergarabat</button>
-        <button class="chip" type="button" onclick="addArtistByName('Las Pelotas', this)">Las Pelotas</button>
-        <button class="chip" type="button" onclick="addArtistByName('Invisible', this)">Invisible</button>
-        <button class="chip" type="button" onclick="addArtistByName('Almendra', this)">Almendra</button>
-        <button class="chip" type="button" onclick="addArtistByName('Pescado Rabioso', this)">Pescado Rabioso</button>
-        <button class="chip" type="button" onclick="addArtistByName('Cerati', this)">Cerati</button>
         <button class="chip" type="button" onclick="addArtistByName('Radiohead', this)">Radiohead</button>
         <button class="chip" type="button" onclick="addArtistByName('The Beatles', this)">The Beatles</button>
         <button class="chip" type="button" onclick="addArtistByName('Pink Floyd', this)">Pink Floyd</button>
         <button class="chip" type="button" onclick="addArtistByName('Led Zeppelin', this)">Led Zeppelin</button>
-        <button class="chip" type="button" onclick="addArtistByName('Queen', this)">Queen</button>
         <button class="chip" type="button" onclick="addArtistByName('Nirvana', this)">Nirvana</button>
         <button class="chip" type="button" onclick="addArtistByName('Foo Fighters', this)">Foo Fighters</button>
         <button class="chip" type="button" onclick="addArtistByName('Metallica', this)">Metallica</button>
-        <button class="chip" type="button" onclick="addArtistByName('Tool', this)">Tool</button>
         <button class="chip" type="button" onclick="addArtistByName('Arctic Monkeys', this)">Arctic Monkeys</button>
         <button class="chip" type="button" onclick="addArtistByName('Tame Impala', this)">Tame Impala</button>
-        <button class="chip" type="button" onclick="addArtistByName('The Strokes', this)">The Strokes</button>
         <button class="chip" type="button" onclick="addArtistByName('Miles Davis', this)">Miles Davis</button>
-        <button class="chip" type="button" onclick="addArtistByName('John Coltrane', this)">John Coltrane</button>
-        <button class="chip" type="button" onclick="addArtistByName('Bill Evans', this)">Bill Evans</button>
-        <button class="chip" type="button" onclick="addArtistByName('Herbie Hancock', this)">Herbie Hancock</button>
-        <button class="chip" type="button" onclick="addArtistByName('Ella Fitzgerald', this)">Ella Fitzgerald</button>
-        <button class="chip" type="button" onclick="addArtistByName('Amy Winehouse', this)">Amy Winehouse</button>
         <button class="chip" type="button" onclick="addArtistByName('Daft Punk', this)">Daft Punk</button>
-        <button class="chip" type="button" onclick="addArtistByName('Massive Attack', this)">Massive Attack</button>
-        <button class="chip" type="button" onclick="addArtistByName('Björk', this)">Björk</button>
         <button class="chip" type="button" onclick="addArtistByName('Hernán Cattáneo', this)">Hernán Cattáneo</button>
-        <button class="chip" type="button" onclick="addArtistByName('Boris Brejcha', this)">Boris Brejcha</button>
-        <button class="chip" type="button" onclick="addArtistByName('Charlotte de Witte', this)">Charlotte de Witte</button>
-        <button class="chip" type="button" onclick="addArtistByName('Nina Kraviz', this)">Nina Kraviz</button>
-        <button class="chip" type="button" onclick="addArtistByName('Tale Of Us', this)">Tale Of Us</button>
       </div>
 
       <div class="form-actions">
-        <button type="button" class="btn-back" onclick="goStep(2)">← Atrás</button>
-        <button type="button" class="btn-next" onclick="goStep(4)">Siguiente → Tu perfil</button>
+        <button type="button" class="btn-back" onclick="goStep('musica')">← Atrás</button>
+        <button type="button" class="btn-next" onclick="goStep('perfil')">Siguiente → Tu perfil</button>
       </div>
     </div>
 
-    <!-- STEP 4: Perfil y objetivo -->
-    <div class="form-step" id="step-4">
+    <!-- ─── STEP CAMPOS: Rubro específico (todos los artistas no-música) ─── -->
+    <div class="form-step" id="step-campos">
+      <div class="form-title" id="campos-title">Tu rubro</div>
+      <p class="form-subtitle" id="campos-subtitle">Contanos un poco más sobre tu trabajo.</p>
+      <div id="campos-contenido"></div>
+      <div class="form-actions">
+        <button type="button" class="btn-back" onclick="goStep('rubro')">← Atrás</button>
+        <button type="button" class="btn-next" onclick="goStep('perfil')">Siguiente → Tu perfil</button>
+      </div>
+    </div>
+
+    <!-- ─── STEP NEGOCIO: Datos del espacio o negocio ─── -->
+    <div class="form-step" id="step-negocio">
+      <div class="form-title">Tu espacio o negocio 🏢</div>
+      <p class="form-subtitle">Contanos sobre tu lugar, servicio u organización.</p>
+
+      <div class="field">
+        <label>Tipo de espacio o negocio</label>
+        <select id="neg-tipo">
+          <option value="" disabled selected>Elegí una opción</option>
+          <option>Sala de ensayo</option>
+          <option>Estudio de grabación</option>
+          <option>Teatro / Sala de espectáculos</option>
+          <option>Lugar de eventos / Recitales</option>
+          <option>Salón de baile</option>
+          <option>Escuela de danza</option>
+          <option>Agencia de modelos</option>
+          <option>Marca de ropa / Indumentaria</option>
+          <option>Productora audiovisual</option>
+          <option>Agencia de management</option>
+          <option>Galería de arte</option>
+          <option>Estudio de tatuajes</option>
+          <option>Otro</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Nombre del lugar / marca / organización</label>
+        <input type="text" id="neg-nombre" placeholder="Ej: Estudio La Perla, Teatro El Convento...">
+      </div>
+      <div class="field">
+        <label>Descripción y servicios que ofrecés</label>
+        <textarea id="neg-descripcion" placeholder="Contá brevemente qué ofrecés, precios referenciales, condiciones..."></textarea>
+      </div>
+      <div class="field">
+        <label>Precio referencial <span style="color:var(--gris2); font-size:0.7rem; text-transform:none; letter-spacing:0">(opcional)</span></label>
+        <input type="text" id="neg-precio" placeholder="Ej: $5.000/hora, consultar, desde $3.000">
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-back" onclick="goStep('cuenta')">← Atrás</button>
+        <button type="button" class="btn-next" onclick="avanzarDesdeNegocio()">Siguiente → Contacto</button>
+      </div>
+    </div>
+
+    <!-- ─── STEP NEGOCIO CONTACTO ─── -->
+    <div class="form-step" id="step-negocio-contacto">
+      <div class="form-title">Contacto y redes 📲</div>
+      <p class="form-subtitle">¿Cómo pueden encontrarte los artistas? Completá lo que tengas.</p>
+
+      <div class="field">
+        <label>Teléfono / WhatsApp <span style="color:var(--gris2); font-size:0.7rem; text-transform:none; letter-spacing:0">(opcional)</span></label>
+        <input type="text" id="neg-telefono" placeholder="Ej: +54 11 1234-5678">
+      </div>
+      <div class="field">
+        <label>Instagram <span style="color:var(--gris2); font-size:0.7rem; text-transform:none; letter-spacing:0">(opcional)</span></label>
+        <input type="text" id="neg-instagram" placeholder="@tusalaensayo">
+      </div>
+      <div class="field">
+        <label>Sitio web <span style="color:var(--gris2); font-size:0.7rem; text-transform:none; letter-spacing:0">(opcional)</span></label>
+        <input type="text" id="neg-web" placeholder="https://www.ejemplo.com">
+      </div>
+
+      <div class="photo-upload" onclick="document.getElementById('neg-foto-input').click()" style="cursor:pointer">
+        <input type="file" id="neg-foto-input" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="previewFotoNegocio(this)">
+        <span class="photo-icon" id="neg-foto-icon">🏢</span>
+        <img id="neg-foto-preview" style="display:none;width:80px;height:80px;border-radius:50%;object-fit:cover;margin:0 auto">
+        <p class="photo-text" id="neg-foto-text"><strong>Subí el logo o foto de tu espacio</strong><br>JPG, PNG o WebP · Máx. 2MB · Recomendado</p>
+      </div>
+
+      <div class="form-actions" style="flex-direction:column;align-items:stretch;gap:1rem">
+        <div class="h-captcha" data-sitekey="d314e4d0-234a-4454-bbd2-2bacefee8694" id="hcaptcha-box" style="display:flex;justify-content:center"></div>
+        <div style="display:flex;gap:.75rem">
+          <button type="button" class="btn-back" onclick="goStep('negocio')">← Atrás</button>
+          <button type="button" class="btn-next" onclick="crearNegocio(this)" style="font-size:1rem;padding:0.9rem 2.5rem;">🏢 Crear mi perfil</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── STEP VISITANTE: Confirmación (solo visitantes) ─── -->
+    <div class="form-step" id="step-visitante">
+      <div class="form-title">Casi listo 🛒</div>
+      <p class="form-subtitle">Confirmá que no sos un robot y creá tu cuenta para empezar a comprar, vender y publicar.</p>
+
+      <div class="form-actions" style="flex-direction:column;align-items:stretch;gap:1rem">
+        <div class="h-captcha" data-sitekey="d314e4d0-234a-4454-bbd2-2bacefee8694" id="hcaptcha-box-visitante" style="display:flex;justify-content:center"></div>
+        <div style="display:flex;gap:.75rem">
+          <button type="button" class="btn-back" onclick="goStep('cuenta')">← Atrás</button>
+          <button type="button" class="btn-next" onclick="crearVisitante(this)" style="font-size:1rem;padding:0.9rem 2.5rem;">🛒 Crear mi cuenta</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── STEP PERFIL: Bio, foto y objetivo (todos los artistas) ─── -->
+    <div class="form-step" id="step-perfil">
       <div class="form-title">Tu perfil ✨</div>
-      <p class="form-subtitle">Últimos detalles. Contales a los demás músicos qué buscás.</p>
+      <p class="form-subtitle" id="perfil-subtitle">Últimos detalles. Contales a los demás qué buscás.</p>
 
       <div class="field">
         <label>Bio corta (aparece en tu perfil)</label>
         <textarea id="bio-text" placeholder="Contá algo sobre vos, tu estilo, tu experiencia, qué buscás..."></textarea>
       </div>
 
-      <span class="chips-label">¿Qué estás buscando en buscARTE?</span>
-      <div class="objetivo-grid">
-        <button type="button" class="objetivo-card" onclick="selectObjetivo(this)">
-          <span class="objetivo-icon">🎸</span>
-          <span class="objetivo-title">Banda estable</span>
-          <span class="objetivo-desc">Quiero formarla o sumarme a una</span>
-        </button>
-        <button type="button" class="objetivo-card" onclick="selectObjetivo(this)">
-          <span class="objetivo-icon">🎤</span>
-          <span class="objetivo-title">Proyecto propio</span>
-          <span class="objetivo-desc">Busco músicos para mi proyecto</span>
-        </button>
-        <button type="button" class="objetivo-card" onclick="selectObjetivo(this)">
-          <span class="objetivo-icon">🎹</span>
-          <span class="objetivo-title">Sesiones / Shows</span>
-          <span class="objetivo-desc">Disponible para tocar en vivo o grabar</span>
-        </button>
-        <button type="button" class="objetivo-card" onclick="selectObjetivo(this)">
-          <span class="objetivo-icon">🥁</span>
-          <span class="objetivo-title">Zapada / Jam</span>
-          <span class="objetivo-desc">Sin compromiso, solo tocar y pasarla bien</span>
-        </button>
+      <span class="chips-label" id="objetivo-label">¿Qué estás buscando en buscARTE?</span>
+      <div class="objetivo-grid" id="objetivo-grid">
+        <!-- Se rellena dinámicamente según el rubro -->
       </div>
 
       <div class="photo-upload" onclick="document.getElementById('reg-foto-input').click()" style="cursor:pointer">
@@ -904,599 +675,955 @@
       </div>
 
       <div class="form-actions" style="flex-direction:column;align-items:stretch;gap:1rem">
-        <div class="h-captcha" data-sitekey="d314e4d0-234a-4454-bbd2-2bacefee8694" id="hcaptcha-box" style="display:flex;justify-content:center"></div>
+        <div class="h-captcha" data-sitekey="d314e4d0-234a-4454-bbd2-2bacefee8694" id="hcaptcha-box-perfil" style="display:flex;justify-content:center"></div>
         <div style="display:flex;gap:.75rem">
-          <button type="button" class="btn-back" onclick="goStep(3)">← Atrás</button>
+          <button type="button" class="btn-back" id="btn-back-perfil" onclick="volverDesdePerfil()">← Atrás</button>
           <button type="button" class="btn-next" onclick="crearPerfil(this)" style="background: var(--neon); font-size: 1rem; padding: 0.9rem 2.5rem;">🎉 Crear mi perfil</button>
         </div>
       </div>
     </div>
 
-    <!-- STEP 5: Éxito -->
-    <div class="form-step" id="step-5">
+    <!-- ─── STEP ÉXITO ─── -->
+    <div class="form-step" id="step-exito">
       <div class="success-screen">
-        <div class="success-icon">🎸</div>
+        <div class="success-icon" id="exito-icon">🎉</div>
         <div class="success-title">¡Ya sos parte<br>de <span>buscARTE</span>!</div>
-        <p class="success-sub">Tu perfil está listo. Ya podés explorar músicos, publicar anuncios y conectar con la escena argentina.</p>
-        <a href="buscARTE_busqueda.html" class="btn-next" style="display: inline-flex; text-decoration: none; font-size: 1rem; padding: 1rem 2.5rem; margin-bottom: 1rem;">Ver músicos →</a>
+        <p class="success-sub" id="exito-sub">Tu perfil está listo. Ya podés explorar artistas, publicar anuncios y conectar con la escena argentina.</p>
+        <a href="buscARTE_busqueda.html" class="btn-next" id="exito-btn" style="display:inline-flex;text-decoration:none;font-size:1rem;padding:1rem 2.5rem;margin-bottom:1rem;">Explorar →</a>
         <br>
-        <a href="#" style="color: var(--gris); font-size: 0.82rem; text-decoration: none;">Completar mi perfil más tarde</a>
+        <a href="buscARTE_perfil.html" style="color:var(--gris);font-size:0.82rem;text-decoration:none;">Completar mi perfil más tarde</a>
       </div>
     </div>
 
-  </div>
-</div>
+  </div><!-- end right-panel -->
+</div><!-- end page -->
 
 <script>
-  // CURSOR
-  const cursor = document.getElementById('cursor');
-  const ring = document.getElementById('cursor-ring');
-  let mx=0,my=0,rx=0,ry=0;
-  document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
-  function animateCursor() {
-    cursor.style.left=mx+'px'; cursor.style.top=my+'px';
-    rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12;
-    ring.style.left=rx+'px'; ring.style.top=ry+'px';
-    requestAnimationFrame(animateCursor);
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let tipoCuenta = null;      // 'artista' | 'negocio' | 'visitante'
+let rubroSeleccionado = null; // 'musica' | 'actuacion' | etc.
+let artists = [];
+let fotoRegistroUrl = null;
+let dropdownIdx = -1;
+
+// ═══════════════════════════════════════
+// hCAPTCHA — Render explícito por widget (soporta múltiples captchas)
+// ═══════════════════════════════════════
+const HCAPTCHA_SITEKEY = 'd314e4d0-234a-4454-bbd2-2bacefee8694';
+const hcaptchaWidgets = {}; // containerId -> widgetId
+
+function renderCaptchaBox(containerId) {
+  if (hcaptchaWidgets[containerId] != null) return; // ya renderizado
+  if (!(window.hcaptcha && typeof window.hcaptcha.render === 'function')) {
+    setTimeout(() => renderCaptchaBox(containerId), 300); // la API todavía no cargó
+    return;
   }
-  animateCursor();
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  try {
+    hcaptchaWidgets[containerId] = window.hcaptcha.render(containerId, { sitekey: HCAPTCHA_SITEKEY });
+  } catch (e) { console.error('hCaptcha render:', e); }
+}
 
-  // STEPS
-  const stepContent = [
-    null,
-    { label: 'Paso 1 de 4', title: 'CREÁ\nTU\nCUENTA', desc: 'Empezá con lo básico. Solo te lleva un minuto y es completamente gratis.', bg: '01' },
-    { label: 'Paso 2 de 4', title: 'TU\nMÚSICA', desc: 'Contanos qué instrumento tocás y qué géneros son los tuyos.', bg: '02' },
-    { label: 'Paso 3 de 4', title: 'TUS\nREFERENTES', desc: 'Tus artistas favoritos definen el matching con otros músicos.', bg: '03' },
-    { label: 'Paso 4 de 4', title: 'TU\nPERFIL', desc: 'Últimos detalles para que otros músicos te encuentren.', bg: '04' },
-    { label: '¡Listo!', title: 'BIE\nNVE\nNIDO', desc: 'Ya sos parte de la comunidad buscARTE.', bg: '✓' },
-  ];
+function getCaptchaResponse(containerId) {
+  const id = hcaptchaWidgets[containerId];
+  if (id == null || !window.hcaptcha) return '';
+  try { return window.hcaptcha.getResponse(id) || ''; } catch (e) { return ''; }
+}
 
-  function goStep(n) {
-    // Validación antes de avanzar
-    if (n === 2) {
-      const nombre = document.getElementById('reg-nombre').value.trim()
-      const email = document.getElementById('reg-email').value.trim()
-      const pass = document.getElementById('reg-password').value
-      const prov = document.getElementById('sel-provincia').value
-      if (!nombre) { alert('Por favor ingresá tu nombre.'); return }
-      if (!email || !email.includes('@')) { alert('Por favor ingresá un email válido.'); return }
-      if (pass.length < 8) { alert('La contraseña debe tener al menos 8 caracteres.'); return }
-      if (!prov || prov === '') { alert('Por favor seleccioná tu provincia.'); return }
-    }
-    if (n === 3) {
-      const instrumento = [...document.querySelectorAll('#chips-instrumentos .chip.selected')]
-      if (instrumento.length === 0) { alert('Por favor seleccioná al menos un instrumento.'); return }
-    }
-    document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
-    document.getElementById('step-' + n).classList.add('active');
+function resetCaptcha(containerId) {
+  const id = hcaptchaWidgets[containerId];
+  if (id != null && window.hcaptcha) { try { window.hcaptcha.reset(id); } catch (e) {} }
+}
 
-    // update left panel
-    const c = stepContent[n];
-    if (c) {
-      document.getElementById('left-label').textContent = c.label;
-      document.getElementById('left-title').innerHTML = c.title.replace(/\n/g, '<br>');
-      document.getElementById('left-desc').textContent = c.desc;
-      document.getElementById('left-bg').textContent = c.bg;
-    }
+// ═══════════════════════════════════════
+// NAVEGACIÓN PRINCIPAL
+// ═══════════════════════════════════════
+function goStep(stepId) {
+  document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+  const stepEl = document.getElementById('step-' + stepId);
+  stepEl.classList.add('active');
+  updateLeftPanel(stepId);
+  // Renderizar el captcha de este paso (si tiene), una sola vez
+  const box = stepEl.querySelector('.h-captcha');
+  if (box && box.id) renderCaptchaBox(box.id);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-    // update progress dots
-    for (let i = 1; i <= 4; i++) {
-      const ps = document.getElementById('ps-' + i);
-      ps.classList.remove('active', 'done');
-      if (i < n) ps.classList.add('done');
-      else if (i === n) ps.classList.add('active');
-    }
+function seleccionarTipo(tipo) {
+  tipoCuenta = tipo;
+  document.querySelectorAll('.tipo-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('tipo-' + tipo).classList.add('selected');
+  // Adaptar label del nombre según tipo
+  if (tipo === 'negocio') {
+    document.getElementById('label-nombre').textContent = 'Nombre del negocio o espacio';
+    document.getElementById('reg-nombre').placeholder = 'Ej: Estudio La Perla, Teatro El Convento...';
+  } else {
+    document.getElementById('label-nombre').textContent = 'Nombre artístico o cómo querés aparecer';
+    document.getElementById('reg-nombre').placeholder = 'Ej: Lucía Moreno, La Maga, Los Piojos...';
+  }
+}
 
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+function avanzarDesdeTipo() {
+  if (!tipoCuenta) { alert('Por favor elegí un tipo de cuenta.'); return; }
+  goStep('cuenta');
+}
+
+function avanzarDesdeCuenta() {
+  const nombre = document.getElementById('reg-nombre').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass = document.getElementById('reg-password').value;
+  const prov = document.getElementById('sel-provincia').value;
+  if (!nombre) { alert('Por favor ingresá tu nombre.'); return; }
+  if (!email || !email.includes('@')) { alert('Por favor ingresá un email válido.'); return; }
+  if (pass.length < 8) { alert('La contraseña debe tener al menos 8 caracteres.'); return; }
+  if (!prov) { alert('Por favor seleccioná tu provincia.'); return; }
+
+  if (tipoCuenta === 'artista') goStep('rubro');
+  else if (tipoCuenta === 'negocio') goStep('negocio');
+  else if (tipoCuenta === 'visitante') goStep('visitante');
+}
+
+// COLORES POR RUBRO
+const RUBRO_COLORS = {
+  musica:'#d4f53c', actuacion:'#ff6b5b', audiovisual:'#5b9fff',
+  modelaje:'#4de8c4', diseno:'#ffaa5b', tatuaje:'#c45bff',
+  danza:'#5bd4ff', maquillaje:'#e8a84a', circo:'#ffdd5b', escritura:'#a0d47b'
+};
+
+function seleccionarRubro(rubro, btn) {
+  rubroSeleccionado = rubro;
+  document.querySelectorAll('.rubro-card').forEach(c => c.classList.remove('selected'));
+  btn.classList.add('selected');
+  // Cambiar paleta de colores según rubro seleccionado
+  document.documentElement.style.setProperty('--neon', RUBRO_COLORS[rubro] || '#d4f53c');
+}
+
+function avanzarDesdeRubro() {
+  if (!rubroSeleccionado) { alert('Por favor elegí tu rubro.'); return; }
+  if (rubroSeleccionado === 'musica') {
+    goStep('musica');
+  } else {
+    renderCamposRubro(rubroSeleccionado);
+    goStep('campos');
+  }
+}
+
+function avanzarDesdeMusica() {
+  const instrumentos = [...document.querySelectorAll('#chips-instrumentos .chip.selected')];
+  if (instrumentos.length === 0) { alert('Por favor seleccioná al menos un instrumento o rol.'); return; }
+  goStep('referentes');
+}
+
+function avanzarDesdeNegocio() {
+  const tipo = document.getElementById('neg-tipo').value;
+  const nombre = document.getElementById('neg-nombre').value.trim();
+  if (!tipo) { alert('Por favor elegí el tipo de negocio.'); return; }
+  if (!nombre) { alert('Por favor ingresá el nombre de tu negocio.'); return; }
+  goStep('negocio-contacto');
+}
+
+function volverDesdePerfil() {
+  if (rubroSeleccionado === 'musica') goStep('referentes');
+  else goStep('campos');
+}
+
+// ═══════════════════════════════════════
+// LEFT PANEL — Dinámico según path
+// ═══════════════════════════════════════
+const leftPanelContent = {
+  tipo:    { label: 'Paso 1', title: '¿QUIÉN\nSOS?',        desc: 'Elegí cómo querés usar buscARTE.', bg: '01', step: 1 },
+  cuenta:  { label: 'Paso 2', title: 'TU\nCUENTA',          desc: 'Empezá con lo básico. Solo te lleva un minuto.', bg: '02', step: 2 },
+  rubro:   { label: 'Paso 3', title: 'TU\nRUBRO',           desc: 'Elegí tu disciplina artística principal.', bg: '03', step: 3 },
+  musica:  { label: 'Paso 4', title: 'TU\nMÚSICA',          desc: 'Contanos qué tocás y qué géneros son los tuyos.', bg: '04', step: 4 },
+  referentes: { label: 'Paso 5', title: 'TUS\nREFERENTES', desc: 'Tus artistas favoritos definen el matching.', bg: '05', step: 5 },
+  campos:  { label: 'Paso 4', title: 'TU\nARTE',            desc: 'Contanos sobre tu trabajo y especialidad.', bg: '04', step: 4 },
+  negocio: { label: 'Paso 3', title: 'TU\nESPACIO',         desc: 'Contanos sobre tu lugar o servicio.', bg: '03', step: 3 },
+  'negocio-contacto': { label: 'Paso 4', title: 'CON\nTACTO', desc: 'Cómo van a encontrarte los artistas.', bg: '04', step: 4 },
+  visitante: { label: 'Último paso', title: 'TU\nCUENTA', desc: 'Confirmá que sos humano y entrá a buscARTE.', bg: '✓', step: 3 },
+  perfil:  { label: 'Último paso', title: 'TU\nPERFIL',     desc: 'Últimos detalles para que te encuentren.', bg: '✓', step: 5 },
+  exito:   { label: '¡Listo!', title: 'BIE\nNVE\nNIDO',     desc: 'Ya sos parte de la comunidad buscARTE.', bg: '✓', step: 6 },
+};
+
+function updateLeftPanel(stepId) {
+  const c = leftPanelContent[stepId];
+  if (!c) return;
+  document.getElementById('left-label').textContent = c.label;
+  document.getElementById('left-title').innerHTML = c.title.replace(/\n/g, '<br>');
+  document.getElementById('left-desc').textContent = c.desc;
+  document.getElementById('left-bg').textContent = c.bg;
+
+  // Actualizar labels de pasos según tipo de cuenta
+  if (tipoCuenta === 'negocio') {
+    document.getElementById('ps-2-label').textContent = 'Tus datos';
+    document.getElementById('ps-3-label').textContent = 'Tu espacio';
+    document.getElementById('ps-4-label').textContent = 'Contacto';
+  } else if (tipoCuenta === 'artista' && rubroSeleccionado === 'musica') {
+    document.getElementById('ps-2-label').textContent = 'Tus datos';
+    document.getElementById('ps-3-label').textContent = 'Tu rubro';
+    document.getElementById('ps-4-label').textContent = 'Tu perfil';
+  } else {
+    document.getElementById('ps-2-label').textContent = 'Tus datos';
+    document.getElementById('ps-3-label').textContent = 'Tu rubro';
+    document.getElementById('ps-4-label').textContent = 'Tu perfil';
   }
 
-  // CHIPS
-  function toggleChip(el) {
-    el.classList.toggle('selected');
+  // Progress dots
+  const currentStep = c.step;
+  for (let i = 1; i <= 4; i++) {
+    const ps = document.getElementById('ps-' + i);
+    ps.classList.remove('active', 'done');
+    if (i < currentStep) ps.classList.add('done');
+    else if (i === currentStep) ps.classList.add('active');
   }
+}
 
-  // OBJETIVO
-  function selectObjetivo(el) {
-    document.querySelectorAll('.objetivo-card').forEach(c => c.classList.remove('selected'));
-    el.classList.add('selected');
+// ═══════════════════════════════════════
+// OBJETIVO CARDS — Dinámico por rubro
+// ═══════════════════════════════════════
+const objetivosXRubro = {
+  musica: [
+    { icon: '🎸', title: 'Banda estable', desc: 'Quiero formarla o sumarme a una' },
+    { icon: '🎤', title: 'Proyecto propio', desc: 'Busco músicos para mi proyecto' },
+    { icon: '🎹', title: 'Sesiones / Shows', desc: 'Disponible para tocar en vivo o grabar' },
+    { icon: '🥁', title: 'Zapada / Jam', desc: 'Sin compromiso, solo tocar y pasarla bien' },
+  ],
+  actuacion: [
+    { icon: '🎭', title: 'Busco obra/proyecto', desc: 'Quiero sumarme a un proyecto teatral' },
+    { icon: '🎬', title: 'Proyecto propio', desc: 'Busco actores para mi proyecto' },
+    { icon: '🎙️', title: 'Disponible para castings', desc: 'Abierto/a a propuestas puntuales' },
+    { icon: '📚', title: 'Dar clases', desc: 'Quiero enseñar actuación' },
+  ],
+  audiovisual: [
+    { icon: '🎬', title: 'Busco proyectos', desc: 'Quiero colaborar en producciones' },
+    { icon: '📽️', title: 'Proyecto propio', desc: 'Busco equipo para mi proyecto' },
+    { icon: '📸', title: 'Disponible para sesiones', desc: 'Abierto/a a trabajos puntuales' },
+    { icon: '🤝', title: 'Colaboraciones', desc: 'Busco co-crear con otros artistas' },
+  ],
+  default: [
+    { icon: '🤝', title: 'Proyecto estable', desc: 'Busco algo a largo plazo' },
+    { icon: '✨', title: 'Proyecto propio', desc: 'Tengo mi propio proyecto' },
+    { icon: '⚡', title: 'Disponible puntualmente', desc: 'Para trabajos y colaboraciones' },
+    { icon: '🎯', title: 'Colaboraciones', desc: 'Busco co-crear con otros artistas' },
+  ]
+};
+
+function renderObjetivos() {
+  const grid = document.getElementById('objetivo-grid');
+  const opts = objetivosXRubro[rubroSeleccionado] || objetivosXRubro.default;
+  grid.innerHTML = opts.map(o => `
+    <button type="button" class="objetivo-card" onclick="selectObjetivo(this)">
+      <span class="objetivo-icon">${o.icon}</span>
+      <span class="objetivo-title">${o.title}</span>
+      <span class="objetivo-desc">${o.desc}</span>
+    </button>
+  `).join('');
+}
+
+// ═══════════════════════════════════════
+// CAMPOS POR RUBRO — Renderizado dinámico
+// ═══════════════════════════════════════
+const rubrosConfig = {
+  actuacion: {
+    titulo: 'Actuación & escena 🎭',
+    subtitulo: 'Contanos sobre tu trabajo en las artes escénicas.',
+    secciones: [
+      { label: '¿Cuál es tu rol?', id: 'chips-rol-actuacion', chips: ['Actor/Actriz','Actor de voz / Doblajista','Director','Dramaturgo','Productor teatral','Asistente de dirección'] },
+      { label: 'Tipo de escena', id: 'chips-tipo-escena', chips: ['Drama','Comedia','Teatro musical','Stand-up','Impro','Infantil','Experimental','Terror','Monólogo','Circo-teatro'] },
+    ]
+  },
+  audiovisual: {
+    titulo: 'Audiovisual & fotografía 🎬',
+    subtitulo: 'Contanos sobre tu trabajo audiovisual o fotográfico.',
+    secciones: [
+      { label: '¿Cuál es tu rol?', id: 'chips-rol-av', chips: ['Videomaker','Fotógrafo','Editor','Creador de contenido','Operador de drone','Sonidista'] },
+      { label: 'Especialidad', id: 'chips-esp-av', chips: ['Publicidad','Cine / Ficción','Videoclip','Documental','YouTube / Podcast','TikTok / Reels','Sesiones musicales','Eventos','Moda','Retrato','Producto','Prensa','Toma aérea / Drone'] },
+    ]
+  },
+  modelaje: {
+    titulo: 'Modelaje 👗',
+    subtitulo: 'Contanos sobre tu trabajo como modelo.',
+    secciones: [
+      { label: 'Tipo de trabajo', id: 'chips-tipo-modelo', chips: ['Editorial','Publicidad','Pasarela','Artístico','Eventos','Contenido para redes','Plus size'] },
+      { label: 'Género', id: 'chips-genero-modelo', chips: ['Hombre','Mujer','No binario'] },
+    ]
+  },
+  diseno: {
+    titulo: 'Diseño & artes visuales ✏️',
+    subtitulo: 'Contanos sobre tu trabajo creativo.',
+    secciones: [
+      { label: '¿Cuál es tu rol?', id: 'chips-rol-diseno', chips: ['Ilustrador / Dibujante','Diseñador gráfico','Diseñador UX/UI','Animador 2D/3D','Concept artist','Pintor','Muralista','Escultor'] },
+      { label: 'Estilo', id: 'chips-estilo-diseno', chips: ['Realismo','Cartoon','Manga','Vectorial','Pixel art','Acuarela','Lineal','Tipográfico','Collage','Surrealista','Figurativo','Abstracto','Street art / Graffiti','Hiperrealismo','Pop art'] },
+      { label: 'Soporte', id: 'chips-soporte-diseno', chips: ['Digital','Físico','Ambos'] },
+    ]
+  },
+  tatuaje: {
+    titulo: 'Tatuaje & arte corporal 🖋️',
+    subtitulo: 'Contanos sobre tu trabajo.',
+    secciones: [
+      { label: '¿Cuál es tu rol?', id: 'chips-rol-tatu', chips: ['Tatuador','Piercer'] },
+      { label: 'Estilo de tatuaje', id: 'chips-estilo-tatu', chips: ['Realismo','Blackwork','Tradicional','Japonés','Acuarela','Geométrico','Neo-traditional','Fine line','Trash polka','Lettering','Ignorant style','Chicano','Tribal','Neojaponés'] },
+      { label: 'Color', id: 'chips-color-tatu', chips: ['Blanco y negro','Color','Ambos'] },
+    ]
+  },
+  danza: {
+    titulo: 'Danza 💃',
+    subtitulo: 'Contanos sobre tu trabajo artístico.',
+    secciones: [
+      { label: '¿Cuál es tu rol?', id: 'chips-rol-danza', chips: ['Bailarín/a','Coreógrafo','Profesor de danza','Bailarín de sesión'] },
+      { label: 'Disciplina', id: 'chips-disciplina-danza', chips: ['Contemporáneo','Urbano / Hip-hop','Tango','Folclore','Ballet','Danza clásica','Salsa / Ritmos latinos','Flamenco','Danza árabe','Danza aérea','Swing','Pole dance','Expresión corporal'] },
+      { label: 'Nivel', id: 'chips-nivel-danza', chips: ['Amateur','Semiprofesional','Profesional'] },
+    ]
+  },
+  maquillaje: {
+    titulo: 'Maquillaje, vestuario & FX 💄',
+    subtitulo: 'Contanos sobre tu especialidad.',
+    secciones: [
+      { label: '¿Cuál es tu rol?', id: 'chips-rol-maq', chips: ['Maquillador artístico','Maquillador FX / Caracterización','Peluquero artístico','Vestuarista','Diseñador de disfraz / Cosplay','Estilista'] },
+      { label: 'Especialidad', id: 'chips-esp-maq', chips: ['Artístico','Eventos','FX','Teatro / Cine','Cosplay'] },
+    ]
+  },
+  circo: {
+    titulo: 'Circo & artes escénicas 🎪',
+    subtitulo: 'Contanos sobre tu trabajo artístico.',
+    secciones: [
+      { label: '¿Cuál es tu especialidad?', id: 'chips-rol-circo', chips: ['Acróbata','Malabarista','Payaso','Equilibrista','Trapecista','Titiritero','Zanquero','Mago / Ilusionista','Contorsionista','Artista de fuego'] },
+      { label: 'Modalidad', id: 'chips-modalidad-circo', chips: ['Calle','Teatro','Eventos privados','Festivales'] },
+    ]
+  },
+  escritura: {
+    titulo: 'Escritura & guión ✍️',
+    subtitulo: 'Contanos sobre tu trabajo creativo.',
+    secciones: [
+      { label: '¿Cuál es tu rol?', id: 'chips-rol-escritura', chips: ['Guionista','Letrista','Escritor','Libretista teatral','Ghostwriter','Poeta'] },
+      { label: 'Formato', id: 'chips-formato-escritura', chips: ['Guion cine / TV','Letra de canción','Obra teatral','Novela / Cuento','Poesía'] },
+    ]
   }
+};
 
-  // UBICACIÓN EN CASCADA
-  const ubicaciones = {
-    'CABA': {
-      ciudades: ['Buenos Aires (CABA)'],
-      barrios: {
-        'Buenos Aires (CABA)': ['Agronomía','Almagro','Balvanera','Barracas','Belgrano','Boedo','Caballito','Chacarita','Coghlan','Colegiales','Constitución','Floresta','Flores','La Boca','La Paternal','Liniers','Mataderos','Montserrat','Nueva Pompeya','Núñez','Palermo','Parque Avellaneda','Parque Chacabuco','Parque Chas','Parque Patricios','Puerto Madero','Recoleta','Retiro','Saavedra','San Cristóbal','San Nicolás','San Telmo','Versalles','Villa Crespo','Villa del Parque','Villa Devoto','Villa General Mitre','Villa Lugano','Villa Luro','Villa Ortúzar','Villa Pueyrredón','Villa Real','Villa Riachuelo','Villa Santa Rita','Villa Soldati','Villa Urquiza','Otro barrio']
-      }
-    },
-    'Buenos Aires': {
-      ciudades: [
-        '— GBA Zona Norte —','San Isidro','Vicente López','Tigre','San Fernando','Pilar','Escobar','Malvinas Argentinas','José C. Paz','San Miguel','Moreno','Zárate','Campana',
-        '— GBA Zona Oeste —','Morón','Tres de Febrero','Hurlingham','Ituzaingó','Merlo','General San Martín','La Matanza',
-        '— GBA Zona Sur —','Lanús','Lomas de Zamora','Quilmes','Avellaneda','Berazategui','Florencio Varela','Almirante Brown','Ezeiza','Esteban Echeverría','Presidente Perón',
-        '— Interior Provincia —','La Plata','Mar del Plata','Bahía Blanca','Tandil','Junín','Pergamino','Necochea','Olavarría','Azul','San Nicolás de los Arroyos','Luján','Mercedes','Chivilcoy','Tres Arroyos','Otra localidad'
-      ],
-      barrios: {
-        'La Plata': ['Centro','Altos de San Lorenzo','City Bell','El Mondongo','Gonnet','La Loma','Parque Castelli','Villa Elvira','Villa Elisa','Tolosa','Otro barrio'],
-        'Mar del Plata': ['Centro','La Perla','Güemes','Punta Mogotes','Puerto','Stella Maris','Camet','Otro barrio'],
-        'Bahía Blanca': ['Centro','Villa Mitre','Barrio Universitario','Palihue','Napostá','Otro barrio'],
-        'San Isidro': ['San Isidro centro','Martínez','Acassuso','Beccar','La Horqueta','Otro barrio'],
-        'Vicente López': ['Olivos','Florida','Munro','Villa Martelli','La Lucila','Otro barrio'],
-        'Morón': ['Morón centro','Castelar','El Palomar','Haedo','Ituzaingó centro','Otro barrio'],
-        'Lanús': ['Lanús Este','Lanús Oeste','Monte Chingolo','Remedios de Escalada','Otro barrio'],
-        'Lomas de Zamora': ['Lomas centro','Banfield','Temperley','Turdera','Ingeniería','Otro barrio'],
-        'Quilmes': ['Quilmes centro','Bernal','Ezpeleta','Berazategui centro','Otro barrio'],
-        'Avellaneda': ['Avellaneda centro','Dock Sud','Sarandí','Villa Domínico','Otro barrio'],
-        'Tigre': ['Tigre centro','Don Torcuato','El Talar','General Pacheco','Rincón de Milberg','Otro barrio'],
-        'General San Martín': ['San Martín centro','Villa Lynch','Villa Ballester','Palermo','José León Suárez','Otro barrio'],
-        'La Matanza': ['Ramos Mejía','San Justo','Tapiales','Ciudad Evita','González Catán','Laferrere','Otro barrio']
-      }
-    },
-    'Córdoba': {
-      ciudades: ['Córdoba Capital','Villa Carlos Paz','Río Cuarto','San Francisco','Villa María','Cosquín','Alta Gracia','Jesús María','Río Tercero','Bell Ville','Laboulaye','Marcos Juárez','Otra localidad'],
-      barrios: {
-        'Córdoba Capital': ['Alberdi','Argüello','Barrio Jardín','Centro','Cerro de las Rosas','Güemes','General Paz','Juniors','Nueva Córdoba','Palermo','Parque Vélez Sársfield','San Vicente','Villa Cabrera','Villa del Prado','Villa Warcalde','Otro barrio']
-      }
-    },
-    'Santa Fe': {
-      ciudades: ['Rosario','Santa Fe Capital','Rafaela','Venado Tuerto','Reconquista','Villa Gobernador Gálvez','San Lorenzo','Casilda','Esperanza','Otra localidad'],
-      barrios: {
-        'Rosario': ['Centro','Echesortu','Fisherton','Abasto','Las Delicias','Pichincha','Alberdi','República de la Sexta','Tablada','Belgrano','Otro barrio'],
-        'Santa Fe Capital': ['Centro','Alto Verde','Barrio El Pozo','Candioti','Centenario','Otro barrio']
-      }
-    },
-    'Mendoza': {
-      ciudades: ['Mendoza Capital','Godoy Cruz','Guaymallén','Las Heras','Maipú','Luján de Cuyo','San Rafael','General Alvear','Rivadavia','Junín','Otra localidad'],
-      barrios: {
-        'Mendoza Capital': ['Centro','5ta Sección','6ta Sección','Dorrego','El Challao','Otro barrio'],
-        'Godoy Cruz': ['Centro','Dalvian','Presidente Alvear','Otro barrio']
-      }
-    },
-    'Tucumán': {
-      ciudades: ['San Miguel de Tucumán','Tafí Viejo','Banda del Río Salí','Yerba Buena','Concepción','Famaillá','Monteros','Otra localidad'],
-      barrios: {
-        'San Miguel de Tucumán': ['Centro','Barrio Norte','San Javier','Villa Urquiza','Otro barrio']
-      }
-    },
-    'Salta': {
-      ciudades: ['Salta Capital','San Ramón de la Nueva Orán','Tartagal','Güemes','Cafayate','Metán','Otra localidad'],
-      barrios: {
-        'Salta Capital': ['Centro','Tres Cerritos','Limache','San Bernardo','Otro barrio']
-      }
-    },
-    'Entre Ríos': {
-      ciudades: ['Paraná','Concordia','Gualeguaychú','Gualeguay','Colón','Federación','Concepción del Uruguay','Otra localidad'],
-      barrios: {
-        'Paraná': ['Centro','Thompson','General Racedo','Bajada Grande','Otro barrio']
-      }
-    },
-    'Misiones': {
-      ciudades: ['Posadas','Oberá','Eldorado','Puerto Iguazú','Apóstoles','Otra localidad'],
-      barrios: {
-        'Posadas': ['Centro','Villa Cabello','Itaembé Miní','Otro barrio']
-      }
-    },
-    'Chaco': {
-      ciudades: ['Resistencia','Presidencia Roque Sáenz Peña','Villa Ángela','Barranqueras','Otra localidad'],
-      barrios: {
-        'Resistencia': ['Centro','Barranqueras','Puerto Vilelas','Otro barrio']
-      }
-    },
-    'Corrientes': {
-      ciudades: ['Corrientes Capital','Goya','Paso de los Libres','Mercedes','Curuzú Cuatiá','Otra localidad'],
-      barrios: {
-        'Corrientes Capital': ['Centro','Laguna Seca','Tres de Abril','Otro barrio']
-      }
-    },
-    'Santiago del Estero': {
-      ciudades: ['Santiago del Estero Capital','La Banda','Termas de Río Hondo','Frías','Otra localidad'],
-      barrios: {}
-    },
-    'San Juan': {
-      ciudades: ['San Juan Capital','Rivadavia','Chimbas','Santa Lucía','Pocito','Rawson','Otra localidad'],
-      barrios: {
-        'San Juan Capital': ['Centro','Trinidad','Concepción','Otro barrio']
-      }
-    },
-    'Jujuy': {
-      ciudades: ['San Salvador de Jujuy','Palpalá','San Pedro de Jujuy','Libertador General San Martín','Tilcara','Otra localidad'],
-      barrios: {
-        'San Salvador de Jujuy': ['Centro','Alto Comedero','Gorriti','Otro barrio']
-      }
-    },
-    'Río Negro': {
-      ciudades: ['Viedma','Bariloche','Cipolletti','General Roca','Allen','El Bolsón','Otra localidad'],
-      barrios: {
-        'Bariloche': ['Centro','Melipal','Altos del Nahuel','Güemes','Otro barrio']
-      }
-    },
-    'Neuquén': {
-      ciudades: ['Neuquén Capital','Zapala','San Martín de los Andes','Villa La Angostura','Cutral Có','Otra localidad'],
-      barrios: {
-        'Neuquén Capital': ['Centro','Alta Barda','Confluencia','Progreso','Otro barrio']
-      }
-    },
-    'Formosa': {
-      ciudades: ['Formosa Capital','Clorinda','Pirané','Otra localidad'],
-      barrios: {}
-    },
-    'Chubut': {
-      ciudades: ['Rawson','Trelew','Comodoro Rivadavia','Puerto Madryn','Esquel','Otra localidad'],
-      barrios: {
-        'Comodoro Rivadavia': ['Centro','Km 3','Rada Tilly','Otro barrio']
-      }
-    },
-    'San Luis': {
-      ciudades: ['San Luis Capital','Villa Mercedes','Merlo','Otra localidad'],
-      barrios: {}
-    },
-    'Catamarca': {
-      ciudades: ['San Fernando del Valle de Catamarca','Andalgalá','Tinogasta','Santa María','Otra localidad'],
-      barrios: {}
-    },
-    'La Rioja': {
-      ciudades: ['La Rioja Capital','Chilecito','Otra localidad'],
-      barrios: {}
-    },
-    'La Pampa': {
-      ciudades: ['Santa Rosa','General Pico','Otra localidad'],
-      barrios: {}
-    },
-    'Santa Cruz': {
-      ciudades: ['Río Gallegos','Caleta Olivia','Puerto Madryn','El Calafate','Otra localidad'],
-      barrios: {}
-    },
-    'Tierra del Fuego': {
-      ciudades: ['Ushuaia','Río Grande','Tolhuin','Otra localidad'],
-      barrios: {}
+function renderCamposRubro(rubro) {
+  const config = rubrosConfig[rubro];
+  if (!config) return;
+  document.getElementById('campos-title').textContent = config.titulo;
+  document.getElementById('campos-subtitle').textContent = config.subtitulo;
+
+  let html = '';
+  config.secciones.forEach(sec => {
+    html += `<span class="chips-label">${sec.label}</span>`;
+    html += `<div class="chips" id="${sec.id}">`;
+    sec.chips.forEach(chip => {
+      html += `<button type="button" class="chip" onclick="toggleChip(this)">${chip}</button>`;
+    });
+    html += `</div>`;
+  });
+  document.getElementById('campos-contenido').innerHTML = html;
+  // Renderizar objetivos para este rubro
+  renderObjetivos();
+}
+
+// ═══════════════════════════════════════
+// CAMPOS ESPECÍFICOS POR RUBRO → JSON (campos_especificos)
+// Claves limpias para que el perfil público las pueda leer fácil.
+// ═══════════════════════════════════════
+const SECTION_KEYS = {
+  'chips-rol-actuacion':'rol',      'chips-tipo-escena':'tipo_escena',
+  'chips-rol-av':'rol',             'chips-esp-av':'especialidad',
+  'chips-tipo-modelo':'tipo_trabajo','chips-genero-modelo':'genero',
+  'chips-rol-diseno':'rol',         'chips-estilo-diseno':'estilo',      'chips-soporte-diseno':'soporte',
+  'chips-rol-tatu':'rol',           'chips-estilo-tatu':'estilo',        'chips-color-tatu':'color',
+  'chips-rol-danza':'rol',          'chips-disciplina-danza':'disciplina','chips-nivel-danza':'nivel',
+  'chips-rol-maq':'rol',            'chips-esp-maq':'especialidad',
+  'chips-rol-circo':'especialidad', 'chips-modalidad-circo':'modalidad',
+  'chips-rol-escritura':'rol',      'chips-formato-escritura':'formato'
+};
+
+function collectCamposEspecificos() {
+  const campos = {};
+  if (tipoCuenta === 'artista' && rubroSeleccionado && rubroSeleccionado !== 'musica') {
+    const config = rubrosConfig[rubroSeleccionado];
+    if (config) {
+      config.secciones.forEach(sec => {
+        const sel = [...document.querySelectorAll('#' + sec.id + ' .chip.selected')]
+          .map(c => c.textContent.trim()).filter(Boolean);
+        if (sel.length) campos[SECTION_KEYS[sec.id] || sec.id] = sel;
+      });
     }
+  }
+  return campos;
+}
+
+// ═══════════════════════════════════════
+// CREAR PERFIL — Artistas
+// ═══════════════════════════════════════
+const SUPABASE_URL = 'https://xiaanchoanxmampegoay.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68';
+
+async function crearPerfil(btn) {
+  const email = document.getElementById('reg-email')?.value?.trim();
+  const nombre = document.getElementById('reg-nombre')?.value?.trim();
+  const apellido = document.getElementById('reg-apellido')?.value?.trim();
+  const password = document.getElementById('reg-password')?.value;
+  const provincia = document.getElementById('sel-provincia')?.value || '';
+  const ciudad = document.getElementById('sel-ciudad')?.value || '';
+  const barrio = document.getElementById('sel-barrio')?.value || document.querySelector('#field-barrio input')?.value || '';
+
+  if (!nombre) { alert('Por favor ingresá tu nombre.'); goStep('cuenta'); return; }
+  if (!email || !email.includes('@')) { alert('Por favor ingresá un email válido.'); goStep('cuenta'); return; }
+  if (!password || password.length < 8) { alert('La contraseña debe tener al menos 8 caracteres.'); goStep('cuenta'); return; }
+
+  // Validar captcha (widget específico de este paso)
+  const captchaResponse = getCaptchaResponse('hcaptcha-box-perfil');
+  if (!captchaResponse) { alert('Por favor completá el captcha para continuar.'); return; }
+
+  const nombreCompleto = apellido ? `${nombre} ${apellido}` : nombre;
+
+  // Campos música (solo si rubro es música)
+  const instrumentos = rubroSeleccionado === 'musica'
+    ? [...document.querySelectorAll('#chips-instrumentos .chip.selected')].map(c => c.textContent).join(', ')
+    : '';
+  const generos = rubroSeleccionado === 'musica'
+    ? [...document.querySelectorAll('#chips-generos .chip.selected')].map(c => c.textContent).join(', ')
+    : '';
+  const referentes = rubroSeleccionado === 'musica' ? artists.join(', ') : '';
+
+  const disponibilidad = [...document.querySelectorAll('.objetivo-card.selected')].map(c => c.querySelector('.objetivo-title')?.textContent).join(', ');
+  const bio = document.getElementById('bio-text')?.value || '';
+  const camposEspecificos = collectCamposEspecificos();
+
+  btn.textContent = 'Guardando...';
+  btn.style.opacity = '0.7';
+  btn.disabled = true;
+
+  try {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/registrar_usuario`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      },
+      body: JSON.stringify({
+        p_email: email,
+        p_password: password,
+        p_nombre: nombreCompleto,
+        p_provincia: provincia,
+        p_ciudad: ciudad,
+        p_barrio: barrio,
+        p_instrumento: instrumentos,
+        p_generos: generos,
+        p_disponibilidad: disponibilidad,
+        p_referentes: referentes,
+        p_bio: bio,
+        // ── Campos nuevos (multirubro) ──
+        p_tipo_cuenta: tipoCuenta || 'artista',
+        p_rubro: rubroSeleccionado || 'musica',
+        p_campos_especificos: camposEspecificos
+      })
+    });
+
+    let data = null;
+    try { data = await response.json(); } catch(_) { data = null; }
+
+    if (!response.ok || data?.error) {
+      const errText = data?.error || data?.message || JSON.stringify(data || {});
+      if (String(errText).toLowerCase().includes('duplicate') || String(errText).toLowerCase().includes('unique') || String(errText).toLowerCase().includes('ya existe')) {
+        alert('Ese email ya está registrado. ¿Querés ingresar?');
+        window.location.href = 'buscARTE_login.html';
+      } else {
+        alert('Hubo un error al guardar tu perfil. Intentá de nuevo.');
+        console.error('Registro error:', errText);
+        resetCaptcha('hcaptcha-box-perfil');
+      }
+      btn.textContent = '🎉 Crear mi perfil';
+      btn.style.opacity = '1';
+      btn.disabled = false;
+      return;
+    }
+
+    const usuario = Array.isArray(data) ? data[0] : data;
+    if (fotoRegistroUrl && usuario?.id) {
+      subirFotoRegistro(usuario.id).then(fotoUrl => {
+        if (fotoUrl) {
+          fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${usuario.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal' },
+            body: JSON.stringify({ foto_url: fotoUrl })
+          }).catch(e => console.error('Error guardando foto_url:', e));
+        }
+      }).catch(e => console.error('Error subiendo foto:', e));
+    }
+
+    localStorage.setItem('ba_logged', '1');
+    localStorage.setItem('ba_name', nombreCompleto);
+    if (usuario?.id) localStorage.setItem('ba_user_id', String(usuario.id));
+    localStorage.setItem('ba_referentes', artists.join(','));
+    localStorage.setItem('ba_generos', generos);
+    localStorage.setItem('ba_tipo_cuenta', tipoCuenta || 'artista');
+    localStorage.setItem('ba_rubro', rubroSeleccionado || 'musica');
+    if (artists.length) guardarArtistasEnSupabase(artists);
+
+    // Email bienvenida
+    fetch('/.netlify/functions/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tipo: 'bienvenida',
+        destinatario: email,
+        datos: { nombre: nombreCompleto.split(' ')[0] }
+      })
+    }).catch(e => console.error('Error enviando bienvenida:', e));
+
+    // Personalizar pantalla de éxito
+    personalizarExito();
+    goStep('exito');
+
+  } catch (e) {
+    alert('No se pudo conectar. Verificá tu conexión e intentá de nuevo.');
+    console.error(e);
+    resetCaptcha('hcaptcha-box-perfil');
+  } finally {
+    btn.textContent = '🎉 Crear mi perfil';
+    btn.style.opacity = '1';
+    btn.disabled = false;
+  }
+}
+
+// ═══════════════════════════════════════
+// CREAR NEGOCIO
+// ═══════════════════════════════════════
+async function crearNegocio(btn) {
+  const captchaResponse = getCaptchaResponse('hcaptcha-box');
+  if (!captchaResponse) { alert('Por favor completá el captcha para continuar.'); return; }
+
+  const email = document.getElementById('reg-email')?.value?.trim();
+  const password = document.getElementById('reg-password')?.value;
+  const nombre = document.getElementById('neg-nombre')?.value?.trim() || document.getElementById('reg-nombre')?.value?.trim();
+  const provincia = document.getElementById('sel-provincia')?.value || '';
+  const ciudad = document.getElementById('sel-ciudad')?.value || '';
+
+  // Datos de contacto del negocio → campos_especificos (antes se perdían)
+  const camposNegocio = {};
+  const _negTel = document.getElementById('neg-telefono')?.value?.trim(); if (_negTel) camposNegocio.telefono = _negTel;
+  const _negIg  = document.getElementById('neg-instagram')?.value?.trim(); if (_negIg) camposNegocio.instagram = _negIg;
+  const _negWeb = document.getElementById('neg-web')?.value?.trim(); if (_negWeb) camposNegocio.web = _negWeb;
+  const _negPre = document.getElementById('neg-precio')?.value?.trim(); if (_negPre) camposNegocio.precio = _negPre;
+
+  btn.textContent = 'Guardando...';
+  btn.style.opacity = '0.7';
+  btn.disabled = true;
+
+  try {
+    // Por ahora usa el mismo RPC — se actualizará junto con Supabase el 14/6
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/registrar_usuario`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+      body: JSON.stringify({
+        p_email: email,
+        p_password: password,
+        p_nombre: nombre,
+        p_provincia: provincia,
+        p_ciudad: ciudad,
+        p_barrio: '',
+        p_instrumento: '',
+        p_generos: '',
+        p_disponibilidad: '',
+        p_referentes: '',
+        p_bio: document.getElementById('neg-descripcion')?.value || '',
+        p_tipo_cuenta: 'negocio',
+        p_rubro: document.getElementById('neg-tipo')?.value || '',
+        p_campos_especificos: camposNegocio
+      })
+    });
+
+    let data = null;
+    try { data = await response.json(); } catch(_) {}
+
+    if (!response.ok || data?.error) {
+      const errText = data?.error || data?.message || '';
+      if (String(errText).toLowerCase().includes('duplicate') || String(errText).toLowerCase().includes('ya existe')) {
+        alert('Ese email ya está registrado. ¿Querés ingresar?');
+        window.location.href = 'buscARTE_login.html';
+      } else {
+        alert('Hubo un error. Intentá de nuevo.');
+        resetCaptcha('hcaptcha-box');
+      }
+      btn.textContent = '🏢 Crear mi perfil';
+      btn.style.opacity = '1';
+      btn.disabled = false;
+      return;
+    }
+
+    const usuario = Array.isArray(data) ? data[0] : data;
+    localStorage.setItem('ba_logged', '1');
+    localStorage.setItem('ba_name', nombre);
+    if (usuario?.id) localStorage.setItem('ba_user_id', String(usuario.id));
+    localStorage.setItem('ba_tipo_cuenta', 'negocio');
+
+    if (fotoRegistroUrl && usuario?.id) {
+      subirFotoRegistro(usuario.id).then(fotoUrl => {
+        if (fotoUrl) {
+          fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${usuario.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal' },
+            body: JSON.stringify({ foto_url: fotoUrl })
+          }).catch(e => console.error('Error guardando foto_url:', e));
+        }
+      }).catch(e => console.error('Error subiendo foto:', e));
+    }
+
+    personalizarExito();
+    goStep('exito');
+  } catch(e) {
+    alert('No se pudo conectar. Verificá tu conexión.');
+    console.error(e);
+    resetCaptcha('hcaptcha-box');
+  } finally {
+    btn.textContent = '🏢 Crear mi perfil';
+    btn.style.opacity = '1';
+    btn.disabled = false;
+  }
+}
+
+// ═══════════════════════════════════════
+// CREAR VISITANTE (mínimo)
+// ═══════════════════════════════════════
+async function crearVisitante(btn) {
+  const captchaResponse = getCaptchaResponse('hcaptcha-box-visitante');
+  if (!captchaResponse) { alert('Por favor completá el captcha para continuar.'); return; }
+
+  const email = document.getElementById('reg-email')?.value?.trim();
+  const password = document.getElementById('reg-password')?.value;
+  const nombre = document.getElementById('reg-nombre')?.value?.trim();
+  const provincia = document.getElementById('sel-provincia')?.value || '';
+
+  if (btn) { btn.textContent = 'Creando...'; btn.style.opacity = '0.7'; btn.disabled = true; }
+  const restoreBtn = () => { if (btn) { btn.textContent = '🛒 Crear mi cuenta'; btn.style.opacity = '1'; btn.disabled = false; } };
+
+  try {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/registrar_usuario`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+      body: JSON.stringify({
+        p_email: email, p_password: password, p_nombre: nombre,
+        p_provincia: provincia, p_ciudad: '', p_barrio: '',
+        p_instrumento: '', p_generos: '', p_disponibilidad: '', p_referentes: '', p_bio: '',
+        p_tipo_cuenta: 'visitante', p_rubro: '', p_campos_especificos: {}
+      })
+    });
+
+    let data = null;
+    try { data = await response.json(); } catch(_) {}
+
+    if (!response.ok || data?.error) {
+      const errText = data?.error || data?.message || '';
+      if (String(errText).toLowerCase().includes('duplicate') || String(errText).toLowerCase().includes('ya existe')) {
+        alert('Ese email ya está registrado. ¿Querés ingresar?');
+        window.location.href = 'buscARTE_login.html';
+        return;
+      }
+      alert('Hubo un error al crear tu cuenta. Intentá de nuevo.');
+      console.error('Registro visitante error:', errText);
+      resetCaptcha('hcaptcha-box-visitante');
+      restoreBtn();
+      return;
+    }
+
+    const usuario = Array.isArray(data) ? data[0] : data;
+    if (!usuario?.id) {
+      alert('Hubo un error al crear tu cuenta. Intentá de nuevo.');
+      resetCaptcha('hcaptcha-box-visitante');
+      restoreBtn();
+      return;
+    }
+
+    localStorage.setItem('ba_logged', '1');
+    localStorage.setItem('ba_name', nombre || '');
+    localStorage.setItem('ba_user_id', String(usuario.id));
+    localStorage.setItem('ba_tipo_cuenta', 'visitante');
+
+    personalizarExito();
+    goStep('exito');
+  } catch(e) {
+    alert('No se pudo conectar. Verificá tu conexión e intentá de nuevo.');
+    console.error(e);
+    resetCaptcha('hcaptcha-box-visitante');
+    restoreBtn();
+  }
+}
+
+// ═══════════════════════════════════════
+// PANTALLA ÉXITO — Personalizada por tipo
+// ═══════════════════════════════════════
+function personalizarExito() {
+  const iconEl = document.getElementById('exito-icon');
+  const subEl = document.getElementById('exito-sub');
+  const btnEl = document.getElementById('exito-btn');
+
+  if (tipoCuenta === 'negocio') {
+    iconEl.textContent = '🏢';
+    subEl.textContent = 'Tu espacio ya está en buscARTE. Podés explorar artistas, publicar anuncios y conectar con la comunidad creativa argentina.';
+    btnEl.textContent = 'Explorar artistas →';
+    btnEl.href = 'buscARTE_busqueda.html';
+  } else if (tipoCuenta === 'visitante') {
+    iconEl.textContent = '🛒';
+    subEl.textContent = 'Tu cuenta está lista. Podés explorar artistas, ver anuncios y publicar en el marketplace.';
+    btnEl.textContent = 'Ver anuncios →';
+    btnEl.href = 'buscARTE_anuncios.html';
+  } else {
+    const rubrosLabels = { musica: '🎵 músicos', actuacion: '🎭 artistas de escena', audiovisual: '🎬 artistas audiovisuales', modelaje: '👗 modelos', diseno: '✏️ artistas visuales', tatuaje: '🖋️ tatuadores', danza: '💃 bailarines', maquillaje: '💄 artistas de maquillaje', circo: '🎪 artistas de circo', escritura: '✍️ escritores' };
+    const rubroLabel = rubrosLabels[rubroSeleccionado] || 'artistas';
+    iconEl.textContent = '🎉';
+    subEl.textContent = `Tu perfil está listo. Ya podés explorar ${rubroLabel}, publicar anuncios y conectar con la escena argentina.`;
+    btnEl.textContent = 'Explorar →';
+    btnEl.href = 'buscARTE_busqueda.html';
+  }
+}
+
+// ═══════════════════════════════════════
+// CHIPS & OBJETIVO
+// ═══════════════════════════════════════
+function toggleChip(el) { el.classList.toggle('selected'); }
+function selectObjetivo(el) {
+  document.querySelectorAll('.objetivo-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// ═══════════════════════════════════════
+// PASSWORD VALIDATION
+// ═══════════════════════════════════════
+function validarPassword(input) {
+  const fb = document.getElementById('pass-feedback');
+  const val = input.value;
+  if (!val) { fb.textContent = ''; return; }
+  if (val.length < 8) { fb.style.color = '#e8311a'; fb.textContent = 'Mínimo 8 caracteres'; }
+  else if (val.length < 12) { fb.style.color = '#f5a623'; fb.textContent = '✓ Válida (podría ser más larga)'; }
+  else { fb.style.color = 'var(--neon)'; fb.textContent = '✓ Contraseña segura'; }
+}
+
+// ═══════════════════════════════════════
+// FOTO PREVIEW
+// ═══════════════════════════════════════
+function previewFotoNegocio(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) { alert('La imagen no puede superar 2MB.'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    fotoRegistroUrl = e.target.result;
+    document.getElementById('neg-foto-icon').style.display = 'none';
+    document.getElementById('neg-foto-text').innerHTML = '<strong>Logo cargado ✓</strong><br><span style="font-size:.8rem;color:var(--neon)">Clickeá para cambiarlo</span>';
+    const prev = document.getElementById('neg-foto-preview');
+    prev.src = e.target.result;
+    prev.style.display = 'block';
   };
-  const defaultUbicacion = { ciudades: ['Otra localidad'], barrios: {} };
+  reader.readAsDataURL(file);
+}
 
-  function updateCiudades() {
-    const prov = document.getElementById('sel-provincia').value;
-    const data = ubicaciones[prov] || defaultUbicacion;
-    const selCiudad = document.getElementById('sel-ciudad');
+function previewFotoRegistro(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) { alert('La imagen no puede superar 2MB.'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    fotoRegistroUrl = e.target.result;
+    document.getElementById('reg-foto-icon').style.display = 'none';
+    document.getElementById('reg-foto-text').innerHTML = '<strong>Foto cargada ✓</strong><br><span style="font-size:.8rem;color:var(--neon)">Clickeá para cambiarla</span>';
+    const prev = document.getElementById('reg-foto-preview');
+    prev.src = e.target.result;
+    prev.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function subirFotoRegistro(userId) {
+  if (!fotoRegistroUrl || !userId) return null;
+  try {
+    const blob = await (await fetch(fotoRegistroUrl)).blob();
+    const ext = blob.type === 'image/png' ? 'png' : (blob.type === 'image/webp' ? 'webp' : 'jpg');
+    const fileName = `${userId}_registro.${ext}`;
+    const res = await fetch(`${SUPABASE_URL}/storage/v1/object/fotos-perfil/${fileName}`, {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': blob.type, 'x-upsert': 'true' },
+      body: blob
+    });
+    if (!res.ok) { console.error('Error subiendo foto'); return null; }
+    return `${SUPABASE_URL}/storage/v1/object/public/fotos-perfil/${fileName}`;
+  } catch(e) { console.error('subirFoto:', e); return null; }
+}
+
+// ═══════════════════════════════════════
+// UBICACIONES EN CASCADA (igual que antes)
+// ═══════════════════════════════════════
+const ubicaciones = {
+  'CABA': { ciudades: ['Buenos Aires (CABA)'], barrios: { 'Buenos Aires (CABA)': ['Agronomía','Almagro','Balvanera','Barracas','Belgrano','Boedo','Caballito','Chacarita','Coghlan','Colegiales','Constitución','Floresta','Flores','La Boca','La Paternal','Liniers','Mataderos','Montserrat','Nueva Pompeya','Núñez','Palermo','Parque Avellaneda','Parque Chacabuco','Parque Chas','Parque Patricios','Puerto Madero','Recoleta','Retiro','Saavedra','San Cristóbal','San Nicolás','San Telmo','Versalles','Villa Crespo','Villa del Parque','Villa Devoto','Villa General Mitre','Villa Lugano','Villa Luro','Villa Ortúzar','Villa Pueyrredón','Villa Real','Villa Riachuelo','Villa Santa Rita','Villa Soldati','Villa Urquiza','Otro barrio'] } },
+  'Buenos Aires': {
+    ciudades: ['— GBA Zona Norte —','San Isidro','Vicente López','Tigre','San Fernando','Pilar','Escobar','Malvinas Argentinas','José C. Paz','San Miguel','Moreno','Zárate','Campana','— GBA Zona Oeste —','Morón','Tres de Febrero','Hurlingham','Ituzaingó','Merlo','General San Martín','La Matanza','— GBA Zona Sur —','Lanús','Lomas de Zamora','Quilmes','Avellaneda','Berazategui','Florencio Varela','Almirante Brown','Ezeiza','Esteban Echeverría','Presidente Perón','— Interior Provincia —','La Plata','Mar del Plata','Bahía Blanca','Tandil','Junín','Pergamino','Necochea','Olavarría','Azul','San Nicolás de los Arroyos','Luján','Mercedes','Chivilcoy','Tres Arroyos','Otra localidad'],
+    barrios: { 'La Plata': ['Centro','Altos de San Lorenzo','City Bell','El Mondongo','Gonnet','La Loma','Parque Castelli','Villa Elvira','Villa Elisa','Tolosa','Otro barrio'], 'Mar del Plata': ['Centro','La Perla','Güemes','Punta Mogotes','Puerto','Stella Maris','Camet','Otro barrio'], 'Bahía Blanca': ['Centro','Villa Mitre','Barrio Universitario','Palihue','Napostá','Otro barrio'], 'San Isidro': ['San Isidro centro','Martínez','Acassuso','Beccar','La Horqueta','Otro barrio'], 'Vicente López': ['Olivos','Florida','Munro','Villa Martelli','La Lucila','Otro barrio'], 'Morón': ['Morón centro','Castelar','El Palomar','Haedo','Ituzaingó centro','Otro barrio'], 'Lanús': ['Lanús Este','Lanús Oeste','Monte Chingolo','Remedios de Escalada','Otro barrio'], 'Lomas de Zamora': ['Lomas centro','Banfield','Temperley','Turdera','Ingeniería','Otro barrio'], 'Quilmes': ['Quilmes centro','Bernal','Ezpeleta','Berazategui centro','Otro barrio'], 'Avellaneda': ['Avellaneda centro','Dock Sud','Sarandí','Villa Domínico','Otro barrio'], 'Tigre': ['Tigre centro','Don Torcuato','El Talar','General Pacheco','Rincón de Milberg','Otro barrio'], 'General San Martín': ['San Martín centro','Villa Lynch','Villa Ballester','Palermo','José León Suárez','Otro barrio'], 'La Matanza': ['Ramos Mejía','San Justo','Tapiales','Ciudad Evita','González Catán','Laferrere','Otro barrio'] }
+  },
+  'Córdoba': { ciudades: ['Córdoba Capital','Villa Carlos Paz','Río Cuarto','San Francisco','Villa María','Cosquín','Alta Gracia','Jesús María','Río Tercero','Bell Ville','Laboulaye','Marcos Juárez','Otra localidad'], barrios: { 'Córdoba Capital': ['Alberdi','Argüello','Barrio Jardín','Centro','Cerro de las Rosas','Güemes','General Paz','Juniors','Nueva Córdoba','Palermo','Parque Vélez Sársfield','San Vicente','Villa Cabrera','Villa del Prado','Villa Warcalde','Otro barrio'] } },
+  'Santa Fe': { ciudades: ['Rosario','Santa Fe Capital','Rafaela','Venado Tuerto','Reconquista','Villa Gobernador Gálvez','San Lorenzo','Casilda','Esperanza','Otra localidad'], barrios: { 'Rosario': ['Centro','Echesortu','Fisherton','Abasto','Las Delicias','Pichincha','Alberdi','República de la Sexta','Tablada','Belgrano','Otro barrio'], 'Santa Fe Capital': ['Centro','Alto Verde','Barrio El Pozo','Candioti','Centenario','Otro barrio'] } },
+  'Mendoza': { ciudades: ['Mendoza Capital','Godoy Cruz','Guaymallén','Las Heras','Maipú','Luján de Cuyo','San Rafael','General Alvear','Rivadavia','Junín','Otra localidad'], barrios: { 'Mendoza Capital': ['Centro','Dorrego','Godoy Cruz centro','Las Heras centro','Otro barrio'] } },
+  'Tucumán': { ciudades: ['San Miguel de Tucumán','Yerba Buena','Tafí Viejo','Banda del Río Salí','Concepción','Monteros','Otra localidad'], barrios: {} },
+  'Salta': { ciudades: ['Salta Capital','San Ramón de la Nueva Orán','Tartagal','Metán','Cafayate','Otra localidad'], barrios: {} },
+  'Entre Ríos': { ciudades: ['Paraná','Concordia','Gualeguaychú','Colón','Concepción del Uruguay','Otra localidad'], barrios: {} },
+};
+
+function updateCiudades() {
+  const prov = document.getElementById('sel-provincia').value;
+  const data = ubicaciones[prov];
+  const fieldCiudad = document.getElementById('field-ciudad');
+  const fieldBarrio = document.getElementById('field-barrio');
+  const selCiudad = document.getElementById('sel-ciudad');
+  const selBarrio = document.getElementById('sel-barrio');
+  fieldBarrio.style.display = 'none';
+  selBarrio.innerHTML = '<option value="" disabled selected>¿En qué barrio o zona?</option>';
+  if (data) {
     selCiudad.innerHTML = '<option value="" disabled selected>¿En qué ciudad?</option>';
     data.ciudades.forEach(c => {
-      const opt = document.createElement('option');
-      opt.textContent = c; selCiudad.appendChild(opt);
+      if (c.startsWith('—')) { const opt = document.createElement('option'); opt.disabled = true; opt.textContent = c; selCiudad.appendChild(opt); }
+      else { const opt = document.createElement('option'); opt.value = c; opt.textContent = c; selCiudad.appendChild(opt); }
     });
-    document.getElementById('field-ciudad').style.display = 'block';
-    document.getElementById('field-barrio').style.display = 'none';
+    fieldCiudad.style.display = 'block';
+  } else {
+    selCiudad.innerHTML = '<option value="" disabled selected>¿En qué ciudad?</option>';
+    fieldCiudad.style.display = 'block';
   }
+}
 
-  function updateBarrios() {
-    const prov = document.getElementById('sel-provincia').value;
-    const ciudad = document.getElementById('sel-ciudad').value;
-    const data = ubicaciones[prov] || defaultUbicacion;
-    const barrios = data.barrios[ciudad];
-    const fieldBarrio = document.getElementById('field-barrio');
-    if (barrios && barrios.length) {
-      fieldBarrio.innerHTML = `<label>Barrio / Zona <span style="color:var(--gris2);font-size:0.7rem;text-transform:none;letter-spacing:0">(opcional, pero ayuda al matching)</span></label><select id="sel-barrio"><option value="" disabled selected>¿En qué barrio?</option>${barrios.map(b=>`<option>${b}</option>`).join('')}</select>`;
-    } else {
-      fieldBarrio.innerHTML = `<label>Barrio / Zona <span style="color:var(--gris2);font-size:0.7rem;text-transform:none;letter-spacing:0">(opcional)</span></label><input type="text" placeholder="Ej: Centro, Norte, Villa del Lago...">`;
-    }
+function updateBarrios() {
+  const prov = document.getElementById('sel-provincia').value;
+  const ciudad = document.getElementById('sel-ciudad').value;
+  const data = ubicaciones[prov];
+  const fieldBarrio = document.getElementById('field-barrio');
+  const selBarrio = document.getElementById('sel-barrio');
+  if (data && data.barrios && data.barrios[ciudad]) {
+    selBarrio.innerHTML = '<option value="" disabled selected>¿En qué barrio o zona?</option>';
+    data.barrios[ciudad].forEach(b => { const opt = document.createElement('option'); opt.value = b; opt.textContent = b; selBarrio.appendChild(opt); });
     fieldBarrio.style.display = 'block';
+  } else {
+    selBarrio.innerHTML = '<option value="" disabled selected>¿En qué barrio o zona?</option>';
+    fieldBarrio.style.display = 'block';
+    fieldBarrio.querySelector('label').innerHTML = 'Barrio / Zona <span style="color:var(--gris2); font-size:0.7rem; text-transform:none; letter-spacing:0">(escribí tu barrio)</span>';
+    const inputBarrio = document.createElement('input');
+    inputBarrio.type = 'text';
+    inputBarrio.placeholder = 'Escribí tu barrio o zona';
+    inputBarrio.style.cssText = 'width:100%;background:var(--negro2);border:1px solid #2a2a2a;color:var(--blanco);padding:.9rem 1.1rem;font-family:var(--font-body);font-size:.95rem;outline:none;';
+    if (!fieldBarrio.querySelector('input')) { selBarrio.replaceWith(inputBarrio); }
   }
+}
 
-  function validarPassword(input) {
-    const fb = document.getElementById('pass-feedback')
-    const val = input.value
-    if (!val) { fb.textContent = ''; input.style.borderColor = ''; return }
-    if (val.length < 8) {
-      fb.textContent = `✗ Faltan ${8 - val.length} caracteres`
-      fb.style.color = '#ff5555'
-      input.style.borderColor = '#ff5555'
-    } else {
-      fb.textContent = '✓ Contraseña válida'
-      fb.style.color = 'var(--neon)'
-      input.style.borderColor = 'var(--neon)'
-    }
-  }
+// ═══════════════════════════════════════
+// ARTISTAS REFERENTES
+// ═══════════════════════════════════════
+async function buscarArtistas(query) {
+  const dropdown = document.getElementById('artist-dropdown');
+  dropdownIdx = -1;
+  if (!query || query.length < 2) { dropdown.style.display = 'none'; return; }
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/artistas_sugeridos?nombre=ilike.*${encodeURIComponent(query)}*&order=veces.desc&limit=8`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
+    const list = await res.json();
+    if (!list.length) { dropdown.style.display = 'none'; return; }
+    dropdown.innerHTML = list.map(a => `<div data-nombre="${a.nombre}" onclick="selectArtistFromDropdown('${a.nombre.replace(/'/g,"\\'")}') " style="padding:.6rem 1rem;cursor:pointer;font-size:.88rem;border-bottom:1px solid #222;">${a.nombre}</div>`).join('');
+    dropdown.style.display = 'block';
+  } catch(e) { dropdown.style.display = 'none'; }
+}
 
-  // FOTO EN REGISTRO
-  let fotoRegistroUrl = null
+function selectArtistFromDropdown(nombre) {
+  if (!artists.includes(nombre)) { artists.push(nombre); renderArtists(); }
+  document.getElementById('artist-input').value = '';
+  document.getElementById('artist-dropdown').style.display = 'none';
+}
 
-  function previewFotoRegistro(input) {
-    if (!input.files || !input.files[0]) return
-    const file = input.files[0]
-    if (file.size > 2 * 1024 * 1024) { alert('La foto no puede superar 2MB.'); return }
-    const reader = new FileReader()
-    reader.onload = e => {
-      const preview = document.getElementById('reg-foto-preview')
-      preview.src = e.target.result
-      preview.style.display = 'block'
-      document.getElementById('reg-foto-icon').style.display = 'none'
-      document.getElementById('reg-foto-text').innerHTML = '<strong>✓ Foto lista</strong><br>Se guardará al crear el perfil'
-    }
-    reader.readAsDataURL(file)
-    // Guardar referencia al file para subirlo al crear perfil
-    fotoRegistroUrl = input.files[0]
-  }
+function handleArtistKey(e) {
+  const dropdown = document.getElementById('artist-dropdown');
+  const options = dropdown.querySelectorAll('div');
+  if (e.key === 'ArrowDown') { dropdownIdx = Math.min(dropdownIdx + 1, options.length - 1); options.forEach((o, i) => o.style.background = i === dropdownIdx ? '#2a2a2a' : ''); e.preventDefault(); }
+  else if (e.key === 'ArrowUp') { dropdownIdx = Math.max(dropdownIdx - 1, -1); options.forEach((o, i) => o.style.background = i === dropdownIdx ? '#2a2a2a' : ''); e.preventDefault(); }
+  else if (e.key === 'Enter') { if (dropdownIdx >= 0 && options[dropdownIdx]) { selectArtistFromDropdown(options[dropdownIdx].dataset.nombre); } else { addArtist(); } e.preventDefault(); }
+  else if (e.key === 'Escape') { dropdown.style.display = 'none'; }
+}
 
-  async function subirFotoRegistro(userId) {
-    if (!fotoRegistroUrl) return null
+document.addEventListener('click', e => { if (!e.target.closest('.artist-input-wrap')) { const dd = document.getElementById('artist-dropdown'); if (dd) dd.style.display = 'none'; } });
+
+async function guardarArtistasEnSupabase(lista) {
+  for (const nombre of lista) {
     try {
-      const file = fotoRegistroUrl
-      const ext = file.name.split('.').pop()
-      const fileName = `${userId}-${Date.now()}.${ext}`
-      const res = await fetch(
-        `${SUPABASE_URL}/storage/v1/object/fotos-perfil/${fileName}`,
-        {
-          method: 'POST',
-          headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Content-Type': file.type,
-            'x-upsert': 'true'
-          },
-          body: file
-        }
-      )
-      if (res.ok) return `${SUPABASE_URL}/storage/v1/object/public/fotos-perfil/${fileName}`
-    } catch(e) { console.error('Error subiendo foto:', e) }
-    return null
-  }
-  let artists = [];
-  let dropdownIdx = -1;
-
-  async function buscarArtistas(query) {
-    const dropdown = document.getElementById('artist-dropdown');
-    if (!query || query.length < 2) { dropdown.style.display = 'none'; return; }
-
-    try {
-      const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/artistas_sugeridos?nombre=ilike.*${encodeURIComponent(query)}*&order=veces.desc&limit=8`,
-        { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
-      );
-      const sugerencias = await res.json();
-      dropdownIdx = -1;
-
-      if (!sugerencias.length) { dropdown.style.display = 'none'; return; }
-
-      dropdown.innerHTML = sugerencias.map((s, i) =>
-        `<div class="artist-option" data-nombre="${s.nombre}" 
-          style="padding:.65rem 1rem;cursor:pointer;font-size:.85rem;color:#f2ede4;border-bottom:1px solid #222;transition:background .15s"
-          onmousedown="selectArtistFromDropdown('${s.nombre.replace(/'/g,"\\'")}')">
-          ${s.nombre} <span style="color:#555;font-size:.7rem;margin-left:.4rem">${s.veces} ${s.veces===1?'músico':'músicos'}</span>
-        </div>`
-      ).join('');
-      dropdown.style.display = 'block';
-    } catch(e) { dropdown.style.display = 'none'; }
-  }
-
-  function selectArtistFromDropdown(nombre) {
-    addArtistByName(nombre, null);
-    document.getElementById('artist-input').value = '';
-    document.getElementById('artist-dropdown').style.display = 'none';
-  }
-
-  function handleArtistKey(e) {
-    const dropdown = document.getElementById('artist-dropdown');
-    const options = dropdown.querySelectorAll('.artist-option');
-    if (e.key === 'ArrowDown') {
-      dropdownIdx = Math.min(dropdownIdx + 1, options.length - 1);
-      options.forEach((o, i) => o.style.background = i === dropdownIdx ? '#2a2a2a' : '');
-      e.preventDefault();
-    } else if (e.key === 'ArrowUp') {
-      dropdownIdx = Math.max(dropdownIdx - 1, -1);
-      options.forEach((o, i) => o.style.background = i === dropdownIdx ? '#2a2a2a' : '');
-      e.preventDefault();
-    } else if (e.key === 'Enter') {
-      if (dropdownIdx >= 0 && options[dropdownIdx]) {
-        selectArtistFromDropdown(options[dropdownIdx].dataset.nombre);
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/artistas_sugeridos?nombre=eq.${encodeURIComponent(nombre)}`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
+      const existing = await res.json();
+      if (existing.length) {
+        await fetch(`${SUPABASE_URL}/rest/v1/artistas_sugeridos?nombre=eq.${encodeURIComponent(nombre)}`, { method: 'PATCH', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' }, body: JSON.stringify({ veces: existing[0].veces + 1 }) });
       } else {
-        addArtist();
+        await fetch(`${SUPABASE_URL}/rest/v1/artistas_sugeridos`, { method: 'POST', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' }, body: JSON.stringify({ nombre, veces: 1 }) });
       }
-      e.preventDefault();
-    } else if (e.key === 'Escape') {
-      dropdown.style.display = 'none';
-    }
+    } catch(e) { console.error('Error guardando artista:', e); }
   }
+}
 
-  // Cerrar dropdown al clickear afuera
-  document.addEventListener('click', e => {
-    if (!e.target.closest('.artist-input-wrap')) {
-      document.getElementById('artist-dropdown').style.display = 'none';
-    }
-  });
+function addArtist() {
+  const input = document.getElementById('artist-input');
+  const val = input.value.trim();
+  if (!val) return;
+  if (!artists.includes(val)) { artists.push(val); renderArtists(); }
+  input.value = '';
+  document.getElementById('artist-dropdown').style.display = 'none';
+  input.focus();
+}
 
-  async function guardarArtistasEnSupabase(lista) {
-    for (const nombre of lista) {
-      try {
-        // Intentar insertar — si ya existe, sumar 1 a veces
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/artistas_sugeridos?nombre=eq.${encodeURIComponent(nombre)}`,
-          { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
-        );
-        const existing = await res.json();
-        if (existing.length) {
-          await fetch(`${SUPABASE_URL}/rest/v1/artistas_sugeridos?nombre=eq.${encodeURIComponent(nombre)}`, {
-            method: 'PATCH',
-            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-            body: JSON.stringify({ veces: existing[0].veces + 1 })
-          });
-        } else {
-          await fetch(`${SUPABASE_URL}/rest/v1/artistas_sugeridos`, {
-            method: 'POST',
-            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-            body: JSON.stringify({ nombre, veces: 1 })
-          });
-        }
-      } catch(e) { console.error('Error guardando artista:', e); }
-    }
+function addArtistByName(name, btn) {
+  if (!artists.includes(name)) { artists.push(name); renderArtists(); if (btn) btn.classList.add('selected'); }
+  else { artists = artists.filter(a => a !== name); renderArtists(); if (btn) btn.classList.remove('selected'); }
+}
+
+function removeArtist(name) {
+  artists = artists.filter(a => a !== name);
+  renderArtists();
+  document.querySelectorAll('#chips-sugerencias .chip').forEach(c => { if (c.textContent.trim() === name) c.classList.remove('selected'); });
+}
+
+function renderArtists() {
+  const container = document.getElementById('artist-tags');
+  if (!container) return;
+  container.innerHTML = artists.map(a => `<span class="artist-tag">${a}<button type="button" class="artist-tag-remove" onclick="removeArtist('${a.replace(/'/g,"\\'")}')">×</button></span>`).join('');
+}
+
+// ═══════════════════════════════════════
+// INIT — Render objetivos por defecto
+// ═══════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  // Pre-render objetivos para música (por si acaso)
+  const grid = document.getElementById('objetivo-grid');
+  if (grid) {
+    const opts = objetivosXRubro.musica;
+    grid.innerHTML = opts.map(o => `
+      <button type="button" class="objetivo-card" onclick="selectObjetivo(this)">
+        <span class="objetivo-icon">${o.icon}</span>
+        <span class="objetivo-title">${o.title}</span>
+        <span class="objetivo-desc">${o.desc}</span>
+      </button>
+    `).join('');
   }
+});
 
-  function addArtist() {
-    const input = document.getElementById('artist-input');
-    const val = input.value.trim();
-    if (!val) return;
-    if (!artists.includes(val)) {
-      artists.push(val);
-      renderArtists();
-    }
-    input.value = '';
-    document.getElementById('artist-dropdown').style.display = 'none';
-    input.focus();
-  }
-
-  function addArtistByName(name, btn) {
-    if (!artists.includes(name)) {
-      artists.push(name);
-      renderArtists();
-      if (btn) btn.classList.add('selected');
-    } else {
-      artists = artists.filter(a => a !== name);
-      renderArtists();
-      if (btn) btn.classList.remove('selected');
-    }
-  }
-
-  function removeArtist(name) {
-    artists = artists.filter(a => a !== name);
-    renderArtists();
-    document.querySelectorAll('#chips-sugerencias .chip').forEach(c => {
-      if (c.textContent.trim() === name) c.classList.remove('selected');
-    });
-  }
-
-  function renderArtists() {
-    const container = document.getElementById('artist-tags');
-    if (!container) return;
-    container.innerHTML = artists.map(a =>
-      `<span class="artist-tag">${a}<button type="button" class="artist-tag-remove" onclick="removeArtist('${a.replace(/'/g,"\\'")}')">×</button></span>`
-    ).join('');
-  }
-  // ═══ SUPABASE ═══
-  const SUPABASE_URL = 'https://xiaanchoanxmampegoay.supabase.co'
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68'
-
-  async function crearPerfil(btn) {
-    btn = btn || (window.event && window.event.currentTarget) || document.querySelector('.btn-next[onclick*="crearPerfil"]')
-    if (!btn) return
-    const email = document.getElementById('reg-email')?.value?.trim()
-    const nombre = document.getElementById('reg-nombre')?.value?.trim()
-    const apellido = document.getElementById('reg-apellido')?.value?.trim()
-    const password = document.getElementById('reg-password')?.value
-    const provincia = document.getElementById('sel-provincia')?.value || ''
-    const ciudad = document.getElementById('sel-ciudad')?.value || ''
-    const barrio = document.getElementById('sel-barrio')?.value || document.querySelector('#field-barrio input')?.value || ''
-
-    // Validaciones
-    if (!nombre) { alert('Por favor ingresá tu nombre.'); goStep(1); return; }
-    if (!email || !email.includes('@')) { alert('Por favor ingresá un email válido.'); goStep(1); return; }
-    if (!password || password.length < 8) { alert('La contraseña debe tener al menos 8 caracteres.'); goStep(1); return; }
-
-    // Validar captcha
-    let captchaResponse = ''
-    if (window.hcaptcha && typeof window.hcaptcha.getResponse === 'function') {
-      captchaResponse = window.hcaptcha.getResponse()
-    }
-    if (!captchaResponse) {
-      alert('Por favor completá el captcha para continuar.')
-      return
-    }
-
-    const nombreCompleto = apellido ? `${nombre} ${apellido}` : nombre
-    const instrumentos = [...document.querySelectorAll('#chips-instrumentos .chip.selected')].map(c => c.textContent).join(', ')
-    const generos = [...document.querySelectorAll('#chips-generos .chip.selected')].map(c => c.textContent).join(', ')
-    const disponibilidad = [...document.querySelectorAll('.objetivo-card.selected')].map(c => c.querySelector('.objetivo-title')?.textContent).join(', ')
-    const referentes = artists.join(', ')
-    const bio = document.getElementById('bio-text')?.value || ''
-
-    btn.textContent = 'Guardando...'
-    btn.style.opacity = '0.7'
-    btn.disabled = true
-
-    try {
-      const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/registrar_usuario`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`
-        },
-        body: JSON.stringify({
-          p_email: email,
-          p_password: password,
-          p_nombre: nombreCompleto,
-          p_provincia: provincia,
-          p_ciudad: ciudad,
-          p_barrio: barrio,
-          p_instrumento: instrumentos,
-          p_generos: generos,
-          p_disponibilidad: disponibilidad,
-          p_referentes: referentes,
-          p_bio: bio
-        })
-      })
-
-      let data = null
-      try { data = await response.json() } catch(_) { data = null }
-
-      if (!response.ok || data?.error) {
-        const errText = data?.error || data?.message || JSON.stringify(data || {})
-        if (String(errText).toLowerCase().includes('duplicate') || String(errText).toLowerCase().includes('unique') || String(errText).toLowerCase().includes('ya existe')) {
-          alert('Ese email ya está registrado. ¿Querés ingresar?')
-          window.location.href = 'buscARTE_login.html'
-        } else {
-          alert('Hubo un error al guardar tu perfil. Intentá de nuevo.')
-          console.error('Registro error:', errText)
-          if (window.hcaptcha && typeof window.hcaptcha.reset === 'function') window.hcaptcha.reset()
-        }
-        btn.textContent = '🎉 Crear mi perfil'
-        btn.style.opacity = '1'
-        btn.disabled = false
-        return
-      }
-
-      const usuario = Array.isArray(data) ? data[0] : data
-      if (fotoRegistroUrl && usuario?.id) {
-        subirFotoRegistro(usuario.id).then(fotoUrl => {
-          if (fotoUrl) {
-            fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${usuario.id}`, {
-              method: 'PATCH',
-              headers: { 'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal' },
-              body: JSON.stringify({ foto_url: fotoUrl })
-            }).catch(e => console.error('Error guardando foto_url:', e))
-          }
-        }).catch(e => console.error('Error subiendo foto:', e))
-      }
-      localStorage.setItem('ba_logged', '1')
-      localStorage.setItem('ba_name', nombreCompleto)
-      if (usuario?.id) localStorage.setItem('ba_user_id', String(usuario.id))
-      localStorage.setItem('ba_referentes', artists.join(','))
-      localStorage.setItem('ba_generos', generos)
-      if (artists.length) guardarArtistasEnSupabase(artists)
-
-      // Email de bienvenida — no bloquea el flujo
-      fetch('/.netlify/functions/send-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          tipo: 'bienvenida',
-          destinatario: email,
-          datos: { nombre: nombreCompleto.split(' ')[0] }
-        })
-      }).catch(e => console.error('Error enviando bienvenida:', e))
-
-      goStep(5)
-    } catch (e) {
-      alert('No se pudo conectar. Verificá tu conexión e intentá de nuevo.')
-      console.error(e)
-      if (window.hcaptcha && typeof window.hcaptcha.reset === 'function') window.hcaptcha.reset()
-    } finally {
-      btn.textContent = '🎉 Crear mi perfil'
-      btn.style.opacity = '1'
-      btn.disabled = false
-    }
-  }
+// ═══════════════════════════════════════
+// CURSOR
+// ═══════════════════════════════════════
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
+function animateCursor() {
+  cursor.style.left=mx+'px'; cursor.style.top=my+'px';
+  rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12;
+  ring.style.left=rx+'px'; ring.style.top=ry+'px';
+  requestAnimationFrame(animateCursor);
+}
+animateCursor();
 </script>
 <script>
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
-  });
+  window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(() => {}); });
 }
 </script>
 </body>

@@ -4,29 +4,27 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- SEO -->
-  <meta name="keywords" content="buscar músico argentina, guitarrista buenos aires, baterista en mi barrio, bajista rock, cantante jazz, músico palermo, músico villa crespo, músico córdoba, músico rosario">
-  <meta name="description" content="Encontrá músicos cerca tuyo en Argentina. Buscá por instrumento, género musical y barrio. Guitarristas, bateristas, bajistas, cantantes, tecladistas y más en Buenos Aires, Córdoba, Rosario.">
+  <meta name="keywords" content="buscar artista argentina, músico fotógrafo actor diseñador tatuador bailarín, artistas buenos aires, artistas córdoba, artistas rosario, buscARTE">
+  <meta name="description" content="Encontrá artistas y creativos de todos los rubros en Argentina. Músicos, actores, fotógrafos, diseñadores, bailarines, tatuadores y más. Buscá por rubro, zona y especialidad.">
   <meta name="robots" content="index, follow">
   <meta name="author" content="buscARTE">
-  <link rel="canonical" href="https://buscarte.com.ar/musicos">
-
-  <!-- Open Graph (WhatsApp, Facebook, Instagram) -->
+  <link rel="canonical" href="https://buscarte.com.ar/buscARTE_busqueda.html">
+  <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://buscarte.com.ar/buscARTE_busqueda.html">
-  <meta property="og:title" content="Buscar músicos en Argentina — Guitarristas, bateristas, bajistas | buscARTE">
-  <meta property="og:description" content="Encontrá músicos cerca tuyo en Argentina. Buscá por instrumento, género musical y barrio. Guitarristas, bateristas, bajistas, cantantes, tecladistas y más en Buenos Aires, Córdoba, Rosario.">
+  <meta property="og:title" content="Buscar artistas en Argentina — Músicos, actores, fotógrafos y más | buscARTE">
+  <meta property="og:description" content="Encontrá artistas y creativos de todos los rubros en Argentina. 100% gratis.">
   <meta property="og:image" content="https://buscarte.com.ar/og-image.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:locale" content="es_AR">
   <meta property="og:site_name" content="buscARTE">
-
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Buscar músicos en Argentina — Guitarristas, bateristas, bajistas | buscARTE">
-  <meta name="twitter:description" content="Encontrá músicos cerca tuyo en Argentina. Buscá por instrumento, género musical y barrio. Guitarristas, bateristas, bajistas, cantantes, tecladistas y más en Buenos Aires, Córdoba, Rosario.">
+  <meta name="twitter:title" content="Buscar artistas en Argentina | buscARTE">
+  <meta name="twitter:description" content="Encontrá músicos, actores, fotógrafos, diseñadores, bailarines, tatuadores y más.">
   <meta name="twitter:image" content="https://buscarte.com.ar/og-image.jpg">
-<title>Buscar músicos en Argentina — Guitarristas, bateristas, bajistas | buscARTE</title>
+<title>Buscar artistas en Argentina | buscARTE</title>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
@@ -356,7 +354,7 @@
     overflow:hidden;
   }
   .search-intro::after {
-    content:'MUSICOS';
+    content:attr(data-bg-text);
     position:absolute;
     right:-.35rem;
     bottom:-1.1rem;
@@ -404,7 +402,7 @@
   .intro-cta:hover { background:rgba(212,245,60,.07);border-color:var(--neon); }
   .section-switcher {
     display:grid;
-    grid-template-columns:repeat(5, minmax(0,1fr));
+    grid-template-columns:repeat(5, 1fr);
     gap:1px;
     background:#222;
     border:1px solid #222;
@@ -416,17 +414,28 @@
     background:rgba(0,0,0,.48);
     color:var(--gris);
     text-decoration:none;
-    padding:.75rem .65rem;
-    font-size:.69rem;
-    letter-spacing:.08em;
+    padding:.75rem .5rem;
+    font-size:.67rem;
+    letter-spacing:.07em;
     text-transform:uppercase;
     display:flex;
     align-items:center;
     justify-content:center;
-    gap:.42rem;
+    gap:.4rem;
     transition:background .18s,color .18s;
     text-align:center;
+    white-space:normal;
+    line-height:1.3;
+    word-break:break-word;
   }
+  .section-tab-anuncios {
+    grid-column: 1 / -1;
+    border-top:1px solid #2a2a2a;
+    font-size:.68rem;
+    opacity:.7;
+    padding:.6rem;
+  }
+  .section-tab-anuncios:hover { opacity:1; }
   .section-tab:hover { color:var(--blanco);background:#151515; }
   .section-tab.active { background:var(--neon);color:var(--negro);font-weight:700; }
   .section-tab small { display:block;font-size:.56rem;opacity:.72;letter-spacing:.05em;text-transform:none;font-weight:400; }
@@ -520,9 +529,10 @@
     .intro-title { font-size:1.65rem; }
     .intro-copy { font-size:.82rem; }
     .intro-cta { width:100%;text-align:center; }
-    .section-switcher { grid-template-columns:1fr 1fr; }
-    .section-tab { justify-content:flex-start;font-size:.66rem;padding:.7rem .72rem; }
-    .section-tab.active { grid-column:1/-1; }
+    .section-switcher { grid-template-columns: repeat(2, 1fr) !important; }
+    .section-tab { font-size:.62rem; padding:.6rem .4rem; }
+    .section-tab-anuncios { grid-column: 1 / -1 !important; }
+    .section-tab.active { grid-column: unset; }
     .ad-bridge-card { flex-direction:column;align-items:flex-start;padding:1rem; }
     .ad-bridge-actions { width:100%;display:grid;grid-template-columns:1fr; }
     .ad-bridge-btn { text-align:center; }
@@ -569,7 +579,7 @@
   </div>
   <div class="nav-right">
     <ul class="nav-links" style="margin-right:.8rem">
-      <li><a href="buscARTE_busqueda.html" class="nav-link">Músicos</a></li>
+      <li><a href="buscARTE_busqueda.html" class="nav-link">Artistas</a></li>
       <li><a href="buscARTE_anuncios.html" class="nav-link">Anuncios</a></li>
       <li><a href="buscARTE_mensajes.html" class="nav-link">Mensajes</a></li>
     </ul>
@@ -605,78 +615,10 @@
       <div class="filter-title">Filtros</div>
       <button class="filter-clear" onclick="clearFilters()">Limpiar</button>
     </div>
-    <div class="filter-group long-filter">
-      <span class="filter-group-label">Instrumento</span>
-      <div class="filter-chips">
-        <button class="fchip" onclick="toggleFilter(this)">Guitarra</button>
-        <button class="fchip" onclick="toggleFilter(this)">Bajo</button>
-        <button class="fchip" onclick="toggleFilter(this)">Batería</button>
-        <button class="fchip" onclick="toggleFilter(this)">Teclado</button>
-        <button class="fchip" onclick="toggleFilter(this)">Voz / Canto</button>
-        <button class="fchip" onclick="toggleFilter(this)">Saxo</button>
-        <button class="fchip" onclick="toggleFilter(this)">Violín</button>
-        <button class="fchip" onclick="toggleFilter(this)">Cello</button>
-        <button class="fchip" onclick="toggleFilter(this)">Trompeta</button>
-        <button class="fchip" onclick="toggleFilter(this)">Flauta</button>
-        <button class="fchip" onclick="toggleFilter(this)">Percusión</button>
-        <button class="fchip" onclick="toggleFilter(this)">DJ/Prod.</button>
-        <button class="fchip" onclick="toggleFilter(this)">Bandoneón</button>
-        <button class="fchip" onclick="toggleFilter(this)">Charango</button>
-        <button class="fchip" onclick="toggleFilter(this)">Arpa</button>
-        <button class="fchip" onclick="toggleFilter(this)">Acordeón</button>
-        <button class="fchip" onclick="toggleFilter(this)">Contrabajo</button>
-        <button class="fchip" onclick="toggleFilter(this)">Clarinete</button>
-        <button class="fchip" onclick="toggleFilter(this)">Cajón</button>
-        <button class="fchip" onclick="toggleFilter(this)">Bombo leguero</button>
-        <button class="fchip" onclick="toggleFilter(this)">Quena / Zampoña</button>
-        <button class="fchip" onclick="toggleFilter(this)">Ukelele</button>
-        <button class="fchip" onclick="toggleFilter(this)">Controlador MIDI</button>
-        <button class="fchip" onclick="toggleFilter(this)">Técnico de sonido</button>
-        <button class="fchip" onclick="toggleFilter(this)">Compositor / Arreglador</button>
-        <button class="fchip" onclick="toggleFilter(this)">Productor</button>
-        <button class="fchip" onclick="toggleFilter(this)">Mix & Mastering</button>
-        <button class="fchip" onclick="toggleFilter(this)">Manager</button>
-        <button class="fchip" onclick="toggleFilter(this)">Otro</button>
-      </div>
-      <span class="filter-hint">Elegí uno o varios. La lista queda compacta para no tapar todo el buscador.</span>
-    </div>
+    <!-- Filtros dinámicos por rubro — se renderizan via initBusqueda() -->
+    <div id="filters-rubro-principal"></div>
     <div class="filter-divider"></div>
-    <div class="filter-group long-filter">
-      <span class="filter-group-label">Género</span>
-      <div class="filter-chips">
-        <button class="fchip" onclick="toggleFilter(this)">Rock</button>
-        <button class="fchip" onclick="toggleFilter(this)">Rock Nacional</button>
-        <button class="fchip" onclick="toggleFilter(this)">Metal</button>
-        <button class="fchip" onclick="toggleFilter(this)">Jazz</button>
-        <button class="fchip" onclick="toggleFilter(this)">Folklore</button>
-        <button class="fchip" onclick="toggleFilter(this)">Tango</button>
-        <button class="fchip" onclick="toggleFilter(this)">Cumbia</button>
-        <button class="fchip" onclick="toggleFilter(this)">Indie</button>
-        <button class="fchip" onclick="toggleFilter(this)">Pop</button>
-        <button class="fchip" onclick="toggleFilter(this)">Electrónica</button>
-        <button class="fchip" onclick="toggleFilter(this)">R&B</button>
-        <button class="fchip" onclick="toggleFilter(this)">Rap / Hip Hop</button>
-        <button class="fchip" onclick="toggleFilter(this)">Funk</button>
-        <button class="fchip" onclick="toggleFilter(this)">Soul</button>
-        <button class="fchip" onclick="toggleFilter(this)">Reggae</button>
-        <button class="fchip" onclick="toggleFilter(this)">Tropical</button>
-        <button class="fchip" onclick="toggleFilter(this)">Punk</button>
-        <button class="fchip" onclick="toggleFilter(this)">Blues</button>
-        <button class="fchip" onclick="toggleFilter(this)">Prog</button>
-        <button class="fchip" onclick="toggleFilter(this)">Bossanova</button>
-        <button class="fchip" onclick="toggleFilter(this)">Clásica</button>
-        <button class="fchip" onclick="toggleFilter(this)">House</button>
-        <button class="fchip" onclick="toggleFilter(this)">Tech House</button>
-        <button class="fchip" onclick="toggleFilter(this)">Techno</button>
-        <button class="fchip" onclick="toggleFilter(this)">Trance</button>
-        <button class="fchip" onclick="toggleFilter(this)">Melodic House & Techno</button>
-        <button class="fchip" onclick="toggleFilter(this)">Minimal Deep/Tech</button>
-        <button class="fchip" onclick="toggleFilter(this)">Indie Dance</button>
-        <button class="fchip" onclick="toggleFilter(this)">Otro</button>
-      </div>
-      <span class="filter-hint">También podés escribir directo arriba: “baterista jazz palermo”.</span>
-    </div>
-    <div class="filter-divider"></div>
+    <!-- Ubicación — estática para todos los rubros -->
     <div class="filter-group">
       <span class="filter-group-label">Ubicación</span>
       <select id="ciudad-select" style="margin-bottom:.6rem" onchange="setCiudad(this.value)">
@@ -694,51 +636,34 @@
       <input type="text" id="barrio-input" placeholder="Barrio / zona (ej: Almagro)" oninput="setBarrio(this.value)">
     </div>
     <div class="filter-divider"></div>
-    <div class="filter-group">
-      <span class="filter-group-label">Busca</span>
-      <div class="filter-chips">
-        <button class="fchip" onclick="toggleFilter(this)">Banda</button>
-        <button class="fchip" onclick="toggleFilter(this)">Sesiones</button>
-        <button class="fchip" onclick="toggleFilter(this)">Zapada</button>
-        <button class="fchip" onclick="toggleFilter(this)">Proyecto</button>
-        <button class="fchip" onclick="toggleFilter(this)">Clases</button>
-      </div>
-    </div>
-    <div class="filter-divider"></div>
-    <div class="filter-group">
-      <span class="filter-group-label">Artista referente</span>
-      <input type="text" id="referente-input" placeholder="Ej: Linkin Park, Soda..." oninput="setReferente(this.value)">
-      <div style="font-size:.67rem;color:var(--gris2);margin-top:.4rem;line-height:1.5;">Músicos que escuchan lo mismo que vos</div>
-    </div>
-      <div class="filter-group mobile-show-results-wrap">
+    <!-- Filtros extra por rubro (referentes para música, etc.) -->
+    <div id="filters-rubro-extra"></div>
+    <div class="filter-group mobile-show-results-wrap">
       <button class="mobile-show-results" onclick="closeMobileFilters()">Ver resultados →</button>
     </div>
   </aside>
 
+  
+
   <div class="results-area">
-    <section class="search-intro" aria-label="Explorar buscARTE">
+    <section class="search-intro" id="search-intro" aria-label="Explorar buscARTE" data-bg-text="ARTISTAS">
       <div class="intro-kicker">Explorá sin registrarte</div>
       <div class="intro-row">
         <div>
-          <h1 class="intro-title">Encontrá <span>músicos</span><br>y movete por la escena.</h1>
-          <p class="intro-copy">Buscá perfiles por instrumento, género, zona o referentes. Y si no aparece lo que necesitás, también podés ir directo a <strong>anuncios, jams, compra/venta o clases</strong>.</p>
+          <h1 class="intro-title" id="intro-title">Encontrá <span id="intro-rubro-span">artistas</span><br>y movete por la escena.</h1>
+          <p class="intro-copy" id="intro-copy">Buscá perfiles por rubro, zona y especialidad. Y si no aparece lo que necesitás, también podés ir directo a <strong>anuncios o publicar gratis</strong>.</p>
         </div>
         <a class="intro-cta" href="buscARTE_anuncios.html">Ver anuncios →</a>
       </div>
-      <div class="section-switcher">
-        <a class="section-tab active" href="buscARTE_busqueda.html">🎵 <span>Músicos</span></a>
-        <a class="section-tab" href="buscARTE_anuncios.html">📋 <span>Anuncios</span></a>
-        <a class="section-tab" href="buscARTE_anuncios.html?tipo=jam">🥁 <span>Jams</span></a>
-        <a class="section-tab" href="buscARTE_anuncios.html?tipo=vendo">🎛️ <span>Compra/Venta</span></a>
-        <a class="section-tab" href="buscARTE_anuncios.html?tipo=clases">🎓 <span>Clases</span></a>
-      </div>
+      <!-- Selector de rubros — se rellena por initBusqueda() -->
+      <div class="section-switcher" id="section-switcher"></div>
     </section>
 
     <div class="results-header compact">
       <div>
         <div class="results-label">Resultados</div>
-        <div class="results-count"><span id="result-num">—</span> músicos</div>
-        <div class="results-sub" id="result-sub">todos los músicos</div>
+        <div class="results-count"><span id="result-num">—</span> <span id="result-label">artistas</span></div>
+        <div class="results-sub" id="result-sub">todos los artistas</div>
       </div>
       <div class="results-controls">
         <select class="sort-select" id="sort-select">
@@ -758,12 +683,12 @@
 
     <div class="musicians-grid" id="musicians-grid">
       <div style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--gris);font-size:.88rem" id="loading-state">
-        Cargando músicos...
+        Cargando artistas...
       </div>
     </div>
 
     <div class="load-more">
-      <button class="btn-load" id="btn-load-more" onclick="loadMore()" style="display:none">Cargar más músicos</button>
+      <button class="btn-load" id="btn-load-more" onclick="loadMore()" style="display:none">Cargar más →</button>
     </div>
   </div>
 </div>
@@ -793,14 +718,291 @@
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68';
   const SB_HEADERS = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` };
 
-  const COLORES = ['#0d2010', '#2a0a05', '#050d2a', '#1a0d2a', '#2a1a05', '#0d1a2a'];
-  const TEXTO = ['var(--neon)', '#ff6b5b', '#5b9fff', '#c45bff', '#ffaa5b', '#5bd4ff'];
+  // DETECCIÓN DE RUBRO desde URL param (?rubro=musica)
+  const rubroActivo = new URLSearchParams(window.location.search).get('rubro') || 'musica';
+
+  // ═══════════════════════════════════════
+  // CONFIGURACIÓN POR RUBRO
+  // ═══════════════════════════════════════
+  const RUBROS_BUSQUEDA_CONFIG = {
+    musica: {
+      emoji:'🎵', label:'Músicos', labelSingular:'músico', bgText:'MUSICOS', color:'#d4f53c',
+      introSpan:'músicos',
+      introCopy:'Buscá perfiles por instrumento, género, zona o referentes.',
+      searchPlaceholder:'Ej: bajista de jazz en Palermo...',
+      cardSubtitle: p => p.instrumento || 'Músico',
+      cardTags: p => splitList(p.generos).slice(0,3),
+      cardRefs: p => splitList(p.referentes).slice(0,3),
+      filtrosPrincipales: [
+        { label:'Instrumento', hint:'Elegí uno o varios.', chips:['Guitarra','Bajo','Batería','Teclado','Voz / Canto','Saxo','Violín','Cello','Trompeta','Flauta','Percusión','DJ/Prod.','Bandoneón','Charango','Arpa','Acordeón','Contrabajo','Clarinete','Cajón','Bombo leguero','Quena / Zampoña','Ukelele','Técnico de sonido','Compositor / Arreglador','Productor','Mix & Mastering','Manager','Otro'] },
+        { label:'Género', hint:'También podés escribir directo en el buscador.', chips:['Rock','Rock Nacional','Metal','Jazz','Folklore','Tango','Cumbia','Indie','Pop','Electrónica','R&B','Rap / Hip Hop','Funk','Soul','Reggae','Punk','Blues','Prog','Bossanova','Clásica','House','Tech House','Techno','Trance','Melodic House & Techno','Otro'] },
+        { label:'Busca', chips:['Banda','Sesiones','Zapada','Proyecto','Clases'] },
+      ],
+      filtrosExtra: [
+        { label:'Artista referente', type:'referente', placeholder:'Ej: Linkin Park, Soda...', hint:'Músicos que escuchan lo mismo que vos' }
+      ]
+    },
+    actuacion: {
+      emoji:'🎭', label:'Actores & escena', labelSingular:'artista de escena', bgText:'ACTORES', color:'#ff6b5b',
+      introSpan:'actores',
+      introCopy:'Buscá perfiles por rol, tipo de escena y zona.',
+      searchPlaceholder:'Ej: actor de comedia en Buenos Aires...',
+      cardSubtitle: p => getCampoEspecifico(p, 'chips-rol-act') || 'Actor/Actriz',
+      cardTags: p => getCamposEspecificosArray(p, 'chips-escena').slice(0,3),
+      cardRefs: () => [],
+      filtrosPrincipales: [
+        { label:'Rol', chips:['Actor/Actriz','Actor de voz / Doblajista','Director','Dramaturgo','Productor teatral','Asistente de dirección'] },
+        { label:'Tipo de escena', chips:['Drama','Comedia','Teatro musical','Stand-up','Impro','Infantil','Experimental','Terror','Monólogo','Circo-teatro'] },
+        { label:'Disponibilidad', chips:['Busco obra/proyecto','Proyecto propio','Disponible castings','Doy clases'] },
+      ],
+      filtrosExtra: []
+    },
+    audiovisual: {
+      emoji:'🎬', label:'Audiovisual & foto', labelSingular:'artista audiovisual', bgText:'AUDIOVISUAL', color:'#5b9fff',
+      introSpan:'videomakers y fotógrafos',
+      introCopy:'Buscá por rol, especialidad y zona.',
+      searchPlaceholder:'Ej: fotógrafo de moda en Palermo...',
+      cardSubtitle: p => getCampoEspecifico(p, 'chips-rol-av') || 'Audiovisual',
+      cardTags: p => getCamposEspecificosArray(p, 'chips-esp-av').slice(0,3),
+      cardRefs: () => [],
+      filtrosPrincipales: [
+        { label:'Rol', chips:['Videomaker','Fotógrafo','Editor','Creador de contenido','Operador de drone','Sonidista'] },
+        { label:'Especialidad', chips:['Publicidad','Cine / Ficción','Videoclip','Documental','YouTube / Podcast','TikTok / Reels','Sesiones musicales','Eventos','Moda','Retrato','Producto','Prensa','Toma aérea / Drone'] },
+      ],
+      filtrosExtra: []
+    },
+    modelaje: {
+      emoji:'👗', label:'Modelos', labelSingular:'modelo', bgText:'MODELOS', color:'#4de8c4',
+      introSpan:'modelos',
+      introCopy:'Buscá por tipo de trabajo, género y zona.',
+      searchPlaceholder:'Ej: modelo editorial en Buenos Aires...',
+      cardSubtitle: p => getCampoEspecifico(p, 'chips-tipo-modelo') || 'Modelo',
+      cardTags: p => getCamposEspecificosArray(p, 'chips-genero-modelo').slice(0,3),
+      cardRefs: () => [],
+      filtrosPrincipales: [
+        { label:'Tipo de trabajo', chips:['Editorial','Publicidad','Pasarela','Artístico','Eventos','Contenido para redes','Plus size'] },
+        { label:'Género', chips:['Hombre','Mujer','No binario'] },
+      ],
+      filtrosExtra: []
+    },
+    diseno: {
+      emoji:'✏️', label:'Diseño & artes', labelSingular:'artista visual', bgText:'DISEÑO', color:'#ffaa5b',
+      introSpan:'diseñadores y artistas',
+      introCopy:'Buscá por rol, estilo y zona.',
+      searchPlaceholder:'Ej: ilustrador manga en Córdoba...',
+      cardSubtitle: p => getCampoEspecifico(p, 'chips-rol-dis') || 'Diseñador / Artista',
+      cardTags: p => getCamposEspecificosArray(p, 'chips-estilo-dis').slice(0,3),
+      cardRefs: () => [],
+      filtrosPrincipales: [
+        { label:'Rol', chips:['Ilustrador / Dibujante','Diseñador gráfico','Diseñador UX/UI','Animador 2D/3D','Concept artist','Pintor','Muralista','Escultor'] },
+        { label:'Estilo', chips:['Realismo','Cartoon','Manga','Vectorial','Pixel art','Acuarela','Lineal','Street art / Graffiti','Abstracto','Surrealista'] },
+        { label:'Soporte', chips:['Digital','Físico','Ambos'] },
+      ],
+      filtrosExtra: []
+    },
+    tatuaje: {
+      emoji:'🖋️', label:'Tatuadores', labelSingular:'tatuador/a', bgText:'TATUAJE', color:'#c45bff',
+      introSpan:'tatuadores',
+      introCopy:'Buscá por estilo, tipo de trabajo y zona.',
+      searchPlaceholder:'Ej: tatuador realismo en Palermo...',
+      cardSubtitle: p => getCampoEspecifico(p, 'chips-rol-tatu') || 'Tatuador',
+      cardTags: p => getCamposEspecificosArray(p, 'chips-estilo-tatu').slice(0,3),
+      cardRefs: () => [],
+      filtrosPrincipales: [
+        { label:'Rol', chips:['Tatuador','Piercer'] },
+        { label:'Estilo', chips:['Realismo','Blackwork','Tradicional','Japonés','Acuarela','Geométrico','Neo-traditional','Fine line','Trash polka','Lettering','Ignorant style','Chicano','Tribal','Neojaponés'] },
+        { label:'Color', chips:['Blanco y negro','Color','Ambos'] },
+      ],
+      filtrosExtra: []
+    },
+    danza: {
+      emoji:'💃', label:'Bailarines', labelSingular:'bailarín/a', bgText:'DANZA', color:'#5bd4ff',
+      introSpan:'bailarines',
+      introCopy:'Buscá por disciplina, rol y zona.',
+      searchPlaceholder:'Ej: coreógrafo de tango en Buenos Aires...',
+      cardSubtitle: p => getCampoEspecifico(p, 'chips-rol-dan') || 'Bailarín/a',
+      cardTags: p => getCamposEspecificosArray(p, 'chips-disc-dan').slice(0,3),
+      cardRefs: () => [],
+      filtrosPrincipales: [
+        { label:'Rol', chips:['Bailarín/a','Coreógrafo','Profesor de danza','Bailarín de sesión'] },
+        { label:'Disciplina', chips:['Contemporáneo','Urbano / Hip-hop','Tango','Folclore','Ballet','Danza clásica','Salsa / Ritmos latinos','Flamenco','Danza árabe','Danza aérea','Swing','Pole dance','Expresión corporal'] },
+        { label:'Nivel', chips:['Amateur','Semiprofesional','Profesional'] },
+      ],
+      filtrosExtra: []
+    },
+    maquillaje: {
+      emoji:'💄', label:'Maquillaje & vestuario', labelSingular:'artista de maquillaje', bgText:'MAKEUP', color:'#e8a84a',
+      introSpan:'maquilladores y vestuaristas',
+      introCopy:'Buscá por rol, especialidad y zona.',
+      searchPlaceholder:'Ej: maquillador FX en Buenos Aires...',
+      cardSubtitle: p => getCampoEspecifico(p, 'chips-rol-maq') || 'Maquillador/a',
+      cardTags: p => getCamposEspecificosArray(p, 'chips-esp-maq').slice(0,3),
+      cardRefs: () => [],
+      filtrosPrincipales: [
+        { label:'Rol', chips:['Maquillador artístico','Maquillador FX / Caracterización','Peluquero artístico','Vestuarista','Diseñador de disfraz / Cosplay','Estilista'] },
+        { label:'Especialidad', chips:['Artístico','Eventos','FX','Teatro / Cine','Cosplay'] },
+      ],
+      filtrosExtra: []
+    },
+    circo: {
+      emoji:'🎪', label:'Circo & escénicas', labelSingular:'artista de circo', bgText:'CIRCO', color:'#ffdd5b',
+      introSpan:'artistas de circo',
+      introCopy:'Buscá por especialidad, modalidad y zona.',
+      searchPlaceholder:'Ej: malabarista para festival en Rosario...',
+      cardSubtitle: p => getCampoEspecifico(p, 'chips-rol-cir') || 'Artista de circo',
+      cardTags: p => getCamposEspecificosArray(p, 'chips-mod-cir').slice(0,3),
+      cardRefs: () => [],
+      filtrosPrincipales: [
+        { label:'Especialidad', chips:['Acróbata','Malabarista','Payaso','Equilibrista','Trapecista','Titiritero','Zanquero','Mago / Ilusionista','Contorsionista','Artista de fuego'] },
+        { label:'Modalidad', chips:['Calle','Teatro','Eventos privados','Festivales'] },
+      ],
+      filtrosExtra: []
+    },
+    escritura: {
+      emoji:'✍️', label:'Escritores & guionistas', labelSingular:'escritor/a', bgText:'ESCRITURA', color:'#a0d47b',
+      introSpan:'escritores y guionistas',
+      introCopy:'Buscá por rol, formato y zona.',
+      searchPlaceholder:'Ej: letrista para proyecto musical...',
+      cardSubtitle: p => getCampoEspecifico(p, 'chips-rol-esc') || 'Escritor/a',
+      cardTags: p => getCamposEspecificosArray(p, 'chips-formato-esc').slice(0,3),
+      cardRefs: () => [],
+      filtrosPrincipales: [
+        { label:'Rol', chips:['Guionista','Letrista','Escritor','Libretista teatral','Ghostwriter','Poeta'] },
+        { label:'Formato', chips:['Guion cine / TV','Letra de canción','Obra teatral','Novela / Cuento','Poesía'] },
+      ],
+      filtrosExtra: []
+    },
+  };
+
+  // Las claves canónicas de campos_especificos las define el REGISTRO (rol, estilo, etc.).
+  // Este mapa traduce los identificadores que usa el config de esta página a esas claves.
+  const CAMPO_KEY_ALIAS = {
+    'chips-rol-act':'rol',        'chips-escena':'tipo_escena',
+    'chips-rol-av':'rol',         'chips-esp-av':'especialidad',
+    'chips-tipo-modelo':'tipo_trabajo', 'chips-genero-modelo':'genero',
+    'chips-rol-dis':'rol',        'chips-estilo-dis':'estilo',
+    'chips-rol-tatu':'rol',       'chips-estilo-tatu':'estilo',
+    'chips-rol-dan':'rol',        'chips-disc-dan':'disciplina',
+    'chips-rol-maq':'rol',        'chips-esp-maq':'especialidad',
+    'chips-rol-cir':'especialidad','chips-mod-cir':'modalidad',
+    'chips-rol-esc':'rol',        'chips-formato-esc':'formato'
+  };
+
+  // Helpers para campos_especificos
+  function getCampoEspecifico(p, secId) {
+    if (!p.campos_especificos) return '';
+    try {
+      const c = typeof p.campos_especificos === 'string' ? JSON.parse(p.campos_especificos) : p.campos_especificos;
+      const key = CAMPO_KEY_ALIAS[secId] || secId;
+      return (c[key] && c[key][0]) || '';
+    } catch(e) { return ''; }
+  }
+  function getCamposEspecificosArray(p, secId) {
+    if (!p.campos_especificos) return [];
+    try {
+      const c = typeof p.campos_especificos === 'string' ? JSON.parse(p.campos_especificos) : p.campos_especificos;
+      const key = CAMPO_KEY_ALIAS[secId] || secId;
+      return c[key] || [];
+    } catch(e) { return []; }
+  }
+
+  // ═══════════════════════════════════════
+  // INIT BUSQUEDA — adapta la página al rubro
+  // ═══════════════════════════════════════
+  function initBusqueda(rubro) {
+    const config = RUBROS_BUSQUEDA_CONFIG[rubro] || RUBROS_BUSQUEDA_CONFIG.musica;
+
+    // Cambiar paleta de colores según rubro
+    document.documentElement.style.setProperty('--neon', config.color || '#d4f53c');
+    const intro = document.getElementById('search-intro');
+    if (intro) intro.setAttribute('data-bg-text', config.bgText);
+
+    // Intro copy
+    const introSpan = document.getElementById('intro-rubro-span');
+    const introCopy = document.getElementById('intro-copy');
+    if (introSpan) introSpan.textContent = config.introSpan;
+    if (introCopy) introCopy.innerHTML = config.introCopy + ' Y si no aparece lo que necesitás, también podés ir directo a <strong>anuncios o publicar gratis</strong>.';
+
+    // Search placeholder
+    const searchInput = document.getElementById('main-search');
+    if (searchInput) searchInput.placeholder = config.searchPlaceholder;
+
+    // Rubro tabs
+    const switcher = document.getElementById('section-switcher');
+    if (switcher) {
+      const rubros = Object.entries(RUBROS_BUSQUEDA_CONFIG);
+      switcher.innerHTML = rubros.map(([key, c]) =>
+        `<a class="section-tab${key === rubro ? ' active' : ''}" href="buscARTE_busqueda.html?rubro=${key}">${c.emoji} <span>${c.label}</span></a>`
+      ).join('') + `<a class="section-tab section-tab-anuncios" href="buscARTE_anuncios.html">📋 <span>Ver anuncios y publicar gratis →</span></a>`;
+    }
+
+    // Result label
+    const label = document.getElementById('result-label');
+    if (label) label.textContent = config.label.toLowerCase();
+    const sub = document.getElementById('result-sub');
+    if (sub) sub.textContent = `todos los ${config.label.toLowerCase()}`;
+
+    // Render filter chips
+    renderFiltrosPrincipales(config.filtrosPrincipales || []);
+    renderFiltrosExtra(config.filtrosExtra || []);
+  }
+
+  function renderFiltrosPrincipales(grupos) {
+    const container = document.getElementById('filters-rubro-principal');
+    if (!container) return;
+    let html = '';
+    grupos.forEach((grupo, i) => {
+      if (i > 0) html += '<div class="filter-divider"></div>';
+      html += `<div class="filter-group long-filter">
+        <span class="filter-group-label">${grupo.label}</span>
+        <div class="filter-chips">
+          ${(grupo.chips || []).map(chip => `<button class="fchip" onclick="toggleFilter(this)">${chip}</button>`).join('')}
+        </div>
+        ${grupo.hint ? `<span class="filter-hint">${grupo.hint}</span>` : ''}
+      </div>`;
+    });
+    container.innerHTML = html;
+  }
+
+  function renderFiltrosExtra(extras) {
+    const container = document.getElementById('filters-rubro-extra');
+    if (!container) return;
+    let html = '';
+    extras.forEach(extra => {
+      if (extra.type === 'referente') {
+        html += `<div class="filter-group">
+          <span class="filter-group-label">${extra.label}</span>
+          <input type="text" id="referente-input" placeholder="${extra.placeholder}" oninput="setReferente(this.value)">
+          ${extra.hint ? `<div style="font-size:.67rem;color:var(--gris2);margin-top:.4rem;line-height:1.5;">${extra.hint}</div>` : ''}
+        </div>`;
+      }
+    });
+    container.innerHTML = html;
+  }
+
+  const RUBRO_COLORS = {
+    musica:     { bg:'#0d2010', text:'#d4f53c' },
+    actuacion:  { bg:'#2a0a08', text:'#ff6b5b' },
+    audiovisual:{ bg:'#080d2a', text:'#5b9fff' },
+    modelaje:   { bg:'#051f1a', text:'#4de8c4' },
+    diseno:     { bg:'#1f1208', text:'#ffaa5b' },
+    tatuaje:    { bg:'#1a0525', text:'#c45bff' },
+    danza:      { bg:'#051520', text:'#5bd4ff' },
+    maquillaje: { bg:'#1f1008', text:'#e8a84a' },
+    circo:      { bg:'#1f1a05', text:'#ffdd5b' },
+    escritura:  { bg:'#0f1f08', text:'#a0d47b' },
+  };
+  const RUBRO_EMOJIS = {
+    musica:'🎵', actuacion:'🎭', audiovisual:'🎬',
+    modelaje:'👗', diseno:'✏️', tatuaje:'🖋️',
+    danza:'💃', maquillaje:'💄', circo:'🎪', escritura:'✍️',
+  };
 
   const PER_PAGE = 9;
   const MAX_FETCH = 500;
   let offset = 0;
   let perfilesCache = null;
-  let activeFilters = { instrumentos: [], generos: [], ciudad: '', barrio: '', busca: [], referente: '' };
+  let activeFilters = { instrumentos: [], generos: [], ciudad: '', barrio: '', busca: [], referente: '', rubros_chips: [] };
 
   const INSTR_LABELS = ['Guitarra', 'Bajo', 'Batería', 'Teclado', 'Voz / Canto', 'Saxo', 'Violín', 'Cello', 'Trompeta', 'Flauta', 'Percusión', 'DJ/Prod.', 'Bandoneón', 'Charango', 'Arpa', 'Acordeón', 'Contrabajo', 'Clarinete', 'Cajón', 'Bombo leguero', 'Quena / Zampoña', 'Ukelele', 'Controlador MIDI', 'Técnico de sonido', 'Compositor / Arreglador', 'Productor', 'Mix & Mastering', 'Manager', 'Otro'];
   const BUSCA_LABELS = ['Banda', 'Sesiones', 'Zapada', 'Proyecto', 'Clases'];
@@ -883,12 +1085,6 @@
     return String(nombre).split(' ').filter(Boolean).map(w => w[0]).join('').toUpperCase().slice(0, 2) || '??';
   }
 
-  function colorIdx(nombre) {
-    let h = 0;
-    for (const c of String(nombre || '')) h = (h * 31 + c.charCodeAt(0)) % COLORES.length;
-    return h;
-  }
-
   function splitList(value) {
     return String(value || '').split(',').map(v => v.trim()).filter(Boolean);
   }
@@ -900,49 +1096,54 @@
   }
 
   function buildCard(p) {
-    const idx = colorIdx(p.nombre);
+    const config = RUBROS_BUSQUEDA_CONFIG[rubroActivo] || RUBROS_BUSQUEDA_CONFIG.musica;
     const initials = escapeHtml(getInitials(p.nombre));
-    const generos = splitList(p.generos).slice(0, 3);
     const location = [p.barrio, p.ciudad].filter(Boolean).join(', ');
-    const tags = generos.map(g => `<span class="ctag">${escapeHtml(g)}</span>`).join('');
-    const refsList = splitList(p.referentes).slice(0, 3).map(escapeHtml).join(', ');
-    const refs = refsList ? `🎵 <em>${refsList}</em>` : '';
-    const bio = p.bio || (p.instrumento ? `Toca ${p.instrumento}` : 'Músico en buscARTE');
+    const tags = config.cardTags(p).map(g => `<span class="ctag">${escapeHtml(g)}</span>`).join('');
+    const refs = config.cardRefs(p);
+    // Color por rubro del perfil (no del rubro activo de la sección)
+    const rubroCard = p.rubro || rubroActivo || 'musica';
+    const rubroColor = RUBRO_COLORS[rubroCard] || RUBRO_COLORS.musica;
+    const rubroEmoji = RUBRO_EMOJIS[rubroCard] || '🎵';
+    const refsHtml = refs.length ? `${rubroEmoji} <em>${refs.map(escapeHtml).join(', ')}</em>` : '';
+    const subtitulo = config.cardSubtitle(p);
+    const bio = p.bio || (subtitulo ? `${subtitulo} en buscARTE` : 'Artista en buscARTE');
     const foto = safeUrl(p.foto_url);
     const id = encodeURIComponent(String(p.id || ''));
 
     const avatarHTML = foto
       ? `<div class="card-avatar" style="background:#000;overflow:hidden"><img src="${escapeHtml(foto)}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover"></div>`
-      : `<div class="card-avatar" style="background:${COLORES[idx]};color:${TEXTO[idx]}">${initials}</div>`;
+      : `<div class="card-avatar" style="background:${rubroColor.bg};color:${rubroColor.text}">${initials}</div>`;
 
     return `<div class="musician-card" data-id="${escapeHtml(String(p.id || ''))}">
       <div class="card-top">
         ${avatarHTML}
         <div class="card-info">
           <div class="card-name">${escapeHtml(p.nombre || 'Sin nombre')}</div>
-          <div class="card-instrument">${escapeHtml(p.instrumento || 'Músico')}</div>
+          <div class="card-instrument" style="color:${rubroColor.text}">${escapeHtml(subtitulo)}</div>
           <div class="card-location">${location ? '📍 ' + escapeHtml(location) : ''}</div>
         </div>
       </div>
       ${tags ? `<div class="card-tags">${tags}</div>` : ''}
       <div class="card-bio">${escapeHtml(bio)}</div>
       <div class="card-footer">
-        <div class="card-refs">${refs}</div>
-        <a href="buscARTE_perfil_publico.html?id=${id}" class="card-cta">Ver perfil →</a>
+        <div class="card-refs">${refsHtml}</div>
+        <a href="buscARTE_perfil_publico.html?id=${id}&rubro=${rubroActivo}" class="card-cta">Ver perfil →</a>
       </div>
     </div>`;
   }
 
   function buildAdBridgeCard() {
+    const config = RUBROS_BUSQUEDA_CONFIG[rubroActivo] || RUBROS_BUSQUEDA_CONFIG.musica;
     return `<article class="ad-bridge-card" aria-label="Atajo a anuncios de buscARTE">
       <div>
         <div class="ad-bridge-kicker">Atajo útil</div>
-        <div class="ad-bridge-title">¿No encontrás al músico justo?</div>
-        <div class="ad-bridge-copy">Revisá anuncios activos o publicá gratis: búsqueda de banda, jams, clases, compra/venta y más.</div>
+        <div class="ad-bridge-title">¿No encontrás ${config.labelSingular.startsWith('a') || config.labelSingular.startsWith('e') ? 'al' : 'al'} ${config.labelSingular} justo?</div>
+        <div class="ad-bridge-copy">Revisá anuncios activos o publicá gratis lo que estás buscando.</div>
       </div>
       <div class="ad-bridge-actions">
         <a class="ad-bridge-btn" href="buscARTE_anuncios.html">Ver anuncios</a>
-        <a class="ad-bridge-btn primary" href="buscARTE_anuncios.html">Publicar</a>
+        <a class="ad-bridge-btn primary" href="buscARTE_anuncios.html">Publicar gratis</a>
       </div>
     </article>`;
   }
@@ -950,14 +1151,16 @@
   async function fetchProfiles(force = false) {
     if (perfilesCache && !force) return perfilesCache;
 
-    const fields = 'id,nombre,instrumento,generos,ciudad,barrio,bio,referentes,disponibilidad,foto_url,created_at,baneado';
-    const base = `${SUPABASE_URL}/rest/v1/perfiles?select=${fields}&baneado=eq.false&order=created_at.desc&limit=${MAX_FETCH}`;
+    const fields = 'id,nombre,instrumento,generos,ciudad,barrio,bio,referentes,disponibilidad,foto_url,created_at,baneado,rubro,campos_especificos';
+    // Solo artistas del rubro activo: evita que negocios, visitantes u otros rubros se mezclen en el tablón
+    const rubroFilter = `&rubro=eq.${encodeURIComponent(rubroActivo)}&tipo_cuenta=eq.artista`;
+    const base = `${SUPABASE_URL}/rest/v1/perfiles?select=${fields}&baneado=eq.false${rubroFilter}&order=created_at.desc&limit=${MAX_FETCH}`;
     let res = await fetch(base, { headers: SB_HEADERS });
 
-    // Fallback conservador: si el filtro baneado llega a fallar, cargamos sin ese filtro en vez de dejar la página rota.
     if (!res.ok) {
+      // Reintento simple por error transitorio — mantiene el mismo scope, no afloja los filtros
       console.warn('Primer intento de perfiles falló:', res.status, await res.text());
-      res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?select=${fields}&order=created_at.desc&limit=${MAX_FETCH}`, { headers: SB_HEADERS });
+      res = await fetch(base, { headers: SB_HEADERS });
     }
 
     if (!res.ok) {
@@ -994,8 +1197,11 @@
     if (!q) return true;
 
     const { instrDetected, genDetected, zona, normalized } = detectSearchParts(q);
+    const camposBlob = p.campos_especificos
+      ? (typeof p.campos_especificos === 'string' ? p.campos_especificos : JSON.stringify(p.campos_especificos))
+      : '';
     const directBlob = normalizeText([
-      p.nombre, p.instrumento, p.generos, p.ciudad, p.barrio, p.bio, p.referentes, p.disponibilidad
+      p.nombre, p.instrumento, p.generos, p.ciudad, p.barrio, p.bio, p.referentes, p.disponibilidad, camposBlob
     ].filter(Boolean).join(' '));
 
     if (directBlob.includes(normalized)) return true;
@@ -1055,12 +1261,22 @@
 
     const filtered = perfiles.filter(p => {
       if (!matchesSearch(p, searchVal)) return false;
-      if (!matchesArrayField(p.instrumento, activeFilters.instrumentos, INSTR_VALUE_MAP)) return false;
-      if (!matchesArrayField(p.generos, activeFilters.generos)) return false;
-      if (!matchesArrayField(p.disponibilidad, activeFilters.busca)) return false;
+      if (rubroActivo === 'musica') {
+        if (!matchesArrayField(p.instrumento, activeFilters.instrumentos, INSTR_VALUE_MAP)) return false;
+        if (!matchesArrayField(p.generos, activeFilters.generos)) return false;
+        if (!matchesArrayField(p.disponibilidad, activeFilters.busca)) return false;
+        if (refVal && !includesLoose(p.referentes, refVal)) return false;
+      } else {
+        // Para otros rubros: filtrar por campos_especificos una vez que estén en Supabase
+        // Por ahora, si hay chips seleccionados, intentamos hacer match en campos_especificos
+        if (activeFilters.rubros_chips && activeFilters.rubros_chips.length) {
+          const camposStr = p.campos_especificos ? JSON.stringify(p.campos_especificos) : '';
+          const hayMatch = activeFilters.rubros_chips.some(chip => includesLoose(camposStr, chip));
+          if (camposStr && !hayMatch) return false;
+        }
+      }
       if (!matchesCiudad(p, activeFilters.ciudad)) return false;
       if (activeFilters.barrio && !includesLoose(p.barrio || p.ciudad, activeFilters.barrio)) return false;
-      if (refVal && !includesLoose(p.referentes, refVal)) return false;
       return true;
     });
 
@@ -1068,11 +1284,12 @@
   }
 
   function emptyStateHtml(hasFilters) {
+    const cfg = RUBROS_BUSQUEDA_CONFIG[rubroActivo] || RUBROS_BUSQUEDA_CONFIG.musica;
     return `<div style="grid-column:1/-1;padding:4rem 1.5rem;text-align:center">
-      <div style="font-size:2rem;margin-bottom:1rem">🎸</div>
+      <div style="font-size:2rem;margin-bottom:1rem">${cfg.emoji}</div>
       <div style="font-family:var(--font-display);font-size:1.4rem;margin-bottom:.5rem">Sin resultados</div>
       <div style="color:var(--gris);font-size:.88rem;line-height:1.65;max-width:520px;margin:0 auto">
-        ${hasFilters ? 'Probá limpiando filtros o usando una búsqueda más amplia.' : 'Todavía no hay músicos para mostrar con esta búsqueda.'}<br>
+        ${hasFilters ? 'Probá limpiando filtros o usando una búsqueda más amplia.' : `Todavía no hay ${cfg.label.toLowerCase()} para mostrar con esta búsqueda.`}<br>
         También podés mirar anuncios o publicar lo que estás buscando.
       </div>
       <div class="empty-actions">
@@ -1094,7 +1311,7 @@
     if (sub) {
       if (searchVal) sub.textContent = `resultados para “${searchVal}”`;
       else if (activeCount || refVal || barrioVal || activeFilters.ciudad) sub.textContent = 'resultados filtrados';
-      else sub.textContent = 'todos los músicos';
+      else sub.textContent = 'todos los ' + (RUBROS_BUSQUEDA_CONFIG[rubroActivo] || RUBROS_BUSQUEDA_CONFIG.musica).label.toLowerCase();
     }
   }
 
@@ -1104,7 +1321,7 @@
     if (!grid) return;
 
     if (!append) {
-      grid.innerHTML = '<div style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--gris);font-size:.88rem" id="loading-state">Cargando músicos...</div>';
+      grid.innerHTML = '<div style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--gris);font-size:.88rem" id="loading-state">Cargando...</div>';
       offset = 0;
       if (btnLoad) btnLoad.style.display = 'none';
     }
@@ -1116,6 +1333,7 @@
         document.getElementById('main-search')?.value?.trim() ||
         document.getElementById('referente-input')?.value?.trim() ||
         activeFilters.instrumentos.length || activeFilters.generos.length || activeFilters.busca.length ||
+        (activeFilters.rubros_chips && activeFilters.rubros_chips.length) ||
         activeFilters.ciudad || activeFilters.barrio
       );
 
@@ -1142,7 +1360,7 @@
       if (btnLoad) btnLoad.style.display = offset < filtered.length ? 'inline-block' : 'none';
     } catch (e) {
       console.error(e);
-      grid.innerHTML = '<div style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--gris)">Error al cargar músicos. Verificá tu conexión e intentá de nuevo.</div>';
+      grid.innerHTML = '<div style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--gris)">Error al cargar los perfiles. Verificá tu conexión e intentá de nuevo.</div>';
       updateResultText(0);
       if (btnLoad) btnLoad.style.display = 'none';
     }
@@ -1151,7 +1369,7 @@
   function loadMore() {
     const btn = document.getElementById('btn-load-more');
     if (btn) btn.textContent = 'Cargando...';
-    cargarMusicos(true).finally(() => { if (btn) btn.textContent = 'Cargar más músicos'; });
+    cargarMusicos(true).finally(() => { if (btn) btn.textContent = 'Cargar más →'; });
   }
 
   function renderActiveFilters() {
@@ -1184,9 +1402,17 @@
 
   function applyFilters() {
     const onChips = [...document.querySelectorAll('.fchip.on')].map(c => c.textContent.trim());
-    activeFilters.instrumentos = onChips.filter(c => INSTR_LABELS.includes(c));
-    activeFilters.generos = onChips.filter(c => !INSTR_LABELS.includes(c) && !BUSCA_LABELS.includes(c));
-    activeFilters.busca = onChips.filter(c => BUSCA_LABELS.includes(c));
+    if (rubroActivo === 'musica') {
+      activeFilters.instrumentos = onChips.filter(c => INSTR_LABELS.includes(c));
+      activeFilters.generos = onChips.filter(c => !INSTR_LABELS.includes(c) && !BUSCA_LABELS.includes(c));
+      activeFilters.busca = onChips.filter(c => BUSCA_LABELS.includes(c));
+    } else {
+      // Para otros rubros: todos los chips seleccionados van a filtrar por campos_especificos
+      activeFilters.rubros_chips = onChips;
+      activeFilters.instrumentos = [];
+      activeFilters.generos = [];
+      activeFilters.busca = [];
+    }
     renderActiveFilters();
     cargarMusicos(false);
   }
@@ -1219,7 +1445,7 @@
     if (ref) ref.value = '';
     const search = document.getElementById('main-search');
     if (search) search.value = '';
-    activeFilters = { instrumentos: [], generos: [], ciudad: '', barrio: '', busca: [], referente: '' };
+    activeFilters = { instrumentos: [], generos: [], ciudad: '', barrio: '', busca: [], referente: '', rubros_chips: [] };
     renderActiveFilters();
     cargarMusicos(false);
   }
@@ -1281,6 +1507,9 @@
   }
 
   window.addEventListener('DOMContentLoaded', function() {
+    // Inicializar la página según el rubro
+    initBusqueda(rubroActivo);
+
     const search = document.getElementById('main-search');
     if (search) search.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
 
@@ -1395,7 +1624,7 @@
   </a>
 </div>
 <nav class="mobile-bottom-nav" id="mobile-bottom-nav">
-  <a href="buscARTE_busqueda.html" class="mbn-item" data-page="busqueda"><span class="mbn-icon">🎵</span><span>Músicos</span></a>
+  <a href="buscARTE_busqueda.html" class="mbn-item" data-page="busqueda"><span class="mbn-icon">🎨</span><span>Artistas</span></a>
   <a href="buscARTE_anuncios.html" class="mbn-item" data-page="anuncios"><span class="mbn-icon">📋</span><span>Anuncios</span></a>
   <a href="buscARTE_mensajes.html" class="mbn-item" data-page="mensajes"><span class="mbn-icon">💬</span><span>Mensajes</span></a>
   <button class="mbn-item" onclick="toggleMbnPanel()" style="background:none;border:none;flex:1;padding:0;" data-page="perfil"><span class="mbn-icon">👤</span><span>Mi perfil</span></button>

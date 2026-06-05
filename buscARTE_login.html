@@ -4,16 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- SEO -->
-  <meta name="description" content="Ingresá a tu cuenta de buscARTE, la red de músicos argentinos.">
-  <meta name="robots" content="noindex, follow">
+  <meta name="description" content="Ingresá a tu cuenta de buscARTE, la red de artistas argentinos.">
+  <meta name="robots" content="index, follow">
   <meta name="author" content="buscARTE">
-  <link rel="canonical" href="https://buscarte.com.ar/login">
+  <link rel="canonical" href="https://buscarte.com.ar/buscARTE_login.html">
 
   <!-- Open Graph (WhatsApp, Facebook, Instagram) -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://buscarte.com.ar/buscARTE_login.html">
   <meta property="og:title" content="Ingresar — buscARTE">
-  <meta property="og:description" content="Ingresá a tu cuenta de buscARTE, la red de músicos argentinos.">
+  <meta property="og:description" content="Ingresá a tu cuenta de buscARTE, la red de artistas argentinos.">
   <meta property="og:image" content="https://buscarte.com.ar/og-image.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -23,7 +23,7 @@
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Ingresar — buscARTE">
-  <meta name="twitter:description" content="Ingresá a tu cuenta de buscARTE, la red de músicos argentinos.">
+  <meta name="twitter:description" content="Ingresá a tu cuenta de buscARTE, la red de artistas argentinos.">
   <meta name="twitter:image" content="https://buscarte.com.ar/og-image.jpg">
 <title>Ingresar — buscARTE</title>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
@@ -222,7 +222,7 @@
     <div class="left-content">
       <div class="left-label">Bienvenido/a de vuelta</div>
       <div class="left-title">INGRESÁ<br>A TU<br>PERFIL</div>
-      <p class="left-desc">Tu comunidad de músicos te está esperando. Nuevos anuncios, mensajes y conexiones cada día.</p>
+      <p class="left-desc">Tu comunidad de artistas te está esperando. Nuevos anuncios, mensajes y conexiones cada día.</p>
     </div>
     <div class="testimonials">
       <div class="testimonial" style="animation-delay:.1s">
@@ -230,8 +230,8 @@
         <p class="testimonial-autor">— Agustina G., guitarrista · Villa Crespo</p>
       </div>
       <div class="testimonial" style="animation-delay:.2s">
-        <p class="testimonial-text">"La primera jam que organicé tuvo 12 músicos. Nunca imaginé que fuera tan fácil."</p>
-        <p class="testimonial-autor">— Nicolás B., guitarrista · Recoleta</p>
+        <p class="testimonial-text">"Busqué un fotógrafo para mi banda y lo encontré en un día. La plataforma creció un montón."</p>
+        <p class="testimonial-autor">— Nicolás B., músico · Recoleta</p>
       </div>
     </div>
   </div>
@@ -467,6 +467,8 @@
         }
         localStorage.setItem('ba_referentes', user.referentes || '');
         localStorage.setItem('ba_generos', user.generos || '');
+        localStorage.setItem('ba_tipo_cuenta', user.tipo_cuenta || 'artista');
+        localStorage.setItem('ba_rubro', user.rubro || 'musica');
 
         document.getElementById('success-bar')?.classList.add('show');
         localStorage.removeItem('ba_after_login');
