@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "buscARTE — red de artistas argentinos (sitio estático + Netlify Functions)",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"No tests configured\""
   },
   "keywords": [],
   "author": "buscARTE",

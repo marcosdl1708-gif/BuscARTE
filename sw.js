@@ -1,6 +1,6 @@
 // ⚠️ IMPORTANTE: subí este número en CADA deploy (v3 → v4 → v5...).
 // Si no lo cambiás, el navegador puede seguir sirviendo los archivos viejos cacheados.
-const CACHE_VERSION = 'buscarte-v4-2026-06-14';
+const CACHE_VERSION = 'buscarte-v5-2026-06-05';
 const OFFLINE_URL = '/index.html';
 
 const SHELL = [

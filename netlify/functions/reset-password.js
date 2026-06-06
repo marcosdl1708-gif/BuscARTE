@@ -2,7 +2,7 @@ const crypto = require('crypto');
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://xiaanchoanxmampegoay.supabase.co';
-const SUPABASE_KEY = process.env.SUPABASE_KEY;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY;
 const FROM_EMAIL = process.env.FROM_EMAIL || 'buscARTE <hola@buscarte.com.ar>';
 const BASE_URL = process.env.URL || 'https://buscarte.com.ar';
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lucía Moreno — buscARTE</title>
+<title>Perfil — buscARTE</title>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
@@ -314,7 +314,7 @@
 
   @media (max-width:900px) {
     .mobile-bottom-nav {
-      display:flex; position:fixed; bottom:0; left:0; right:0;
+      display:flex; position:fixed; top:auto; bottom:0; left:0; right:0;
       background:#0f0f0f; border-top:1px solid #2a2a2a;
       z-index:500; height:54px;
     }
@@ -403,7 +403,7 @@
 
   @media (max-width:900px) {
     .mobile-bottom-nav {
-      display:flex; position:fixed; bottom:0; left:0; right:0;
+      display:flex; position:fixed; top:auto; bottom:0; left:0; right:0;
       background:#0f0f0f; border-top:1px solid #2a2a2a;
       z-index:500; height:54px;
     }
@@ -723,7 +723,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="buscARTE">
-  <link rel="apple-touch-icon" href="/icons/icon-192.svg">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
 </head>
 <body>
 
@@ -1542,11 +1542,12 @@
         body: JSON.stringify({
           tipo: 'reporte',
           datos: {
-            perfil_id: perfilId,
-            perfil_nombre: perfilNombre,
+            perfilId: perfilId,
+            perfilNombre: perfilNombre,
             motivo: reportMotivo,
             detalle: detalle,
-            reportado_por: localStorage.getItem('ba_user_id') || 'anónimo',
+            reporterId: localStorage.getItem('ba_user_id') || 'anónimo',
+            reporterNombre: localStorage.getItem('ba_name') || 'Usuario no informado',
             url: window.location.href
           }
         })

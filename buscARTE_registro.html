@@ -224,7 +224,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="buscARTE">
-  <link rel="apple-touch-icon" href="/icons/icon-192.svg">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
 </head>
 <body>
 
@@ -1484,6 +1484,23 @@ const ubicaciones = {
   'Entre Ríos': { ciudades: ['Paraná','Concordia','Gualeguaychú','Colón','Concepción del Uruguay','Otra localidad'], barrios: {} },
 };
 
+// Input de barrio libre persistente: se crea UNA sola vez y nunca se reemplaza el <select>.
+// Así evitamos el bug de destruir #sel-barrio con replaceWith (que rompía al cambiar de provincia/ciudad).
+function getInputBarrioLibre() {
+  const fieldBarrio = document.getElementById('field-barrio');
+  let input = document.getElementById('input-barrio-libre');
+  if (!input) {
+    input = document.createElement('input');
+    input.type = 'text';
+    input.id = 'input-barrio-libre';
+    input.placeholder = 'Escribí tu barrio o zona';
+    input.style.cssText = 'width:100%;background:var(--negro2);border:1px solid #2a2a2a;color:var(--blanco);padding:.9rem 1.1rem;font-family:var(--font-body);font-size:.95rem;outline:none;';
+    input.style.display = 'none';
+    fieldBarrio.appendChild(input);
+  }
+  return input;
+}
+
 function updateCiudades() {
   const prov = document.getElementById('sel-provincia').value;
   const data = ubicaciones[prov];
@@ -1492,7 +1509,14 @@ function updateCiudades() {
   const selCiudad = document.getElementById('sel-ciudad');
   const selBarrio = document.getElementById('sel-barrio');
   fieldBarrio.style.display = 'none';
-  selBarrio.innerHTML = '<option value="" disabled selected>¿En qué barrio o zona?</option>';
+  // Reseteamos barrio sin destruir nodos
+  if (selBarrio) {
+    selBarrio.style.display = '';
+    selBarrio.value = '';
+    selBarrio.innerHTML = '<option value="" disabled selected>¿En qué barrio o zona?</option>';
+  }
+  const inputBarrioLibre = document.getElementById('input-barrio-libre');
+  if (inputBarrioLibre) { inputBarrioLibre.style.display = 'none'; inputBarrioLibre.value = ''; }
   if (data) {
     selCiudad.innerHTML = '<option value="" disabled selected>¿En qué ciudad?</option>';
     data.ciudades.forEach(c => {
@@ -1512,19 +1536,26 @@ function updateBarrios() {
   const data = ubicaciones[prov];
   const fieldBarrio = document.getElementById('field-barrio');
   const selBarrio = document.getElementById('sel-barrio');
+  const labelBarrio = fieldBarrio.querySelector('label');
+  const inputBarrioLibre = getInputBarrioLibre();
   if (data && data.barrios && data.barrios[ciudad]) {
+    // Hay barrios predefinidos → mostramos el select, ocultamos el input libre
+    selBarrio.style.display = '';
+    selBarrio.value = '';
     selBarrio.innerHTML = '<option value="" disabled selected>¿En qué barrio o zona?</option>';
     data.barrios[ciudad].forEach(b => { const opt = document.createElement('option'); opt.value = b; opt.textContent = b; selBarrio.appendChild(opt); });
+    inputBarrioLibre.style.display = 'none';
+    inputBarrioLibre.value = '';
+    if (labelBarrio) labelBarrio.innerHTML = 'Barrio / Zona <span style="color:var(--gris2); font-size:0.7rem; text-transform:none; letter-spacing:0">(opcional, pero ayuda al matching)</span>';
     fieldBarrio.style.display = 'block';
   } else {
+    // Sin barrios predefinidos → ocultamos el select, mostramos el input libre
+    selBarrio.style.display = 'none';
+    selBarrio.value = '';
     selBarrio.innerHTML = '<option value="" disabled selected>¿En qué barrio o zona?</option>';
+    if (labelBarrio) labelBarrio.innerHTML = 'Barrio / Zona <span style="color:var(--gris2); font-size:0.7rem; text-transform:none; letter-spacing:0">(escribí tu barrio)</span>';
+    inputBarrioLibre.style.display = '';
     fieldBarrio.style.display = 'block';
-    fieldBarrio.querySelector('label').innerHTML = 'Barrio / Zona <span style="color:var(--gris2); font-size:0.7rem; text-transform:none; letter-spacing:0">(escribí tu barrio)</span>';
-    const inputBarrio = document.createElement('input');
-    inputBarrio.type = 'text';
-    inputBarrio.placeholder = 'Escribí tu barrio o zona';
-    inputBarrio.style.cssText = 'width:100%;background:var(--negro2);border:1px solid #2a2a2a;color:var(--blanco);padding:.9rem 1.1rem;font-family:var(--font-body);font-size:.95rem;outline:none;';
-    if (!fieldBarrio.querySelector('input')) { selBarrio.replaceWith(inputBarrio); }
   }
 }
 
@@ -1539,7 +1570,15 @@ async function buscarArtistas(query) {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/artistas_sugeridos?nombre=ilike.*${encodeURIComponent(query)}*&order=veces.desc&limit=8`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
     const list = await res.json();
     if (!list.length) { dropdown.style.display = 'none'; return; }
-    dropdown.innerHTML = list.map(a => `<div data-nombre="${a.nombre}" onclick="selectArtistFromDropdown('${a.nombre.replace(/'/g,"\\'")}') " style="padding:.6rem 1rem;cursor:pointer;font-size:.88rem;border-bottom:1px solid #222;">${a.nombre}</div>`).join('');
+    dropdown.innerHTML = '';
+    list.forEach(a => {
+      const item = document.createElement('div');
+      item.setAttribute('data-nombre', a.nombre);
+      item.style.cssText = 'padding:.6rem 1rem;cursor:pointer;font-size:.88rem;border-bottom:1px solid #222;';
+      item.textContent = a.nombre;
+      item.addEventListener('click', () => selectArtistFromDropdown(a.nombre));
+      dropdown.appendChild(item);
+    });
     dropdown.style.display = 'block';
   } catch(e) { dropdown.style.display = 'none'; }
 }
@@ -1599,7 +1638,19 @@ function removeArtist(name) {
 function renderArtists() {
   const container = document.getElementById('artist-tags');
   if (!container) return;
-  container.innerHTML = artists.map(a => `<span class="artist-tag">${a}<button type="button" class="artist-tag-remove" onclick="removeArtist('${a.replace(/'/g,"\\'")}')">×</button></span>`).join('');
+  container.innerHTML = '';
+  artists.forEach(a => {
+    const tag = document.createElement('span');
+    tag.className = 'artist-tag';
+    tag.appendChild(document.createTextNode(a));
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'artist-tag-remove';
+    btn.textContent = '×';
+    btn.addEventListener('click', () => removeArtist(a));
+    tag.appendChild(btn);
+    container.appendChild(tag);
+  });
 }
 
 // ═══════════════════════════════════════

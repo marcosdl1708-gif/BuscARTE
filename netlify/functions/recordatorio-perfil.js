@@ -5,7 +5,7 @@
  */
 
 const SUPABASE_URL   = process.env.SUPABASE_URL || 'https://xiaanchoanxmampegoay.supabase.co';
-const SUPABASE_KEY   = process.env.SUPABASE_SERVICE_KEY;
+const SUPABASE_KEY   = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY;
 const SEND_EMAIL_URL = process.env.URL
   ? `${process.env.URL}/.netlify/functions/send-email`
   : 'https://buscarte.com.ar/.netlify/functions/send-email';

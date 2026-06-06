@@ -234,7 +234,7 @@
 
   @media (max-width:900px) {
     .mobile-bottom-nav {
-      display:flex; position:fixed; bottom:0; left:0; right:0;
+      display:flex; position:fixed; top:auto; bottom:0; left:0; right:0;
       background:#0f0f0f; border-top:1px solid #2a2a2a;
       z-index:500; height:54px;
     }
@@ -564,7 +564,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="buscARTE">
-  <link rel="apple-touch-icon" href="/icons/icon-192.svg">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
 </head>
 <body>
 
@@ -721,7 +721,8 @@
   // DETECCIÓN DE RUBRO: URL param (?rubro=X) → rubro de la cuenta (si es artístico) → música
   const RUBROS_VALIDOS_BUSQ = ['musica','actuacion','audiovisual','modelaje','diseno','tatuaje','danza','maquillaje','circo','escritura'];
   const _rubroCuentaBusq = localStorage.getItem('ba_rubro');
-  const rubroActivo = new URLSearchParams(window.location.search).get('rubro')
+  const _rubroParamBusq = new URLSearchParams(window.location.search).get('rubro');
+  const rubroActivo = (RUBROS_VALIDOS_BUSQ.includes(_rubroParamBusq) ? _rubroParamBusq : null)
     || (RUBROS_VALIDOS_BUSQ.includes(_rubroCuentaBusq) ? _rubroCuentaBusq : 'musica');
 
   // ═══════════════════════════════════════
@@ -1275,7 +1276,7 @@
         if (activeFilters.rubros_chips && activeFilters.rubros_chips.length) {
           const camposStr = p.campos_especificos ? JSON.stringify(p.campos_especificos) : '';
           const hayMatch = activeFilters.rubros_chips.some(chip => includesLoose(camposStr, chip));
-          if (camposStr && !hayMatch) return false;
+          if (!camposStr || !hayMatch) return false;
         }
       }
       if (!matchesCiudad(p, activeFilters.ciudad)) return false;

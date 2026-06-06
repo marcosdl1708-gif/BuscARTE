@@ -296,7 +296,7 @@
 
   @media (max-width:900px) {
     .mobile-bottom-nav {
-      display:flex; position:fixed; bottom:0; left:0; right:0;
+      display:flex; position:fixed; top:auto; bottom:0; left:0; right:0;
       background:#0f0f0f; border-top:1px solid #2a2a2a;
       z-index:500; height:54px;
     }
@@ -816,7 +816,7 @@
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="buscARTE" name="apple-mobile-web-app-title"/>
-<link href="/icons/icon-192.svg" rel="apple-touch-icon"/>
+<link href="/icons/icon-192.png" rel="apple-touch-icon"/>
 </head>
 <body>
 <div class="cursor" id="cursor"></div>
@@ -1298,7 +1298,9 @@
   const SB_HEADERS = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
 
   // ─── RUBRO DESDE URL + COLORES ───
-  const rubroFiltro = new URLSearchParams(window.location.search).get('rubro') || null
+  const RUBROS_VALIDOS_ANUN = ['musica','actuacion','audiovisual','modelaje','diseno','tatuaje','danza','maquillaje','circo','escritura']
+  const _rubroParamAnun = new URLSearchParams(window.location.search).get('rubro')
+  const rubroFiltro = RUBROS_VALIDOS_ANUN.includes(_rubroParamAnun) ? _rubroParamAnun : null
   const RUBRO_COLORS = {
     musica:'#d4f53c', actuacion:'#ff6b5b', audiovisual:'#5b9fff',
     modelaje:'#4de8c4', diseno:'#ffaa5b', tatuaje:'#c45bff',
