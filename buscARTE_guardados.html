@@ -92,7 +92,7 @@
   .hero-stat-val { font-family:var(--font-display);font-size:1.5rem;color:var(--neon);line-height:1; }
   .hero-stat-label { font-size:.62rem;color:var(--gris2);letter-spacing:.11em;text-transform:uppercase;margin-top:.35rem; }
 
-  .toolbar { display:flex;align-items:center;justify-content:space-between;gap:1rem;border:1px solid #1c1c1c;background:var(--negro2);padding:.75rem;margin-bottom:1.2rem;position:sticky;top:60px;z-index:50; }
+  .toolbar { display:flex;align-items:center;justify-content:space-between;gap:1rem;border:1px solid #1c1c1c;background:var(--negro2);padding:.75rem;margin-bottom:0;position:sticky;top:60px;z-index:50; }
   .tabs { display:flex;gap:.4rem;flex-wrap:wrap; }
   .tab-btn {
     background:transparent;border:1px solid var(--gris3);color:var(--gris);padding:.5rem .85rem;
@@ -107,6 +107,27 @@
   }
   .search-box input:focus { border-color:var(--neon); }
   .sort-select { background:var(--negro);border:1px solid var(--gris3);color:var(--blanco);padding:.55rem .8rem;font-family:var(--font-body);font-size:.78rem;outline:none;cursor:none; }
+
+  /* Filtro por rubro */
+  .rubro-filter-row {
+    display:none; align-items:center; gap:.4rem;
+    border:1px solid #1c1c1c; border-top:none;
+    background:var(--negro2); padding:.55rem .75rem;
+    margin-bottom:1.2rem; overflow-x:auto;
+    position:sticky; top:calc(60px + 53px); z-index:49;
+    scrollbar-width:none;
+  }
+  .rubro-filter-row::-webkit-scrollbar { display:none; }
+  .rubro-filter-row.visible { display:flex; }
+  .rf-label { font-size:.6rem; letter-spacing:.15em; text-transform:uppercase; color:var(--gris2); white-space:nowrap; flex-shrink:0; }
+  .rf-chip {
+    background:transparent; border:1px solid var(--gris3); color:var(--gris);
+    padding:.38rem .72rem; font-family:var(--font-body); font-size:.68rem;
+    letter-spacing:.07em; text-transform:uppercase; cursor:none; transition:all .2s;
+    white-space:nowrap; flex-shrink:0;
+  }
+  .rf-chip:hover { border-color:#555; color:var(--blanco); }
+  .rf-chip.active { font-weight:600; }
 
   .section-panel { display:none; }
   .section-panel.active { display:block; }
@@ -216,7 +237,7 @@
 <nav>
   <a href="index.html" class="nav-logo">busc<span>ARTE</span></a>
   <ul class="nav-links">
-    <li><a href="buscARTE_busqueda.html" class="nav-link">Músicos</a></li>
+    <li><a href="buscARTE_busqueda.html" class="nav-link">Artistas</a></li>
     <li><a href="buscARTE_anuncios.html" class="nav-link">Anuncios</a></li>
     <li><a href="buscARTE_mensajes.html" class="nav-link">Mensajes</a></li>
   </ul>
@@ -262,7 +283,7 @@
       <div class="hero-stats">
         <div class="hero-stat">
           <div class="hero-stat-val" id="stat-musicos">—</div>
-          <div class="hero-stat-label">Músicos</div>
+          <div class="hero-stat-label">Artistas</div>
         </div>
         <div class="hero-stat">
           <div class="hero-stat-val" id="stat-nombres">—</div>
@@ -275,7 +296,7 @@
 
     <section class="toolbar">
       <div class="tabs">
-        <button class="tab-btn active" id="tab-musicos" onclick="setSection('musicos')">♡ Músicos</button>
+        <button class="tab-btn active" id="tab-musicos" onclick="setSection('musicos')">♡ Artistas</button>
         <button class="tab-btn" id="tab-nombres" onclick="setSection('nombres')">🎲 Nombres</button>
       </div>
       <div class="toolbar-actions">
@@ -285,10 +306,13 @@
         <select class="sort-select" id="sort-select" onchange="renderCurrentSection()">
           <option value="recientes">Más recientes</option>
           <option value="az">Nombre A-Z</option>
-          <option value="instrumento">Instrumento</option>
+          <option value="instrumento">Instrumento / Rol</option>
         </select>
       </div>
     </section>
+
+    <!-- Filtro por rubro — solo visible en tab Artistas si hay múltiples rubros -->
+    <div class="rubro-filter-row" id="rubro-filter-row"></div>
 
     <section class="section-panel active" id="panel-musicos">
       <div class="guardados-grid" id="musicians-grid">
@@ -312,7 +336,7 @@
   <a href="#" class="mbn-panel-item danger" onclick="mbnLogout()"><span class="mbn-pi-icon">🚪</span> Cerrar sesión</a>
 </div>
 <nav class="mobile-bottom-nav" id="mobile-bottom-nav">
-  <a href="buscARTE_busqueda.html" class="mbn-item" data-page="busqueda"><span class="mbn-icon">🎵</span><span>Músicos</span></a>
+  <a href="buscARTE_busqueda.html" class="mbn-item" data-page="busqueda"><span class="mbn-icon">🎨</span><span>Artistas</span></a>
   <a href="buscARTE_anuncios.html" class="mbn-item" data-page="anuncios"><span class="mbn-icon">📋</span><span>Anuncios</span></a>
   <a href="buscARTE_mensajes.html" class="mbn-item" data-page="mensajes"><span class="mbn-icon">💬</span><span>Mensajes</span></a>
   <button class="mbn-item active" onclick="toggleMbnPanel()" style="background:none;border:none;flex:1;padding:0;" data-page="perfil"><span class="mbn-icon">👤</span><span>Mi perfil</span></button>
@@ -328,6 +352,26 @@
   let nombresGuardados = [];
   let cargandoPerfiles = false;
   let previewMode = false;
+  let currentRubroFilter = 'todos';
+
+  const RUBRO_COLORS = {
+    musica:     { bg:'#0d2010', text:'#d4f53c' },
+    actuacion:  { bg:'#2a0a08', text:'#ff6b5b' },
+    audiovisual:{ bg:'#080d2a', text:'#5b9fff' },
+    modelaje:   { bg:'#051f1a', text:'#4de8c4' },
+    diseno:     { bg:'#1f1208', text:'#ffaa5b' },
+    tatuaje:    { bg:'#1a0525', text:'#c45bff' },
+    danza:      { bg:'#051520', text:'#5bd4ff' },
+    maquillaje: { bg:'#1f1008', text:'#e8a84a' },
+    circo:      { bg:'#1f1a05', text:'#ffdd5b' },
+    escritura:  { bg:'#0f1f08', text:'#a0d47b' },
+  };
+
+  const RUBRO_LABELS = {
+    musica:'🎵 Músicos', actuacion:'🎭 Actores', audiovisual:'🎬 Audiovisual',
+    modelaje:'👗 Modelaje', diseno:'✏️ Diseño', tatuaje:'🖋️ Tatuaje',
+    danza:'💃 Danza', maquillaje:'💄 Maquillaje', circo:'🎪 Circo', escritura:'✍️ Escritura',
+  };
 
   function requireLogin() {
     try {
@@ -370,14 +414,14 @@
     })();
   }
 
-  const COLORES = ['#1a0a2e','#0a2e1a','#2e1a0a','#0a1a2e','#2e0a1a','#1a2e0a'];
-  const TEXTO = ['#c45bff','#4cff9f','#ffaa5b','#5b9fff','#ff5b8a','#c9ff5b'];
 
-  function colorIdx(nombre) {
-    if (!nombre) return 0;
-    let total = 0;
-    for (const ch of String(nombre)) total += ch.charCodeAt(0);
-    return total % COLORES.length;
+  // Subtítulo para perfiles que no son de música (leen su rol de campos_especificos)
+  function subtituloDesdeCampos(p) {
+    if (!p || !p.campos_especificos) return '';
+    let c = p.campos_especificos;
+    if (typeof c === 'string') { try { c = JSON.parse(c); } catch(_) { return ''; } }
+    if (!c || typeof c !== 'object') return '';
+    return c.rol || c.tipo_trabajo || c.especialidad || c.disciplina || c.estilo || '';
   }
 
   function getInitials(nombre) {
@@ -394,6 +438,11 @@
     const sort = document.getElementById('sort-select')?.value || 'recientes';
     let arr = [...perfilesGuardados];
 
+    // Filtro por rubro
+    if (currentRubroFilter && currentRubroFilter !== 'todos') {
+      arr = arr.filter(p => (p.rubro || 'musica') === currentRubroFilter);
+    }
+
     if (q) {
       arr = arr.filter(p => normalizeText([
         p.nombre, p.instrumento, p.generos, p.ciudad, p.barrio, p.bio, p.referentes
@@ -405,6 +454,36 @@
     return arr;
   }
 
+  function renderRubroFilter() {
+    const row = document.getElementById('rubro-filter-row');
+    if (!row) return;
+
+    // Solo mostrar en tab de artistas y si hay perfiles guardados
+    if (currentSection !== 'musicos' || !perfilesGuardados.length) {
+      row.classList.remove('visible');
+      return;
+    }
+
+    // Rubros únicos presentes en los perfiles guardados
+    const rubrosPresentes = [...new Set(perfilesGuardados.map(p => p.rubro || 'musica'))];
+
+    row.classList.add('visible');
+
+    const chips = ['todos', ...rubrosPresentes].map(rubro => {
+      const isActive = currentRubroFilter === rubro;
+      const color = rubro === 'todos' ? null : RUBRO_COLORS[rubro];
+      const label = rubro === 'todos' ? 'Todos' : (RUBRO_LABELS[rubro] || rubro);
+      const activeStyle = isActive && color
+        ? `background:${color.bg};border-color:${color.text};color:${color.text};`
+        : isActive
+        ? `background:var(--negro2);border-color:var(--blanco);color:var(--blanco);`
+        : '';
+      return `<button class="rf-chip${isActive ? ' active' : ''}" style="${activeStyle}" onclick="setRubroFilter('${rubro}')">${label}</button>`;
+    }).join('');
+
+    row.innerHTML = `<span class="rf-label">Rubro</span>${chips}`;
+  }
+
   function getFilteredNombres() {
     const q = normalizeText(document.getElementById('search-input')?.value || '');
     let arr = [...nombresGuardados];
@@ -414,23 +493,24 @@
   }
 
   function buildCard(p) {
-    const idx = colorIdx(p.nombre);
+    const rubroColor = RUBRO_COLORS[p.rubro] || RUBRO_COLORS.musica;
     const initials = getInitials(p.nombre);
     const generos = String(p.generos||'').split(',').map(g=>g.trim()).filter(Boolean).slice(0,3);
     const location = [p.barrio, p.ciudad].filter(Boolean).join(', ');
     const tags = generos.map(g=>`<span class="ctag">${escapeHtml(g)}</span>`).join('');
-    const refs = p.referentes ? `🎵 <em>${escapeHtml(String(p.referentes).split(',').slice(0,3).join(', '))}</em>` : 'Sin referentes cargados';
-    const bio = p.bio || (p.instrumento ? `Toca ${p.instrumento}` : 'Músico en buscARTE');
+    const refs = p.referentes ? `🎨 <em>${escapeHtml(String(p.referentes).split(',').slice(0,3).join(', '))}</em>` : '';
+    const bio = p.bio || (p.instrumento ? escapeHtml(p.instrumento) : 'Artista en buscARTE');
+    const subtitulo = p.instrumento || subtituloDesdeCampos(p) || (RUBRO_LABELS[p.rubro] || 'Artista');
     const avatarHTML = p.foto_url
       ? `<div class="card-avatar" style="background:#000"><img src="${escapeHtml(p.foto_url)}" alt="${escapeHtml(p.nombre || 'Perfil')}"></div>`
-      : `<div class="card-avatar" style="background:${COLORES[idx]};color:${TEXTO[idx]}">${escapeHtml(initials)}</div>`;
+      : `<div class="card-avatar" style="background:${rubroColor.bg};color:${rubroColor.text}">${escapeHtml(initials)}</div>`;
 
-    return `<article class="saved-card" data-id="${escapeHtml(p.id)}">
+    return `<article class="saved-card" data-id="${escapeHtml(p.id)}" style="border-left:3px solid ${rubroColor.text}33">
       <div class="card-top">
         ${avatarHTML}
         <div class="card-info">
           <div class="card-name">${escapeHtml(p.nombre || 'Sin nombre')}</div>
-          <div class="card-instrument">${escapeHtml(p.instrumento || 'Músico')}</div>
+          <div class="card-instrument" style="color:${rubroColor.text}">${escapeHtml(subtitulo)}</div>
           <div class="card-location">${location ? '📍 ' + escapeHtml(location) : 'Sin ubicación cargada'}</div>
         </div>
         <button class="btn-unsave" onclick="quitarGuardado('${String(p.id).replace(/'/g, "\\'")}', this)" title="Quitar de guardados">♥</button>
@@ -439,24 +519,31 @@
       <div class="card-bio">${escapeHtml(bio)}</div>
       <div class="card-footer">
         <div class="card-refs">${refs}</div>
-        <a href="buscARTE_perfil_publico.html?id=${encodeURIComponent(p.id)}" class="card-cta">Ver perfil →</a>
+        <a href="buscARTE_perfil_publico.html?id=${encodeURIComponent(p.id)}${p.rubro ? '&rubro=' + encodeURIComponent(p.rubro) : ''}" class="card-cta">Ver perfil →</a>
       </div>
     </article>`;
+  }
+
+  function setRubroFilter(rubro) {
+    currentRubroFilter = rubro;
+    renderRubroFilter();
+    renderPerfiles();
   }
 
   function renderPerfiles() {
     const grid = document.getElementById('musicians-grid');
     const arr = getFilteredPerfiles();
     document.getElementById('stat-musicos').textContent = String(perfilesGuardados.length);
+    renderRubroFilter();
 
     if (!arr.length) {
       const hasAny = perfilesGuardados.length > 0;
       grid.innerHTML = `<div class="empty-state">
         <div class="empty-icon">${hasAny ? '🔎' : '♡'}</div>
-        <div class="empty-title">${hasAny ? 'No hay resultados con esa búsqueda' : 'Sin músicos guardados todavía'}</div>
-        <div class="empty-sub">${hasAny ? 'Probá con otro nombre, instrumento, barrio o género.' : 'Cuando guardes un perfil desde la búsqueda, va a aparecer acá.'}</div>
+        <div class="empty-title">${hasAny ? 'No hay resultados con esa búsqueda' : 'Sin artistas guardados todavía'}</div>
+        <div class="empty-sub">${hasAny ? 'Probá con otro nombre, instrumento, barrio o género.' : 'Cuando guardes un perfil desde el tablón, va a aparecer acá.'}</div>
         <div class="empty-actions">
-          ${hasAny ? `<button class="btn-outline" onclick="limpiarBusqueda()">Limpiar búsqueda</button>` : `<a href="buscARTE_busqueda.html" class="btn-solid">Buscar músicos →</a>`}
+          ${hasAny ? `<button class="btn-outline" onclick="limpiarBusqueda()">Limpiar búsqueda</button>` : `<a href="buscARTE_busqueda.html" class="btn-solid">Buscar artistas →</a>`}
         </div>
       </div>`;
       return;
@@ -505,6 +592,11 @@
     document.querySelectorAll('.section-panel').forEach(panel => panel.classList.remove('active'));
     document.getElementById('panel-' + section).classList.add('active');
 
+    // Mostrar/ocultar filtro de rubro según la tab activa
+    const row = document.getElementById('rubro-filter-row');
+    if (row) row.classList.toggle('visible', section === 'musicos');
+    if (section !== 'musicos') currentRubroFilter = 'todos';
+
     const sort = document.getElementById('sort-select');
     if (section === 'nombres') {
       [...sort.options].forEach(opt => opt.disabled = opt.value === 'instrumento');
@@ -537,7 +629,7 @@
           { id: 2, nombre:'Nicolás Bustos', instrumento:'Batería', generos:'Rock, Indie', ciudad:'CABA', barrio:'Caballito', bio:'Buscando proyectos con material propio.', referentes:'Radiohead, Soda Stereo, Él Mató' }
         ];
       } else {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles_guardados?user_id=eq.${encodeURIComponent(miId)}&select=perfil_id`, { headers: hdrs });
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles_guardados?user_id=eq.${encodeURIComponent(miId)}&select=perfil_id&order=created_at.desc`, { headers: hdrs });
         if (!res.ok) throw new Error(await res.text());
         const guardados = await res.json();
         ids = Array.isArray(guardados) ? guardados.map(g => g.perfil_id).filter(Boolean) : [];
@@ -545,7 +637,7 @@
         if (!ids.length) {
           perfilesGuardados = [];
         } else {
-          const pRes = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=in.(${ids.join(',')})&select=id,nombre,instrumento,generos,ciudad,barrio,bio,referentes,foto_url`, { headers: hdrs });
+          const pRes = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=in.(${ids.join(',')})&select=id,nombre,instrumento,generos,ciudad,barrio,bio,referentes,foto_url,rubro,campos_especificos`, { headers: hdrs });
           if (!pRes.ok) throw new Error(await pRes.text());
           const perfiles = await pRes.json();
           const order = new Map(ids.map((id, idx) => [String(id), idx]));

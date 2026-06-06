@@ -17,7 +17,7 @@ async function getUsuariosIncompletos() {
   const hace14dias = new Date(Date.now() - 14 * 24 * 3600 * 1000).toISOString();
   const hace7dias  = new Date(Date.now() -  7 * 24 * 3600 * 1000).toISOString();
   const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/perfiles?select=id,nombre,email,foto_url,descripcion` +
+    `${SUPABASE_URL}/rest/v1/perfiles?select=id,nombre,email,foto_url,bio` +
     `&created_at=gte.${encodeURIComponent(hace14dias)}` +
     `&created_at=lte.${encodeURIComponent(hace7dias)}` +
     `&email=not.is.null`,
@@ -28,18 +28,18 @@ async function getUsuariosIncompletos() {
   return data.filter(u =>
     u.email &&
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(u.email) &&
-    (!u.foto_url || !u.descripcion || u.descripcion.trim().length < 10)
+    (!u.foto_url || !u.bio || u.bio.trim().length < 10)
   );
 }
 
 async function sendRecordatorio(user) {
   const res = await fetch(SEND_EMAIL_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'x-buscarte-secret': process.env.INTERNAL_SECRET || '' },
     body: JSON.stringify({
       tipo: 'perfil_incompleto',
       destinatario: user.email,
-      datos: { nombre: user.nombre || 'músico/a' }
+      datos: { nombre: user.nombre || 'artista' }
     })
   });
   if (!res.ok) {

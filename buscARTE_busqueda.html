@@ -718,8 +718,11 @@
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68';
   const SB_HEADERS = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` };
 
-  // DETECCIÓN DE RUBRO desde URL param (?rubro=musica)
-  const rubroActivo = new URLSearchParams(window.location.search).get('rubro') || 'musica';
+  // DETECCIÓN DE RUBRO: URL param (?rubro=X) → rubro de la cuenta (si es artístico) → música
+  const RUBROS_VALIDOS_BUSQ = ['musica','actuacion','audiovisual','modelaje','diseno','tatuaje','danza','maquillaje','circo','escritura'];
+  const _rubroCuentaBusq = localStorage.getItem('ba_rubro');
+  const rubroActivo = new URLSearchParams(window.location.search).get('rubro')
+    || (RUBROS_VALIDOS_BUSQ.includes(_rubroCuentaBusq) ? _rubroCuentaBusq : 'musica');
 
   // ═══════════════════════════════════════
   // CONFIGURACIÓN POR RUBRO
@@ -1121,7 +1124,7 @@
         <div class="card-info">
           <div class="card-name">${escapeHtml(p.nombre || 'Sin nombre')}</div>
           <div class="card-instrument" style="color:${rubroColor.text}">${escapeHtml(subtitulo)}</div>
-          <div class="card-location">${location ? '📍 ' + escapeHtml(location) : ''}</div>
+          <div class="card-location">${location ? '📍 ' + escapeHtml(location) : ''}${p.edad ? (location ? ' · ' : '') + escapeHtml(p.edad + ' años') : ''}</div>
         </div>
       </div>
       ${tags ? `<div class="card-tags">${tags}</div>` : ''}
@@ -1151,7 +1154,7 @@
   async function fetchProfiles(force = false) {
     if (perfilesCache && !force) return perfilesCache;
 
-    const fields = 'id,nombre,instrumento,generos,ciudad,barrio,bio,referentes,disponibilidad,foto_url,created_at,baneado,rubro,campos_especificos';
+    const fields = 'id,nombre,instrumento,generos,ciudad,barrio,bio,referentes,disponibilidad,foto_url,created_at,baneado,rubro,campos_especificos,edad';
     // Solo artistas del rubro activo: evita que negocios, visitantes u otros rubros se mezclen en el tablón
     const rubroFilter = `&rubro=eq.${encodeURIComponent(rubroActivo)}&tipo_cuenta=eq.artista`;
     const base = `${SUPABASE_URL}/rest/v1/perfiles?select=${fields}&baneado=eq.false${rubroFilter}&order=created_at.desc&limit=${MAX_FETCH}`;

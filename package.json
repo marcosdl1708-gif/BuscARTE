@@ -1,13 +1,12 @@
 {
-  "name": "updated",
+  "name": "buscarte",
   "version": "1.0.0",
-  "description": "",
-  "main": "sw.js",
+  "description": "buscARTE — red de artistas argentinos (sitio estático + Netlify Functions)",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "buscARTE",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {

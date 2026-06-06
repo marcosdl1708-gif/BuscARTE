@@ -1,60 +1,40 @@
-# buscARTE — Netlify redirects / rewrites
-# Canonical público: URLs limpias.
-# Las URLs limpias se sirven con 200 para que Google las pueda indexar.
-
+# busCARTE — Netlify redirects
+# Clean URLs publicas
 /                         /index.html                         200
-/home                     /                                  301
-/home/                    /                                  301
-/inicio                   /                                  301
-/inicio/                  /                                  301
+/home                     /index.html                         301
+/home/                    /index.html                         301
+/inicio                   /index.html                         301
+/inicio/                  /index.html                         301
 
-# URLs limpias públicas indexables
-/musicos                  /buscARTE_busqueda.html             200
-/musicos/                 /musicos                           301
-/anuncios                 /buscARTE_anuncios.html             200
-/anuncios/                /anuncios                          301
-/generador                /buscARTE_generador.html            200
-/generador/               /generador                         301
-/contacto                 /buscARTE_contacto.html             200
-/contacto/                /contacto                          301
-/registro                 /buscARTE_registro.html             200
-/registro/                /registro                          301
-/login                    /buscARTE_login.html                200
-/login/                   /login                             301
-/terminos                 /buscARTE_terminos.html             200
-/terminos/                /terminos                          301
-/privacidad               /buscARTE_privacidad.html           200
-/privacidad/              /privacidad                        301
+/artistas                 /buscARTE_busqueda.html             301
+/artistas/                /buscARTE_busqueda.html             301
+/musicos                  /buscARTE_busqueda.html             301
+/musicos/                 /buscARTE_busqueda.html             301
+/anuncios                 /buscARTE_anuncios.html             301
+/anuncios/                /buscARTE_anuncios.html             301
+/generador                /buscARTE_generador.html            301
+/generador/               /buscARTE_generador.html            301
+/contacto                 /buscARTE_contacto.html             301
+/contacto/                /buscARTE_contacto.html             301
+/registro                 /buscARTE_registro.html             301
+/registro/                /buscARTE_registro.html             301
+/login                    /buscARTE_login.html                301
+/login/                   /buscARTE_login.html                301
+/terminos                 /buscARTE_terminos.html             301
+/terminos/                /buscARTE_terminos.html             301
+/privacidad               /buscARTE_privacidad.html           301
+/privacidad/              /buscARTE_privacidad.html           301
 
-# Redirigir versiones .html públicas a la URL canónica limpia
-/buscARTE_busqueda.html   /musicos                           301
-/buscARTE_anuncios.html   /anuncios                          301
-/buscARTE_generador.html  /generador                         301
-/buscARTE_contacto.html   /contacto                          301
-/buscARTE_registro.html   /registro                          301
-/buscARTE_login.html      /login                             301
-/buscARTE_terminos.html   /terminos                          301
-/buscARTE_privacidad.html /privacidad                        301
+# Alias viejos / errores de casing
+/buscarte_login           /buscARTE_login.html                301
+/buscarte_contacto        /buscARTE_contacto.html             301
+/buscarte_registro        /buscARTE_registro.html             301
+/buscarte_artistas        /buscARTE_busqueda.html             301
+/buscarte_busqueda        /buscARTE_busqueda.html             301
+/buscarte_anuncios        /buscARTE_anuncios.html             301
+/buscarte_generador       /buscARTE_generador.html            301
 
-# Alias viejos / errores de casing hacia canónicas
-/buscarte_login           /login                             301
-/buscarte_login/          /login                             301
-/buscarte_contacto        /contacto                          301
-/buscarte_contacto/       /contacto                          301
-/buscarte_registro        /registro                          301
-/buscarte_registro/       /registro                          301
-/buscarte_busqueda        /musicos                           301
-/buscarte_busqueda/       /musicos                           301
-/buscarte_anuncios        /anuncios                          301
-/buscarte_anuncios/       /anuncios                          301
-/buscarte_generador       /generador                         301
-/buscarte_generador/      /generador                         301
-/buscarte_terminos        /terminos                          301
-/buscarte_terminos/       /terminos                          301
-/buscarte_privacidad      /privacidad                        301
-/buscarte_privacidad/     /privacidad                        301
-
-# PWA / SEO: servir directo
+# PWA / SEO: que estos archivos se sirvan directo
 /manifest.json            /manifest.json                      200
 /sitemap.xml              /sitemap.xml                        200
 /robots.txt               /robots.txt                         200

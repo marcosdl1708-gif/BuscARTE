@@ -38,6 +38,12 @@ function makeToken() {
   return crypto.randomBytes(32).toString('hex');
 }
 
+// Guardamos solo el hash del token en la DB. El token crudo viaja en el email.
+// Así, si alguien leyera la tabla perfiles, no podría usar los reset_token.
+function hashToken(token) {
+  return crypto.createHash('sha256').update(String(token || '')).digest('hex');
+}
+
 async function readJsonSafe(response) {
   const text = await response.text();
   if (!text) return null;
@@ -127,7 +133,7 @@ async function solicitar(emailRaw) {
   await supabaseFetch(`/rest/v1/perfiles?id=eq.${usuario.id}`, {
     method: 'PATCH',
     headers: { 'Prefer': 'return=minimal' },
-    body: JSON.stringify({ reset_token: token, reset_expires: expires })
+    body: JSON.stringify({ reset_token: hashToken(token), reset_expires: expires })
   });
 
   await sendResetEmail(email, usuario.nombre, token);
@@ -140,7 +146,7 @@ async function verificar(tokenRaw) {
   if (!token) return json(200, { valido: false, error: 'Token inválido' });
 
   const usuarios = await supabaseFetch(
-    `/rest/v1/perfiles?reset_token=eq.${encodeURIComponent(token)}&select=id,nombre,reset_expires&limit=1`
+    `/rest/v1/perfiles?reset_token=eq.${encodeURIComponent(hashToken(token))}&select=id,nombre,reset_expires&limit=1`
   );
   const usuario = Array.isArray(usuarios) ? usuarios[0] : null;
 
@@ -162,7 +168,7 @@ async function cambiar(tokenRaw, nuevaPassword) {
   }
 
   const usuarios = await supabaseFetch(
-    `/rest/v1/perfiles?reset_token=eq.${encodeURIComponent(token)}&select=id,reset_expires&limit=1`
+    `/rest/v1/perfiles?reset_token=eq.${encodeURIComponent(hashToken(token))}&select=id,reset_expires&limit=1`
   );
   const usuario = Array.isArray(usuarios) ? usuarios[0] : null;
 

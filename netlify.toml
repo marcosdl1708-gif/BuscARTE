@@ -1,0 +1,21 @@
+# netlify.toml — configuración de buscARTE
+#
+# Lo CRÍTICO de este archivo: declarar las funciones programadas (scheduled functions).
+# Sin esto, los comentarios "Schedule: ..." dentro de los .js NO hacen nada y los emails
+# automáticos (resumen mensual y recordatorio de perfil) nunca se ejecutan.
+#
+# Cron en UTC. Argentina (ART) = UTC-3, así que 13:00 UTC = 10:00 ART.
+# El nombre entre comillas es el del archivo de la función sin .js.
+
+[build.environment]
+  # @netlify/functions ^5 requiere Node >= 18. Fijamos una versión LTS para que
+  # las funciones tengan fetch global y crypto disponibles.
+  NODE_VERSION = "20"
+
+[functions."resumen-mensual"]
+  # Día 1 de cada mes, 10:00 ART
+  schedule = "0 13 1 * *"
+
+[functions."recordatorio-perfil"]
+  # Cada lunes, 10:00 ART
+  schedule = "0 13 * * 1"

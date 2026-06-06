@@ -65,13 +65,15 @@
   .conv-tab.active { background:var(--neon);color:var(--negro); }
   .conv-tab:hover:not(.active) { color:var(--blanco);background:rgba(255,255,255,.03); }
   .conv-list { flex:1;overflow-y:auto; }
-  .conv-list::-webkit-scrollbar, .chat-messages::-webkit-scrollbar { width:3px; }
-  .conv-list::-webkit-scrollbar-thumb, .chat-messages::-webkit-scrollbar-thumb { background:var(--gris3); }
+  .conv-list::-webkit-scrollbar, .chat-messages::-webkit-scrollbar { width:9px; }
+  .conv-list::-webkit-scrollbar-thumb, .chat-messages::-webkit-scrollbar-thumb { background:var(--gris3); border-radius:6px; border:2px solid var(--negro); }
+  .conv-list::-webkit-scrollbar-thumb:hover, .chat-messages::-webkit-scrollbar-thumb:hover { background:var(--gris2); }
+  .conv-list, .chat-messages { scrollbar-width:thin; scrollbar-color:var(--gris3) transparent; }
   .conv-item { display:flex;align-items:flex-start;gap:.85rem;padding:1rem 1.2rem;border-bottom:1px solid #161616;cursor:none;transition:background .15s;position:relative; }
   .conv-item:hover { background:rgba(255,255,255,.025); }
   .conv-item.active { background:rgba(212,245,60,.045);border-left:2px solid var(--neon);padding-left:calc(1.2rem - 2px); }
   .conv-item.unread .conv-preview, .conv-item.unread .conv-name { color:var(--blanco);font-weight:500; }
-  .conv-avatar, .chat-header-avatar, .msg-avatar { border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);flex-shrink:0;overflow:hidden;background:#0d2010;color:var(--neon); }
+  .conv-avatar, .chat-header-avatar, .msg-avatar { border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);flex-shrink:0;overflow:hidden;background:#111;color:var(--gris); }
   .conv-avatar { width:40px;height:40px;font-size:.82rem;position:relative; }
   .conv-avatar img, .chat-header-avatar img, .msg-avatar img { width:100%;height:100%;object-fit:cover;display:block; }
   .conv-body { flex:1;min-width:0; }
@@ -202,7 +204,7 @@
 <nav>
   <a href="index.html" class="nav-logo">busc<span>ARTE</span></a>
   <ul class="nav-links">
-    <li><a href="buscARTE_busqueda.html" class="nav-link">Músicos</a></li>
+    <li><a href="buscARTE_busqueda.html" class="nav-link">Artistas</a></li>
     <li><a href="buscARTE_anuncios.html" class="nav-link">Anuncios</a></li>
     <li><a href="buscARTE_mensajes.html" class="nav-link active">Mensajes</a></li>
   </ul>
@@ -277,14 +279,14 @@
       <div class="chat-empty">
         <span class="chat-empty-icon">💬</span>
         <div class="chat-empty-title">Seleccioná una conversación</div>
-        <p class="chat-empty-sub">Tus mensajes van a aparecer acá. Elegí una conversación de la izquierda para seguir hablando.</p><div style="display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center"><a href="buscARTE_busqueda.html" class="chat-action-btn">Buscar músicos</a><a href="buscARTE_anuncios.html" class="chat-action-btn">Ver anuncios</a></div>
+        <p class="chat-empty-sub">Tus mensajes van a aparecer acá. Elegí una conversación de la izquierda para seguir hablando.</p><div style="display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center"><a href="buscARTE_busqueda.html" class="chat-action-btn">Buscar artistas</a><a href="buscARTE_anuncios.html" class="chat-action-btn">Ver anuncios</a></div>
       </div>
     </div>
     <div class="chat-input-area" id="chat-input-area">
       <div class="quick-replies" id="quick-replies">
         <div class="quick-reply-label">Respuestas rápidas</div>
         <button type="button" class="quick-reply" onclick="insertQuickReply('Hola, vi tu perfil y me interesa conectar. ¿Tenés disponibilidad?')">Disponibilidad</button>
-        <button type="button" class="quick-reply" onclick="insertQuickReply('Buenas, ¿te copa coordinar una prueba o ensayo esta semana?')">Coordinar ensayo</button>
+        <button type="button" class="quick-reply" onclick="insertQuickReply('Buenas, ¿te copa coordinar un encuentro esta semana?')">Coordinar encuentro</button>
         <button type="button" class="quick-reply" onclick="insertQuickReply('Hola, te escribo por el anuncio. ¿Sigue vigente?')">Anuncio vigente</button>
         <button type="button" class="quick-reply" onclick="insertQuickReply('Genial, pasame más data y vemos cómo seguimos.')">Pedir data</button>
       </div>
@@ -311,7 +313,7 @@
   <a href="#" class="mbn-panel-item danger" onclick="mbnLogout()"><span class="mbn-pi-icon">🚪</span> Cerrar sesión</a>
 </div>
 <nav class="mobile-bottom-nav" id="mobile-bottom-nav">
-  <a href="buscARTE_busqueda.html" class="mbn-item" data-page="busqueda"><span class="mbn-icon">🎵</span><span>Músicos</span></a>
+  <a href="buscARTE_busqueda.html" class="mbn-item" data-page="busqueda"><span class="mbn-icon">🎨</span><span>Artistas</span></a>
   <a href="buscARTE_anuncios.html" class="mbn-item" data-page="anuncios"><span class="mbn-icon">📋</span><span>Anuncios</span></a>
   <a href="buscARTE_mensajes.html" class="mbn-item active" data-page="mensajes"><span class="mbn-icon">💬</span><span>Mensajes</span></a>
   <button class="mbn-item" onclick="toggleMbnPanel()" style="background:none;border:none;flex:1;padding:0;" data-page="perfil"><span class="mbn-icon">👤</span><span>Mi perfil</span></button>
@@ -322,6 +324,19 @@
   const SUPABASE_URL = 'https://xiaanchoanxmampegoay.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68';
   const headers = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' };
+
+  const RUBRO_COLORS = {
+    musica:     { bg:'#0d2010', text:'#d4f53c' },
+    actuacion:  { bg:'#2a0a08', text:'#ff6b5b' },
+    audiovisual:{ bg:'#080d2a', text:'#5b9fff' },
+    modelaje:   { bg:'#051f1a', text:'#4de8c4' },
+    diseno:     { bg:'#1f1208', text:'#ffaa5b' },
+    tatuaje:    { bg:'#1a0525', text:'#c45bff' },
+    danza:      { bg:'#051520', text:'#5bd4ff' },
+    maquillaje: { bg:'#1f1008', text:'#e8a84a' },
+    circo:      { bg:'#1f1a05', text:'#ffdd5b' },
+    escritura:  { bg:'#0f1f08', text:'#a0d47b' },
+  };
   let miUserId = localStorage.getItem('ba_user_id');
   const miNombre = localStorage.getItem('ba_name') || 'Yo';
 
@@ -333,6 +348,12 @@
   let convFilter = 'todas';
   let unreadByUserId = {};
   let lastSeenInicial = localStorage.getItem('ba_msg_last_seen') || '1970-01-01T00:00:00.000Z';
+  // Estado de lectura POR usuario: una conversación queda "no leída" solo si llegó un
+  // mensaje después de la última vez que la abriste. Persiste en localStorage.
+  let readByUser = {};
+  try { readByUser = JSON.parse(localStorage.getItem('ba_msg_read_by_user') || '{}') || {}; } catch(_) { readByUser = {}; }
+  // Firma del último render de mensajes — evita re-renderizar (y romper el scroll) en el polling.
+  let ultimaFirmaMsgs = '';
 
   if (!PREVIEW_MODE && localStorage.getItem('ba_logged') !== '1') {
     window.location.replace('buscARTE_login.html?redirect=' + encodeURIComponent('buscARTE_mensajes.html'));
@@ -352,8 +373,10 @@
   }
   function avatarHTML(perfil, cls) {
     const nombre = perfil?.nombre || 'Usuario';
-    if (perfil?.foto_url) return `<div class="${cls}"><img src="${escapeHTML(perfil.foto_url)}" alt=""></div>`;
-    return `<div class="${cls}">${escapeHTML(getInitials(nombre))}</div>`;
+    const rubro = perfil?.rubro || 'musica';
+    const color = RUBRO_COLORS[rubro] || RUBRO_COLORS.musica;
+    if (perfil?.foto_url) return `<div class="${cls}" style="background:#000"><img src="${escapeHTML(perfil.foto_url)}" alt=""></div>`;
+    return `<div class="${cls}" style="background:${color.bg};color:${color.text}">${escapeHTML(getInitials(nombre))}</div>`;
   }
   function timeAgo(iso) {
     if (!iso) return '';
@@ -431,11 +454,19 @@
   async function calcularNuevos() {
     unreadByUserId = {};
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/mensajes?para_user_id=eq.${filterValue(miUserId)}&created_at=gt.${encodeURIComponent(lastSeenInicial)}&select=id,de_user_id,created_at&limit=999`, { headers });
+      // Traemos los mensajes recibidos (recientes) y contamos como "no leído" solo los que
+      // llegaron DESPUÉS de la última vez que abrimos la conversación de ese usuario.
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/mensajes?para_user_id=eq.${filterValue(miUserId)}&select=id,de_user_id,created_at&order=created_at.desc&limit=999`, { headers });
       if (!res.ok) return;
-      const nuevos = await res.json();
-      nuevos.forEach(m => { unreadByUserId[String(m.de_user_id)] = (unreadByUserId[String(m.de_user_id)] || 0) + 1; });
-      const total = nuevos.length;
+      const recibidos = await res.json();
+      let total = 0;
+      recibidos.forEach(m => {
+        const leidoHasta = readByUser[String(m.de_user_id)];
+        if (!leidoHasta || new Date(m.created_at) > new Date(leidoHasta)) {
+          unreadByUserId[String(m.de_user_id)] = (unreadByUserId[String(m.de_user_id)] || 0) + 1;
+          total++;
+        }
+      });
       const el = document.getElementById('conv-count');
       const badge = document.getElementById('nav-msg-badge');
       if (total > 0) {
@@ -452,7 +483,7 @@
   async function cargarPerfiles(ids) {
     perfilesPorId = {};
     if (!ids.length) return;
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=in.(${ids.map(filterValue).join(',')})&select=id,nombre,instrumento,ciudad,foto_url,email`, { headers });
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=in.(${ids.map(filterValue).join(',')})&select=id,nombre,instrumento,ciudad,foto_url,email,rubro`, { headers });
     if (!res.ok) throw new Error('perfiles ' + res.status + ': ' + await res.text());
     const perfiles = await res.json();
     perfiles.forEach(p => { perfilesPorId[String(p.id)] = p; });
@@ -477,7 +508,7 @@
     if (q) data = data.filter(c => [c.nombre, c.meta, c.preview, c.contexto].join(' ').toLowerCase().includes(q));
 
     if (!data.length) {
-      lista.innerHTML = `<div class="conv-empty">${q ? 'No encontramos conversaciones con esa búsqueda.' : convFilter === 'nuevas' ? 'No tenés mensajes nuevos.' : 'Todavía no tenés conversaciones.<br><a href="buscARTE_busqueda.html">Buscar músicos →</a>'}</div>`;
+      lista.innerHTML = `<div class="conv-empty">${q ? 'No encontramos conversaciones con esa búsqueda.' : convFilter === 'nuevas' ? 'No tenés mensajes nuevos.' : 'Todavía no tenés conversaciones.<br><a href="buscARTE_busqueda.html">Buscar artistas →</a>'}</div>`;
       return;
     }
     lista.innerHTML = data.map(c => `
@@ -495,14 +526,14 @@
 
   function decorateConv(conv) {
     const otroId = String(conv.user1_id) === String(miUserId) ? conv.user2_id : conv.user1_id;
-    const perfil = perfilesPorId[String(otroId)] || { id: otroId, nombre:'Usuario eliminado', instrumento:'Músico' };
+    const perfil = perfilesPorId[String(otroId)] || { id: otroId, nombre:'Usuario eliminado', instrumento:'Artista' };
     const anuncio = conv.anuncio_id ? anunciosPorId[String(conv.anuncio_id)] : null;
     return {
       ...conv,
       otroId,
       perfil,
       nombre: perfil.nombre || 'Usuario',
-      meta: `${perfil.instrumento || 'Músico'}${perfil.ciudad ? ' · ' + perfil.ciudad : ''}`,
+      meta: `${perfil.instrumento || 'Artista'}${perfil.ciudad ? ' · ' + perfil.ciudad : ''}`,
       preview: conv.ultimo_mensaje || 'Nueva conversación',
       contexto: anuncio ? `📋 ${anuncio.titulo || 'Anuncio'}` : '👤 Perfil directo',
       unreadCount: unreadByUserId[String(otroId)] || 0
@@ -532,9 +563,16 @@
     document.getElementById('composer-note')?.classList.remove('visible');
     updateComposerState();
 
-    document.getElementById('chat-header-avatar').innerHTML = avatarHTML(conv.perfil, 'chat-header-avatar').replace(/^<div class="chat-header-avatar">|<\/div>$/g, '');
-    if (conv.perfil?.foto_url) document.getElementById('chat-header-avatar').innerHTML = `<img src="${escapeHTML(conv.perfil.foto_url)}" alt="">`;
-    else document.getElementById('chat-header-avatar').textContent = getInitials(conv.nombre);
+    const _headerAv = document.getElementById('chat-header-avatar');
+    const _rubroColor = RUBRO_COLORS[conv.perfil?.rubro || 'musica'] || RUBRO_COLORS.musica;
+    if (conv.perfil?.foto_url) {
+      _headerAv.style.background = '#000';
+      _headerAv.innerHTML = `<img src="${escapeHTML(conv.perfil.foto_url)}" alt="">`;
+    } else {
+      _headerAv.style.background = _rubroColor.bg;
+      _headerAv.style.color = _rubroColor.text;
+      _headerAv.textContent = getInitials(conv.nombre);
+    }
     document.getElementById('chat-header-name').textContent = conv.nombre;
     document.getElementById('chat-header-meta').textContent = conv.meta;
     document.getElementById('chat-ver-perfil').href = 'buscARTE_perfil_publico.html?id=' + encodeURIComponent(conv.otroId);
@@ -554,6 +592,12 @@
     }
 
     unreadByUserId[String(conv.otroId)] = 0;
+    // Marcar esta conversación como leída (persistente) — evita que reaparezca como "nuevo"
+    if (conv.otroId != null) {
+      readByUser[String(conv.otroId)] = new Date().toISOString();
+      try { localStorage.setItem('ba_msg_read_by_user', JSON.stringify(readByUser)); } catch(_) {}
+    }
+    ultimaFirmaMsgs = '';  // forzar render al cambiar de conversación
     renderConversaciones();
     await cargarMensajes(true);
     document.getElementById('chat-input').focus();
@@ -573,13 +617,33 @@
       return;
     }
     const wasAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 80;
+    const prevScrollHeight = container.scrollHeight;
+    const prevScrollTop = container.scrollTop;
     try {
       const res = await fetch(`${SUPABASE_URL}/rest/v1/mensajes?or=(and(de_user_id.eq.${filterValue(miUserId)},para_user_id.eq.${filterValue(convActiva.otroId)}),and(de_user_id.eq.${filterValue(convActiva.otroId)},para_user_id.eq.${filterValue(miUserId)}))&order=created_at.asc`, { headers });
       if (!res.ok) throw new Error('mensajes ' + res.status + ': ' + await res.text());
       const msgs = await res.json();
+      // Si nada cambió (polling), no re-renderizamos: así no se rompe tu posición de scroll.
+      const ultimo = msgs.length ? msgs[msgs.length - 1] : null;
+      const firma = msgs.length + '|' + (ultimo ? (ultimo.id + '|' + ultimo.created_at) : '');
+      if (!forceScroll && firma === ultimaFirmaMsgs) {
+        localStorage.setItem('ba_msg_last_seen', new Date().toISOString());
+        return;
+      }
+      ultimaFirmaMsgs = firma;
       renderMensajes(msgs);
-      if (forceScroll || wasAtBottom) container.scrollTop = container.scrollHeight;
+      if (forceScroll || wasAtBottom) {
+        container.scrollTop = container.scrollHeight;
+      } else {
+        // Estás leyendo mensajes viejos: mantenemos la posición (no rebotar al fondo).
+        container.scrollTop = container.scrollHeight - (prevScrollHeight - prevScrollTop);
+      }
       localStorage.setItem('ba_msg_last_seen', new Date().toISOString());
+      // Marcar leído (persistente) los mensajes de esta conversación
+      if (convActiva && convActiva.otroId != null) {
+        readByUser[String(convActiva.otroId)] = new Date().toISOString();
+        try { localStorage.setItem('ba_msg_read_by_user', JSON.stringify(readByUser)); } catch(_) {}
+      }
     } catch(e) {
       console.error('Error cargando mensajes:', e);
       container.innerHTML = `<div class="chat-empty"><span class="chat-empty-icon">⚠️</span><div class="chat-empty-title">No se pudieron cargar los mensajes</div><p class="chat-empty-sub">Revisá tu conexión e intentá de nuevo.</p></div>`;
@@ -674,7 +738,7 @@
       fetch('/.netlify/functions/send-email', {
         method:'POST',
         headers: { 'Content-Type':'application/json' },
-        body: JSON.stringify({ tipo:'mensaje', destinatario:destinatario.email, datos: { remitente:miNombre || 'Un músico', preview:text.length > 120 ? text.slice(0,120) + '...' : text } })
+        body: JSON.stringify({ tipo:'mensaje', destinatario:destinatario.email, datos: { remitente:miNombre || 'Un artista', preview:text.length > 120 ? text.slice(0,120) + '...' : text } })
       }).catch(()=>{});
     } catch(e) {}
   }

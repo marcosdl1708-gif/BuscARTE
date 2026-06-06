@@ -1,12 +1,12 @@
 User-agent: *
 Allow: /
 
-# Páginas privadas / utilitarias
-Disallow: /buscARTE_mensajes.html
-Disallow: /buscARTE_guardados.html
-Disallow: /buscARTE_mis_anuncios.html
-Disallow: /buscARTE_perfil.html
-Disallow: /buscARTE_reset.html
-Disallow: /buscARTE_recuperar.html
+# Las páginas privadas/de utilidad (login, perfil, mensajes, guardados, mis_anuncios,
+# recuperar, reset) NO se bloquean acá a propósito: llevan <meta robots noindex>, así que
+# conviene que Google las pueda rastrear para VER ese noindex y sacarlas del índice.
+# Bloquearlas acá impediría que vea el noindex.
+
+# No tiene sentido rastrear las funciones serverless.
+Disallow: /.netlify/functions/
 
 Sitemap: https://buscarte.com.ar/sitemap.xml

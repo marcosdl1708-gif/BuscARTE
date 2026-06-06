@@ -1458,7 +1458,7 @@
         fetch(`${SUPABASE_URL}/rest/v1/conversaciones?id=eq.${encodeURIComponent(convId)}`, {
           method: 'PATCH',
           headers: { ...hdrs, 'Prefer': 'return=minimal' },
-          body: JSON.stringify({ ultimo_mensaje: texto, updated_at: new Date().toISOString() })
+          body: JSON.stringify({ ultimo_mensaje: texto, updated_at: new Date().toISOString(), anuncio_id: dbId(anuncioId) })
         }).catch(()=>{})
       }
 

@@ -3,1039 +3,329 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- SEO -->
-  <meta name="keywords" content="músicos argentina, buscar músico, guitarrista buenos aires, baterista, bajista, cantante, banda de rock argentina, músicos por ciudad, red social músicos, jam session argentina">
-  <meta name="description" content="buscARTE es la red gratuita para músicos argentinos. Encontrá guitarristas, bateristas, bajistas, cantantes y más por ciudad, barrio y género musical. Buenos Aires, Córdoba, Rosario y todo el país.">
-  <meta name="robots" content="index, follow">
-  <meta name="author" content="buscARTE">
-  <link rel="canonical" href="https://buscarte.com.ar/">
 
-  <!-- Open Graph (WhatsApp, Facebook, Instagram) -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://buscarte.com.ar/">
-  <meta property="og:title" content="buscARTE — Encontrá músicos en Argentina | Red de músicos argentinos">
-  <meta property="og:description" content="buscARTE es la red gratuita para músicos argentinos. Encontrá guitarristas, bateristas, bajistas, cantantes y más por ciudad, barrio y género musical. Buenos Aires, Córdoba, Rosario y todo el país.">
-  <meta property="og:image" content="https://buscarte.com.ar/og-image.jpg">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:locale" content="es_AR">
-  <meta property="og:site_name" content="buscARTE">
+<!-- SEO -->
+<meta name="keywords" content="artistas argentina, músicos fotógrafos actores diseñadores bailarines tatuadores, buscar artista, red artistas argentinos, Buenos Aires, Córdoba, Rosario, buscARTE">
+<meta name="description" content="buscARTE es la red gratuita para artistas argentinos. Músicos, actores, fotógrafos, diseñadores, bailarines, tatuadores y más. Encontrá artistas por rubro, zona y especialidad. 100% gratis.">
+<meta name="robots" content="index, follow">
+<meta name="author" content="buscARTE">
+<link rel="canonical" href="https://buscarte.com.ar/">
 
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="buscARTE — Encontrá músicos en Argentina | Red de músicos argentinos">
-  <meta name="twitter:description" content="buscARTE es la red gratuita para músicos argentinos. Encontrá guitarristas, bateristas, bajistas, cantantes y más por ciudad, barrio y género musical. Buenos Aires, Córdoba, Rosario y todo el país.">
-  <meta name="twitter:image" content="https://buscarte.com.ar/og-image.jpg">
-<title>buscARTE — Encontrá músicos en Argentina | Red de músicos argentinos</title>
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://buscarte.com.ar/">
+<meta property="og:title" content="buscARTE — La red de artistas argentinos | Músicos, actores, fotógrafos y más">
+<meta property="og:description" content="Encontrá artistas de todos los rubros en Argentina. Músicos, actores, fotógrafos, diseñadores, bailarines, tatuadores. 100% gratis.">
+<meta property="og:image" content="https://buscarte.com.ar/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="es_AR">
+<meta property="og:site_name" content="buscARTE">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="buscARTE — La red de artistas argentinos">
+<meta name="twitter:description" content="Músicos, actores, fotógrafos, diseñadores, bailarines, tatuadores y más. 100% gratis.">
+<meta name="twitter:image" content="https://buscarte.com.ar/og-image.jpg">
+
+<title>buscARTE — La red de artistas argentinos | Músicos, actores, fotógrafos y más</title>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+
 <style>
-  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --negro:#080808; --negro2:#111111; --negro3:#1a1a1a;
+  --blanco:#f2ede4; --neon:#d4f53c; --rojo:#e8311a;
+  --gris:#888; --gris2:#444; --gris3:#2a2a2a;
+  --font-display:'Archivo Black',sans-serif;
+  --font-body:'Archivo',sans-serif;
+}
+html { scroll-behavior:smooth; }
+body { background:var(--negro); color:var(--blanco); font-family:var(--font-body); font-weight:300; overflow-x:hidden; cursor:none; }
 
-  :root {
-    --negro: #080808;
-    --negro2: #111111;
-    --negro3: #1a1a1a;
-    --blanco: #f2ede4;
-    --neon: #d4f53c;
-    --rojo: #e8311a;
-    --gris: #888;
-    --gris2: #444;
-    --font-display: 'Archivo Black', sans-serif;
-    --font-body: 'Archivo', sans-serif;
-  }
+/* CURSOR */
+.cursor { width:10px;height:10px;background:var(--neon);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform .1s,width .2s,height .2s; }
+.cursor-ring { width:36px;height:36px;border:1px solid rgba(212,245,60,.4);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .15s ease; }
 
-  html { scroll-behavior: smooth; }
+/* GRAIN */
+body::before { content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");opacity:.035;pointer-events:none;z-index:1000; }
 
-  body {
-    background: var(--negro);
-    color: var(--blanco);
-    font-family: var(--font-body);
-    font-weight: 300;
-    overflow-x: hidden;
-    cursor: none;
-  }
+/* NAV */
+nav { position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.4rem 3rem;border-bottom:1px solid #1c1c1c;background:rgba(8,8,8,.92);backdrop-filter:blur(12px); }
+.nav-logo { font-family:var(--font-display);font-size:1.5rem;letter-spacing:-.01em;color:var(--blanco);text-decoration:none; }
+.nav-logo span { color:var(--neon); }
+.nav-links { display:flex;gap:2.5rem;list-style:none; }
+.nav-links a { color:var(--gris);text-decoration:none;font-size:.82rem;letter-spacing:.12em;text-transform:uppercase;transition:color .2s; }
+.nav-links a:hover { color:var(--blanco); }
+.nav-right { display:flex;gap:1rem;align-items:center; }
+.btn-ghost { background:transparent;border:1px solid var(--gris2);color:var(--blanco);padding:.55rem 1.4rem;font-family:var(--font-body);font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;cursor:none;transition:border-color .2s,color .2s;text-decoration:none;display:inline-block; }
+.btn-ghost:hover { border-color:var(--blanco); }
+.btn-neon { background:var(--neon);border:none;color:var(--negro);padding:.55rem 1.4rem;font-family:var(--font-body);font-weight:500;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;cursor:none;transition:opacity .2s;text-decoration:none;display:inline-block; }
+.btn-neon:hover { opacity:.85; }
+/* NAV USER */
+.nav-user { position:relative; }
+.nav-avatar-wrap { display:flex;align-items:center;gap:.5rem;cursor:none;padding:.3rem .6rem;border:1px solid var(--gris3);transition:border-color .2s;user-select:none; }
+.nav-avatar-wrap:hover { border-color:var(--gris2); }
+.nav-avatar-circle { width:28px;height:28px;border-radius:50%;background:#0d2010;color:var(--neon);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.62rem;flex-shrink:0; }
+.nav-avatar-name { font-size:.78rem;color:var(--blanco);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.nav-avatar-chevron { font-size:.6rem;color:var(--gris);transition:transform .2s; }
+.nav-avatar-wrap.open .nav-avatar-chevron { transform:rotate(180deg); }
+.nav-dropdown { position:absolute;top:calc(100% + 8px);right:0;background:var(--negro2);border:1px solid #2a2a2a;min-width:200px;display:none;flex-direction:column;z-index:300; }
+.nav-dropdown.open { display:flex; }
+.nav-dropdown-item { display:flex;align-items:center;gap:.6rem;padding:.75rem 1.1rem;color:var(--gris);text-decoration:none;font-size:.82rem;transition:all .15s;background:transparent;border:none;font-family:var(--font-body);cursor:none;text-align:left;width:100%; }
+.nav-dropdown-item:hover { background:rgba(255,255,255,.04);color:var(--blanco); }
+.nav-dropdown-divider { height:1px;background:#1c1c1c;margin:.3rem 0; }
+.nav-logout:hover { color:var(--rojo) !important; }
+.nav-badge { background:var(--neon);color:var(--negro);font-size:.62rem;font-weight:700;padding:.15rem .45rem;margin-left:.5rem;border-radius:2px;min-width:1.2rem;text-align:center;display:inline-block; }
+.nav-links { list-style:none !important;display:flex !important;gap:2rem !important;padding:0 !important;margin:0 !important; }
+.nav-links li { list-style:none !important; }
+.nav-link { color:var(--gris);text-decoration:none;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;transition:color .2s; }
+.nav-link:hover { color:var(--blanco); }
+.nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap { pointer-events:auto !important; }
+nav a, nav button { pointer-events:auto !important; }
 
-  /* CURSOR PERSONALIZADO */
-  .cursor {
-    width: 10px; height: 10px;
-    background: var(--neon);
-    border-radius: 50%;
-    position: fixed;
-    pointer-events: none;
-    z-index: 9999;
-    transform: translate(-50%, -50%);
-    transition: transform 0.1s, width 0.2s, height 0.2s;
-  }
-  .cursor-ring {
-    width: 36px; height: 36px;
-    border: 1px solid rgba(212,245,60,0.4);
-    border-radius: 50%;
-    position: fixed;
-    pointer-events: none;
-    z-index: 9998;
-    transform: translate(-50%, -50%);
-    transition: all 0.15s ease;
-  }
-  a:hover ~ .cursor, button:hover ~ .cursor { width: 20px; height: 20px; }
+/* HERO */
+.hero { min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 3rem 5rem;position:relative;overflow:hidden; }
+.hero-bg-text { position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--font-display);font-size:clamp(10rem,22vw,22rem);color:transparent;-webkit-text-stroke:1px #1e1e1e;white-space:nowrap;pointer-events:none;user-select:none;letter-spacing:-.04em;opacity:.6; }
+.hero-tag { display:inline-flex;align-items:center;gap:.6rem;font-size:.75rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gris);margin-bottom:1.8rem;animation:fadeUp .8s ease both; }
+.hero-tag::before { content:'';display:block;width:28px;height:1px;background:var(--neon); }
+h1 { font-family:var(--font-display);font-size:clamp(4.5rem,10vw,9.5rem);line-height:.88;letter-spacing:-.03em;margin-bottom:2rem;animation:fadeUp .8s .1s ease both; }
+h1 .accent { color:var(--neon); }
+h1 .rojo { color:var(--rojo); }
+.hero-bottom { display:flex;align-items:flex-end;justify-content:space-between;animation:fadeUp .8s .2s ease both; }
+.hero-desc { max-width:420px;color:var(--gris);font-size:1rem;line-height:1.75;font-weight:300; }
+.hero-desc strong { color:var(--blanco);font-weight:400; }
+.hero-actions { display:flex;gap:1rem;align-items:center; }
+.hero-scroll { position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.5rem;color:var(--gris2);font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;animation:bounce 2s infinite; }
+.hero-scroll::after { content:'';display:block;width:1px;height:40px;background:linear-gradient(to bottom,var(--gris2),transparent); }
 
-  /* GRAIN OVERLAY */
-  body::before {
-    content: '';
-    position: fixed;
-    top: -50%; left: -50%;
-    width: 200%; height: 200%;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-    opacity: 0.035;
-    pointer-events: none;
-    z-index: 1000;
-  }
+/* HERO — nuevo layout product */
+.hero-product { min-height:92vh;justify-content:center;padding-top:7.5rem;padding-bottom:4rem; }
+.hero-content { position:relative;z-index:2;max-width:1180px;width:100%; }
+.hero-kicker-row { display:flex;flex-wrap:wrap;gap:.6rem;margin-bottom:1.4rem; }
+.hero-kicker-pill { border:1px solid #2a2a2a;color:var(--gris);padding:.35rem .75rem;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;background:rgba(255,255,255,.02); }
+.hero-kicker-pill.strong { border-color:rgba(212,245,60,.4);color:var(--neon);background:rgba(212,245,60,.05); }
+.hero-product h1 { max-width:980px;margin-bottom:1.4rem; }
+.hero-desc-wide { max-width:680px;font-size:1.08rem;color:var(--gris);line-height:1.75;margin-bottom:2rem; }
+.hero-desc-wide strong { color:var(--blanco);font-weight:500; }
+.hero-main-actions { display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:2rem; }
+.hero-main-actions .btn-neon, .hero-main-actions .btn-ghost { font-size:.9rem;padding:.9rem 1.45rem; }
+.hero-proof { display:flex;gap:1px;flex-wrap:wrap;max-width:820px;background:#1c1c1c;border:1px solid #1c1c1c; }
+.hero-proof span { background:rgba(8,8,8,.88);color:var(--gris);padding:.75rem 1rem;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase; }
+.hero-proof strong { color:var(--neon);font-weight:500; }
 
-  /* NAV */
-  nav {
-    position: fixed; top: 0; left: 0; right: 0;
-    z-index: 100;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 1.4rem 3rem;
-    border-bottom: 1px solid #1c1c1c;
-    background: rgba(8,8,8,0.92);
-    backdrop-filter: blur(12px);
-  }
-  .nav-logo {
-    font-family: var(--font-display);
-    font-size: 1.5rem;
-    letter-spacing: -0.01em;
-    color: var(--blanco);
-    text-decoration: none;
-  }
-  .nav-logo span { color: var(--neon); }
-  .nav-links {
-    display: flex; gap: 2.5rem; list-style: none;
-  }
-  .nav-links a {
-    color: var(--gris);
-    text-decoration: none;
-    font-size: 0.82rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    transition: color 0.2s;
-  }
-  .nav-links a:hover { color: var(--blanco); }
-  .nav-right { display: flex; gap: 1rem; align-items: center; }
-  .btn-ghost {
-    background: transparent;
-    border: 1px solid var(--gris2);
-    color: var(--blanco);
-    padding: 0.55rem 1.4rem;
-    font-family: var(--font-body);
-    font-size: 0.82rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    cursor: none;
-    transition: border-color 0.2s, color 0.2s;
-    text-decoration: none;
-    display: inline-block;
-  }
-  .btn-ghost:hover { border-color: var(--blanco); }
-  .btn-neon {
-    background: var(--neon);
-    border: none;
-    color: var(--negro);
-    padding: 0.55rem 1.4rem;
-    font-family: var(--font-body);
-    font-weight: 500;
-    font-size: 0.82rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    cursor: none;
-    transition: opacity 0.2s;
-    text-decoration: none;
-    display: inline-block;
-  }
-  .btn-neon:hover { opacity: 0.85; }
+/* HERO LOGGED IN */
+.hero-quick-nav { display:flex;gap:1rem;flex-wrap:wrap; }
+.hqn-btn { display:flex;align-items:center;gap:.6rem;background:rgba(255,255,255,.05);border:1px solid #333;color:var(--blanco);text-decoration:none;padding:.9rem 1.6rem;font-family:var(--font-body);font-size:.88rem;letter-spacing:.06em;text-transform:uppercase;transition:border-color .2s,background .2s,color .2s;min-width:140px; }
+.hqn-btn:hover { border-color:var(--neon);background:rgba(212,245,60,.06);color:var(--neon); }
+.hqn-icon { font-size:1.1rem; }
 
-  /* HERO */
-  .hero {
-    min-height: 100vh;
-    display: flex; flex-direction: column; justify-content: flex-end;
-    padding: 0 3rem 5rem;
-    position: relative;
-    overflow: hidden;
-  }
+/* ══════════════════════════════════
+   SECCIÓN: ELEGÍ TU RUBRO
+   La pieza central de la home nueva
+══════════════════════════════════ */
+.rubros-section { padding:5.5rem 3rem;border-bottom:1px solid #1c1c1c; }
+.rubros-intro { display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2.8rem;padding-bottom:2rem;border-bottom:1px solid #1c1c1c; }
+.rubros-grid {
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:1px;
+  background:#1c1c1c;
+  border:1px solid #1c1c1c;
+}
+.rubro-item {
+  background:var(--negro);
+  padding:2rem 1.6rem;
+  text-decoration:none;
+  color:var(--gris);
+  display:flex;
+  flex-direction:column;
+  gap:.55rem;
+  transition:background .2s,color .2s,border-color .2s;
+  border-left:3px solid transparent;
+  position:relative;
+  overflow:hidden;
+}
+.rubro-item::after {
+  content:'→';
+  position:absolute;
+  right:1rem;top:.9rem;
+  color:#222;
+  font-size:1rem;
+  transition:color .2s,transform .2s;
+}
+.rubro-item:hover { background:var(--negro2);color:var(--blanco); }
+.rubro-item:hover::after { color:var(--neon);transform:translateX(3px); }
+.rubro-item:hover { border-left-color:var(--rcolor,var(--neon)); }
+.ri-emoji { font-size:1.9rem;transition:transform .2s; }
+.rubro-item:hover .ri-emoji { transform:scale(1.08); }
+.ri-name { font-family:var(--font-display);font-size:1.05rem;letter-spacing:-.01em;line-height:1; }
+.ri-sub { font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gris2);line-height:1.4; }
 
-  .hero-bg-text {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    font-family: var(--font-display);
-    font-size: clamp(10rem, 22vw, 22rem);
-    color: transparent;
-    -webkit-text-stroke: 1px #1e1e1e;
-    white-space: nowrap;
-    pointer-events: none;
-    user-select: none;
-    letter-spacing: -0.04em;
-    opacity: 0.6;
-  }
+/* STATS BAR */
+.stats-bar { border-top:1px solid #1c1c1c;border-bottom:1px solid #1c1c1c;display:grid;grid-template-columns:repeat(4,1fr);position:relative;z-index:2; }
+.stat-item { padding:2.5rem 3rem;border-right:1px solid #1c1c1c;transition:background .3s; }
+.stat-item:last-child { border-right:none; }
+.stat-item:hover { background:var(--negro2); }
+.stat-num { font-family:var(--font-display);font-size:3rem;letter-spacing:-.02em;line-height:1;margin-bottom:.3rem; }
+.stat-num span { color:var(--neon); }
+.stat-label { font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gris); }
 
-  .hero-tag {
-    display: inline-flex; align-items: center; gap: 0.6rem;
-    font-size: 0.75rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--gris);
-    margin-bottom: 1.8rem;
-    animation: fadeUp 0.8s ease both;
-  }
-  .hero-tag::before {
-    content: '';
-    display: block;
-    width: 28px; height: 1px;
-    background: var(--neon);
-  }
+/* TICKER — disciplinas artísticas */
+.ticker-wrap { overflow:hidden;border-bottom:1px solid #1c1c1c;padding:1.2rem 0;background:var(--negro2); }
+.ticker { display:flex;gap:0;animation:ticker 40s linear infinite;width:max-content; }
+.ticker:hover { animation-play-state:paused; }
+.ticker-item { display:flex;align-items:center;gap:0;white-space:nowrap; }
+.ticker-text { font-family:var(--font-display);font-size:.9rem;letter-spacing:.1em;text-transform:uppercase;padding:0 2.5rem;color:var(--gris2);transition:color .2s; }
+.ticker-item:hover .ticker-text { color:var(--neon); }
+.ticker-sep { color:var(--neon);font-size:.6rem; }
 
-  h1 {
-    font-family: var(--font-display);
-    font-size: clamp(4.5rem, 10vw, 9.5rem);
-    line-height: 0.88;
-    letter-spacing: -0.03em;
-    margin-bottom: 2rem;
-    animation: fadeUp 0.8s 0.1s ease both;
-  }
-  h1 .accent { color: var(--neon); }
-  h1 .rojo { color: var(--rojo); }
+/* CÓMO FUNCIONA */
+.section { padding:7rem 3rem; }
+.section-header { display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:4rem;padding-bottom:2rem;border-bottom:1px solid #1c1c1c; }
+.section-label { font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--neon);margin-bottom:.8rem; }
+.section-title { font-family:var(--font-display);font-size:clamp(2.8rem,5vw,4.5rem);line-height:.92;letter-spacing:-.02em; }
+.section-sub { color:var(--gris);font-size:.9rem;line-height:1.7;max-width:280px;text-align:right; }
+.intent-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#1c1c1c;border:1px solid #1c1c1c; }
+  .intent-rubro-note { display:inline-flex;align-items:center;gap:.35rem;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gris2);border:1px solid #2a2a2a;padding:.2rem .55rem;margin-bottom:.85rem;background:rgba(255,255,255,.02); }
+.intent-card { background:var(--negro);padding:2.1rem 1.6rem;min-height:240px;display:flex;flex-direction:column;justify-content:space-between;text-decoration:none;color:var(--blanco);transition:background .25s,transform .25s;position:relative;overflow:hidden; }
+.intent-card:hover { background:#101010;transform:translateY(-2px); }
+.intent-card::after { content:'→';position:absolute;right:1.3rem;top:1.1rem;color:var(--gris2);font-size:1.2rem;transition:color .2s,transform .2s; }
+.intent-card:hover::after { color:var(--neon);transform:translateX(3px); }
+.intent-icon { font-size:2rem;margin-bottom:1.2rem;display:block; }
+.intent-title { font-family:var(--font-display);font-size:1.2rem;line-height:1;letter-spacing:-.01em;margin-bottom:.75rem; }
+.intent-desc { color:var(--gris);font-size:.83rem;line-height:1.55; }
+.intent-meta { margin-top:1.4rem;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--neon); }
 
-  .hero-bottom {
-    display: flex; align-items: flex-end; justify-content: space-between;
-    animation: fadeUp 0.8s 0.2s ease both;
-  }
-  .hero-desc {
-    max-width: 420px;
-    color: var(--gris);
-    font-size: 1rem;
-    line-height: 1.75;
-    font-weight: 300;
-  }
-  .hero-desc strong { color: var(--blanco); font-weight: 400; }
-  .hero-actions { display: flex; gap: 1rem; align-items: center; }
-  .hero-scroll {
-    position: absolute; bottom: 2.5rem; left: 50%;
-    transform: translateX(-50%);
-    display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
-    color: var(--gris2);
-    font-size: 0.7rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    animation: bounce 2s infinite;
-  }
-  .hero-scroll::after {
-    content: '';
-    display: block;
-    width: 1px; height: 40px;
-    background: linear-gradient(to bottom, var(--gris2), transparent);
-  }
+/* PERFILES MUESTRA */
+.profiles-section { padding:7rem 3rem;background:var(--negro2);border-top:1px solid #1c1c1c;border-bottom:1px solid #1c1c1c; }
+.profiles-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#222;border:1px solid #222;margin-top:4rem; }
+.profile-card { background:var(--negro2);padding:2rem;transition:background .3s,transform .3s;position:relative;border-top:3px solid transparent; }
+.profile-card:hover { background:#161616;transform:translateY(-2px); }
+.profile-top { display:flex;align-items:center;gap:1rem;margin-bottom:1.2rem; }
+.avatar { width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:1.1rem;flex-shrink:0; }
+.profile-name { font-weight:500;font-size:1rem;margin-bottom:.15rem; }
+.profile-meta { font-size:.78rem;color:var(--gris); }
+.profile-tags { display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.2rem; }
+.tag { font-size:.68rem;padding:.2rem .6rem;border:1px solid #2a2a2a;color:var(--gris);text-transform:uppercase;letter-spacing:.08em; }
+.tag-neon { border-color:var(--neon);color:var(--neon); }
+.profile-footer { display:flex;justify-content:space-between;align-items:center;padding-top:1rem;border-top:1px solid #222; }
+.profile-looking { font-size:.75rem;color:var(--gris); }
+.profile-looking strong { color:var(--blanco);font-weight:400; }
+.match { font-size:.72rem;padding:.2rem .6rem;letter-spacing:.05em; }
 
-  /* STATS BAR */
-  .stats-bar {
-    border-top: 1px solid #1c1c1c;
-    border-bottom: 1px solid #1c1c1c;
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    position: relative; z-index: 2;
-  }
-  .stat-item {
-    padding: 2.5rem 3rem;
-    border-right: 1px solid #1c1c1c;
-    transition: background 0.3s;
-  }
-  .stat-item:last-child { border-right: none; }
-  .stat-item:hover { background: var(--negro2); }
-  .stat-num {
-    font-family: var(--font-display);
-    font-size: 3rem;
-    letter-spacing: -0.02em;
-    line-height: 1;
-    margin-bottom: 0.3rem;
-  }
-  .stat-num span { color: var(--neon); }
-  .stat-label {
-    font-size: 0.78rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--gris);
-  }
+/* CTA FINAL */
+.cta-section { padding:8rem 3rem;text-align:center;border-top:1px solid #1c1c1c;position:relative;overflow:hidden; }
+.cta-bg { position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(212,245,60,.04) 0%,transparent 70%);pointer-events:none; }
+.cta-label { font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--neon);margin-bottom:1.5rem;display:block; }
+.cta-title { font-family:var(--font-display);font-size:clamp(3.5rem,8vw,7rem);line-height:.9;letter-spacing:-.03em;margin-bottom:1.5rem; }
+.cta-title .accent { color:var(--neon); }
+.cta-sub { color:var(--gris);font-size:1rem;line-height:1.7;max-width:420px;margin:0 auto 3rem; }
+.cta-domain { display:inline-block;font-size:.8rem;letter-spacing:.15em;color:var(--gris2);border:1px solid #2a2a2a;padding:.5rem 1.5rem;margin-bottom:2.5rem;font-family:'Courier New',monospace; }
+.cta-domain span { color:var(--neon); }
 
-  /* GENRES TICKER */
-  .ticker-wrap {
-    overflow: hidden;
-    border-bottom: 1px solid #1c1c1c;
-    padding: 1.2rem 0;
-    background: var(--negro2);
-  }
-  .ticker {
-    display: flex; gap: 0;
-    animation: ticker 30s linear infinite;
-    width: max-content;
-  }
-  .ticker:hover { animation-play-state: paused; }
-  .ticker-item {
-    display: flex; align-items: center; gap: 0;
-    white-space: nowrap;
-  }
-  .ticker-text {
-    font-family: var(--font-display);
-    font-size: 0.9rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 0 2.5rem;
-    color: var(--gris2);
-    transition: color 0.2s;
-  }
-  .ticker-item:hover .ticker-text { color: var(--neon); }
-  .ticker-sep {
-    color: var(--neon);
-    font-size: 0.6rem;
-  }
+/* FOOTER */
+footer { border-top:1px solid #1c1c1c;padding:2.5rem 3rem;display:flex;justify-content:space-between;align-items:center; }
+.footer-logo { font-family:var(--font-display);font-size:1.3rem;letter-spacing:-.01em; }
+.footer-logo span { color:var(--neon); }
+.footer-links { display:flex;gap:2rem;list-style:none; }
+.footer-links a { color:var(--gris);text-decoration:none;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;transition:color .2s; }
+.footer-links a:hover { color:var(--blanco); }
+.footer-copy { font-size:.75rem;color:var(--gris2); }
 
-  /* SECCIÓN: CÓMO FUNCIONA */
-  .section { padding: 7rem 3rem; }
-  .section-header {
-    display: flex; align-items: flex-end; justify-content: space-between;
-    margin-bottom: 4rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid #1c1c1c;
-  }
-  .section-label {
-    font-size: 0.72rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--neon);
-    margin-bottom: 0.8rem;
-  }
-  .section-title {
-    font-family: var(--font-display);
-    font-size: clamp(2.8rem, 5vw, 4.5rem);
-    line-height: 0.92;
-    letter-spacing: -0.02em;
-  }
-  .section-sub {
-    color: var(--gris);
-    font-size: 0.9rem;
-    line-height: 1.7;
-    max-width: 280px;
-    text-align: right;
-  }
+/* ANIMACIONES */
+@keyframes fadeUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+@keyframes ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+@keyframes bounce { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(8px)} }
+.reveal { opacity:0;transform:translateY(40px);transition:opacity .7s ease,transform .7s ease; }
+.reveal.visible { opacity:1;transform:translateY(0); }
 
-  .steps {
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    gap: 1px;
-    background: #1c1c1c;
-    border: 1px solid #1c1c1c;
-  }
-  .step {
-    background: var(--negro);
-    padding: 3rem;
-    position: relative;
-    overflow: hidden;
-    transition: background 0.3s;
-  }
-  .step:hover { background: var(--negro2); }
-  .step::before {
-    content: attr(data-num);
-    position: absolute;
-    top: -0.5rem; right: 1.5rem;
-    font-family: var(--font-display);
-    font-size: 8rem;
-    color: #161616;
-    line-height: 1;
-    pointer-events: none;
-    transition: color 0.3s;
-  }
-  .step:hover::before { color: #1e1e1e; }
-  .step-icon {
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
-    display: block;
-  }
-  .step-title {
-    font-family: var(--font-display);
-    font-size: 1.6rem;
-    letter-spacing: -0.01em;
-    margin-bottom: 0.8rem;
-  }
-  .step-desc {
-    color: var(--gris);
-    font-size: 0.88rem;
-    line-height: 1.7;
-  }
+/* ══ MOBILE ══ */
+@media (max-width:768px) {
+  html,body { overflow-x:hidden !important; }
+  .cursor,.cursor-ring { display:none !important; }
+  body { cursor:auto !important; }
+  nav { padding:.75rem 1rem !important; }
+  .nav-links { display:none !important; }
+  .btn-ghost { padding:.45rem .9rem !important;font-size:.72rem !important; }
+  .btn-neon { padding:.45rem .9rem !important;font-size:.72rem !important; }
+  .hero-product { min-height:auto !important;padding-top:6rem !important;padding-bottom:2.5rem !important; }
+  .hero-bg-text { display:none !important; }
+  h1 { font-size:clamp(1.9rem,7.5vw,4rem) !important;line-height:.9 !important; }
+  .hero-kicker-row { gap:.45rem !important; }
+  .hero-kicker-pill { font-size:.58rem !important;padding:.32rem .55rem !important; }
+  .hero-desc-wide { font-size:.9rem !important;margin-bottom:1.2rem !important; }
+  .hero-main-actions { flex-direction:column !important;align-items:stretch !important;gap:.7rem !important; }
+  .hero-main-actions a { width:100% !important;text-align:center !important; }
+  .hero-proof { display:grid !important;grid-template-columns:1fr !important;width:100% !important; }
+  .hero-quick-nav { display:grid !important;grid-template-columns:1fr 1fr !important;gap:.6rem !important;width:100% !important; }
+  .hqn-btn { justify-content:center !important;padding:.9rem !important;font-size:.75rem !important;min-width:0 !important; }
+  /* Rubros grid: 2 cols en mobile */
+  .rubros-section { padding:3rem 1.25rem !important; }
+  .rubros-intro { flex-direction:column !important;align-items:flex-start !important;gap:1rem !important; }
+  .rubros-grid { grid-template-columns:repeat(2,1fr) !important; }
+  .rubro-item { padding:1.4rem 1.1rem !important; }
+  .ri-name { font-size:.9rem !important; }
+  .ri-sub { font-size:.6rem !important; }
+  /* Stats */
+  .stats-bar { grid-template-columns:1fr 1fr !important; }
+  .stat-item { padding:1.35rem 1.25rem !important; }
+  .stat-item:nth-child(2) { border-right:none !important; }
+  .stat-item:nth-child(3),.stat-item:nth-child(4) { border-top:1px solid #1c1c1c !important; }
+  .stat-num { font-size:2rem !important; }
+  /* Sections */
+  .section { padding:3.5rem 1.25rem !important; }
+  .profiles-section { padding:3.5rem 1.25rem !important; }
+  .section-header { flex-direction:column !important;align-items:flex-start !important;gap:1rem !important;margin-bottom:2rem !important; }
+  .section-title { font-size:clamp(2rem,9vw,3.5rem) !important; }
+  .section-sub { max-width:100% !important;text-align:left !important;font-size:.85rem !important; }
+  /* Intent cards */
+  .intent-grid { grid-template-columns:1fr !important; }
+  .intent-card { min-height:auto !important;padding:1.35rem 1.2rem !important; }
+  .intent-title { font-size:1.05rem !important; }
+  /* Profiles */
+  .profiles-grid { grid-template-columns:1fr !important; }
+  .profile-card { padding:1.25rem !important; }
+  /* CTA */
+  .cta-section { padding:4rem 1.25rem !important; }
+  .cta-title { font-size:clamp(2.2rem,9vw,4rem) !important; }
+  /* Footer */
+  footer { flex-direction:column !important;gap:1rem !important;padding:2rem 1.25rem !important;text-align:center !important; }
+  .footer-links { flex-wrap:wrap !important;justify-content:center !important; }
+}
+@media (min-width:769px) and (max-width:1300px) {
+  h1 { font-size:clamp(2.8rem,5.5vw,5.5rem) !important;line-height:.9 !important; }
+  .rubros-grid { grid-template-columns:repeat(5,1fr) !important; }
+  .intent-grid { grid-template-columns:repeat(3,1fr) !important; }
 
-  /* PERFILES MUESTRA */
-  .profiles-section {
-    padding: 7rem 3rem;
-    background: var(--negro2);
-    border-top: 1px solid #1c1c1c;
-    border-bottom: 1px solid #1c1c1c;
-  }
-  .profiles-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1px;
-    background: #222;
-    border: 1px solid #222;
-    margin-top: 4rem;
-  }
-  .profile-card {
-    background: var(--negro2);
-    padding: 2rem;
-    transition: background 0.3s, transform 0.3s;
-    position: relative;
-  }
-  .profile-card:hover {
-    background: #161616;
-    transform: translateY(-2px);
-  }
-  .profile-top {
-    display: flex; align-items: center; gap: 1rem;
-    margin-bottom: 1.2rem;
-  }
-  .avatar {
-    width: 50px; height: 50px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-display);
-    font-size: 1.1rem;
-    flex-shrink: 0;
-  }
-  .av-g { background: #0d2010; color: var(--neon); }
-  .av-r { background: #2a0a05; color: #ff6b5b; }
-  .av-b { background: #050d2a; color: #5b9fff; }
-  .profile-name {
-    font-weight: 500;
-    font-size: 1rem;
-    margin-bottom: 0.15rem;
-  }
-  .profile-meta {
-    font-size: 0.78rem;
-    color: var(--gris);
-  }
-  .profile-tags {
-    display: flex; flex-wrap: wrap; gap: 0.4rem;
-    margin-bottom: 1.2rem;
-  }
-  .tag {
-    font-size: 0.68rem;
-    padding: 0.2rem 0.6rem;
-    border: 1px solid #2a2a2a;
-    color: var(--gris);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-  .tag-neon { border-color: var(--neon); color: var(--neon); }
-  .profile-footer {
-    display: flex; justify-content: space-between; align-items: center;
-    padding-top: 1rem;
-    border-top: 1px solid #222;
-  }
-  .profile-looking {
-    font-size: 0.75rem;
-    color: var(--gris);
-  }
-  .profile-looking strong { color: var(--blanco); font-weight: 400; }
-  .match {
-    font-size: 0.72rem;
-    background: rgba(212,245,60,0.1);
-    color: var(--neon);
-    padding: 0.2rem 0.6rem;
-    letter-spacing: 0.05em;
-  }
-
-  /* BUSCAR SECTION */
-  .search-section {
-    padding: 7rem 3rem;
-  }
-  .search-box {
-    display: flex; gap: 0;
-    border: 1px solid #2a2a2a;
-    margin-top: 3rem;
-    margin-bottom: 2rem;
-  }
-  .search-input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    color: var(--blanco);
-    padding: 1.2rem 1.5rem;
-    font-family: var(--font-body);
-    font-size: 1rem;
-    font-weight: 300;
-    outline: none;
-  }
-  .search-input::placeholder { color: var(--gris2); }
-  .search-btn {
-    background: var(--neon);
-    border: none;
-    color: var(--negro);
-    padding: 1.2rem 2.5rem;
-    font-family: var(--font-display);
-    font-size: 0.9rem;
-    letter-spacing: 0.08em;
-    cursor: none;
-    transition: opacity 0.2s;
-  }
-  .search-btn:hover { opacity: 0.85; }
-  .filters {
-    display: flex; gap: 1rem; flex-wrap: wrap;
-  }
-  .filter-select {
-    background: var(--negro2);
-    border: 1px solid #2a2a2a;
-    color: var(--gris);
-    padding: 0.7rem 1.2rem;
-    font-family: var(--font-body);
-    font-size: 0.82rem;
-    cursor: none;
-    outline: none;
-    transition: border-color 0.2s;
-    appearance: none;
-    padding-right: 2rem;
-  }
-  .filter-select:hover { border-color: #444; }
-
-  /* CTA FINAL */
-  .cta-section {
-    padding: 8rem 3rem;
-    text-align: center;
-    border-top: 1px solid #1c1c1c;
-    position: relative;
-    overflow: hidden;
-  }
-  .cta-bg {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(212,245,60,0.04) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .cta-label {
-    font-size: 0.72rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--neon);
-    margin-bottom: 1.5rem;
-    display: block;
-  }
-  .cta-title {
-    font-family: var(--font-display);
-    font-size: clamp(3.5rem, 8vw, 7rem);
-    line-height: 0.9;
-    letter-spacing: -0.03em;
-    margin-bottom: 1.5rem;
-  }
-  .cta-title .accent { color: var(--neon); }
-  .cta-sub {
-    color: var(--gris);
-    font-size: 1rem;
-    line-height: 1.7;
-    max-width: 420px;
-    margin: 0 auto 3rem;
-  }
-  .cta-domain {
-    display: inline-block;
-    font-size: 0.8rem;
-    letter-spacing: 0.15em;
-    color: var(--gris2);
-    border: 1px solid #2a2a2a;
-    padding: 0.5rem 1.5rem;
-    margin-bottom: 2.5rem;
-    font-family: 'Courier New', monospace;
-  }
-  .cta-domain span { color: var(--neon); }
-
-  /* FOOTER */
-  footer {
-    border-top: 1px solid #1c1c1c;
-    padding: 2.5rem 3rem;
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .footer-logo {
-    font-family: var(--font-display);
-    font-size: 1.3rem;
-    letter-spacing: -0.01em;
-  }
-  .footer-logo span { color: var(--neon); }
-  .footer-links {
-    display: flex; gap: 2rem; list-style: none;
-  }
-  .footer-links a {
-    color: var(--gris);
-    text-decoration: none;
-    font-size: 0.78rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    transition: color 0.2s;
-  }
-  .footer-links a:hover { color: var(--blanco); }
-  .footer-copy {
-    font-size: 0.75rem;
-    color: var(--gris2);
-  }
-
-  /* ANIMATIONS */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes ticker {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
-  @keyframes bounce {
-    0%, 100% { transform: translateX(-50%) translateY(0); }
-    50% { transform: translateX(-50%) translateY(8px); }
-  }
-
-  /* SCROLL REVEAL */
-  .reveal {
-    opacity: 0;
-    transform: translateY(40px);
-    transition: opacity 0.7s ease, transform 0.7s ease;
-  }
-  .reveal.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  /* NAV DROPDOWN */
-  .nav-user { position:relative; }
-  .nav-avatar-wrap { display:flex;align-items:center;gap:.5rem;cursor:none;padding:.3rem .6rem;border:1px solid var(--gris3);transition:border-color .2s;user-select:none; }
-  .nav-avatar-wrap:hover { border-color:var(--gris2); }
-  .nav-avatar-circle { width:28px;height:28px;border-radius:50%;background:#0d2010;color:var(--neon);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.62rem;flex-shrink:0; }
-  .nav-avatar-name { font-size:.78rem;color:var(--blanco); }
-  .nav-avatar-chevron { font-size:.6rem;color:var(--gris);transition:transform .2s; }
-  .nav-avatar-wrap.open .nav-avatar-chevron { transform:rotate(180deg); }
-  .nav-dropdown { position:absolute;top:calc(100% + 8px);right:0;background:var(--negro2);border:1px solid #2a2a2a;min-width:200px;display:none;flex-direction:column;z-index:300; }
-  .nav-dropdown.open { display:flex; }
-  .nav-dropdown-item { display:flex;align-items:center;gap:.6rem;padding:.75rem 1.1rem;color:var(--gris);text-decoration:none;font-size:.82rem;transition:all .15s;background:transparent;border:none;font-family:var(--font-body);cursor:none;text-align:left;width:100%; }
-  .nav-dropdown-item:hover { background:rgba(255,255,255,.04);color:var(--blanco); }
-  .nav-dropdown-divider { height:1px;background:#1c1c1c;margin:.3rem 0; }
-  .nav-logout:hover { color:var(--rojo) !important; }
-  .nav-badge {
-    background:var(--neon);color:var(--negro);
-    font-size:.62rem;font-weight:700;
-    padding:.15rem .45rem;margin-left:.5rem;
-    border-radius:2px; min-width:1.2rem; text-align:center;
-    display:inline-block;
-  }
-  /* NAV LINKS FIX */
-  .nav-links { list-style:none !important; display:flex !important; gap:2rem !important; padding:0 !important; margin:0 !important; }
-  .nav-links li { list-style:none !important; }
-  .nav-link { color:var(--gris);text-decoration:none;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;transition:color .2s; }
-  .nav-link:hover { color:var(--blanco); }
-  .nav-link.active { color:var(--neon); }
-  /* NAV AVATAR NAME — truncate long usernames */
-  .nav-avatar-name { font-size:.78rem;color:var(--blanco);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
-  /* NAV LINKS CLICKABLE FIX */
-  .nav-link, .nav-dropdown-item, .nav-logo, .nav-avatar-wrap { pointer-events:auto !important; }
-  nav a, nav button { pointer-events:auto !important; }
-  /* ── MOBILE RESPONSIVE ── */
-  @media (max-width: 768px) {
-    /* GLOBAL: prevenir scroll horizontal */
-    html, body { overflow-x: hidden !important; }
-    .cursor, .cursor-ring { display: none !important; }
-    body { cursor: auto !important; }
-
-    /* NAV */
-    nav { padding: .75rem 1rem !important; }
-    .nav-links { display: none !important; }
-    .btn-ghost {
-      display: inline-block !important;
-      padding: .45rem .9rem !important;
-      font-size: .72rem !important;
-      letter-spacing: .04em !important;
-    }
-    .btn-neon {
-      padding: .45rem .9rem !important;
-      font-size: .72rem !important;
-      letter-spacing: .04em !important;
-    }
-
-    /* HERO — mantener overflow:hidden para que el bg-text no desborde */
-    .hero {
-      min-height: 90vh !important;
-      padding: 5rem 1.25rem 3rem !important;
-      overflow: hidden !important;
-    }
-    /* Ocultar texto decorativo de fondo — solo visual, no aporta en mobile */
-    .hero-bg-text { display: none !important; }
-    .hero-tag { font-size: .68rem !important; }
-    /* h1 con tamaño reducido para que "EN LA ESCENA" entre sin cortarse */
-    h1 {
-      font-size: clamp(1.9rem, 7.5vw, 4rem) !important;
-      line-height: .9 !important;
-      letter-spacing: -.02em !important;
-      white-space: normal !important;
-    }
-    .hero-bottom { flex-direction: column !important; align-items: flex-start !important; gap: 1rem !important; }
-    .hero-desc { font-size: .85rem !important; max-width: 100% !important; }
-    .hero-actions {
-      flex-direction: column !important;
-      align-items: stretch !important;
-      gap: .75rem !important;
-      width: 100% !important;
-    }
-    .hero-actions a, .hero-actions button {
-      width: 100% !important;
-      text-align: center !important;
-    }
-    .hero-scroll { display: none !important; }
-
-    /* STATS */
-    .stats-bar {
-      grid-template-columns: 1fr 1fr !important;
-      padding: 0 !important;
-    }
-    .stat-item {
-      padding: 1.35rem 1.25rem !important;
-    }
-    .stat-item:nth-child(2) { border-right: none !important; }
-    .stat-item:nth-child(3),
-    .stat-item:nth-child(4) { border-top: 1px solid #1c1c1c !important; }
-    .stat-num { font-size: 2rem !important; }
-    .stat-label { font-size: .72rem !important; }
-
-    /* SECTION HEADERS — apilar vertical en mobile */
-    .section { padding: 3.5rem 1.25rem !important; }
-    .profiles-section { padding: 3.5rem 1.25rem !important; }
-    .section-header {
-      flex-direction: column !important;
-      align-items: flex-start !important;
-      gap: 1rem !important;
-      margin-bottom: 2rem !important;
-    }
-    .section-title {
-      font-size: clamp(2rem, 9vw, 3.5rem) !important;
-    }
-    .section-sub {
-      max-width: 100% !important;
-      text-align: left !important;
-      font-size: .85rem !important;
-    }
-    /* Ocultar bg decorativos en secciones */
-    .section-bg-text { display: none !important; }
-
-    /* STEPS */
-    .steps { grid-template-columns: 1fr !important; }
-    .step {
-      padding: 1.5rem 1.25rem !important;
-      border-right: none !important;
-      border-bottom: 1px solid #1c1c1c !important;
-    }
-    .step::before { display: none !important; }
-
-    /* SEARCH */
-    .search-box { flex-direction: column !important; gap: .5rem !important; }
-    .search-input {
-      font-size: .9rem !important;
-      border-right: 1px solid #1c1c1c !important;
-    }
-    .search-btn { width: 100% !important; }
-    .filters {
-      display: grid !important;
-      grid-template-columns: 1fr 1fr !important;
-      gap: .5rem !important;
-    }
-    .filter-select {
-      width: 100% !important;
-      min-width: 0 !important;
-    }
-
-    /* PROFILES */
-    .profiles-grid { grid-template-columns: 1fr !important; }
-    .profile-card { padding: 1.25rem !important; }
-
-    /* CTA */
-    .cta-section { padding: 4rem 1.25rem !important; overflow: hidden !important; }
-    .cta-title { font-size: clamp(2.2rem, 9vw, 4rem) !important; }
-    .cta-sub { font-size: .88rem !important; }
-    .cta-domain { font-size: .78rem !important; word-break: break-all !important; }
-
-    /* FOOTER */
-    footer {
-      flex-direction: column !important;
-      gap: 1rem !important;
-      padding: 2rem 1.25rem !important;
-      text-align: center !important;
-    }
-    .footer-links { flex-wrap: wrap !important; justify-content: center !important; }
-  }
-
-  /* HERO QUICK NAV (logueado) */
-  .hero-quick-nav {
-    display: flex; gap: 1rem; flex-wrap: wrap;
-  }
-  .hqn-btn {
-    display: flex; align-items: center; gap: .6rem;
-    background: rgba(255,255,255,.05);
-    border: 1px solid #333;
-    color: var(--blanco); text-decoration: none;
-    padding: .9rem 1.6rem;
-    font-family: var(--font-body); font-size: .88rem;
-    letter-spacing: .06em; text-transform: uppercase;
-    transition: border-color .2s, background .2s, color .2s;
-    min-width: 140px;
-  }
-  .hqn-btn:hover { border-color: var(--neon); background: rgba(212,245,60,.06); color: var(--neon); }
-  .hqn-icon { font-size: 1.1rem; }
-  @media (max-width: 768px) {
-    .hero-quick-nav {
-      display: grid !important;
-      grid-template-columns: 1fr 1fr !important;
-      gap: .6rem !important;
-      width: 100% !important;
-    }
-    .hqn-btn {
-      justify-content: center !important;
-      padding: .9rem !important;
-      font-size: .75rem !important;
-    }
-    #hero-logueado p { font-size: .8rem !important; }
-  }
-
-
-  /* ── LAPTOP / TABLET (769px - 1300px) ── */
-  @media (min-width:769px) and (max-width:1300px) {
-    h1 {
-      font-size: clamp(2.8rem, 5.5vw, 5.5rem) !important;
-      line-height: .9 !important;
-    }
-    .hero { padding: 4rem 3rem 3rem !important; }
-    .hqn-btn { padding: .75rem 1.2rem !important; font-size: .82rem !important; min-width: 120px !important; }
-  }
-
-
-
-  /* ── CODEO CONCEPTO: HOME MÁS ACCIONABLE ── */
-  .hero-product {
-    min-height: 92vh;
-    justify-content: center;
-    padding-top: 7.5rem;
-    padding-bottom: 4rem;
-  }
-  .hero-content {
-    position: relative;
-    z-index: 2;
-    max-width: 1180px;
-    width: 100%;
-  }
-  .hero-kicker-row {
-    display:flex;
-    flex-wrap:wrap;
-    gap:.6rem;
-    margin-bottom:1.4rem;
-  }
-  .hero-kicker-pill {
-    border:1px solid #2a2a2a;
-    color:var(--gris);
-    padding:.35rem .75rem;
-    font-size:.68rem;
-    letter-spacing:.1em;
-    text-transform:uppercase;
-    background:rgba(255,255,255,.02);
-  }
-  .hero-kicker-pill.strong {
-    border-color:rgba(212,245,60,.4);
-    color:var(--neon);
-    background:rgba(212,245,60,.05);
-  }
-  .hero-product h1 {
-    max-width: 980px;
-    margin-bottom: 1.4rem;
-  }
-  .hero-desc-wide {
-    max-width: 680px;
-    font-size: 1.08rem;
-    color: var(--gris);
-    line-height: 1.75;
-    margin-bottom: 2rem;
-  }
-  .hero-desc-wide strong { color:var(--blanco); font-weight:500; }
-  .hero-main-actions {
-    display:flex;
-    align-items:center;
-    gap:1rem;
-    flex-wrap:wrap;
-    margin-bottom:2rem;
-  }
-  .hero-main-actions .btn-neon,
-  .hero-main-actions .btn-ghost {
-    font-size:.9rem;
-    padding:.9rem 1.45rem;
-  }
-  .hero-proof {
-    display:flex;
-    gap:1px;
-    flex-wrap:wrap;
-    max-width: 820px;
-    background:#1c1c1c;
-    border:1px solid #1c1c1c;
-  }
-  .hero-proof span {
-    background:rgba(8,8,8,.88);
-    color:var(--gris);
-    padding:.75rem 1rem;
-    font-size:.72rem;
-    letter-spacing:.1em;
-    text-transform:uppercase;
-  }
-  .hero-proof strong { color:var(--neon); font-weight:500; }
-  .home-search {
-    padding-top: 4.5rem;
-    padding-bottom: 4.5rem;
-    border-top:1px solid #1c1c1c;
-    border-bottom:1px solid #1c1c1c;
-    background:linear-gradient(180deg, #0b0b0b 0%, #080808 100%);
-  }
-  .home-search .section-title {
-    margin-bottom:.8rem !important;
-  }
-  .search-intro {
-    color:var(--gris);
-    max-width:680px;
-    line-height:1.7;
-    margin-top:1rem;
-  }
-  .quick-searches {
-    display:flex;
-    flex-wrap:wrap;
-    gap:.6rem;
-    margin-top:1.2rem;
-  }
-  .quick-chip {
-    background:transparent;
-    border:1px solid #2a2a2a;
-    color:var(--gris);
-    padding:.55rem .85rem;
-    font-family:var(--font-body);
-    font-size:.76rem;
-    letter-spacing:.04em;
-    cursor:none;
-    transition:all .2s;
-  }
-  .quick-chip:hover { color:var(--neon); border-color:var(--neon); background:rgba(212,245,60,.05); }
-  .intent-grid {
-    display:grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap:1px;
-    background:#1c1c1c;
-    border:1px solid #1c1c1c;
-  }
-  .intent-card {
-    background:var(--negro);
-    padding:2.1rem 1.6rem;
-    min-height:240px;
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-    text-decoration:none;
-    color:var(--blanco);
-    transition:background .25s, transform .25s;
-    position:relative;
-    overflow:hidden;
-  }
-  .intent-card:hover {
-    background:#101010;
-    transform:translateY(-2px);
-  }
-  .intent-card::after {
-    content:'→';
-    position:absolute;
-    right:1.3rem;
-    top:1.1rem;
-    color:var(--gris2);
-    font-size:1.2rem;
-    transition:color .2s, transform .2s;
-  }
-  .intent-card:hover::after { color:var(--neon); transform:translateX(3px); }
-  .intent-icon { font-size:2rem; margin-bottom:1.2rem; display:block; }
-  .intent-title {
-    font-family:var(--font-display);
-    font-size:1.2rem;
-    line-height:1;
-    letter-spacing:-.01em;
-    margin-bottom:.75rem;
-  }
-  .intent-desc {
-    color:var(--gris);
-    font-size:.83rem;
-    line-height:1.55;
-  }
-  .intent-meta {
-    margin-top:1.4rem;
-    font-size:.66rem;
-    letter-spacing:.1em;
-    text-transform:uppercase;
-    color:var(--neon);
-  }
-  .profiles-section .section-sub strong { color:var(--blanco); font-weight:500; }
-  @media (min-width:769px) and (max-width:1300px) {
-    .intent-grid { grid-template-columns: repeat(3, 1fr); }
-    .intent-card { min-height:220px; }
-  }
-  @media (max-width:768px) {
-    .hero-product { min-height:auto !important; padding-top:6rem !important; padding-bottom:2.5rem !important; }
-    .hero-kicker-row { gap:.45rem !important; }
-    .hero-kicker-pill { font-size:.58rem !important; padding:.32rem .55rem !important; }
-    .hero-desc-wide { font-size:.9rem !important; margin-bottom:1.2rem !important; }
-    .hero-main-actions { flex-direction:column !important; align-items:stretch !important; gap:.7rem !important; }
-    .hero-main-actions a { width:100% !important; text-align:center !important; }
-    .hero-proof { display:grid !important; grid-template-columns:1fr !important; width:100% !important; }
-    .hero-proof span { font-size:.66rem !important; }
-    .home-search { padding-top:3rem !important; padding-bottom:3rem !important; }
-    .quick-searches { display:grid !important; grid-template-columns:1fr 1fr !important; }
-    .quick-chip { cursor:auto !important; font-size:.68rem !important; padding:.55rem .5rem !important; }
-    .intent-grid { grid-template-columns:1fr !important; }
-    .intent-card { min-height:auto !important; padding:1.35rem 1.2rem !important; }
-    .intent-title { font-size:1.05rem !important; }
-    .intent-meta { margin-top:1rem !important; }
-  }
-
-
-  @media (max-width:900px) {
-    .home-search .quick-searches { grid-template-columns:1fr 1fr !important; }
-  }
-  @media (max-width:520px) {
-    .home-search .quick-searches { grid-template-columns:1fr !important; }
-  }
+}
 </style>
-  <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#0a0a0a">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="buscARTE">
-  <link rel="apple-touch-icon" href="/icons/icon-192.svg">
+
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="buscARTE">
+<link rel="apple-touch-icon" href="/icons/icon-192.svg">
+
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
-  "@graph": [
+  "@context":"https://schema.org",
+  "@graph":[
     {
-      "@type": "Organization",
-      "name": "buscARTE",
-      "url": "https://buscarte.com.ar",
-      "logo": "https://buscarte.com.ar/icons/icon-512.png",
-      "description": "La red gratuita de músicos argentinos",
-      "foundingLocation": {
-        "@type": "Place",
-        "name": "Buenos Aires, Argentina"
-      },
-      "sameAs": []
+      "@type":"Organization",
+      "name":"buscARTE",
+      "url":"https://buscarte.com.ar",
+      "logo":"https://buscarte.com.ar/icons/icon-512.png",
+      "description":"La red gratuita de artistas argentinos — músicos, actores, fotógrafos, diseñadores, bailarines, tatuadores y más",
+      "foundingLocation":{"@type":"Place","name":"Buenos Aires, Argentina"},
+      "sameAs":[]
     },
     {
-      "@type": "WebSite",
-      "name": "buscARTE",
-      "url": "https://buscarte.com.ar",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://buscarte.com.ar/buscARTE_busqueda.html?q={search_term_string}",
-        "query-input": "required name=search_term_string"
-      }
+      "@type":"WebSite",
+      "name":"buscARTE",
+      "url":"https://buscarte.com.ar",
+      "potentialAction":{"@type":"SearchAction","target":"https://buscarte.com.ar/buscARTE_busqueda.html?q={search_term_string}","query-input":"required name=search_term_string"}
     }
   ]
 }
@@ -1050,7 +340,7 @@
 <nav>
   <a href="index.html" class="nav-logo">busc<span>ARTE</span></a>
   <ul class="nav-links">
-    <li><a href="buscARTE_busqueda.html" class="nav-link">Músicos</a></li>
+    <li><a href="buscARTE_busqueda.html" class="nav-link">Artistas</a></li>
     <li><a href="buscARTE_anuncios.html" class="nav-link">Anuncios</a></li>
     <li><a href="#como-funciona" class="nav-link">Cómo funciona</a></li>
   </ul>
@@ -1086,8 +376,8 @@
   <div class="hero-content">
     <div class="hero-kicker-row">
       <span class="hero-kicker-pill strong">Gratis</span>
-      <span class="hero-kicker-pill">Músicos argentinos</span>
-      <span class="hero-kicker-pill">Jams · anuncios · equipos</span>
+      <span class="hero-kicker-pill">Músicos · Actores · Fotógrafos · Bailarines · Tatuadores</span>
+      <span class="hero-kicker-pill">10 disciplinas · Todo el país</span>
     </div>
 
     <h1>
@@ -1096,35 +386,23 @@
       EN LA <span class="rojo">ESCENA</span>
     </h1>
 
-    <!-- Estado: logueado -->
-    <div id="hero-logueado" style="display:none; margin-bottom:2rem;">
-      <p style="color:var(--gris);font-size:.95rem;margin-bottom:1.4rem;letter-spacing:.02em;">
+    <!-- Logueado -->
+    <div id="hero-logueado" style="display:none;margin-bottom:2rem">
+      <p style="color:var(--gris);font-size:.95rem;margin-bottom:1.4rem;letter-spacing:.02em">
         Bienvenido de vuelta, <span id="hero-nombre" style="color:var(--blanco);font-weight:500"></span> 👋
       </p>
       <div class="hero-quick-nav">
-        <a href="buscARTE_busqueda.html" class="hqn-btn">
-          <span class="hqn-icon">🎵</span>
-          <span class="hqn-label">Músicos</span>
-        </a>
-        <a href="buscARTE_anuncios.html" class="hqn-btn">
-          <span class="hqn-icon">📋</span>
-          <span class="hqn-label">Anuncios</span>
-        </a>
-        <a href="buscARTE_mensajes.html" class="hqn-btn">
-          <span class="hqn-icon">💬</span>
-          <span class="hqn-label">Mensajes</span>
-        </a>
-        <a href="#" class="hqn-btn" id="hero-mi-perfil">
-          <span class="hqn-icon">👤</span>
-          <span class="hqn-label">Mi perfil</span>
-        </a>
+        <a href="buscARTE_busqueda.html" class="hqn-btn"><span class="hqn-icon">🎨</span><span>Artistas</span></a>
+        <a href="buscARTE_anuncios.html" class="hqn-btn"><span class="hqn-icon">📋</span><span>Anuncios</span></a>
+        <a href="buscARTE_mensajes.html" class="hqn-btn"><span class="hqn-icon">💬</span><span>Mensajes</span></a>
+        <a href="#" class="hqn-btn" id="hero-mi-perfil"><span class="hqn-icon">👤</span><span>Mi perfil</span></a>
       </div>
     </div>
 
-    <!-- Estado: no logueado -->
+    <!-- No logueado -->
     <div id="hero-invitado-wrap">
       <p class="hero-desc-wide">
-        La red gratuita para <strong>buscar músicos</strong>, publicar anuncios, encontrar jams, ofrecer clases y mover equipos entre artistas de Argentina.
+        La red gratuita para <strong>artistas argentinos</strong>. Músicos, actores, fotógrafos, diseñadores, bailarines, tatuadores y más — conectados por rubro, zona y afinidad.
       </p>
       <div class="hero-main-actions" id="hero-invitado">
         <a href="#explorar" class="btn-neon">Explorar gratis</a>
@@ -1134,7 +412,8 @@
       <div class="hero-proof">
         <span><strong>Sin comisiones</strong></span>
         <span>Sin algoritmos raros</span>
-        <span>Hecho para la escena argentina</span>
+        <span><strong>10</strong> rubros artísticos</span>
+        <span>Hecho en Argentina 🇦🇷</span>
       </div>
     </div>
   </div>
@@ -1142,29 +421,67 @@
   <div class="hero-scroll">scroll</div>
 </section>
 
-<!-- BÚSQUEDA RÁPIDA -->
-<section class="search-section reveal home-search" id="explorar">
-  <div class="section-label">Probá sin registrarte</div>
-  <div class="section-title" style="font-family: var(--font-display); font-size: clamp(2.8rem, 5vw, 4.5rem); line-height: 0.92; letter-spacing: -0.02em; margin-bottom: 0;">¿QUÉ<br>BUSCÁS HOY?</div>
-  <p class="search-intro">Entrá a mirar primero. El registro aparece cuando quieras publicar, guardar o contactar a alguien.</p>
+<!-- SECCIÓN: ELEGÍ TU RUBRO — la gran novedad -->
+<section class="rubros-section reveal" id="explorar">
+  <div class="rubros-intro">
+    <div>
+      <div class="section-label">Probá sin registrarte</div>
+      <div class="section-title" style="font-family:var(--font-display);font-size:clamp(2.8rem,5vw,4.5rem);line-height:.92;letter-spacing:-.02em">¿DE QUÉ<br>RUBRO SOS?</div>
+    </div>
+    <p style="color:var(--gris);font-size:.9rem;line-height:1.7;max-width:280px;text-align:right">Entrá al tablón de tu disciplina y encontrá artistas de tu rubro en todo el país. El registro aparece cuando querés publicar o contactar.</p>
+  </div>
 
-  <div class="quick-searches" aria-label="Accesos rápidos" style="margin-top:2rem;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem">
-    <button class="quick-chip" type="button" onclick="window.location.href='buscARTE_busqueda.html'" style="padding:1rem .8rem;text-align:left">
-      <strong style="display:block;color:var(--blanco);font-size:.82rem;margin-bottom:.25rem">🎵 Explorar músicos</strong>
-      <span style="color:var(--gris);font-size:.72rem;line-height:1.4">Ver perfiles por instrumento, género y zona.</span>
-    </button>
-    <button class="quick-chip" type="button" onclick="window.location.href='buscARTE_anuncios.html'" style="padding:1rem .8rem;text-align:left">
-      <strong style="display:block;color:var(--blanco);font-size:.82rem;margin-bottom:.25rem">📋 Ver anuncios</strong>
-      <span style="color:var(--gris);font-size:.72rem;line-height:1.4">Buscos, jams, compra/venta y clases.</span>
-    </button>
-    <button class="quick-chip" type="button" onclick="window.location.href='buscARTE_anuncios.html?publicar=1'" style="padding:1rem .8rem;text-align:left">
-      <strong style="display:block;color:var(--blanco);font-size:.82rem;margin-bottom:.25rem">➕ Publicar algo</strong>
-      <span style="color:var(--gris);font-size:.72rem;line-height:1.4">Buscá músico, ofrecete o subí un evento.</span>
-    </button>
-    <button class="quick-chip" type="button" onclick="window.location.href='buscARTE_generador.html'" style="padding:1rem .8rem;text-align:left">
-      <strong style="display:block;color:var(--blanco);font-size:.82rem;margin-bottom:.25rem">🎲 Generador</strong>
-      <span style="color:var(--gris);font-size:.72rem;line-height:1.4">Probá nombres para tu banda o proyecto.</span>
-    </button>
+  <div class="rubros-grid">
+    <a class="rubro-item" href="buscARTE_busqueda.html?rubro=musica" style="--rcolor:#d4f53c">
+      <span class="ri-emoji">🎵</span>
+      <span class="ri-name">Músicos</span>
+      <span class="ri-sub">Guitarristas · Bateristas · Cantantes · DJs</span>
+    </a>
+    <a class="rubro-item" href="buscARTE_busqueda.html?rubro=actuacion" style="--rcolor:#ff6b5b">
+      <span class="ri-emoji">🎭</span>
+      <span class="ri-name">Actores & Escena</span>
+      <span class="ri-sub">Actores · Directores · Dramaturgos</span>
+    </a>
+    <a class="rubro-item" href="buscARTE_busqueda.html?rubro=audiovisual" style="--rcolor:#5b9fff">
+      <span class="ri-emoji">🎬</span>
+      <span class="ri-name">Audiovisual & Foto</span>
+      <span class="ri-sub">Videomakers · Fotógrafos · Editores</span>
+    </a>
+    <a class="rubro-item" href="buscARTE_busqueda.html?rubro=modelaje" style="--rcolor:#4de8c4">
+      <span class="ri-emoji">👗</span>
+      <span class="ri-name">Modelaje</span>
+      <span class="ri-sub">Editorial · Pasarela · Contenido</span>
+    </a>
+    <a class="rubro-item" href="buscARTE_busqueda.html?rubro=diseno" style="--rcolor:#ffaa5b">
+      <span class="ri-emoji">✏️</span>
+      <span class="ri-name">Diseño & Artes</span>
+      <span class="ri-sub">Ilustradores · Diseñadores · Artistas</span>
+    </a>
+    <a class="rubro-item" href="buscARTE_busqueda.html?rubro=tatuaje" style="--rcolor:#c45bff">
+      <span class="ri-emoji">🖋️</span>
+      <span class="ri-name">Tatuaje</span>
+      <span class="ri-sub">Tatuadores · Piercers · Estilos</span>
+    </a>
+    <a class="rubro-item" href="buscARTE_busqueda.html?rubro=danza" style="--rcolor:#5bd4ff">
+      <span class="ri-emoji">💃</span>
+      <span class="ri-name">Danza</span>
+      <span class="ri-sub">Bailarines · Coreógrafos · Profesores</span>
+    </a>
+    <a class="rubro-item" href="buscARTE_busqueda.html?rubro=maquillaje" style="--rcolor:#e8a84a">
+      <span class="ri-emoji">💄</span>
+      <span class="ri-name">Maquillaje & FX</span>
+      <span class="ri-sub">Maquilladores · Vestuaristas · Estilistas</span>
+    </a>
+    <a class="rubro-item" href="buscARTE_busqueda.html?rubro=circo" style="--rcolor:#ffdd5b">
+      <span class="ri-emoji">🎪</span>
+      <span class="ri-name">Circo & Escénicas</span>
+      <span class="ri-sub">Acróbatas · Malabaristas · Fuego</span>
+    </a>
+    <a class="rubro-item" href="buscARTE_busqueda.html?rubro=escritura" style="--rcolor:#a0d47b">
+      <span class="ri-emoji">✍️</span>
+      <span class="ri-name">Escritura & Guión</span>
+      <span class="ri-sub">Guionistas · Letristas · Poetas</span>
+    </a>
   </div>
 </section>
 
@@ -1172,7 +489,7 @@
 <div class="stats-bar reveal">
   <div class="stat-item">
     <div class="stat-num" id="stat-musicos">—<span>+</span></div>
-    <div class="stat-label">Músicos registrados</div>
+    <div class="stat-label">Artistas registrados</div>
   </div>
   <div class="stat-item">
     <div class="stat-num">23<span></span></div>
@@ -1183,43 +500,47 @@
     <div class="stat-label">Anuncios publicados</div>
   </div>
   <div class="stat-item">
-    <div class="stat-num">100<span>%</span></div>
-    <div class="stat-label">Gratis para empezar</div>
+    <div class="stat-num">10<span></span></div>
+    <div class="stat-label">Rubros artísticos</div>
   </div>
 </div>
 
-<!-- TICKER DE GÉNEROS -->
+<!-- TICKER — disciplinas artísticas -->
 <div class="ticker-wrap">
   <div class="ticker">
-    <div class="ticker-item"><span class="ticker-text">Rock Nacional</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Folklore</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Jazz</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Tango</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Metal</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Cumbia</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Indie</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Electrónica</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Reggae</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Funk</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Hip Hop</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Pop</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Punk</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Tropical</span><span class="ticker-sep">✦</span></div>
-    <!-- duplicate for seamless loop -->
-    <div class="ticker-item"><span class="ticker-text">Rock Nacional</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Folklore</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Jazz</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Tango</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Metal</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Cumbia</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Indie</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Electrónica</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Reggae</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Funk</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Hip Hop</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Pop</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Punk</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Tropical</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Guitarristas</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Actores</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Fotógrafos</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Bailarines</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Tatuadores</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Ilustradores</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Cantantes</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Videomakers</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Malabaristas</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Diseñadores</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Modelos</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Guionistas</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Bateristas</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Maquilladores</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Muralistas</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Escritores</span><span class="ticker-sep">✦</span></div>
+    <!-- duplicado para loop continuo -->
+    <div class="ticker-item"><span class="ticker-text">Guitarristas</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Actores</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Fotógrafos</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Bailarines</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Tatuadores</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Ilustradores</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Cantantes</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Videomakers</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Malabaristas</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Diseñadores</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Modelos</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Guionistas</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Bateristas</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Maquilladores</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Muralistas</span><span class="ticker-sep">✦</span></div>
+    <div class="ticker-item"><span class="ticker-text">Escritores</span><span class="ticker-sep">✦</span></div>
   </div>
 </div>
 
@@ -1228,17 +549,17 @@
   <div class="section-header reveal">
     <div>
       <div class="section-label">Entrá por donde necesites</div>
-      <div class="section-title">MENOS<br>VUELTAS.<br>MÁS MÚSICA.</div>
+      <div class="section-title">MENOS<br>VUELTAS.<br>MÁS ARTE.</div>
     </div>
-    <p class="section-sub">Entrá directo a lo que necesitás: encontrar músicos, mirar anuncios, publicar algo o probar herramientas para tu proyecto.</p>
+    <p class="section-sub">Encontrá artistas, publicá anuncios, explorá eventos o usá nuestras herramientas. Sin registro para mirar.</p>
   </div>
 
   <div class="intent-grid reveal">
     <a class="intent-card" href="buscARTE_busqueda.html">
       <div>
-        <span class="intent-icon">🎸</span>
-        <div class="intent-title">BUSCO<br>MÚSICOS</div>
-        <p class="intent-desc">Filtrá por instrumento, género, zona y disponibilidad. Ideal para armar banda, sesión o proyecto.</p>
+        <span class="intent-icon">🎨</span>
+        <div class="intent-title">BUSCO<br>ARTISTAS</div>
+        <p class="intent-desc">Filtrá por rubro, especialidad, zona y disponibilidad. Músicos, actores, fotógrafos, bailarines y más.</p>
       </div>
       <div class="intent-meta">Explorar perfiles</div>
     </a>
@@ -1247,7 +568,7 @@
       <div>
         <span class="intent-icon">🙋</span>
         <div class="intent-title">ME<br>OFREZCO</div>
-        <p class="intent-desc">Creá tu perfil y dejá claro qué tocás, qué buscás y con quién te gustaría conectar.</p>
+        <p class="intent-desc">Creá tu perfil artístico y dejá claro qué hacés, qué buscás y cómo conectar con vos.</p>
       </div>
       <div class="intent-meta">Crear perfil gratis</div>
     </a>
@@ -1256,97 +577,112 @@
       <div>
         <span class="intent-icon">📋</span>
         <div class="intent-title">VER<br>ANUNCIOS</div>
-        <p class="intent-desc">Busquedas de músicos, ofrecidos, clases, fechas, jams y oportunidades publicadas por la comunidad.</p>
+        <p class="intent-desc">Castings, busco colaborador, me ofrezco — publicados por artistas de todos los rubros en todo el país.</p>
       </div>
       <div class="intent-meta">Mirar tablón</div>
     </a>
 
-    <a class="intent-card" href="buscARTE_anuncios.html?tipo=jam">
+    <a class="intent-card" href="buscARTE_anuncios.html">
       <div>
-        <span class="intent-icon">🥁</span>
-        <div class="intent-title">JAMS<br>Y ZAPADAS</div>
-        <p class="intent-desc">Encontrá espacios para tocar, conocer músicos y mover la escena sin esperar una banda estable.</p>
+        <span class="intent-rubro-note">✦ Para todos los rubros</span>
+        <span class="intent-icon">📅</span>
+        <div class="intent-title">EVENTOS<br>Y JAMS</div>
+        <p class="intent-desc">Jams, muestras, ensayos abiertos, castings, shootings, zapadas. Elegís tu rubro al entrar.</p>
       </div>
-      <div class="intent-meta">Buscar jams</div>
+      <div class="intent-meta">Buscar eventos</div>
     </a>
 
-    <a class="intent-card" href="buscARTE_anuncios.html?tipo=vendo">
+    <a class="intent-card" href="buscARTE_anuncios.html">
       <div>
-        <span class="intent-icon">🎛️</span>
-        <div class="intent-title">EQUIPOS<br>Y CLASES</div>
-        <p class="intent-desc">Compra, venta, alquiler y clases entre músicos. Más comunidad, menos marketplace genérico.</p>
+        <span class="intent-rubro-note">✦ Para todos los rubros</span>
+        <span class="intent-icon">🎓</span>
+        <div class="intent-title">CLASES<br>Y TALLERES</div>
+        <p class="intent-desc">Clases de guitarra, actuación, fotografía, danza, tatuaje y más. Presencial u online. Elegís el rubro al entrar.</p>
+      </div>
+      <div class="intent-meta">Buscar clases</div>
+    </a>
+
+    <a class="intent-card" href="buscARTE_anuncios.html">
+      <div>
+        <span class="intent-rubro-note">✦ Para todos los rubros</span>
+        <span class="intent-icon">🛒</span>
+        <div class="intent-title">MARKETPLACE</div>
+        <p class="intent-desc">Instrumentos, equipos, vestuario, materiales artísticos — compra y venta entre artistas. Elegís el rubro al entrar.</p>
       </div>
       <div class="intent-meta">Ver oportunidades</div>
     </a>
   </div>
 </section>
 
-<!-- PERFILES -->
+<!-- PERFILES: 3 rubros distintos -->
 <section class="profiles-section" id="comunidad">
   <div class="section-header reveal">
     <div>
       <div class="section-label">Cómo se ve la comunidad</div>
-      <div class="section-title">PERFILES<br>QUE DAN<br>CONTEXTO</div>
+      <div class="section-title">ASÍ SE<br>VEN LOS<br>PERFILES.</div>
     </div>
-    <p class="section-sub">Músicos de todo el país empezando a conectar con alguien como vos.</p>
+    <p class="section-sub"><strong>Músicos, bailarines, tatuadores</strong> y más conectando en todo el país.</p>
   </div>
 
   <div class="profiles-grid reveal">
-    <div class="profile-card">
+    <!-- Músico — neon -->
+    <div class="profile-card" style="border-top-color:#d4f53c">
       <div class="profile-top">
-        <div class="avatar av-g">LM</div>
+        <div class="avatar" style="background:#0d2010;color:#d4f53c">LM</div>
         <div>
           <div class="profile-name">Lucía Moreno</div>
-          <div class="profile-meta">Guitarrista · Buenos Aires</div>
+          <div class="profile-meta">🎵 Guitarrista · Buenos Aires</div>
         </div>
       </div>
       <div class="profile-tags">
-        <span class="tag tag-neon">Jazz</span>
+        <span class="tag" style="border-color:#d4f53c;color:#d4f53c">Jazz</span>
         <span class="tag">Fusión</span>
         <span class="tag">Bossanova</span>
         <span class="tag">Funk</span>
       </div>
       <div class="profile-footer">
         <div class="profile-looking">Busca <strong>banda estable</strong></div>
-        <span class="match">98% afinidad</span>
+        <span class="match" style="background:rgba(212,245,60,.1);color:#d4f53c">98% afinidad</span>
       </div>
     </div>
 
-    <div class="profile-card">
+    <!-- Tatuador — violeta -->
+    <div class="profile-card" style="border-top-color:#c45bff">
       <div class="profile-top">
-        <div class="avatar av-r">RV</div>
+        <div class="avatar" style="background:#1a0525;color:#c45bff">MR</div>
         <div>
-          <div class="profile-name">Rodrigo Valdés</div>
-          <div class="profile-meta">Bajista · Rosario</div>
+          <div class="profile-name">Matías Ríos</div>
+          <div class="profile-meta">🖋️ Tatuador · Rosario</div>
         </div>
       </div>
       <div class="profile-tags">
-        <span class="tag tag-neon">Rock</span>
-        <span class="tag">Metal</span>
-        <span class="tag">Prog</span>
+        <span class="tag" style="border-color:#c45bff;color:#c45bff">Fine line</span>
+        <span class="tag">Realismo</span>
+        <span class="tag">Blackwork</span>
       </div>
       <div class="profile-footer">
-        <div class="profile-looking">Busca <strong>proyecto serio</strong></div>
-        <span class="match">91% afinidad</span>
+        <div class="profile-looking">Busca <strong>guest spots</strong></div>
+        <span class="match" style="background:rgba(196,91,255,.1);color:#c45bff">Agenda abierta</span>
       </div>
     </div>
 
-    <div class="profile-card">
+    <!-- Bailarina — cyan -->
+    <div class="profile-card" style="border-top-color:#5bd4ff">
       <div class="profile-top">
-        <div class="avatar av-b">SM</div>
+        <div class="avatar" style="background:#051520;color:#5bd4ff">CM</div>
         <div>
-          <div class="profile-name">Sol Martínez</div>
-          <div class="profile-meta">Cantante · Córdoba</div>
+          <div class="profile-name">Camila Montes</div>
+          <div class="profile-meta">💃 Bailarina · Córdoba</div>
         </div>
       </div>
       <div class="profile-tags">
-        <span class="tag tag-neon">Folklore</span>
-        <span class="tag">Indie</span>
-        <span class="tag">Pop</span>
+        <span class="tag" style="border-color:#5bd4ff;color:#5bd4ff">Contemporáneo</span>
+        <span class="tag">Tango</span>
+        <span class="tag">Danza aérea</span>
       </div>
       <div class="profile-footer">
-        <div class="profile-looking">Busca <strong>músicos y productor</strong></div>
-        <span class="match">87% afinidad</span>
+        <div class="profile-looking">Busca <strong>compañía</strong></div>
+        <span class="match" style="background:rgba(91,212,255,.1);color:#5bd4ff">Doy clases</span>
       </div>
     </div>
   </div>
@@ -1360,10 +696,10 @@
     SUMATE A<br>
     LA <span class="accent">ESCENA</span>
   </div>
-  <p class="cta-sub">Gratis para siempre en el plan base. Sin excusas para no encontrar a los músicos que buscás.</p>
+  <p class="cta-sub">Gratis, sin comisiones y hecho para la escena local. Sin excusas para no conectar con los artistas que buscás.</p>
   <div class="cta-domain">www.<span>buscarte</span>.com.ar</div>
   <br>
-  <a href="buscARTE_registro.html" class="btn-neon" style="font-size: 1rem; padding: 1rem 3rem;">Crear perfil gratis →</a>
+  <a href="buscARTE_registro.html" class="btn-neon" style="font-size:1rem;padding:1rem 3rem">Crear perfil gratis →</a>
 </section>
 
 <!-- FOOTER -->
@@ -1379,33 +715,29 @@
 </footer>
 
 <script>
-  // Cursor personalizado
+  // CURSOR
   const cursor = document.getElementById('cursor');
   const ring = document.getElementById('cursor-ring');
   let mx = 0, my = 0, rx = 0, ry = 0;
   document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
   function animateCursor() {
-    cursor.style.left = mx + 'px';
-    cursor.style.top = my + 'px';
-    rx += (mx - rx) * 0.12;
-    ry += (my - ry) * 0.12;
-    ring.style.left = rx + 'px';
-    ring.style.top = ry + 'px';
+    cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+    rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
     requestAnimationFrame(animateCursor);
   }
   animateCursor();
 
-  // Scroll reveal
+  // SCROLL REVEAL
   const reveals = document.querySelectorAll('.reveal');
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry, i) => {
-      if (entry.isIntersecting) {
-        setTimeout(() => entry.target.classList.add('visible'), i * 80);
-      }
+      if (entry.isIntersecting) setTimeout(() => entry.target.classList.add('visible'), i * 80);
     });
   }, { threshold: 0.1 });
   reveals.forEach(el => observer.observe(el));
 
+  // BADGE MENSAJES
   async function cargarBadgeMensajes(uid) {
     const badge = document.getElementById('nav-msg-badge');
     if (!badge || !uid) return;
@@ -1417,114 +749,69 @@
       );
       const msgs = await res.json();
       const count = Array.isArray(msgs) ? msgs.length : 0;
-      if (count > 0) {
-        badge.textContent = count > 99 ? '99+' : count;
-        badge.style.display = 'inline';
-      } else {
-        badge.style.display = 'none';
-      }
+      if (count > 0) { badge.textContent = count > 99 ? '99+' : count; badge.style.display = 'inline'; }
+      else badge.style.display = 'none';
     } catch(e) { if(badge) badge.style.display = 'none'; }
   }
 
   // NAV SESSION
-  (function initNav(){
-    const l=localStorage.getItem('ba_logged')==='1';
-    const n=localStorage.getItem('ba_name')||'Mi perfil';
-    const uid=localStorage.getItem('ba_user_id')||'';
-    const i=n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-    if(l){
-      const g=document.getElementById('nav-guest');
-      const u=document.getElementById('nav-user');
-      if(g)g.style.display='none';
-      if(u)u.style.display='flex';
-      const c=document.getElementById('nav-avatar-circle');
-      if(c)c.textContent=i;
-      const nm=document.getElementById('nav-avatar-name');
-      if(nm)nm.textContent=n.split(' ')[0];
+  (function initNav() {
+    const l = localStorage.getItem('ba_logged') === '1';
+    const n = localStorage.getItem('ba_name') || 'Mi perfil';
+    const uid = localStorage.getItem('ba_user_id') || '';
+    const i = n.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    if (l) {
+      const g = document.getElementById('nav-guest');
+      const u = document.getElementById('nav-user');
+      if (g) g.style.display = 'none';
+      if (u) u.style.display = 'flex';
+      const c = document.getElementById('nav-avatar-circle');
+      if (c) c.textContent = i;
+      const nm = document.getElementById('nav-avatar-name');
+      if (nm) nm.textContent = n.split(' ')[0];
       cargarBadgeMensajes(uid);
-      // Fix Mi perfil link with real user ID
-      const miPerfilLink=document.querySelector('.nav-dropdown-item[href*="perfil_publico"]');
-      if(miPerfilLink && uid) miPerfilLink.href='buscARTE_perfil_publico.html?id=' + encodeURIComponent(uid);
-      // Hero logueado: mostrar accesos rápidos
+      const miPerfilLink = document.querySelector('.nav-dropdown-item[href*="perfil_publico"]');
+      if (miPerfilLink && uid) miPerfilLink.href = 'buscARTE_perfil_publico.html?id=' + encodeURIComponent(uid);
       const inv = document.getElementById('hero-invitado-wrap');
       const log = document.getElementById('hero-logueado');
-      if(inv) inv.style.display = 'none';
-      if(log) log.style.display = 'block';
+      if (inv) inv.style.display = 'none';
+      if (log) log.style.display = 'block';
       const hn = document.getElementById('hero-nombre');
-      if(hn) hn.textContent = n.split(' ')[0];
+      if (hn) hn.textContent = n.split(' ')[0];
       const hmp = document.getElementById('hero-mi-perfil');
-      if(hmp && uid) hmp.href = 'buscARTE_perfil_publico.html?id=' + encodeURIComponent(uid);
+      if (hmp && uid) hmp.href = 'buscARTE_perfil_publico.html?id=' + encodeURIComponent(uid);
     }
   })();
-  function toggleUserMenu(e){ if(e) e.stopPropagation(); const w=document.getElementById('nav-avatar-btn'); const d=document.getElementById('nav-dropdown'); if(w)w.classList.toggle('open'); if(d)d.classList.toggle('open'); }
-  document.addEventListener('click',e=>{if(!e.target.closest('#nav-user')){document.getElementById('nav-avatar-btn')?.classList.remove('open');document.getElementById('nav-dropdown')?.classList.remove('open');}});
-  function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');window.location.href='index.html';}
+  function toggleUserMenu(e) { if (e) e.stopPropagation(); document.getElementById('nav-avatar-btn')?.classList.toggle('open'); document.getElementById('nav-dropdown')?.classList.toggle('open'); }
+  document.addEventListener('click', e => { if (!e.target.closest('#nav-user')) { document.getElementById('nav-avatar-btn')?.classList.remove('open'); document.getElementById('nav-dropdown')?.classList.remove('open'); } });
+  function logout() { localStorage.removeItem('ba_logged'); localStorage.removeItem('ba_name'); localStorage.removeItem('ba_user_id'); window.location.href = 'index.html'; }
 
-  // BUSCADOR DEL INDEX
-
-  function setQuickSearch(texto) {
-    const input = document.getElementById('index-search');
-    if (input) {
-      input.value = texto;
-      input.focus();
-    }
-  }
-
-  // No forzamos registro para explorar: el login debería pedirse recién para acciones como publicar, contactar o guardar.
-  function buscarDesdeIndex() {
-    const q = document.getElementById('index-search')?.value?.trim()
-    const instr = document.getElementById('index-instrumento')?.value
-    const genero = document.getElementById('index-genero')?.value
-    const provincia = document.getElementById('index-provincia')?.value
-    const objetivo = document.getElementById('index-objetivo')?.value
-    const params = new URLSearchParams()
-    if (q) params.set('q', q)
-    if (instr) params.set('instrumento', instr)
-    if (genero) params.set('genero', genero)
-    if (provincia) params.set('provincia', provincia)
-    if (objetivo) params.set('objetivo', objetivo)
-    window.location.href = 'buscARTE_busqueda.html' + (params.toString() ? '?' + params.toString() : '')
-  }
-
-  function irA(url) {
-    window.location.href = url
-  }
-
-  // CARGAR STATS REALES
-  const SB_URL = 'https://xiaanchoanxmampegoay.supabase.co'
-  const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68'
-  const sbHdrs = { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Prefer': 'count=exact' }
+  // STATS REALES
+  const SB_URL = 'https://xiaanchoanxmampegoay.supabase.co';
+  const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68';
+  const sbHdrs = { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Prefer': 'count=exact' };
 
   async function cargarStatsIndex() {
     try {
       const [rm, ra] = await Promise.all([
-        fetch(`${SB_URL}/rest/v1/perfiles?select=id`, { headers: sbHdrs }),
+        fetch(`${SB_URL}/rest/v1/perfiles?select=id&tipo_cuenta=eq.artista`, { headers: sbHdrs }),
         fetch(`${SB_URL}/rest/v1/anuncios?estado=eq.activo&select=id`, { headers: sbHdrs })
-      ])
-
-      if (!rm.ok || !ra.ok) throw new Error('No se pudieron cargar las estadísticas del inicio')
-
-      const musicosJson = await rm.json().catch(() => [])
-      const anunciosJson = await ra.json().catch(() => [])
-
-      const totalMusicos = rm.headers.get('content-range')?.split('/')[1] || String(Array.isArray(musicosJson) ? musicosJson.length : '')
-      const totalAnuncios = ra.headers.get('content-range')?.split('/')[1] || String(Array.isArray(anunciosJson) ? anunciosJson.length : '')
-      const sm = document.getElementById('stat-musicos')
-      const sa = document.getElementById('stat-anuncios')
-      if (sm && totalMusicos) sm.innerHTML = `${totalMusicos}<span>+</span>`
-      if (sa && totalAnuncios) sa.innerHTML = `${totalAnuncios}<span>+</span>`
-    } catch(e) {
-      console.warn('Stats inicio no disponibles:', e)
-    }
+      ]);
+      if (!rm.ok || !ra.ok) return;
+      const totalArtistas = rm.headers.get('content-range')?.split('/')[1] || '';
+      const totalAnuncios = ra.headers.get('content-range')?.split('/')[1] || '';
+      const sm = document.getElementById('stat-musicos');
+      const sa = document.getElementById('stat-anuncios');
+      if (sm && totalArtistas) sm.innerHTML = `${totalArtistas}<span>+</span>`;
+      if (sa && totalAnuncios) sa.innerHTML = `${totalAnuncios}<span>+</span>`;
+    } catch(e) {}
   }
-  cargarStatsIndex()
-
+  cargarStatsIndex();
 </script>
+
 <script>
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
-  });
+  window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(() => {}); });
 }
 </script>
 </body>

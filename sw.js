@@ -1,4 +1,6 @@
-const CACHE_VERSION = 'buscarte-v2';
+// ⚠️ IMPORTANTE: subí este número en CADA deploy (v3 → v4 → v5...).
+// Si no lo cambiás, el navegador puede seguir sirviendo los archivos viejos cacheados.
+const CACHE_VERSION = 'buscarte-v4-2026-06-14';
 const OFFLINE_URL = '/index.html';
 
 const SHELL = [
@@ -6,6 +8,10 @@ const SHELL = [
   '/index.html',
   '/buscARTE_busqueda.html',
   '/buscARTE_anuncios.html',
+  '/buscARTE_anuncio_detalle.html',
+  '/buscARTE_perfil.html',
+  '/buscARTE_perfil_publico.html',
+  '/buscARTE_mensajes.html',
   '/buscARTE_login.html',
   '/buscARTE_registro.html',
   '/buscARTE_generador.html',

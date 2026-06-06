@@ -1,7 +1,7 @@
 {
   "name": "buscARTE",
   "short_name": "buscARTE",
-  "description": "La red gratuita para músicos argentinos: encontrá músicos, anuncios, jams, clases y compra/venta de equipos.",
+  "description": "La red gratuita para artistas argentinos: músicos, actores, fotógrafos, bailarines, diseñadores y más. Encontrá colaboradores, anuncios, eventos y oportunidades.",
   "id": "/",
   "start_url": "/",
   "scope": "/",
@@ -58,9 +58,9 @@
   ],
   "shortcuts": [
     {
-      "name": "Buscar músicos",
-      "short_name": "Músicos",
-      "description": "Explorar perfiles de músicos",
+      "name": "Buscar artistas",
+      "short_name": "Artistas",
+      "description": "Explorar perfiles de artistas por rubro y zona",
       "url": "/buscARTE_busqueda.html",
       "icons": [
         {

@@ -1865,10 +1865,11 @@
   }
 
   function buildQuery() {
-    // HOTFIX SIMPLE: no filtrar por estado ni columnas especiales en Supabase.
-    // Traemos una tanda amplia y filtramos en cliente para evitar errores por enums/filtros/order.
+    // Traemos una tanda amplia (200) y filtramos el resto en cliente. Subimos el límite y
+    // excluimos ocultos en el server para que, al filtrar por rubro, no queden anuncios de un
+    // rubro "escondidos" más allá de la primera tanda (el filtro de cliente igual revalida estado/oculto).
     const order = 'created_at.desc'
-    return `${SUPABASE_URL}/rest/v1/anuncios?select=*&order=${order}&limit=60&offset=${anunciosOffset}`
+    return `${SUPABASE_URL}/rest/v1/anuncios?select=*&oculto=not.is.true&order=${order}&limit=200&offset=${anunciosOffset}`
   }
 
   function buildFallbackQuery() {
@@ -2575,7 +2576,7 @@
       }
       anunciosOffset += data.length
       const btnMore = document.getElementById('btn-load-more')
-      if (btnMore) btnMore.style.display = data.length >= 60 ? 'inline-block' : 'none'
+      if (btnMore) btnMore.style.display = data.length >= 200 ? 'inline-block' : 'none'
     } catch(e) {
       console.error('Error real cargando anuncios:', e)
       lista.innerHTML = `<div style="padding:3rem;text-align:center;color:var(--gris);line-height:1.7">

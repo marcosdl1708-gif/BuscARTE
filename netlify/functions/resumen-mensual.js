@@ -64,11 +64,11 @@ async function getAllUsers() {
 async function sendResumen(user, stats, mes) {
   const res = await fetch(SEND_EMAIL_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'x-buscarte-secret': process.env.INTERNAL_SECRET || '' },
     body: JSON.stringify({
       tipo: 'resumen_mensual',
       destinatario: user.email,
-      datos: { nombre: user.nombre || 'músico/a', mes, nuevosMusicos: stats.totalMusicos, nuevosAnuncios: stats.totalAnuncios, proximosEventos: stats.proximosEventos }
+      datos: { nombre: user.nombre || 'artista', mes, nuevosMusicos: stats.totalMusicos, nuevosAnuncios: stats.totalAnuncios, proximosEventos: stats.proximosEventos }
     })
   });
   if (!res.ok) {

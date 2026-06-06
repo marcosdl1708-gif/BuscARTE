@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Generador de nombres para bandas y artistas — buscARTE</title>
-  <meta name="description" content="Generador gratuito de nombres para bandas y artistas. Guardá, copiá y combiná ideas para tu proyecto musical en buscARTE.">
+  <meta name="description" content="Generador de nombres para bandas y proyectos musicales. Registrate gratis en buscARTE para usarlo y guardar tus ideas.">
   <meta name="robots" content="index, follow">
   <meta name="author" content="buscARTE">
-  <link rel="canonical" href="https://buscarte.com.ar/generador">
+  <link rel="canonical" href="https://buscarte.com.ar/buscARTE_generador.html">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://buscarte.com.ar/buscARTE_generador.html">
   <meta property="og:title" content="Generador de nombres — buscARTE">
@@ -133,7 +133,27 @@
 
     .toast { position:fixed; left:50%; bottom:1.4rem; transform:translateX(-50%) translateY(12px); background:var(--neon); color:var(--negro); font-family:var(--font-display); font-size:.8rem; letter-spacing:.04em; padding:.75rem 1rem; opacity:0; pointer-events:none; z-index:9999; transition:all .2s; }
     .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
-    @keyframes fadeUp { from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:translateY(0)} }
+  /* ── LOCK SCREEN — solo músicos ── */
+  .gen-lock {
+    position:fixed; inset:0; z-index:800;
+    background:rgba(8,8,8,.97); backdrop-filter:blur(8px);
+    display:flex; align-items:center; justify-content:center;
+    padding:2rem;
+  }
+  .gen-lock-box {
+    max-width:440px; width:100%;
+    border:1px solid #2a2a2a; background:var(--negro2);
+    padding:2.5rem 2rem; text-align:center;
+  }
+  .gen-lock-icon { font-size:2.8rem; margin-bottom:1rem; display:block; }
+  .gen-lock-title { font-family:var(--font-display); font-size:1.6rem; letter-spacing:-.02em; margin-bottom:.6rem; }
+  .gen-lock-sub { color:var(--gris); font-size:.88rem; line-height:1.7; margin-bottom:1.8rem; }
+  .gen-lock-sub strong { color:var(--blanco); font-weight:500; }
+  .gen-lock-actions { display:flex; flex-direction:column; gap:.6rem; }
+  .gen-lock-btn-primary { background:var(--neon); border:none; color:var(--negro); padding:.85rem; font-family:var(--font-display); font-size:.9rem; letter-spacing:.03em; text-decoration:none; display:block; transition:opacity .2s; }
+  .gen-lock-btn-primary:hover { opacity:.85; }
+  .gen-lock-btn-ghost { background:transparent; border:1px solid var(--gris3); color:var(--gris); padding:.75rem; font-family:var(--font-body); font-size:.78rem; letter-spacing:.08em; text-transform:uppercase; text-decoration:none; display:block; transition:all .2s; }
+  .gen-lock-btn-ghost:hover { border-color:var(--blanco); color:var(--blanco); }
 
     @media (max-width: 900px) {
       .cursor, .cursor-ring { display:none !important; }
@@ -168,10 +188,20 @@
 <div class="cursor" id="cursor"></div>
 <div class="cursor-ring" id="cursor-ring"></div>
 
+<!-- LOCK: solo para músicos -->
+<div class="gen-lock" id="gen-lock" style="display:none">
+  <div class="gen-lock-box">
+    <span class="gen-lock-icon">🎸</span>
+    <div class="gen-lock-title" id="gen-lock-title">Solo para músicos</div>
+    <p class="gen-lock-sub" id="gen-lock-sub"></p>
+    <div class="gen-lock-actions" id="gen-lock-actions"></div>
+  </div>
+</div>
+
 <nav>
   <a href="index.html" class="nav-logo">busc<span>ARTE</span></a>
   <div class="nav-center">
-    <a href="buscARTE_busqueda.html" class="nav-link">Músicos</a>
+    <a href="buscARTE_busqueda.html" class="nav-link">Artistas</a>
     <a href="buscARTE_anuncios.html" class="nav-link">Anuncios</a>
     <a href="buscARTE_generador.html" class="nav-link active">Generador</a>
   </div>
@@ -205,7 +235,7 @@
   <section class="hero">
     <div class="hero-main">
       <div>
-        <div class="page-label">Herramienta creativa</div>
+        <div class="page-label">🎵 Para músicos</div>
         <h1 class="page-title">Generador de <span>nombres</span></h1>
         <p class="page-sub">Para bandas, solistas y proyectos raros que todavía no tienen nombre. Generá ideas, guardá favoritas y copialas para compartir con tu banda.</p>
       </div>
@@ -262,7 +292,7 @@
 
       <button class="btn-generar" id="btn-generar">🎲 Generar nombres</button>
       <button class="btn-secondary" id="btn-clear-results">Limpiar resultados</button>
-      <p class="disclaimer">Los nombres se guardan en este navegador. También los vas a ver en Guardados dentro de la pestaña “Nombres”.</p>
+      <p class="disclaimer">Herramienta para proyectos musicales — bandas, solistas y proyectos raros. Los nombres se guardan en este navegador y los encontrás en Guardados bajo “Nombres”.</p>
     </aside>
 
     <section class="results-panel">
@@ -304,6 +334,37 @@
 <div class="toast" id="toast">Listo</div>
 
 <script>
+  // ── CONTROL DE ACCESO: solo músicos registrados ──
+  // No logueado           → lock con CTA de registro (intriga)
+  // Logueado, rubro música → acceso completo
+  // Logueado, otro rubro   → lock (la herramienta es de música)
+  (function checkAcceso() {
+    const logueado = localStorage.getItem('ba_logged') === '1';
+    const rubro = localStorage.getItem('ba_rubro') || 'musica';
+    const lock = document.getElementById('gen-lock');
+    const lockTitle = document.getElementById('gen-lock-title');
+    const lockSub = document.getElementById('gen-lock-sub');
+    const lockActions = document.getElementById('gen-lock-actions');
+
+    if (!logueado) {
+      if (lock) lock.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      if (lockTitle) lockTitle.textContent = 'Solo para músicos registrados';
+      if (lockSub) lockSub.innerHTML = 'El generador de nombres para bandas y proyectos es <strong>exclusivo para músicos de buscARTE</strong>.<br><br>Registrarte es gratis y te da acceso a esta y otras herramientas.';
+      if (lockActions) lockActions.innerHTML = `
+        <a href="buscARTE_registro.html" class="gen-lock-btn-primary">Crear perfil gratis →</a>
+        <a href="buscARTE_login.html" class="gen-lock-btn-ghost">Ya tengo cuenta</a>`;
+    } else if (rubro !== 'musica') {
+      if (lock) lock.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      if (lockTitle) lockTitle.textContent = 'Solo para músicos';
+      if (lockSub) lockSub.innerHTML = 'El generador de nombres está pensado para <strong>bandas, solistas y proyectos musicales</strong>, y tu cuenta es de otro rubro.';
+      if (lockActions) lockActions.innerHTML = `
+        <a href="buscARTE_busqueda.html" class="gen-lock-btn-primary">← Volver a Artistas</a>
+        <a href="buscARTE_anuncios.html" class="gen-lock-btn-ghost">Ver anuncios</a>`;
+    }
+  })();
+
   const BANDA = {
     prefijos: ['Los','Las','La','El','Proyecto','Colectivo','Banda','Trío','Cuarteto','La Orquesta','El Conjunto','Gran'],
     adj_masc: ['Roto','Perdido','Oscuro','Vacío','Libre','Eterno','Salvaje','Quieto','Profundo','Amargo','Bravo','Loco','Nuevo','Viejo','Intenso','Urgente','Maldito','Olvidado','Encendido','Turbio','Fiero','Extraño','Secreto','Latente'],

@@ -3,6 +3,36 @@ const FROM_EMAIL = process.env.FROM_EMAIL || 'buscARTE <hola@buscarte.com.ar>';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'BuscARTE.webmail@gmail.com';
 const BASE_URL = process.env.URL || 'https://buscarte.com.ar';
 
+// Anti-relay: config opcional. Si no se setean, la función se comporta como antes (no rompe),
+// pero queda SIN protección y se loguea un warning. Configurar ambas en Netlify para activar.
+const SUPABASE_URL = process.env.SUPABASE_URL || '';
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || '';
+const INTERNAL_SECRET = process.env.INTERNAL_SECRET || '';
+
+// Públicos pero con destinatario forzado al admin (nunca relay):
+const TIPOS_ADMIN = ['contacto', 'reporte'];
+// Internos (solo server): requieren secreto por header. Incluye reset por el link sensible.
+const TIPOS_INTERNOS = ['novedades', 'resumen_mensual', 'perfil_incompleto', 'reset'];
+// Transaccionales que dispara el navegador: el destinatario DEBE ser un usuario registrado.
+const TIPOS_TRANSACCIONALES = ['bienvenida', 'mensaje'];
+
+// Devuelve true si el email existe en perfiles, false si no, null si no se pudo verificar
+// (falta config de Supabase o error). En null, no bloqueamos para no romper el flujo.
+async function destinatarioEsUsuario(email) {
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) return null;
+  try {
+    const url = `${SUPABASE_URL}/rest/v1/perfiles?email=eq.${encodeURIComponent(email)}&select=id&limit=1`;
+    const r = await fetch(url, {
+      headers: { apikey: SUPABASE_SERVICE_KEY, Authorization: `Bearer ${SUPABASE_SERVICE_KEY}` }
+    });
+    if (!r.ok) return null;
+    const rows = await r.json();
+    return Array.isArray(rows) && rows.length > 0;
+  } catch (_) {
+    return null;
+  }
+}
+
 const JSON_HEADERS = {
   'Content-Type': 'application/json; charset=utf-8',
   'Access-Control-Allow-Origin': '*',
@@ -45,7 +75,7 @@ function brandShell(content) {
       <div style="max-width:600px;margin:0 auto;background:#0a0a0a;color:#f2ede4;padding:32px;border-radius:8px">
         <h1 style="font-size:28px;margin:0 0 18px;letter-spacing:-1px">busc<span style="color:#d4f53c">ARTE</span></h1>
         ${content}
-        <p style="color:#555;font-size:12px;margin-top:32px">buscARTE · La red gratuita para músicos argentinos y la escena que los rodea</p>
+        <p style="color:#555;font-size:12px;margin-top:32px">buscARTE · La red gratuita para artistas argentinos</p>
       </div>
     </div>`;
 }
@@ -58,7 +88,7 @@ function buildEmail(tipo, rawDatos = {}) {
   const datos = rawDatos || {};
 
   if (tipo === 'bienvenida') {
-    const nombre = clean(datos.nombre, 80) || 'músico/a';
+    const nombre = clean(datos.nombre, 80) || 'artista';
     return {
       subject: `¡Bienvenido/a a buscARTE, ${stripForSubject(nombre, 60)}!`,
       html: brandShell(`
@@ -67,16 +97,16 @@ function buildEmail(tipo, rawDatos = {}) {
         <p style="color:#888;margin:22px 0 8px">Ahora podés:</p>
         <ul style="color:#ccc;padding-left:22px;line-height:1.8">
           <li>Completar tu perfil para aparecer mejor en las búsquedas.</li>
-          <li>Explorar músicos y conectar con otros artistas.</li>
+          <li>Explorar artistas de todos los rubros y conectar con colaboradores.</li>
           <li>Publicar anuncios, jams, clases o compra/venta de equipos.</li>
         </ul>
-        ${cta('Explorar músicos →', `${BASE_URL}/buscARTE_busqueda.html`)}
+        ${cta('Explorar artistas →', `${BASE_URL}/buscARTE_busqueda.html`)}
       `)
     };
   }
 
   if (tipo === 'mensaje') {
-    const remitente = clean(datos.remitente, 80) || 'Un músico';
+    const remitente = clean(datos.remitente, 80) || 'Un artista';
     const preview = clean(datos.preview, 300);
     return {
       subject: `💬 Nuevo mensaje de ${stripForSubject(remitente, 70)} en buscARTE`,
@@ -155,27 +185,27 @@ function buildEmail(tipo, rawDatos = {}) {
   }
 
   if (tipo === 'novedades') {
-    const nombre = clean(datos.nombre, 80) || 'músico/a';
+    const nombre = clean(datos.nombre, 80) || 'artista';
     return {
-      subject: '🎸 buscARTE creció — novedades que te van a interesar',
+      subject: '🎨 buscARTE creció — novedades que te van a interesar',
       html: brandShell(`
-        <h2 style="color:#d4f53c;margin:0 0 16px">Pasaron muchas cosas desde que te sumaste 🎶</h2>
+        <h2 style="color:#d4f53c;margin:0 0 16px">Pasaron muchas cosas desde que te sumaste ✦</h2>
         <p>Hola <strong>${escapeHtml(nombre)}</strong>, te contamos las novedades de buscARTE porque seguro hay algo que no viste.</p>
 
         <div style="margin:24px 0;padding:20px;background:#111;border-left:3px solid #d4f53c">
           <p style="margin:0 0 10px;color:#d4f53c;font-weight:700;font-size:15px">🆕 Lo que hay nuevo</p>
           <ul style="color:#ccc;padding-left:20px;line-height:2;margin:0">
-            <li><strong>125 músicos nuevos</strong> se sumaron a la red</li>
-            <li><strong>Anuncios de clases</strong> — encontrá o publicá clases de tu instrumento</li>
+            <li><strong>Artistas nuevos</strong> se sumaron a la comunidad — músicos, diseñadores, fotógrafos y más</li>
+            <li><strong>Anuncios de clases</strong> — encontrá o publicá clases de tu rubro</li>
             <li><strong>Compra / venta / alquiler</strong> de instrumentos y equipos</li>
-            <li><strong>Jams y eventos</strong> — hay una jam publicada esperando músicos</li>
+            <li><strong>Jams y eventos</strong> — hay eventos y jams para sumarse</li>
             <li>Mejoras en la creación de perfil, mensajería y filtros de búsqueda</li>
           </ul>
         </div>
 
         <div style="margin:24px 0;padding:20px;background:#111;border-left:3px solid #555">
           <p style="margin:0 0 10px;color:#f2ede4;font-weight:700;font-size:15px">📋 Tu perfil importa</p>
-          <p style="color:#ccc;margin:0">Los músicos con foto y descripción completa aparecen primero en las búsquedas y reciben más mensajes. Si todavía no completaste el tuyo, vale la pena.</p>
+          <p style="color:#ccc;margin:0">Los artistas con foto y descripción completa aparecen primero en las búsquedas y reciben más mensajes. Si todavía no completaste el tuyo, vale la pena.</p>
           ${cta('Completar mi perfil →', `${BASE_URL}/buscARTE_perfil.html`)}
         </div>
 
@@ -195,7 +225,7 @@ function buildEmail(tipo, rawDatos = {}) {
   }
 
   if (tipo === 'resumen_mensual') {
-    const nombre = clean(datos.nombre, 80) || 'músico/a';
+    const nombre = clean(datos.nombre, 80) || 'artista';
     const nuevosMusicos = parseInt(datos.nuevosMusicos) || 0;
     const nuevosAnuncios = parseInt(datos.nuevosAnuncios) || 0;
     const proximosEventos = datos.proximosEventos || [];
@@ -214,15 +244,15 @@ function buildEmail(tipo, rawDatos = {}) {
       : '';
 
     return {
-      subject: `🎸 buscARTE en ${mes} — ${nuevosMusicos} músicos nuevos, ${nuevosAnuncios} anuncios`,
+      subject: `✨ buscARTE en ${mes} — ${nuevosMusicos} artistas nuevos, ${nuevosAnuncios} anuncios`,
       html: brandShell(`
         <h2 style="color:#d4f53c;margin:0 0 16px">Lo que pasó en buscARTE ${escapeHtml(mes)}</h2>
-        <p>Hola <strong>${escapeHtml(nombre)}</strong>, acá va el resumen del mes para que no te pierdas nada de la escena.</p>
+        <p>Hola <strong>${escapeHtml(nombre)}</strong>, acá va el resumen del mes para que no te pierdas nada.</p>
 
         <div style="display:flex;gap:12px;margin:24px 0">
           <div style="flex:1;background:#111;padding:18px;text-align:center">
             <div style="font-size:32px;font-weight:700;color:#d4f53c">${nuevosMusicos}</div>
-            <div style="font-size:13px;color:#888;margin-top:4px">músicos nuevos</div>
+            <div style="font-size:13px;color:#888;margin-top:4px">artistas nuevos</div>
           </div>
           <div style="flex:1;background:#111;padding:18px;text-align:center">
             <div style="font-size:32px;font-weight:700;color:#d4f53c">${nuevosAnuncios}</div>
@@ -234,7 +264,7 @@ function buildEmail(tipo, rawDatos = {}) {
 
         <div style="margin:24px 0;padding:20px;background:#111;border-left:3px solid #555">
           <p style="margin:0 0 10px;color:#f2ede4;font-weight:700;font-size:15px">📋 ¿Tenés algo para publicar?</p>
-          <p style="color:#ccc;margin:0">Podés publicar anuncios gratis — busco músico, me ofrezco, jams, clases o compra/venta de equipos.</p>
+          <p style="color:#ccc;margin:0">Podés publicar anuncios gratis — busco artista, me ofrezco, jams, clases o compra/venta de equipos.</p>
           ${cta('Ver anuncios →', `${BASE_URL}/buscARTE_anuncios.html`)}
         </div>
 
@@ -244,7 +274,7 @@ function buildEmail(tipo, rawDatos = {}) {
   }
 
   if (tipo === 'perfil_incompleto') {
-    const nombre = clean(datos.nombre, 80) || 'músico/a';
+    const nombre = clean(datos.nombre, 80) || 'artista';
     return {
       subject: 'Tu perfil en buscARTE está casi listo 👀',
       html: brandShell(`
@@ -253,8 +283,8 @@ function buildEmail(tipo, rawDatos = {}) {
         <p style="color:#888;margin:20px 0 8px">Los perfiles completos reciben <strong style="color:#f2ede4">hasta 3 veces más visitas</strong>. En especial:</p>
         <ul style="color:#ccc;padding-left:22px;line-height:2">
           <li>📸 <strong>Foto de perfil</strong> — genera confianza y te hace reconocible</li>
-          <li>🎸 <strong>Instrumento y géneros</strong> — para que te encuentren fácil</li>
-          <li>📍 <strong>Zona</strong> — para conectar con músicos cercanos</li>
+          <li>🎨 <strong>Especialidad y rubro</strong> — para que te encuentren fácil</li>
+          <li>📍 <strong>Zona</strong> — para conectar con artistas cercanos</li>
           <li>✍️ <strong>Descripción</strong> — contá quién sos y qué buscás</li>
         </ul>
         ${cta('Completar mi perfil →', `${BASE_URL}/buscARTE_perfil.html`)}
@@ -285,10 +315,35 @@ exports.handler = async function(event) {
 
   if (!email) return json(400, { error: 'Tipo de email desconocido' });
 
-  // Contacto y reportes siempre van al mail administrativo para evitar uso como relay abierto.
-  const destinatario = ['contacto', 'reporte'].includes(tipo)
-    ? ADMIN_EMAIL
-    : clean(payload.destinatario, 160);
+  // ── Autorización por tipo (anti-relay) ──
+  let destinatario;
+
+  if (TIPOS_ADMIN.includes(tipo)) {
+    // contacto / reporte: el destinatario se fuerza al admin; nunca se usa el del payload.
+    destinatario = ADMIN_EMAIL;
+  } else {
+    destinatario = clean(payload.destinatario, 160);
+    if (!isEmail(destinatario)) return json(400, { error: 'Destinatario inválido' });
+
+    if (TIPOS_TRANSACCIONALES.includes(tipo)) {
+      // bienvenida / mensaje (los dispara el navegador): el destinatario debe ser un usuario real.
+      const esUsuario = await destinatarioEsUsuario(destinatario);
+      if (esUsuario === false) return json(403, { error: 'Destinatario no autorizado' });
+      if (esUsuario === null) {
+        console.warn(`[send-email] No se pudo verificar el destinatario (faltan SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY): el tipo "${tipo}" queda SIN protección anti-relay. Configuralos en Netlify.`);
+      }
+    } else {
+      // Internos (TIPOS_INTERNOS: novedades, resumen_mensual, perfil_incompleto, reset) y
+      // cualquier tipo futuro no clasificado: solo server, requieren secreto por header.
+      if (INTERNAL_SECRET) {
+        const headers = event.headers || {};
+        const provisto = headers['x-buscarte-secret'] || headers['X-Buscarte-Secret'] || '';
+        if (provisto !== INTERNAL_SECRET) return json(403, { error: 'No autorizado' });
+      } else {
+        console.warn(`[send-email] INTERNAL_SECRET no configurada: el tipo "${tipo}" está SIN protección anti-relay. Configurala en Netlify y mandá el header "x-buscarte-secret" desde las funciones programadas.`);
+      }
+    }
+  }
 
   if (!isEmail(destinatario)) return json(400, { error: 'Destinatario inválido' });
 
