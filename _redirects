@@ -1,31 +1,35 @@
 # busCARTE — Netlify redirects
 # Clean URLs publicas
 /                         /index.html                         200
-/home                     /index.html                         301
-/home/                    /index.html                         301
-/inicio                   /index.html                         301
-/inicio/                  /index.html                         301
+/home                     /                                   301
+/home/                    /                                   301
+/inicio                   /                                   301
+/inicio/                  /                                   301
 
-/artistas                 /buscARTE_busqueda.html             301
-/artistas/                /buscARTE_busqueda.html             301
-/musicos                  /buscARTE_busqueda.html             301
-/musicos/                 /buscARTE_busqueda.html             301
-/anuncios                 /buscARTE_anuncios.html             301
-/anuncios/                /buscARTE_anuncios.html             301
-/generador                /buscARTE_generador.html            301
-/generador/               /buscARTE_generador.html            301
-/contacto                 /buscARTE_contacto.html             301
-/contacto/                /buscARTE_contacto.html             301
-/registro                 /buscARTE_registro.html             301
-/registro/                /buscARTE_registro.html             301
-/login                    /buscARTE_login.html                301
-/login/                   /buscARTE_login.html                301
-/terminos                 /buscARTE_terminos.html             301
-/terminos/                /buscARTE_terminos.html             301
-/privacidad               /buscARTE_privacidad.html           301
-/privacidad/              /buscARTE_privacidad.html           301
+/artistas                 /buscARTE_busqueda                  301
+/artistas/                /buscARTE_busqueda                  301
+/musicos                  /buscARTE_busqueda                  301
+/musicos/                 /buscARTE_busqueda                  301
+/anuncios                 /buscARTE_anuncios                  301
+/anuncios/                /buscARTE_anuncios                  301
+/generador                /buscARTE_generador                 301
+/generador/               /buscARTE_generador                 301
+/contacto                 /buscARTE_contacto                  301
+/contacto/                /buscARTE_contacto                  301
+/registro                 /buscARTE_registro                  301
+/registro/                /buscARTE_registro                  301
+/login                    /buscARTE_login                     301
+/login/                   /buscARTE_login                     301
+/terminos                 /buscARTE_terminos                  301
+/terminos/                /buscARTE_terminos                  301
+/privacidad               /buscARTE_privacidad                301
+/privacidad/              /buscARTE_privacidad                301
 
-# Alias viejos / errores de casing
+# Alias viejos / errores de casing.
+# OJO: el destino queda con .html A PROPOSITO. Netlify resuelve rutas sin distinguir
+# mayus/minus al SERVIR archivos, asi que una regla origen-minuscula -> destino-misma-
+# palabra-en-CamelCase-sin-.html podria entrar en loop. El .html en el destino rompe
+# esa coincidencia y evita el loop; despues Pretty URLs lo lleva a la version sin .html.
 /buscarte_login           /buscARTE_login.html                301
 /buscarte_contacto        /buscARTE_contacto.html             301
 /buscarte_registro        /buscARTE_registro.html             301

@@ -3,6 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- SEO: canónica única por id. Resuelve "Duplicada sin canónica" en GSC.
+     El contenido del perfil lo carga JS desde Supabase y el HTML base es idéntico
+     para todos los ids, así que la canónica no puede ser estática: se arma acá,
+     temprano en el <head>, a partir de ?id. Formato canónico: sin .html. -->
+<script>
+(function () {
+  var id = new URLSearchParams(location.search).get('id');
+  var url = 'https://buscarte.com.ar/buscARTE_perfil_publico' + (id ? '?id=' + encodeURIComponent(id) : '');
+  var c = document.createElement('link');
+  c.setAttribute('rel', 'canonical');
+  c.setAttribute('href', url);
+  document.head.appendChild(c);
+  var o = document.createElement('meta');
+  o.setAttribute('property', 'og:url');
+  o.setAttribute('content', url);
+  document.head.appendChild(o);
+  var r = document.createElement('meta');
+  r.setAttribute('name', 'robots');
+  r.setAttribute('content', 'index, follow');
+  document.head.appendChild(r);
+})();
+</script>
 <title>Perfil — buscARTE</title>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
