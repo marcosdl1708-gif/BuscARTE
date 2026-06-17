@@ -930,6 +930,14 @@
 
   const BADGES = { busco:'badge-busco', ofrezco:'badge-ofrezco', jam:'badge-jam', vende:'badge-vendo', vendo:'badge-vendo', clases:'badge-clases' }
   const LABELS = { busco:'🔍 Busco artista', ofrezco:'🙋 Me ofrezco', jam:'📅 Jam / Evento', vende:'🛒 Vendo / Alquilo', vendo:'🛒 Vendo / Alquilo', clases:'🎓 Doy clases' }
+  // Íconos de identidad por rubro (coinciden con el listado y los chips del filtro)
+  const RUBRO_ICONS = {
+    musica:'🎵', actuacion:'🎭', audiovisual:'🎬', modelaje:'👗', diseno:'✏️',
+    tatuaje:'🖋️', danza:'💃', maquillaje:'💄', circo:'🎪', escritura:'✍️'
+  }
+  function getLabelOfrezco(a) {
+    return `${RUBRO_ICONS[a.rubro] || '🙋'} Me ofrezco`
+  }
   const ACTION_TITLES = { busco:'Responder al anuncio', ofrezco:'Contactar', jam:'Me apunto', vende:'Consultar al vendedor', vendo:'Consultar al vendedor', clases:'Consultar por clases' }
   const ACTION_BTNS = { busco:'Enviar respuesta →', ofrezco:'Enviar mensaje →', jam:'Confirmar asistencia →', vende:'Enviar consulta →', vendo:'Enviar consulta →', clases:'Enviar consulta →' }
 
@@ -1224,7 +1232,7 @@
 
   function renderAnuncio(a, autor, id) {
     const tipo = normalizarTipo(a.tipo)
-    const label = LABELS[tipo] || escapeHtml(tipo)
+    const label = tipo === 'ofrezco' ? getLabelOfrezco(a) : (LABELS[tipo] || escapeHtml(tipo))
     const badge = BADGES[tipo] || 'badge-busco'
     const i = initials(autor.nombre)
     const zona = a.zona || a.lugar || ''

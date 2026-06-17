@@ -1350,6 +1350,14 @@
     // "Jam" es término musical; para otros rubros mostramos "Evento"
     return (a.rubro || 'musica') === 'musica' ? '📅 Jam / Evento' : '📅 Evento'
   }
+  // Íconos de identidad por rubro (mismos que los chips del filtro)
+  const RUBRO_ICONS = {
+    musica:'🎵', actuacion:'🎭', audiovisual:'🎬', modelaje:'👗', diseno:'✏️',
+    tatuaje:'🖋️', danza:'💃', maquillaje:'💄', circo:'🎪', escritura:'✍️'
+  }
+  function getLabelOfrezco(a) {
+    return `${RUBRO_ICONS[a.rubro] || '🙋'} Me ofrezco`
+  }
   const LABELS = {
     busco: '🔍 Busco artista',
     ofrezco: '🎨 Me ofrezco',
@@ -1830,7 +1838,7 @@
     const tipo = canonicalTipo(a.tipo)
     const badge = BADGES[tipo] || 'badge-busco'
     // Para "busco": mostrar el rubro buscado dinámicamente
-    const label = tipo === 'busco' ? getLabelBusco(a) : tipo === 'jam' ? getLabelJam(a) : (LABELS[tipo] || escapeHtml(tipo))
+    const label = tipo === 'busco' ? getLabelBusco(a) : tipo === 'jam' ? getLabelJam(a) : tipo === 'ofrezco' ? getLabelOfrezco(a) : (LABELS[tipo] || escapeHtml(tipo))
     const respondText = RESPOND_TEXT[tipo] || 'Ver anuncio →'
     const tags = [a.instrumentos, a.instrumento, a.generos, a.categoria_producto, a.nivel, a.modalidad]
       .filter(Boolean).join(',').split(',').map(t=>t.trim()).filter(Boolean).slice(0,4)
@@ -1947,6 +1955,8 @@
     if (a.oculto === true || String(a.oculto || '').toLowerCase() === 'true') return false
     const estado = String(a.estado || '').toLowerCase().trim()
     if (estado && !['activo','activa','publicado','publicada'].includes(estado)) return false
+    // Defensa: filas incompletas/basura sin tipo real (no provienen del flujo de publicación)
+    if (canonicalTipo(a.tipo) === 'todos') return false
 
     // Filtrar por rubro del tablón activo
     const rfActivo = getRubroFiltroEfectivo ? getRubroFiltroEfectivo() : rubroFiltro
