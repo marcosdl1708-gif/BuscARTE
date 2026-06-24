@@ -810,6 +810,39 @@
     .mbn-panel { z-index:920 !important; width:100% !important; max-width:100% !important; }
   }
 
+  /* ═══ Filtros colapsables (acordeón) + scrollbar usable ═══ */
+  .filter-group-collapsible { padding:0 1.5rem; margin-bottom:1.1rem; }
+  .filter-group-collapsible > summary {
+    list-style:none; cursor:none; padding:.25rem 0; user-select:none;
+  }
+  .filter-group-collapsible > summary::-webkit-details-marker { display:none; }
+  .filter-group-collapsible .fg-head {
+    display:flex; align-items:center; justify-content:space-between; gap:.5rem;
+    font-size:.6rem; letter-spacing:.18em; text-transform:uppercase; color:var(--gris2);
+    transition:color .15s;
+  }
+  .filter-group-collapsible > summary:hover .fg-head { color:var(--gris); }
+  .filter-group-collapsible .fg-chevron { font-size:.65rem; transition:transform .2s; }
+  .filter-group-collapsible[open] > summary .fg-chevron { transform:rotate(180deg); }
+  .filter-group-collapsible[open] > summary { margin-bottom:.55rem; }
+  .filter-group-collapsible .filter-chips { padding-bottom:.1rem; }
+
+  /* Scrollbar del panel de filtros: de 3px (casi invisible) a una barra agarrable */
+  .filters-panel { scrollbar-width:thin; scrollbar-color:var(--gris2) transparent; }
+  .filters-panel::-webkit-scrollbar { width:10px; }
+  .filters-panel::-webkit-scrollbar-track { background:transparent; }
+  .filters-panel::-webkit-scrollbar-thumb {
+    background:var(--gris2); border-radius:6px; border:2px solid var(--negro2);
+  }
+  .filters-panel::-webkit-scrollbar-thumb:hover { background:var(--gris); }
+
+  @media (max-width:900px) {
+    /* Tap-target más cómodo en mobile para abrir/cerrar grupos */
+    .filter-group-collapsible > summary { padding:.6rem 0 !important; }
+    .filter-group-collapsible { margin-bottom:.55rem !important; }
+    .filter-group-collapsible .fg-head { font-size:.66rem !important; }
+  }
+
 </style>
 <link href="/manifest.json" rel="manifest"/>
 <meta content="#0a0a0a" name="theme-color"/>
@@ -1080,8 +1113,7 @@
 <div class="filter-divider"></div>
 <div class="filter-group">
 <span class="filter-group-label">Zona</span>
-<select><option>Todo el país</option><option selected="">Buenos Aires (CABA)</option><option>Gran Buenos Aires</option><option>Rosario</option><option>Córdoba</option><option>Mendoza</option></select>
-<div style="margin-top:.5rem"><input id="zona-musico" oninput="anunciosOffset=0;cargarAnuncios(false)" placeholder="Barrio (ej: Almagro)" type="text"/></div>
+<input id="zona-musico" oninput="anunciosOffset=0;cargarAnuncios(false)" placeholder="Ciudad o barrio (ej: Córdoba, Almagro)" type="text"/>
 </div>
 </div>
 <!-- FILTROS: JAM / ZAPADA -->
@@ -1127,8 +1159,7 @@
 <div class="filter-divider"></div>
 <div class="filter-group">
 <span class="filter-group-label">Zona</span>
-<select><option>Todo el país</option><option selected="">Buenos Aires (CABA)</option><option>Gran Buenos Aires</option><option>Rosario</option><option>Córdoba</option></select>
-<div style="margin-top:.5rem"><input id="zona-jam" oninput="anunciosOffset=0;cargarAnuncios(false)" placeholder="Barrio / lugar" type="text"/></div>
+<input id="zona-jam" oninput="anunciosOffset=0;cargarAnuncios(false)" placeholder="Ciudad, barrio o lugar" type="text"/>
 </div>
 </div>
 <!-- FILTROS: VENDO / ALQUILO -->
@@ -1172,8 +1203,7 @@
 <div class="filter-divider"></div>
 <div class="filter-group">
 <span class="filter-group-label">Zona</span>
-<select><option>Todo el país</option><option selected="">Buenos Aires (CABA)</option><option>Gran Buenos Aires</option><option>Rosario</option><option>Córdoba</option></select>
-<div style="margin-top:.5rem"><input id="zona-vende" oninput="anunciosOffset=0;cargarAnuncios(false)" placeholder="Barrio (ej: Caballito)" type="text"/></div>
+<input id="zona-vende" oninput="anunciosOffset=0;cargarAnuncios(false)" placeholder="Ciudad o barrio (ej: Caballito)" type="text"/>
 </div>
 </div>
 <!-- FILTROS: DOY CLASES -->
@@ -2336,14 +2366,18 @@
     const grupos = rubro === 'marketplace'
       ? MARKETPLACE_GRUPOS.map(function(g){ return { label: g.label, chips: g.cats } })
       : (RUBROS_FILTROS_PANEL[rubro] || RUBROS_FILTROS_PANEL.musica)
+    // En Compra-venta los grupos son muy largos → colapsados por defecto (solo se ven los
+    // encabezados). En los demás rubros quedan abiertos como antes, pero plegables.
+    const colapsar = rubro === 'marketplace'
     let html = ''
-    grupos.forEach((grupo, i) => {
-      if (i > 0) html += '<div class="filter-divider"></div>'
-      html += '<div class="filter-group long-filter">' +
-        '<span class="filter-group-label">' + grupo.label + '</span>' +
+    grupos.forEach((grupo) => {
+      const openAttr = colapsar ? '' : ' open'
+      html += '<details class="filter-group-collapsible"' + openAttr + '>' +
+        '<summary><span class="fg-head"><span class="fg-label">' + grupo.label + '</span>' +
+        '<span class="fg-chevron">▾</span></span></summary>' +
         '<div class="filter-chips">' +
         grupo.chips.map(chip => '<button class="fchip" onclick="this.classList.toggle(\'on\');anunciosOffset=0;cargarAnuncios(false)">' + chip + '</button>').join('') +
-        '</div></div>'
+        '</div></details>'
     })
     container.innerHTML = html
   }
