@@ -1197,6 +1197,44 @@
     }
   }
 
+  // Render mínimo para cuentas "visitante": no son artistas, así que no mostramos
+  // instrumento/rubro/stats/resumen IA ni secciones artísticas. Solo identidad y contacto.
+  function renderPerfilVisitante(p) {
+    const instEl = document.getElementById('perfil-instrumento')
+    if (instEl) instEl.textContent = 'Usuario de buscARTE'
+    // Resumen IA: no aplica a un visitante sin datos artísticos
+    const aiLabel = document.querySelector('.ai-label')
+    if (aiLabel) aiLabel.style.display = 'none'
+    const tagline = document.getElementById('perfil-tagline')
+    if (tagline) tagline.style.display = 'none'
+    // Grilla de stats artísticos (instrumento/género/exp/busca/zona)
+    const stats = document.querySelector('.profile-stats')
+    if (stats) stats.style.display = 'none'
+    // Tags del hero (géneros)
+    const tags = document.getElementById('perfil-tags')
+    if (tags) tags.style.display = 'none'
+    // Secciones artísticas del cuerpo (géneros, videos, disponibilidad)
+    ;['perfil-generos','perfil-videos','perfil-disponibilidad'].forEach(function(id){
+      const el = document.getElementById(id)
+      const cont = el && el.closest('.section')
+      if (cont) cont.style.display = 'none'
+    })
+    const secRef = document.getElementById('section-referentes')
+    if (secRef) secRef.style.display = 'none'
+    // "Sobre mí" solo si hay bio
+    if (!p.bio) {
+      const bioEl = document.getElementById('perfil-bio-text')
+      const bioSec = bioEl && bioEl.closest('.section')
+      if (bioSec) bioSec.style.display = 'none'
+    }
+    // "Redes" solo si hay algún contacto cargado
+    if (!p.celular && !p.redes) {
+      const redesEl = document.getElementById('perfil-redes')
+      const redesSec = redesEl && redesEl.closest('.section')
+      if (redesSec) redesSec.style.display = 'none'
+    }
+  }
+
   // CARGAR PERFIL REAL DESDE URL
   async function cargarPerfilPublico() {
     const params = new URLSearchParams(window.location.search)
@@ -1226,14 +1264,21 @@
 
       // Detectar rubro con cadena de prioridad:
       // 1. URL param ?rubro=X (pasado desde busqueda.html al clickear "Ver perfil →")
-      // 2. p.rubro de Supabase (disponible el 14/6 tras la migración)
-      // 3. localStorage.ba_rubro (útil para testing con dev_login)
-      // 4. 'musica' como fallback final
+      // 2. p.rubro de Supabase (el rubro real del perfil que se está viendo)
+      // 3. 'musica' como fallback final
+      // OJO: NO usamos localStorage.ba_rubro — ese es el rubro de QUIEN MIRA, no del perfil
+      // visto. Usarlo hacía que un perfil ajeno heredara la disciplina del espectador
+      // (p.ej. un visitante sin rubro se mostraba como "Músico" si lo miraba un músico).
       const urlRubro = new URLSearchParams(window.location.search).get('rubro')
-      const rubro = urlRubro || p.rubro || localStorage.getItem('ba_rubro') || 'musica'
+      const rubro = urlRubro || p.rubro || 'musica'
 
-      // Aplicar color, secciones y labels según rubro
-      aplicarRubroPerfil(rubro, p)
+      // Un visitante no es artista: no tiene instrumento/rubro/stats. Render mínimo y honesto.
+      if (p.tipo_cuenta === 'visitante') {
+        renderPerfilVisitante(p)
+      } else {
+        // Aplicar color, secciones y labels según rubro
+        aplicarRubroPerfil(rubro, p)
+      }
 
       // ¿Estoy viendo mi propio perfil? (sin id en la URL = se cargó mi perfil, o el id coincide con el mío)
       const esPropio = !params.get('id') || String(p.id) === String(localStorage.getItem('ba_user_id'))
