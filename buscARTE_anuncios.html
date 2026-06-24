@@ -935,15 +935,15 @@
 <!-- Se rellena dinámicamente por renderJamChips() -->
 </div>
 <div class="mrow">
-<div class="mfield"><label>Fecha</label><input type="date"/></div>
-<div class="mfield"><label>Hora</label><input type="time"/></div>
+<div class="mfield"><label>Fecha</label><input id="jam-fecha" type="date"/></div>
+<div class="mfield"><label>Hora</label><input id="jam-hora" type="time"/></div>
 </div>
-<div class="mfield"><label>Lugar / dirección</label><input placeholder="Ej: Parque Centenario, CABA / Bar La Trastienda, Balvanera" type="text"/></div>
+<div class="mfield"><label>Lugar / dirección</label><input id="jam-lugar" placeholder="Ej: Parque Centenario, CABA / Bar La Trastienda, Balvanera" type="text"/></div>
 <div class="mrow">
-<div class="mfield"><label>Precio de entrada <span class="opt">opcional</span></label><input placeholder="Ej: Gratis / $2.000 / A la gorra" type="text"/></div>
-<div class="mfield"><label>Link de entradas o evento <span class="opt">opcional</span></label><input placeholder="https://..." type="url"/></div>
+<div class="mfield"><label>Precio de entrada <span class="opt">opcional</span></label><input id="jam-precio" placeholder="Ej: Gratis / $2.000 / A la gorra" type="text"/></div>
+<div class="mfield"><label>Link de entradas o evento <span class="opt">opcional</span></label><input id="jam-link" placeholder="https://..." type="url"/></div>
 </div>
-<div class="mfield"><label>Contacto / más info <span class="opt">opcional</span></label><input placeholder="Ej: @usuario Instagram / WhatsApp..." type="text"/></div>
+<div class="mfield"><label>Contacto / más info <span class="opt">opcional</span></label><input id="jam-contacto" placeholder="Ej: @usuario Instagram / WhatsApp..." type="text"/></div>
 <div class="mfield">
 <label>Flyer del evento <span class="opt">— opcional</span></label>
 <div class="foto-upload" id="foto-jam-zone" onclick="document.getElementById('foto-jam-input').click()" style="cursor:pointer">
@@ -1364,6 +1364,9 @@
   let sidebarTipo = 'busco'
   let tipoFiltro = 'todos'
   let anunciosOffset = 0
+  // Tipo de cuenta del usuario (artista / negocio / visitante). Gobierna qué puede publicar.
+  // Se cachea en localStorage y se refresca desde la DB en cada carga (ver cargarTipoCuenta()).
+  window.__baTipoCuenta = localStorage.getItem('ba_tipo_cuenta') || null
   const ANUNCIOS_PER_PAGE = 10
 
   const BADGES = { busco:'badge-busco', ofrezco:'badge-ofrezco', jam:'badge-jam', vende:'badge-vendo', vendo:'badge-vendo', clases:'badge-clases' }
@@ -1441,7 +1444,7 @@
   function renderVendeCategorias() {
     const sel = document.getElementById('vende-categoria')
     if (!sel) return
-    let html = '<option disabled selected>¿Qué es?</option>'
+    let html = '<option value="" disabled selected>¿Qué es?</option>'
     MARKETPLACE_GRUPOS.forEach(function(g){
       if (g.cats.length === 1 && g.cats[0] === 'Otro') return
       html += '<optgroup label="' + g.label + '">' + g.cats.map(function(c){ return '<option>' + c + '</option>' }).join('') + '</optgroup>'
@@ -1542,6 +1545,9 @@
   function openModal(tipo) {
     if (!requireLogin('publicar')) return
     tipo = canonicalTipo(tipo || 'busco')
+    // Visitante: si pide un tipo no permitido (busco/ofrezco/clases), caer al primero permitido.
+    const permitidos = publicarTiposPermitidos()
+    if (permitidos && !permitidos.includes(tipo)) tipo = permitidos[0]
     currentTipo = tipo
     // Marcar el botón de tipo correcto. El selector se regenera por rubro (orden/cantidad
     // variables), así que matcheamos por el onclick en vez de un índice fijo.
@@ -1760,6 +1766,12 @@
     const btn = document.querySelector('.btn-submit')
     const formActivo = document.querySelector('.modal-form.active')
     const tipo = canonicalTipo(formActivo?.id?.replace('form-', '') || currentTipo)
+    // Visitante: solo puede publicar evento o compra-venta (defensa por si quedó un form viejo abierto).
+    const permitidosPub = publicarTiposPermitidos()
+    if (permitidosPub && !permitidosPub.includes(tipo)) {
+      alert('Como visitante podés publicar un evento o vender en Compra-venta. Para publicar como artista, creá tu perfil artístico.')
+      return
+    }
     const miId = normalizeId(localStorage.getItem('ba_user_id'))
     let datos = { tipo, estado:'activo', user_id: miId }
     // Rubro de quien publica (su disciplina). Define el tablón para ofrezco/clases/jam.
@@ -1772,7 +1784,10 @@
       const inputs = [...form.querySelectorAll('input[type=text]')]
       datos.titulo = inputs[0]?.value?.trim()
       datos.descripcion = form.querySelector('textarea')?.value?.trim()
-      const chips = getSelectedTexts(form)
+      // En "busco" los chips de campo viven en #busco-chips-especificos; NO tomar el
+      // selector de rubro (#busco-rubro-chips) o su label (ej. "🎵 Música") se guardaría como dato.
+      const chipsRoot = (tipo === 'busco' ? document.getElementById('busco-chips-especificos') : form) || form
+      const chips = getSelectedTexts(chipsRoot)
       datos.instrumentos = chips.filter(c => INSTRUMENTOS.includes(c)).join(', ')
       datos.generos = chips.filter(c => GENEROS.includes(c) && !INSTRUMENTOS.includes(c)).join(', ')
       // Chips específicos de rubros no musicales (rol, estilo, etc.) → tags
@@ -1803,13 +1818,13 @@
       datos.titulo = document.getElementById('jam-titulo')?.value?.trim()
       datos.descripcion = form.querySelector('textarea')?.value?.trim()
       datos.generos = getSelectedTexts(document.getElementById('jam-generos')).join(', ')
-      const fechaInput = form.querySelector('input[type="date"]')?.value
-      const horaInput = form.querySelector('input[type="time"]')?.value || '18:00'
+      const fechaInput = document.getElementById('jam-fecha')?.value
+      const horaInput = document.getElementById('jam-hora')?.value || '18:00'
       datos.fecha_evento = fechaInput ? new Date(fechaInput + 'T' + horaInput).toISOString() : null
-      datos.lugar = form.querySelector('input[placeholder*="Parque"], input[placeholder*="Trastienda"], input[placeholder*="Lugar"], input[placeholder*="dirección"]')?.value?.trim()
-      datos.precio_entrada = form.querySelector('input[placeholder*="Gratis"], input[placeholder*="gorra"]')?.value?.trim()
-      datos.link_evento = form.querySelector('input[type="url"]')?.value?.trim()
-      datos.contacto_evento = form.querySelector('input[placeholder*="Instagram"], input[placeholder*="WhatsApp"]')?.value?.trim()
+      datos.lugar = document.getElementById('jam-lugar')?.value?.trim()
+      datos.precio_entrada = document.getElementById('jam-precio')?.value?.trim()
+      datos.link_evento = document.getElementById('jam-link')?.value?.trim()
+      datos.contacto_evento = document.getElementById('jam-contacto')?.value?.trim()
       if (!datos.titulo) datos.titulo = datos.lugar ? `Jam en ${datos.lugar}` : 'Jam / Zapada'
       if (uploadJamPromise) datos.foto_url = await uploadJamPromise
       else datos.foto_url = fotoJamUrl || null
@@ -1818,6 +1833,8 @@
     if (tipo === 'vende') {
       const form = document.getElementById('form-vende')
       datos.categoria_producto = form.querySelector('select')?.value?.trim()
+      // Defensa: si quedó el placeholder ("¿Qué es?") tratarlo como vacío
+      if (datos.categoria_producto === '¿Qué es?') datos.categoria_producto = ''
       datos.marca = form.querySelector('input[placeholder*="Fender"]')?.value?.trim()
       datos.condicion = form.querySelector('.radio-btn.selected')?.textContent?.trim()
       const precioVal = parseFloat(document.getElementById('vende-precio')?.value)
@@ -1898,10 +1915,12 @@
     // Para "busco": mostrar el rubro buscado dinámicamente
     const label = tipo === 'busco' ? getLabelBusco(a) : tipo === 'jam' ? getLabelJam(a) : tipo === 'ofrezco' ? getLabelOfrezco(a) : (LABELS[tipo] || escapeHtml(tipo))
     const respondText = RESPOND_TEXT[tipo] || 'Ver anuncio →'
-    const tags = [a.instrumentos, a.instrumento, a.generos, a.categoria_producto, a.nivel, a.modalidad]
+    const tags = [a.instrumentos, a.instrumento, a.generos, a.tags, a.categoria_producto, a.nivel, a.modalidad]
       .filter(Boolean).join(',').split(',').map(t=>t.trim()).filter(Boolean).slice(0,4)
     const zona = a.zona || a.lugar || ''
-    const precio = a.precio || a.precio_entrada || ''
+    let precio = a.precio || a.precio_entrada || ''
+    if (precio && /^\d/.test(String(precio).trim())) precio = '$' + String(precio).trim()
+    if (tipo === 'clases' && precio) precio = precio + '/h'
     const tagsHTML = [...tags, precio].filter(Boolean).map(t=>`<span class="anuncio-tag">${escapeHtml(t)}</span>`).join('')
     const fechaInfo = (tipo === 'jam' && a.fecha_evento) ? formatFecha(a.fecha_evento) : null
     const fechaHTML = fechaInfo ? `<div class="anuncio-fecha${fechaInfo.pasado ? ' anuncio-pasado' : ''}"><span class="anuncio-fecha-icon">📅</span>${escapeHtml(fechaInfo.str)}</div>` : ''
@@ -2225,14 +2244,79 @@
     },
   }
 
+  // ─── Gating por tipo de cuenta ───
+  // Visitante (según el plan): solo puede publicar EVENTOS y COMPRA-VENTA.
+  // Devuelve null = sin restricción (artista/negocio o tipo aún desconocido → no bloqueamos).
+  function publicarTiposPermitidos() {
+    return window.__baTipoCuenta === 'visitante' ? ['jam','vende'] : null
+  }
+
+  // Renderiza la UI de PUBLICAR (sidebar derecha + botones del modal) según TU rubro y tu tipo
+  // de cuenta. Separado de las tabs para poder re-aplicarlo (p.ej. al confirmar el tipo de cuenta)
+  // sin resetear la pestaña/panel que el usuario esté mirando.
+  function renderPublishUI() {
+    const pubRubro = localStorage.getItem('ba_rubro') || 'musica'
+    const pubConfig = RUBROS_ANUNCIO_CONFIG[pubRubro] || RUBROS_ANUNCIO_CONFIG.musica
+    const permitidos = publicarTiposPermitidos()
+    let pubItems
+    if (permitidos) {
+      // Visitante: set fijo de evento + compra-venta, independiente del rubro.
+      pubItems = [
+        { tipo:'jam',   icon:'📅', label:'Evento',        desc:'Publicá un evento abierto' },
+        { tipo:'vende', icon:'🛒', label:'Vendo / Alquilo', desc:'Instrumentos, equipos, objetos' },
+      ]
+    } else {
+      pubItems = pubConfig.sidebar.slice()
+      if (!pubItems.some(function(it){ return it.tipo === 'vende' })) {
+        pubItems.push({ tipo:'vende', icon:'🛒', label:'Vendo equipo', desc:'Publicá en Compra-venta' })
+      }
+    }
+    const publishEl = document.querySelector('.publish-types')
+    if (publishEl) {
+      publishEl.innerHTML = pubItems.map((item, i) =>
+        `<button class="publish-type${i === 0 ? ' selected' : ''}" onclick="selectPublishType(this,'${item.tipo}')">` +
+        `<span class="ptype-icon">${item.icon}</span>` +
+        `<div><span class="ptype-label">${item.label}</span><span class="ptype-desc">${item.desc}</span></div>` +
+        `</button>`
+      ).join('')
+      sidebarTipo = pubItems[0].tipo
+    }
+    const modalTipoEl = document.querySelector('.modal-tipo-selector')
+    if (modalTipoEl) {
+      modalTipoEl.innerHTML = pubItems.map((item, i) =>
+        `<button class="modal-tipo-btn${i === 0 ? ' selected' : ''}" onclick="selectTipo('${item.tipo}',this)">` +
+        `<span class="modal-tipo-icon">${item.icon}</span>` +
+        `<span class="modal-tipo-label">${item.label}</span>` +
+        `</button>`
+      ).join('')
+    }
+  }
+
+  // Trae el tipo de cuenta (y refresca el rubro) del usuario logueado. Fail-safe: si falla, no
+  // restringe nada. Cachea en localStorage para que el gating sea inmediato en la próxima carga.
+  async function cargarTipoCuenta() {
+    const uid = localStorage.getItem('ba_user_id')
+    if (localStorage.getItem('ba_logged') !== '1' || !uid) return
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${qs(uid)}&select=tipo_cuenta,rubro`, { headers: SB_HEADERS, cache:'no-store' })
+      if (!res.ok) return
+      const rows = await res.json()
+      const p = Array.isArray(rows) ? rows[0] : null
+      if (!p) return
+      const prev = window.__baTipoCuenta
+      if (p.tipo_cuenta) { window.__baTipoCuenta = p.tipo_cuenta; localStorage.setItem('ba_tipo_cuenta', p.tipo_cuenta) }
+      if (p.rubro) localStorage.setItem('ba_rubro', p.rubro)
+      // Si el tipo cambió respecto a lo ya renderizado, re-aplicar SOLO la UI de publicar.
+      if (prev !== window.__baTipoCuenta) renderPublishUI()
+    } catch(e) { /* fail-safe: sin restricción */ }
+  }
+
   // ─── FUNCIÓN CENTRAL: actualiza tabs + sidebar + modal según rubro ───
   function actualizarTabsYSidebar(rubro) {
     // Las TABS de navegación reflejan el tablón que estás mirando (rubro navegado).
     const config = RUBROS_ANUNCIO_CONFIG[rubro] || RUBROS_ANUNCIO_CONFIG.musica
-    // La UI de PUBLICAR (sidebar + modal) refleja TU rubro de perfil, no el tablón navegado:
+    // La UI de PUBLICAR (sidebar + modal) refleja TU rubro de perfil y tu tipo de cuenta:
     // publicás siempre en tu disciplina. "Busco" deja elegir a quién buscás (cualquier rubro).
-    const pubRubro = localStorage.getItem('ba_rubro') || 'musica'
-    const pubConfig = RUBROS_ANUNCIO_CONFIG[pubRubro] || RUBROS_ANUNCIO_CONFIG.musica
 
     // 1. Tipo-tabs (navegación) — sin íconos para que entren mejor.
     //    En Compra-venta no hay tipos (todo es vende), así que ocultamos las tabs.
@@ -2249,36 +2333,8 @@
       }
     }
 
-    // Tipos de publicación según TU rubro. La compra-venta (vende) es transversal:
-    // si tu rubro no la trae de fábrica (p.ej. tatuaje), la agregamos igual para que
-    // puedas publicar en la sección Compra-venta.
-    let pubItems = pubConfig.sidebar.slice()
-    if (!pubItems.some(function(it){ return it.tipo === 'vende' })) {
-      pubItems.push({ tipo:'vende', icon:'🛒', label:'Vendo equipo', desc:'Publicá en Compra-venta' })
-    }
-
-    // 2. Sidebar derecha — tipos de publicación (según TU rubro)
-    const publishEl = document.querySelector('.publish-types')
-    if (publishEl) {
-      publishEl.innerHTML = pubItems.map((item, i) =>
-        `<button class="publish-type${i === 0 ? ' selected' : ''}" onclick="selectPublishType(this,'${item.tipo}')">` +
-        `<span class="ptype-icon">${item.icon}</span>` +
-        `<div><span class="ptype-label">${item.label}</span><span class="ptype-desc">${item.desc}</span></div>` +
-        `</button>`
-      ).join('')
-      sidebarTipo = pubItems[0].tipo
-    }
-
-    // 3. Modal — botones de tipo de anuncio (según TU rubro)
-    const modalTipoEl = document.querySelector('.modal-tipo-selector')
-    if (modalTipoEl) {
-      modalTipoEl.innerHTML = pubItems.map((item, i) =>
-        `<button class="modal-tipo-btn${i === 0 ? ' selected' : ''}" onclick="selectTipo('${item.tipo}',this)">` +
-        `<span class="modal-tipo-icon">${item.icon}</span>` +
-        `<span class="modal-tipo-label">${item.label}</span>` +
-        `</button>`
-      ).join('')
-    }
+    // 2 + 3. UI de publicar (sidebar + modal) según TU rubro y tipo de cuenta.
+    renderPublishUI()
 
     // Resetear tab activo a Todos
     tipoFiltro = 'todos'
@@ -2793,7 +2849,7 @@
       document.getElementById('nav-dropdown')?.classList.remove('open')
     }
   })
-  function logout(){ localStorage.removeItem('ba_logged'); localStorage.removeItem('ba_name'); localStorage.removeItem('ba_user_id'); window.location.href='index.html' }
+  function logout(){ localStorage.removeItem('ba_logged'); localStorage.removeItem('ba_name'); localStorage.removeItem('ba_user_id'); localStorage.removeItem('ba_tipo_cuenta'); localStorage.removeItem('ba_rubro'); window.location.href='index.html' }
 
   function toggleMobileFiltersAn() {
     const panel = document.getElementById('anuncios-filters-panel')
@@ -2871,6 +2927,7 @@
       cargarAnuncios(false)
     }
     cargarStatsSidebar()
+    cargarTipoCuenta()
   }
   if (document.readyState === 'loading') window.addEventListener('DOMContentLoaded', initAnunciosPage)
   else initAnunciosPage()
@@ -2931,6 +2988,8 @@ function mbnLogout(){
   localStorage.removeItem('ba_logged');
   localStorage.removeItem('ba_name');
   localStorage.removeItem('ba_user_id');
+  localStorage.removeItem('ba_tipo_cuenta');
+  localStorage.removeItem('ba_rubro');
   window.location.href='index.html';
 }
 

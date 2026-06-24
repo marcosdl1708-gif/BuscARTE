@@ -1268,7 +1268,7 @@
     rubroStyle.id = 'rubro-detail-style'
     rubroStyle.textContent = `.detail-hero-card { background: linear-gradient(135deg, ${rc.text}0B, rgba(255,255,255,.015) 38%, rgba(0,0,0,.02)) !important; } .detail-hero-card::after { background: radial-gradient(circle, ${rc.text}13, transparent 65%) !important; }`
     document.head.appendChild(rubroStyle)
-    const tags = [a.instrumentos, a.instrumento, a.generos, a.categoria_producto, a.nivel, a.modalidad].filter(Boolean).join(',').split(',').map(t=>t.trim()).filter(Boolean)
+    const tags = [a.instrumentos, a.instrumento, a.generos, a.tags, a.categoria_producto, a.nivel, a.modalidad].filter(Boolean).join(',').split(',').map(t=>t.trim()).filter(Boolean)
     const tagsHTML = [...new Set(tags)].map(t=>`<span class="dtag dtag-neon">${escapeHtml(t)}</span>`).join('')
     const tipoParam = tipo === 'vende' ? 'vende' : tipo
     const actionTitle = ACTION_TITLES[tipo] || 'Contactar'
