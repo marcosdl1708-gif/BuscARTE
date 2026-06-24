@@ -1059,6 +1059,7 @@
 <div class="filter-group" id="fp-rubro-global">
 <span class="filter-group-label">Rubro</span>
 <div class="filter-chips">
+<button class="fchip" data-rubro="marketplace" onclick="filtrarPorRubro(this)" style="width:100%;justify-content:center;margin-bottom:.35rem">🛒 Compra-venta de equipos</button>
 <button class="fchip" data-rubro="musica" onclick="filtrarPorRubro(this)">🎵 Música</button>
 <button class="fchip" data-rubro="actuacion" onclick="filtrarPorRubro(this)">🎭 Actuación</button>
 <button class="fchip" data-rubro="audiovisual" onclick="filtrarPorRubro(this)">🎬 Audiovisual</button>
@@ -1104,9 +1105,9 @@
 </div>
 </div>
 <div class="filter-divider"></div>
-<div class="filter-group">
-<span class="filter-group-label">Género musical</span>
-<div class="filter-chips">
+<div class="filter-group" id="fp-jam-tipo-group">
+<span class="filter-group-label" id="fp-jam-tipo-label">Género musical</span>
+<div class="filter-chips" id="fp-jam-tipo-chips">
 <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Rock</button>
 <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Jazz</button>
 <button class="fchip" onclick="this.classList.toggle('on');filtrarJam()">Blues</button>
@@ -1178,8 +1179,8 @@
 <!-- FILTROS: DOY CLASES -->
 <div class="filter-panel" id="fp-clases">
 <div class="filter-group">
-<span class="filter-group-label">Disciplina</span>
-<div class="filter-chips">
+<span class="filter-group-label" id="fp-clases-disc-label">Disciplina</span>
+<div class="filter-chips" id="fp-clases-disc-chips">
 <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Guitarra</button>
 <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Bajo</button>
 <button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Batería</button>
@@ -1394,12 +1395,29 @@
   const CATEGORIAS_VENTA_POR_RUBRO = {
     musica: ['Guitarra eléctrica','Guitarra acústica','Guitarra clásica','Bajo eléctrico','Bajo acústico','Batería acústica','Batería electrónica','Percusión','Teclado / Piano','Piano acústico','Saxo','Trompeta','Trombón','Flauta','Clarinete','Violín','Cello','Viola','Bandoneón / Acordeón','Charango / Guitarra folk','Amplificador guitarra','Amplificador bajo','Pedalera multiefectos','Pedal individual','Micrófono','Interfaz de audio','Equipo PA / Sonido','Monitores / Parlantes','Home Studio / Grabación','Sala de ensayo','Cuerdas / Púas / Accesorios','Estuche / Funda','Otro'],
     audiovisual: ['Cámara réflex / DSLR','Cámara mirrorless','Cámara de video','Cámara de acción / GoPro','Lente / Objetivo','Estabilizador / Gimbal','Trípode / Monopié','Iluminación / Flash','Micrófono / Audio','Drone','Monitor / Grabador externo','Tarjetas / Almacenamiento','Batería / Cargador','Bolso / Mochila','Filtros / Accesorios','Otro'],
+    tatuaje: ['Máquina rotativa','Máquina de bobina','Fuente / Power supply','Pedal','Grip / Tubo','Cartuchos','Agujas','Tintas','Camilla / Silla','Stencil / Insumos','Otro'],
   }
-  function renderVendeCategorias(rubro) {
+
+  // Grupos del marketplace (sección Compra-venta), transversal a todos los rubros.
+  // Se usan tanto en el filtro lateral como en el <select> de publicación.
+  const MARKETPLACE_GRUPOS = [
+    { label:'🎵 Instrumentos y sonido', cats: CATEGORIAS_VENTA_POR_RUBRO.musica.filter(function(c){ return c !== 'Otro' }) },
+    { label:'🎬 Foto y video',          cats: CATEGORIAS_VENTA_POR_RUBRO.audiovisual.filter(function(c){ return c !== 'Otro' }) },
+    { label:'🖋️ Tatuaje',              cats: CATEGORIAS_VENTA_POR_RUBRO.tatuaje.filter(function(c){ return c !== 'Otro' }) },
+    { label:'📦 Varios / Otros',        cats: ['Otro'] },
+  ]
+  // El <select> de publicación muestra TODAS las categorías agrupadas por área: el marketplace
+  // es transversal, así que cualquiera puede vender cualquier cosa, sin depender de su rubro.
+  function renderVendeCategorias() {
     const sel = document.getElementById('vende-categoria')
     if (!sel) return
-    const cats = CATEGORIAS_VENTA_POR_RUBRO[rubro] || CATEGORIAS_VENTA_POR_RUBRO.musica
-    sel.innerHTML = '<option disabled selected>¿Qué es?</option>' + cats.map(c => `<option>${c}</option>`).join('')
+    let html = '<option disabled selected>¿Qué es?</option>'
+    MARKETPLACE_GRUPOS.forEach(function(g){
+      if (g.cats.length === 1 && g.cats[0] === 'Otro') return
+      html += '<optgroup label="' + g.label + '">' + g.cats.map(function(c){ return '<option>' + c + '</option>' }).join('') + '</optgroup>'
+    })
+    html += '<option>Otro</option>'
+    sel.innerHTML = html
   }
   const CONDICIONES = ['Nuevo','Usado','Para reparar']
 
@@ -1495,9 +1513,15 @@
     if (!requireLogin('publicar')) return
     tipo = canonicalTipo(tipo || 'busco')
     currentTipo = tipo
-    const idxMap = { busco:0, ofrezco:1, jam:2, vende:3, clases:4 }
-    const idx = idxMap[tipo] ?? 0
-    document.querySelectorAll('.modal-tipo-btn').forEach((b,i)=>b.classList.toggle('selected', i===idx))
+    // Marcar el botón de tipo correcto. El selector se regenera por rubro (orden/cantidad
+    // variables), así que matcheamos por el onclick en vez de un índice fijo.
+    let tipoMatch = false
+    document.querySelectorAll('.modal-tipo-btn').forEach(b => {
+      const m = (b.getAttribute('onclick') || '').includes("'" + tipo + "'")
+      b.classList.toggle('selected', m)
+      if (m) tipoMatch = true
+    })
+    if (!tipoMatch) { const primero = document.querySelector('.modal-tipo-btn'); if (primero) primero.classList.add('selected') }
     showForm(tipo)
     const modal = document.getElementById('modal')
     if (modal) modal.classList.add('open')
@@ -1547,8 +1571,11 @@
     const miRubro = localStorage.getItem('ba_rubro') || 'musica'
 
     if (tipo === 'busco') {
-      // "Busco" deja elegir a quién buscás (cualquier rubro). Siempre mostramos el selector.
-      seleccionarRubroBusco(buscoRubroSeleccionado || 'musica', null)
+      // "Busco" deja elegir a quién buscás (cualquier rubro). Siempre mostramos el selector
+      // y dejamos marcado el chip del rubro activo para que se vea el estado actual.
+      const rb = buscoRubroSeleccionado || 'musica'
+      const chipBtn = document.querySelector('#busco-rubro-chips .mchip[onclick*="\'' + rb + '\'"]')
+      seleccionarRubroBusco(rb, chipBtn)
       const rubroField = document.getElementById('busco-rubro-field')
       if (rubroField) rubroField.style.display = ''
     }
@@ -1557,7 +1584,7 @@
     if (tipo === 'ofrezco') renderOfrecerChips(miRubro)
     if (tipo === 'clases') renderClasesChips(miRubro)
     if (tipo === 'jam') renderJamChips(miRubro)
-    if (tipo === 'vende') renderVendeCategorias(miRubro)
+    if (tipo === 'vende') renderVendeCategorias()
 
     // Actualizar título del modal según el tipo seleccionado
     actualizarTituloModal(tipo)
@@ -1706,7 +1733,7 @@
     const miId = normalizeId(localStorage.getItem('ba_user_id'))
     let datos = { tipo, estado:'activo', user_id: miId }
     // Rubro de quien publica (su disciplina). Define el tablón para ofrezco/clases/jam.
-    // El marketplace (vende) es transversal: se muestra en todos los rubros y no necesita
+    // El marketplace (vende) es transversal: vive en la sección Compra-venta y no necesita
     // un rubro propio, así que un visitante (sin ba_rubro) queda con rubro null, no 'musica'.
     datos.rubro = (tipo === 'vende') ? (localStorage.getItem('ba_rubro') || null) : (localStorage.getItem('ba_rubro') || 'musica')
 
@@ -1961,19 +1988,25 @@
 
     // Filtrar por rubro del tablón activo
     const rfActivo = getRubroFiltroEfectivo ? getRubroFiltroEfectivo() : rubroFiltro
-    if (rfActivo) {
-      const tipo = canonicalTipo(a.tipo)
-      if (tipo === 'busco') {
-        // "Busco" aparece en el tablón del rubro que busca
-        const rb = a.rubro_buscado || 'musica'
-        if (rb !== rfActivo) return false
-      } else if (tipo === 'vende') {
-        // Marketplace transversal: el vende se muestra en todos los tablones,
-        // sin importar el rubro de quien publica. No filtramos por rubro.
-      } else {
-        // ofrezco / clases / jam: aparecen en el tablón del rubro que publica
-        const rp = a.rubro || 'musica'
-        if (rp !== rfActivo) return false
+    const tipoCanon = canonicalTipo(a.tipo)
+    if (rfActivo === 'marketplace') {
+      // Sección Compra-venta: SOLO vende, transversal a todos los rubros.
+      // El filtro por categoría se aplica más abajo (chips contra categoria_producto).
+      if (tipoCanon !== 'vende') return false
+    } else {
+      // En cualquier tablón de rubro (o en "todos los rubros") el vende NO aparece:
+      // la compra-venta vive únicamente en la sección Compra-venta.
+      if (tipoCanon === 'vende') return false
+      if (rfActivo) {
+        if (tipoCanon === 'busco') {
+          // "Busco" aparece en el tablón del rubro que busca
+          const rb = a.rubro_buscado || 'musica'
+          if (rb !== rfActivo) return false
+        } else {
+          // ofrezco / clases / jam: aparecen en el tablón del rubro que publica
+          const rp = a.rubro || 'musica'
+          if (rp !== rfActivo) return false
+        }
       }
     }
 
@@ -2023,7 +2056,6 @@
         { label:'Busco músico', tipo:'musico' },
         { label:'Me ofrezco', tipo:'ofrezco' },
         { label:'Jam / Evento', tipo:'jam' },
-        { label:'Vendo equipo', tipo:'vende' },
         { label:'Clases', tipo:'clases' },
       ],
       sidebar: [
@@ -2056,7 +2088,6 @@
         { label:'Todos', tipo:'todos' },
         { label:'Busco foto/video', tipo:'musico' },
         { label:'Me ofrezco', tipo:'ofrezco' },
-        { label:'Vendo equipo', tipo:'vende' },
       ],
       sidebar: [
         { tipo:'busco', icon:'🎬', label:'Busco foto / video', desc:'Para proyecto, sesión, videoclip...' },
@@ -2173,31 +2204,45 @@
     const pubRubro = localStorage.getItem('ba_rubro') || 'musica'
     const pubConfig = RUBROS_ANUNCIO_CONFIG[pubRubro] || RUBROS_ANUNCIO_CONFIG.musica
 
-    // 1. Tipo-tabs (navegación) — sin íconos para que entren mejor
+    // 1. Tipo-tabs (navegación) — sin íconos para que entren mejor.
+    //    En Compra-venta no hay tipos (todo es vende), así que ocultamos las tabs.
     const tabsEl = document.querySelector('.tipo-tabs')
     if (tabsEl) {
-      tabsEl.innerHTML = config.tabs.map((tab, i) => {
-        const active = i === 0 ? ' active' : ''
-        return `<button class="tipo-tab${active}" onclick="setTab(this,'${tab.tipo}')">${tab.label}</button>`
-      }).join('')
+      if (rubro === 'marketplace') {
+        tabsEl.style.display = 'none'
+      } else {
+        tabsEl.style.display = ''
+        tabsEl.innerHTML = config.tabs.map((tab, i) => {
+          const active = i === 0 ? ' active' : ''
+          return `<button class="tipo-tab${active}" onclick="setTab(this,'${tab.tipo}')">${tab.label}</button>`
+        }).join('')
+      }
+    }
+
+    // Tipos de publicación según TU rubro. La compra-venta (vende) es transversal:
+    // si tu rubro no la trae de fábrica (p.ej. tatuaje), la agregamos igual para que
+    // puedas publicar en la sección Compra-venta.
+    let pubItems = pubConfig.sidebar.slice()
+    if (!pubItems.some(function(it){ return it.tipo === 'vende' })) {
+      pubItems.push({ tipo:'vende', icon:'🛒', label:'Vendo equipo', desc:'Publicá en Compra-venta' })
     }
 
     // 2. Sidebar derecha — tipos de publicación (según TU rubro)
     const publishEl = document.querySelector('.publish-types')
     if (publishEl) {
-      publishEl.innerHTML = pubConfig.sidebar.map((item, i) =>
+      publishEl.innerHTML = pubItems.map((item, i) =>
         `<button class="publish-type${i === 0 ? ' selected' : ''}" onclick="selectPublishType(this,'${item.tipo}')">` +
         `<span class="ptype-icon">${item.icon}</span>` +
         `<div><span class="ptype-label">${item.label}</span><span class="ptype-desc">${item.desc}</span></div>` +
         `</button>`
       ).join('')
-      sidebarTipo = pubConfig.sidebar[0].tipo
+      sidebarTipo = pubItems[0].tipo
     }
 
     // 3. Modal — botones de tipo de anuncio (según TU rubro)
     const modalTipoEl = document.querySelector('.modal-tipo-selector')
     if (modalTipoEl) {
-      modalTipoEl.innerHTML = pubConfig.sidebar.map((item, i) =>
+      modalTipoEl.innerHTML = pubItems.map((item, i) =>
         `<button class="modal-tipo-btn${i === 0 ? ' selected' : ''}" onclick="selectTipo('${item.tipo}',this)">` +
         `<span class="modal-tipo-icon">${item.icon}</span>` +
         `<span class="modal-tipo-label">${item.label}</span>` +
@@ -2207,6 +2252,13 @@
 
     // Resetear tab activo a Todos
     tipoFiltro = 'todos'
+    // ...y dejar visible el panel de filtros que corresponde a "Todos" (fp-musico).
+    // Si no, tras cambiar de rubro podía quedar activo el panel de otra pestaña (clases/jam/vende).
+    document.querySelectorAll('.filter-panel').forEach(p => p.classList.remove('active'))
+    const fpDefault = document.getElementById('fp-musico')
+    if (fpDefault) fpDefault.classList.add('active')
+    const catLabel = document.getElementById('filter-category-label')
+    if (catLabel) catLabel.textContent = rubro === 'marketplace' ? 'Compra-venta' : 'Todos los anuncios'
   }
 
   // ─── RUBRO EN MODAL BUSCO ARTISTA ───
@@ -2281,7 +2333,9 @@
   function renderFiltrosPanel(rubro) {
     const container = document.getElementById('fp-rubro-campos')
     if (!container) return
-    const grupos = RUBROS_FILTROS_PANEL[rubro] || RUBROS_FILTROS_PANEL.musica
+    const grupos = rubro === 'marketplace'
+      ? MARKETPLACE_GRUPOS.map(function(g){ return { label: g.label, chips: g.cats } })
+      : (RUBROS_FILTROS_PANEL[rubro] || RUBROS_FILTROS_PANEL.musica)
     let html = ''
     grupos.forEach((grupo, i) => {
       if (i > 0) html += '<div class="filter-divider"></div>'
@@ -2294,7 +2348,27 @@
     container.innerHTML = html
   }
 
-  // ─── CLASES: chips de disciplina por rubro ───
+  // ─── Filtros rubro-aware para Clases y Jam/Evento ───
+  // Reutilizan la misma config que los forms de publicación (RUBROS_CLASES_CHIPS / RUBROS_JAM_CHIPS)
+  // para que lo que se filtra coincida con lo que se guarda en cada rubro.
+  function renderClasesFiltros(rubro) {
+    const chipsEl = document.getElementById('fp-clases-disc-chips')
+    if (!chipsEl) return
+    const config = RUBROS_CLASES_CHIPS[rubro] || RUBROS_CLASES_CHIPS.musica
+    chipsEl.innerHTML = config.chips.map(chip =>
+      '<button class="fchip" onclick="this.classList.toggle(\'on\');anunciosOffset=0;cargarAnuncios(false)">' + chip + '</button>'
+    ).join('')
+  }
+  function renderJamFiltros(rubro) {
+    const chipsEl = document.getElementById('fp-jam-tipo-chips')
+    const labelEl = document.getElementById('fp-jam-tipo-label')
+    if (!chipsEl) return
+    const config = RUBROS_JAM_CHIPS[rubro] || RUBROS_JAM_CHIPS.musica
+    if (labelEl) labelEl.textContent = config.label
+    chipsEl.innerHTML = config.chips.map(chip =>
+      '<button class="fchip" onclick="this.classList.toggle(\'on\');filtrarJam()">' + chip + '</button>'
+    ).join('')
+  }
   const RUBROS_CLASES_CHIPS = {
     musica:     { label:'Disciplina / Instrumento que enseñás', chips:['Guitarra','Bajo','Batería','Teclado / Piano','Voz / Canto','Saxo','Violín','Trompeta','Percusión','DJ / Productor','Bandoneón','Flauta','Acordeón','Ukelele','Contrabajo','Cello','Charango','Producción musical'] },
     actuacion:  { label:'Qué enseñás', chips:['Actuación','Teatro', 'Comedia','Impro','Voz actoral','Stand-up','Doblaje','Dirección teatral'] },
@@ -2303,7 +2377,6 @@
     circo:      { label:'Especialidad que enseñás', chips:['Malabares','Acrobacia','Equilibrismo','Trapecio','Artística de fuego','Contorsionismo','Circo en general'] },
     audiovisual:{ label:'Qué enseñás', chips:['Fotografía','Edición de video','Iluminación','Dirección de cine','Podcast','Producción audiovisual'] },
     maquillaje: { label:'Qué enseñás', chips:['Maquillaje artístico','Maquillaje FX','Caracterización','Vestuario','Peluquería artística'] },
-    circo:      { label:'Especialidad que enseñás', chips:['Malabares','Acrobacia','Equilibrismo','Trapecio','Artística de fuego','Circo en general'] },
     modelaje:   { label:'Qué enseñás', chips:['Pasarela','Posar para fotos','Actuación para cámara','Postura y presencia'] },
     escritura:  { label:'Qué enseñás', chips:['Escritura creativa','Guion','Dramaturgia','Poesía','Narrativa','Letras de canciones'] },
     tatuaje:    { label:'Qué enseñás', chips:['Tatuaje en general','Fine line','Blackwork','Realismo','Ilustración para tattoo'] },
@@ -2465,7 +2538,7 @@
     if (!yaActivo) {
       btn.classList.add('on')
       rubroFiltroActivo = rubro
-      if (RUBRO_COLORS[rubro]) document.documentElement.style.setProperty('--neon', RUBRO_COLORS[rubro])
+      document.documentElement.style.setProperty('--neon', RUBRO_COLORS[rubro] || '#d4f53c')
     } else {
       rubroFiltroActivo = null
       document.documentElement.style.setProperty('--neon', '#d4f53c')
@@ -2473,6 +2546,8 @@
     // Adaptar tabs, sidebar, modal y filtros al rubro seleccionado
     actualizarTabsYSidebar(rubroFiltroActivo || 'musica')
     renderFiltrosPanel(rubroFiltroActivo || 'musica')
+    renderClasesFiltros(rubroFiltroActivo || 'musica')
+    renderJamFiltros(rubroFiltroActivo || 'musica')
     anunciosOffset = 0
     cargarAnuncios(false)
   }
@@ -2489,6 +2564,8 @@
     // Arrancar tabs y filtros en el rubro inicial (URL param, o el rubro de la cuenta)
     actualizarTabsYSidebar(rubroInicial || 'musica')
     renderFiltrosPanel(rubroInicial || 'musica')
+    renderClasesFiltros(rubroInicial || 'musica')
+    renderJamFiltros(rubroInicial || 'musica')
 
     // Pre-seleccionar rubro buscado en el modal según el rubro inicial
     if (rubroInicial) {
@@ -2586,7 +2663,8 @@
       const efRubro = getRubroFiltroEfectivo()
       const rubroLabel = efRubro ? (RUBROS_LABELS[efRubro] || efRubro) : null
       if (sub) {
-        if (rubroLabel && tipoFiltro === 'todos') sub.textContent = `anuncios de ${rubroLabel}`
+        if (efRubro === 'marketplace') sub.textContent = 'compra-venta de equipos'
+        else if (rubroLabel && tipoFiltro === 'todos') sub.textContent = `anuncios de ${rubroLabel}`
         else if (tipoFiltro === 'todos') sub.textContent = 'explorá todas las categorías'
         else sub.textContent = filterLabels[tipoFiltro] || 'anuncios activos'
       }
