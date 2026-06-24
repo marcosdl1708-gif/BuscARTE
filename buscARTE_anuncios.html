@@ -1706,8 +1706,9 @@
     const miId = normalizeId(localStorage.getItem('ba_user_id'))
     let datos = { tipo, estado:'activo', user_id: miId }
     // Rubro de quien publica (su disciplina). Define el tablón para ofrezco/clases/jam.
-    // El marketplace (vende) es transversal y se muestra en todos los rubros.
-    datos.rubro = localStorage.getItem('ba_rubro') || 'musica'
+    // El marketplace (vende) es transversal: se muestra en todos los rubros y no necesita
+    // un rubro propio, así que un visitante (sin ba_rubro) queda con rubro null, no 'musica'.
+    datos.rubro = (tipo === 'vende') ? (localStorage.getItem('ba_rubro') || null) : (localStorage.getItem('ba_rubro') || 'musica')
 
     if (tipo === 'busco' || tipo === 'ofrezco') {
       const form = document.getElementById('form-' + tipo)
@@ -1966,8 +1967,11 @@
         // "Busco" aparece en el tablón del rubro que busca
         const rb = a.rubro_buscado || 'musica'
         if (rb !== rfActivo) return false
+      } else if (tipo === 'vende') {
+        // Marketplace transversal: el vende se muestra en todos los tablones,
+        // sin importar el rubro de quien publica. No filtramos por rubro.
       } else {
-        // ofrezco / clases / jam / vende: aparecen en el tablón del rubro que publica
+        // ofrezco / clases / jam: aparecen en el tablón del rubro que publica
         const rp = a.rubro || 'musica'
         if (rp !== rfActivo) return false
       }
