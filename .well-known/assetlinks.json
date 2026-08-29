@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "ar.com.buscarte.app",
+      "sha256_cert_fingerprints": [
+        "AD:96:23:2E:49:F4:1C:1B:CD:96:75:FF:0D:E6:F4:99:A0:C8:D3:A3:32:40:69:5E:E1:BE:EC:8E:69:15:2A:15"
+      ]
+    }
+  }
+]
