@@ -544,6 +544,12 @@
   .report-success-icon { font-size:2.5rem; margin-bottom:.75rem; }
   .report-success-title { font-family:var(--font-display);font-size:1.2rem;margin-bottom:.4rem; }
   .report-success-sub { color:var(--gris);font-size:.82rem;line-height:1.6; }
+  .report-error {
+    display:none; margin-top:1rem; padding:.8rem .9rem;
+    border:1px solid rgba(232,49,26,.45); background:rgba(232,49,26,.08);
+    color:#ff8c7d; font-size:.8rem; line-height:1.55;
+  }
+  .report-error a { color:var(--neon); }
 
 
   @media (max-width:900px) {
@@ -1581,6 +1587,18 @@
   let reportMotivo = '';
   function abrirReporte() {
     const ov = document.getElementById('report-overlay');
+    const formC = document.getElementById('report-form-content');
+    const successC = document.getElementById('report-success');
+    const errorC = document.getElementById('report-error');
+    const detalle = document.getElementById('report-detail');
+    const send = document.getElementById('btn-send-report');
+    reportMotivo = '';
+    document.querySelectorAll('.report-option').forEach(b => b.classList.remove('selected'));
+    if (formC) formC.style.display = 'block';
+    if (successC) successC.style.display = 'none';
+    if (errorC) errorC.style.display = 'none';
+    if (detalle) { detalle.value = ''; detalle.classList.remove('visible'); }
+    if (send) { send.textContent = 'Enviar reporte'; send.disabled = true; }
     if (ov) ov.classList.add('open');
   }
   function cerrarReporte() {
@@ -1592,7 +1610,11 @@
     document.querySelectorAll('.report-option').forEach(b => b.classList.remove('selected'));
     if (btn) btn.classList.add('selected');
     const send = document.getElementById('btn-send-report');
+    const detalle = document.getElementById('report-detail');
+    const errorC = document.getElementById('report-error');
     if (send) send.disabled = false;
+    if (detalle) detalle.classList.add('visible');
+    if (errorC) errorC.style.display = 'none';
   }
   async function enviarReporte() {
     if (!reportMotivo) return;
@@ -1601,9 +1623,12 @@
     const params = new URLSearchParams(window.location.search);
     const perfilId = params.get('id') || '';
     const perfilNombre = (document.getElementById('perfil-nombre')?.textContent || '').replace(/\s+/g, ' ').trim();
+    const errorC = document.getElementById('report-error');
+    const fallback = document.getElementById('report-email-fallback');
+    if (errorC) errorC.style.display = 'none';
     if (send) { send.textContent = 'Enviando...'; send.disabled = true; }
     try {
-      await fetch('/.netlify/functions/send-email', {
+      const response = await fetch('/.netlify/functions/send-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1619,15 +1644,23 @@
           }
         })
       });
+      if (!response.ok) throw new Error(`El servidor respondió ${response.status}`);
+
+      const formC = document.getElementById('report-form-content');
+      const successC = document.getElementById('report-success');
+      if (formC) formC.style.display = 'none';
+      if (successC) successC.style.display = 'block';
+      setTimeout(cerrarReporte, 2500);
     } catch (e) {
       console.error('Error enviando reporte:', e);
+      if (fallback) {
+        const asunto = 'Reporte de perfil en buscARTE';
+        const cuerpo = `Perfil: ${perfilNombre || 'Sin nombre'}\nID: ${perfilId || 'No informado'}\nMotivo: ${reportMotivo}\nDetalles: ${detalle || 'Sin detalles'}\nEnlace: ${window.location.href}`;
+        fallback.href = `mailto:BuscARTE.webmail@gmail.com?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+      }
+      if (errorC) errorC.style.display = 'block';
+      if (send) { send.textContent = 'Reintentar'; send.disabled = false; }
     }
-    // El reporte es best-effort: confirmamos al usuario aunque el email falle del lado del servidor
-    const formC = document.getElementById('report-form-content');
-    const successC = document.getElementById('report-success');
-    if (formC) formC.style.display = 'none';
-    if (successC) successC.style.display = 'block';
-    setTimeout(cerrarReporte, 2500);
   }
 
 
@@ -1690,6 +1723,7 @@ function mbnLogout(){
       <div class="report-modal-title">Reportar perfil</div>
       <div class="report-modal-sub" id="report-sub">¿Por qué querés reportar este perfil?</div>
       <div class="report-options">
+        <button type="button" class="report-option" onclick="selectMotivo(this,'Explotación, abuso o riesgo infantil')">🛡️ Explotación, abuso o riesgo infantil</button>
         <button class="report-option" onclick="selectMotivo(this,'Contenido inapropiado')">🚫 Contenido inapropiado u ofensivo</button>
         <button class="report-option" onclick="selectMotivo(this,'Spam o publicidad')">📢 Spam o publicidad no autorizada</button>
         <button class="report-option" onclick="selectMotivo(this,'Perfil falso')">🎭 Perfil falso o identidad robada</button>
@@ -1700,6 +1734,10 @@ function mbnLogout(){
       <div class="report-actions">
         <button class="btn-report-cancel" onclick="cerrarReporte()">Cancelar</button>
         <button class="btn-report-send" id="btn-send-report" onclick="enviarReporte()" disabled>Enviar reporte</button>
+      </div>
+      <div class="report-error" id="report-error" role="alert">
+        No pudimos enviar el reporte. Reintentá o
+        <a id="report-email-fallback" href="mailto:BuscARTE.webmail@gmail.com?subject=Reporte%20de%20perfil%20en%20buscARTE">envialo por correo</a>.
       </div>
     </div>
     <div class="report-success" id="report-success" style="display:none">

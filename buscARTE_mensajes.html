@@ -267,6 +267,7 @@
       <div class="chat-header-actions">
         <span class="chat-toolbar-pill" id="chat-status-pill">Activo</span>
         <button type="button" class="chat-action-btn soft" onclick="cargarMensajes(true)">Actualizar</button>
+        <button type="button" class="chat-action-btn soft" onclick="reportarConversacion()">Reportar</button>
         <a href="#" id="chat-ver-perfil" class="chat-action-btn">Ver perfil →</a>
       </div>
     </header>
@@ -772,6 +773,23 @@
     const params = new URLSearchParams(location.search);
     const convId = params.get('conv');
     if (convId && conversaciones.some(c => String(c.id) === String(convId))) abrirConvPorId(convId);
+  }
+
+  function reportarConversacion() {
+    if (!convActiva) return;
+    const params = new URLSearchParams({
+      asunto: 'Reportar una conversación',
+      mensaje: [
+        'Quiero reportar una conversación de buscARTE.',
+        `Conversación: ${convActiva.id || 'No informada'}`,
+        `Usuario: ${convActiva.nombre || 'No informado'}`,
+        `ID del usuario: ${convActiva.otroId || 'No informado'}`,
+        `Enlace: ${window.location.href}`,
+        '',
+        'Motivo y detalles (no adjuntes material ilegal):'
+      ].join('\n')
+    });
+    window.location.href = `buscARTE_contacto.html?${params.toString()}`;
   }
 
   function initNav() {

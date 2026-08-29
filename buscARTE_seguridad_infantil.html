@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Estándares de seguridad infantil de buscARTE: conductas prohibidas, canales de denuncia y medidas frente al abuso y la explotación sexual infantil.">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="buscARTE">
+  <link rel="canonical" href="https://buscarte.com.ar/seguridad-infantil">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://buscarte.com.ar/seguridad-infantil">
+  <meta property="og:title" content="Seguridad infantil — buscARTE">
+  <meta property="og:description" content="Estándares, canales de denuncia y medidas de buscARTE contra el abuso y la explotación sexual infantil.">
+  <meta property="og:image" content="https://buscarte.com.ar/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="es_AR">
+  <meta property="og:site_name" content="buscARTE">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Seguridad infantil — buscARTE">
+  <meta name="twitter:description" content="Estándares, canales de denuncia y medidas de buscARTE contra el abuso y la explotación sexual infantil.">
+  <meta name="twitter:image" content="https://buscarte.com.ar/og-image.jpg">
+  <title>Seguridad infantil — buscARTE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="buscARTE">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <style>
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    :root {
+      --negro:#080808; --negro2:#111; --negro3:#1a1a1a;
+      --blanco:#f2ede4; --neon:#d4f53c; --rojo:#e8311a;
+      --gris:#888; --gris2:#555; --gris3:#2a2a2a;
+      --font-display:'Archivo Black',sans-serif;
+      --font-body:'Archivo',sans-serif;
+    }
+    html { scroll-behavior:smooth; }
+    body {
+      background:var(--negro);
+      color:var(--blanco);
+      font-family:var(--font-body);
+      font-weight:300;
+      min-height:100vh;
+      overflow-x:hidden;
+      cursor:none;
+      line-height:1.75;
+    }
+    body::before {
+      content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      opacity:.03;pointer-events:none;z-index:0;
+    }
+    .cursor { width:10px;height:10px;background:var(--neon);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%); }
+    .cursor-ring { width:36px;height:36px;border:1px solid rgba(212,245,60,.35);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%); }
+    nav {
+      position:fixed;top:0;left:0;right:0;z-index:100;
+      display:flex;align-items:center;justify-content:space-between;
+      height:60px;padding:0 2.5rem;
+      border-bottom:1px solid #1c1c1c;
+      background:rgba(8,8,8,.96);backdrop-filter:blur(12px);
+    }
+    .nav-logo { font-family:var(--font-display);font-size:1.4rem;color:var(--blanco);text-decoration:none; }
+    .nav-logo span { color:var(--neon); }
+    .nav-links { display:flex;align-items:center;gap:1.6rem;list-style:none; }
+    .nav-link { color:var(--gris);text-decoration:none;font-size:.76rem;letter-spacing:.1em;text-transform:uppercase;transition:color .2s; }
+    .nav-link:hover, .nav-link.active { color:var(--neon); }
+    .top-spacer { height:60px; }
+    main { position:relative;z-index:1; }
+    .hero { border-bottom:1px solid #1c1c1c;padding:4rem 2.5rem 2.5rem;position:relative;overflow:hidden; }
+    .hero-inner { max-width:1120px;margin:0 auto;position:relative;z-index:1;display:grid;grid-template-columns:1fr 330px;gap:2rem;align-items:end; }
+    .hero-kicker { font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--neon);margin-bottom:.8rem; }
+    h1 { font-family:var(--font-display);font-size:clamp(2.4rem,6vw,4.8rem);line-height:.92;letter-spacing:-.04em;margin-bottom:1rem; }
+    h1 span { color:var(--neon); }
+    .hero-desc { color:var(--gris);font-size:1rem;line-height:1.7;max-width:680px; }
+    .hero-bg { position:absolute;right:-3rem;top:50%;transform:translateY(-50%);font-family:var(--font-display);font-size:11rem;color:transparent;-webkit-text-stroke:1px #161616;letter-spacing:-.06em;white-space:nowrap;pointer-events:none;user-select:none; }
+    .hero-card { border:1px solid rgba(212,245,60,.18);background:rgba(212,245,60,.035);padding:1.4rem; }
+    .hero-card-label { font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--neon);margin-bottom:.65rem; }
+    .hero-card-text { color:var(--blanco);font-size:.9rem;line-height:1.7; }
+    .meta-row { display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.3rem; }
+    .meta-chip { border:1px solid var(--gris3);color:var(--gris);padding:.3rem .75rem;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase; }
+    .meta-chip.neon { border-color:rgba(212,245,60,.3);color:var(--neon);background:rgba(212,245,60,.05); }
+    .doc-layout { max-width:1120px;margin:0 auto;padding:2.5rem;display:grid;grid-template-columns:260px 1fr;gap:2.5rem; }
+    .toc { position:sticky;top:84px;align-self:start;border:1px solid #1c1c1c;background:var(--negro2);padding:1.25rem; }
+    .toc-title { font-family:var(--font-display);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gris);margin-bottom:.9rem; }
+    .toc a { display:block;color:var(--gris);text-decoration:none;font-size:.8rem;padding:.45rem 0;border-bottom:1px solid #191919;transition:color .15s; }
+    .toc a:last-child { border-bottom:none; }
+    .toc a:hover { color:var(--neon); }
+    .doc-content { min-width:0; }
+    .summary-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#1c1c1c;margin-bottom:2.4rem; }
+    .summary-card { background:var(--negro2);padding:1.25rem;min-height:130px; }
+    .summary-icon { font-size:1.4rem;margin-bottom:.55rem; }
+    .summary-title { font-family:var(--font-display);font-size:.82rem;line-height:1.2;margin-bottom:.45rem; }
+    .summary-text { color:var(--gris);font-size:.8rem;line-height:1.6; }
+    section { padding:2rem 0;border-bottom:1px solid #1c1c1c; }
+    section:first-of-type { padding-top:0; }
+    section:last-of-type { border-bottom:none; }
+    h2 { font-family:var(--font-display);font-size:1.15rem;letter-spacing:.04em;text-transform:uppercase;color:var(--neon);margin-bottom:.85rem;line-height:1.25; }
+    p { color:#cfcfcf;margin-bottom:1rem;font-size:.96rem;line-height:1.8; }
+    ul, ol { color:#cfcfcf;padding-left:1.2rem;margin-bottom:1rem; }
+    li { margin-bottom:.55rem; }
+    strong { color:var(--blanco);font-weight:500; }
+    a { color:var(--neon);text-decoration:none; }
+    a:hover { opacity:.75; }
+    .callout { border-left:2px solid var(--neon);background:rgba(212,245,60,.045);padding:1rem 1.2rem;margin:1.2rem 0;color:var(--gris);font-size:.9rem;line-height:1.7; }
+    .danger-callout { border-left-color:var(--rojo);background:rgba(232,49,26,.06); }
+    .report-button { display:inline-flex;align-items:center;justify-content:center;background:var(--neon);color:var(--negro);padding:.75rem 1rem;font-family:var(--font-display);font-size:.78rem;letter-spacing:.04em;text-transform:uppercase;margin:.35rem 0 1rem; }
+    .report-button:hover { opacity:.86; }
+    .footer { position:relative;z-index:1;border-top:1px solid #1c1c1c;padding:2rem 2.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;color:var(--gris);font-size:.82rem; }
+    .footer-links { display:flex;gap:1rem;flex-wrap:wrap; }
+    .footer-links a { color:var(--gris); }
+    .footer-links a:hover { color:var(--neon); }
+    @media (max-width:900px) {
+      .cursor, .cursor-ring { display:none !important; }
+      * { cursor:auto !important; }
+      nav { height:56px;padding:.6rem 1rem; }
+      .nav-links { gap:.8rem; }
+      .nav-link { font-size:.65rem; }
+      .nav-links li:first-child { display:none; }
+      .top-spacer { height:56px; }
+      .hero { padding:2.5rem 1.25rem 2rem; }
+      .hero-inner { grid-template-columns:1fr;gap:1.2rem; }
+      .hero-bg { font-size:5rem;right:-1.5rem;top:1rem;transform:none;opacity:.8; }
+      h1 { font-size:2.25rem; }
+      .hero-desc { font-size:.92rem; }
+      .doc-layout { grid-template-columns:1fr;padding:1.5rem 1.25rem;gap:1.5rem; }
+      .toc { display:none; }
+      .summary-grid { grid-template-columns:1fr; }
+      section { padding:1.55rem 0; }
+      h2 { font-size:1rem; }
+      p, li { font-size:.9rem; }
+      .footer { flex-direction:column;text-align:center;padding:2rem 1.25rem; }
+      .footer-links { justify-content:center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursor-ring"></div>
+
+  <nav>
+    <a href="index.html" class="nav-logo">busc<span>ARTE</span></a>
+    <ul class="nav-links">
+      <li><a href="buscARTE_terminos.html" class="nav-link">Términos</a></li>
+      <li><a href="buscARTE_privacidad.html" class="nav-link">Privacidad</a></li>
+      <li><a href="buscARTE_contacto.html" class="nav-link">Contacto</a></li>
+    </ul>
+  </nav>
+  <div class="top-spacer"></div>
+
+  <main>
+    <section class="hero">
+      <div class="hero-bg">PROTECCIÓN</div>
+      <div class="hero-inner">
+        <div>
+          <div class="hero-kicker">Normas de la comunidad</div>
+          <h1>Seguridad <span>infantil</span></h1>
+          <p class="hero-desc">Estándares de buscARTE para prevenir, denunciar y responder ante el abuso y la explotación sexual infantil en nuestra web y aplicación.</p>
+          <div class="meta-row">
+            <span class="meta-chip neon">Última actualización: 29 de agosto de 2026</span>
+            <span class="meta-chip">Aplicación: buscARTE</span>
+          </div>
+        </div>
+        <div class="hero-card">
+          <div class="hero-card-label">Compromiso central</div>
+          <div class="hero-card-text">buscARTE mantiene una política de <strong>tolerancia cero</strong> frente al abuso y la explotación sexual infantil y al material que represente esas conductas.</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="doc-layout">
+      <aside class="toc">
+        <div class="toc-title">En esta página</div>
+        <a href="#alcance">Alcance</a>
+        <a href="#prohibiciones">Conductas prohibidas</a>
+        <a href="#denunciar">Cómo denunciar</a>
+        <a href="#respuesta">Cómo respondemos</a>
+        <a href="#autoridades">Autoridades</a>
+        <a href="#contacto">Contacto designado</a>
+      </aside>
+
+      <div class="doc-content">
+        <div class="summary-grid">
+          <div class="summary-card">
+            <div class="summary-icon">🛡️</div>
+            <div class="summary-title">Tolerancia cero</div>
+            <div class="summary-text">No permitimos contenido ni conductas que exploten, sexualicen o pongan en riesgo a niñas, niños o adolescentes.</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-icon">🚩</div>
+            <div class="summary-title">Denuncia accesible</div>
+            <div class="summary-text">Podés reportar desde un perfil o desde Contacto, tanto en la web como dentro de la aplicación.</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-icon">⚖️</div>
+            <div class="summary-title">Acción y cooperación</div>
+            <div class="summary-text">Revisamos reportes, removemos contenido, suspendemos cuentas y cooperamos con las autoridades cuando corresponde.</div>
+          </div>
+        </div>
+
+        <section id="alcance">
+          <h2>1. Alcance y compromiso</h2>
+          <p>Estos estándares se aplican a <strong>buscARTE</strong>, tanto en su sitio web como en su aplicación móvil, e incluyen perfiles, fotos, textos, anuncios, mensajes y cualquier otro contenido o interacción generados por usuarios.</p>
+          <p>buscARTE prohíbe de forma expresa todo abuso y explotación sexual infantil (EASI; también denominado CSAE por sus siglas en inglés) y todo material de abuso sexual infantil (MASI; también denominado CSAM).</p>
+          <div class="callout danger-callout"><strong>No se admite ninguna excepción.</strong> La intención artística, educativa, humorística o cualquier otra justificación no habilita contenido o conductas que abusen, exploten, sexualicen o pongan en peligro a una persona menor de 18 años.</div>
+        </section>
+
+        <section id="prohibiciones">
+          <h2>2. Conductas y contenidos prohibidos</h2>
+          <p>Está prohibido crear, publicar, solicitar, almacenar, intercambiar, vender, distribuir, promover o facilitar:</p>
+          <ul>
+            <li>Material de abuso sexual infantil (MASI/CSAM), real, generado, manipulado o simulado.</li>
+            <li>Grooming o captación de menores con fines sexuales, incluyendo intentos de trasladar la conversación a otros canales.</li>
+            <li>Sextorsión, amenazas, chantaje o presión vinculados con imágenes, videos o conversaciones sexuales.</li>
+            <li>Explotación sexual, trata, comercialización o facilitación de encuentros sexuales con menores.</li>
+            <li>Sexualización de menores, solicitudes de contenido íntimo o cualquier conducta que los ponga en riesgo.</li>
+            <li>Enlaces, instrucciones o mecanismos destinados a acceder a material o actividades de este tipo.</li>
+          </ul>
+        </section>
+
+        <section id="denunciar">
+          <h2>3. Cómo denunciar</h2>
+          <p>Si encontrás una cuenta, perfil, anuncio, mensaje o contenido que pueda vulnerar estos estándares, podés denunciarlo desde buscARTE:</p>
+          <ol>
+            <li>En un perfil público, elegí <strong>Reportar perfil</strong> y seleccioná la opción relacionada con explotación, abuso o riesgo infantil.</li>
+            <li>En una conversación, elegí <strong>Reportar</strong>. Para cualquier otro contenido, abrí <strong>Contacto</strong>, elegí el motivo <strong>Seguridad infantil</strong> y describí lo ocurrido.</li>
+            <li>También podés escribir a <a href="mailto:BuscARTE.webmail@gmail.com?subject=Seguridad%20infantil">BuscARTE.webmail@gmail.com</a>.</li>
+          </ol>
+          <a class="report-button" href="buscARTE_contacto.html?asunto=Seguridad%20infantil">Denunciar un problema de seguridad →</a>
+          <p>Incluí, si es posible, el nombre del perfil o anuncio, la URL y una explicación breve. <strong>No descargues, guardes, reenvíes ni adjuntes material potencialmente ilegal.</strong> No hace falta que nos envíes una copia: identificá dónde aparece para que podamos revisarlo de manera segura.</p>
+          <div class="callout">Si existe peligro inmediato para una niña, niño o adolescente, contactá primero a los servicios de emergencia o a la autoridad competente de tu jurisdicción.</div>
+        </section>
+
+        <section id="respuesta">
+          <h2>4. Cómo respondemos</h2>
+          <p>Los reportes vinculados con seguridad infantil reciben atención prioritaria. Según el caso y la información disponible, buscARTE puede:</p>
+          <ul>
+            <li>Revisar el contenido, la cuenta y la actividad relacionada.</li>
+            <li>Ocultar o remover contenido y limitar, suspender o cerrar cuentas.</li>
+            <li>Preservar registros y evidencia pertinente en la medida permitida por la ley y nuestras obligaciones de privacidad.</li>
+            <li>Impedir nuevas publicaciones o accesos asociados con infracciones.</li>
+            <li>Cooperar con investigaciones oficiales y responder requerimientos legales válidos.</li>
+          </ul>
+          <p>La persona denunciada no tiene derecho a recibir información que identifique a quien realizó el reporte, salvo obligación legal.</p>
+        </section>
+
+        <section id="autoridades">
+          <h2>5. Cumplimiento y reporte a autoridades</h2>
+          <p>buscARTE cumple las leyes aplicables de seguridad infantil. Cuando tomamos conocimiento razonable de material o conductas que puedan constituir abuso o explotación sexual infantil, los reportamos a las autoridades u organismos competentes mediante los canales correspondientes y preservamos la información necesaria, conforme a la legislación aplicable.</p>
+          <p>También podemos colaborar con autoridades de protección de la niñez y fuerzas de seguridad ante solicitudes legales válidas.</p>
+        </section>
+
+        <section id="contacto">
+          <h2>6. Contacto designado</h2>
+          <p>El punto de contacto de buscARTE para asuntos de seguridad infantil es <a href="mailto:BuscARTE.webmail@gmail.com?subject=Seguridad%20infantil">BuscARTE.webmail@gmail.com</a>.</p>
+          <p>Para otros reportes o consultas, usá el <a href="buscARTE_contacto.html">formulario de contacto</a>. Estos estándares complementan nuestros <a href="buscARTE_terminos.html">Términos de uso</a> y nuestra <a href="buscARTE_privacidad.html">Política de privacidad</a>.</p>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div><a href="index.html" class="nav-logo" style="font-size:1rem">busc<span>ARTE</span></a></div>
+    <div class="footer-links">
+      <a href="buscARTE_terminos.html">Términos</a>
+      <a href="buscARTE_privacidad.html">Privacidad</a>
+      <a href="buscARTE_seguridad_infantil.html">Seguridad infantil</a>
+      <a href="buscARTE_contacto.html">Contacto</a>
+    </div>
+  </footer>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', function() {
+      const cursor = document.getElementById('cursor');
+      const ring = document.getElementById('cursor-ring');
+      if (!cursor || !ring) return;
+      let mx = 0, my = 0;
+      document.addEventListener('mousemove', function(event) {
+        mx = event.clientX;
+        my = event.clientY;
+      });
+      (function tick() {
+        cursor.style.left = mx + 'px';
+        cursor.style.top = my + 'px';
+        ring.style.left = mx + 'px';
+        ring.style.top = my + 'px';
+        requestAnimationFrame(tick);
+      })();
+    });
+  </script>
+</body>
+</html>

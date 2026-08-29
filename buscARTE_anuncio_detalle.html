@@ -582,7 +582,7 @@
             </div>
           </a>
           <a href="buscARTE_perfil_publico.html" class="btn-ver-perfil">Ver perfil completo →</a>
-          <a href="#" class="report-link" onclick="return false">⚑ Reportar anuncio</a>
+          <a href="buscARTE_contacto.html?asunto=Reportar%20un%20anuncio" class="report-link" onclick="return abrirReporteAnuncio(event,this)">⚑ Reportar anuncio</a>
         </div>
       </div>
     </div>
@@ -687,7 +687,7 @@
             </div>
           </a>
           <a href="buscARTE_perfil_publico.html" class="btn-ver-perfil">Ver perfil completo →</a>
-          <a href="#" class="report-link" onclick="return false">⚑ Reportar anuncio</a>
+          <a href="buscARTE_contacto.html?asunto=Reportar%20un%20anuncio" class="report-link" onclick="return abrirReporteAnuncio(event,this)">⚑ Reportar anuncio</a>
         </div>
       </div>
     </div>
@@ -791,7 +791,7 @@
             </div>
           </a>
           <a href="buscARTE_perfil_publico.html" class="btn-ver-perfil">Ver perfil →</a>
-          <a href="#" class="report-link" onclick="return false">⚑ Reportar anuncio</a>
+          <a href="buscARTE_contacto.html?asunto=Reportar%20un%20anuncio" class="report-link" onclick="return abrirReporteAnuncio(event,this)">⚑ Reportar anuncio</a>
         </div>
       </div>
     </div>
@@ -921,7 +921,7 @@
             </div>
           </a>
           <a href="buscARTE_perfil_publico.html" class="btn-ver-perfil">Ver perfil →</a>
-          <a href="#" class="report-link" onclick="return false">⚑ Reportar anuncio</a>
+          <a href="buscARTE_contacto.html?asunto=Reportar%20un%20anuncio" class="report-link" onclick="return abrirReporteAnuncio(event,this)">⚑ Reportar anuncio</a>
         </div>
       </div>
     </div>
@@ -1003,6 +1003,44 @@
       if (!['http:', 'https:'].includes(u.protocol)) return ''
       return u.href
     } catch(e) { return '' }
+  }
+  function abrirReporteAnuncio(event, link) {
+    if (event) event.preventDefault()
+    const container = link?.closest('.anuncio-view') || document
+    const anuncioId = String(link?.dataset.anuncioId || new URLSearchParams(location.search).get('id') || '').trim()
+    const titulo = String(
+      link?.dataset.anuncioTitulo ||
+      container.querySelector('.hero-title, .detail-titulo')?.textContent ||
+      'Sin título'
+    ).replace(/\s+/g, ' ').trim()
+    const autor = String(
+      link?.dataset.anuncioAutor ||
+      container.querySelector('.autor-nombre, .meta-name')?.textContent ||
+      'No informado'
+    ).replace(/\s+/g, ' ').trim()
+    const anuncioUrl = new URL(location.href)
+    anuncioUrl.hash = ''
+
+    const mensaje = [
+      'Quiero reportar este anuncio de buscARTE.',
+      `Título: ${titulo}`,
+      anuncioId ? `ID: ${anuncioId}` : '',
+      `Publicado por: ${autor}`,
+      `Enlace: ${anuncioUrl.href}`,
+      '',
+      'Motivo y detalles:'
+    ].filter(linea => linea !== '').join('\n')
+
+    const params = new URLSearchParams({
+      asunto: 'Reportar un anuncio',
+      mensaje,
+      origen: 'anuncio',
+      anuncio_titulo: titulo,
+      anuncio_url: anuncioUrl.href
+    })
+    if (anuncioId) params.set('anuncio_id', anuncioId)
+    window.location.href = `buscARTE_contacto.html?${params.toString()}`
+    return false
   }
   function timeAgo(iso) {
     if (!iso) return ''
@@ -1180,7 +1218,7 @@
     }
   }
 
-  function autorSidebar(a, autor) {
+  function autorSidebar(a, autor, id) {
     const i = initials(autor.nombre)
     const rc = RUBRO_COLORS[autor.rubro || 'musica'] || RUBRO_COLORS.musica
     return `<div class="sidebar-card">
@@ -1193,7 +1231,12 @@
         </div>
       </a>
       ${a.user_id ? `<a href="buscARTE_perfil_publico.html?id=${encodeURIComponent(a.user_id)}${autor.rubro ? '&rubro=' + encodeURIComponent(autor.rubro) : ''}" class="btn-ver-perfil">Ver perfil →</a>` : ''}
-      <a href="buscARTE_contacto.html" class="report-link">⚑ Reportar anuncio</a>
+      <a href="buscARTE_contacto.html?asunto=Reportar%20un%20anuncio"
+         class="report-link"
+         data-anuncio-id="${escapeAttr(id || '')}"
+         data-anuncio-titulo="${escapeAttr(a.titulo || 'Sin título')}"
+         data-anuncio-autor="${escapeAttr(autor.nombre || 'No informado')}"
+         onclick="return abrirReporteAnuncio(event,this)">⚑ Reportar anuncio</a>
     </div>`
   }
 
@@ -1347,7 +1390,7 @@
       </div>
       <div class="detail-sidebar">
         ${contactoSidebar(a, autor, id)}
-        ${autorSidebar(a, autor)}
+        ${autorSidebar(a, autor, id)}
       </div>
     </div>
     <div class="mobile-sticky-action">

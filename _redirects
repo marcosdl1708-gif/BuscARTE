@@ -24,6 +24,8 @@
 /terminos/                /buscARTE_terminos                  301
 /privacidad               /buscARTE_privacidad                301
 /privacidad/              /buscARTE_privacidad                301
+/seguridad-infantil       /buscARTE_seguridad_infantil       301
+/seguridad-infantil/      /buscARTE_seguridad_infantil       301
 
 # Alias viejos / errores de casing.
 # OJO: el destino queda con .html A PROPOSITO. Netlify resuelve rutas sin distinguir
