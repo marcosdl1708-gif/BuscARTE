@@ -427,6 +427,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="buscARTE">
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
+<script src="/assets/js/meta-pixel.js?v=1" defer></script>
 </head>
 <body>
 
@@ -1398,6 +1399,13 @@
       <button class="btn-share" onclick="shareAnuncio()">Compartir</button>
     </div>`
     document.title = `buscARTE — ${a.titulo || 'Anuncio'}`
+    if (id) {
+      window.MetaAds?.trackOnce('ViewContent', {
+        content_type: 'artistic_ad',
+        ad_type: tipo,
+        category: rubroColorKey
+      }, `view-ad:${id}`, 'session')
+    }
   }
 
   async function cargarAnuncio() {
@@ -1524,6 +1532,10 @@
         body: JSON.stringify({ de_user_id: dbId(miId), para_user_id: dbId(paraId), anuncio_id: dbId(anuncioId), contenido: texto })
       })
       if (!msgRes.ok) throw new Error(await msgRes.text())
+
+      window.MetaAds?.trackOnce('Contact', {
+        content_type: 'artistic_ad'
+      }, `contact-ad:${anuncioId}`)
 
       if (convId) {
         fetch(`${SUPABASE_URL}/rest/v1/conversaciones?id=eq.${encodeURIComponent(convId)}`, {

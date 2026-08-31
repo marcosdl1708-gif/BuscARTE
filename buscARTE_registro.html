@@ -225,6 +225,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="buscARTE">
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
+<script src="/assets/js/meta-pixel.js?v=1" defer></script>
 </head>
 <body>
 
@@ -1371,6 +1372,11 @@ async function crearVisitante(btn) {
 // PANTALLA ÉXITO — Personalizada por tipo
 // ═══════════════════════════════════════
 function personalizarExito() {
+  const registroId = localStorage.getItem('ba_user_id') || `${tipoCuenta || 'artista'}:${Date.now()}`;
+  window.MetaAds?.trackOnce('CompleteRegistration', {
+    account_type: tipoCuenta || 'artista'
+  }, `registration:${registroId}`);
+
   const iconEl = document.getElementById('exito-icon');
   const subEl = document.getElementById('exito-sub');
   const btnEl = document.getElementById('exito-btn');

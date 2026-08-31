@@ -850,6 +850,7 @@
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="buscARTE" name="apple-mobile-web-app-title"/>
 <link href="/icons/icon-192.png" rel="apple-touch-icon"/>
+<script src="/assets/js/meta-pixel.js?v=1" defer></script>
 </head>
 <body>
 <div class="cursor" id="cursor"></div>
@@ -1872,6 +1873,10 @@
         alert('No se pudo publicar. Revisá los datos e intentá de nuevo.')
         return
       }
+      window.MetaAds?.trackCustom('PublishAd', {
+        ad_type: tipo,
+        category: datos.rubro_buscado || datos.rubro || 'general'
+      })
       btn.textContent = '✓ Publicado'
       btn.style.background = '#a8c832'
       setTimeout(() => {

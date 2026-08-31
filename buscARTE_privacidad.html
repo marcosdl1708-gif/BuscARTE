@@ -255,6 +255,7 @@
   }
 
   </style>
+<script src="/assets/js/meta-pixel.js?v=1" defer></script>
 </head>
 <body>
   <div class="cursor" id="cursor"></div>
@@ -302,7 +303,7 @@
         <h1>Política de <span>privacidad</span></h1>
         <p class="hero-desc">Cómo manejamos la información que cargás en buscARTE, qué partes son públicas, qué derechos tenés sobre tus datos y cómo podés editar o eliminar tu cuenta.</p>
         <div class="meta-row">
-          <span class="meta-chip neon">Última actualización: mayo 2026</span>
+          <span class="meta-chip neon">Última actualización: agosto 2026</span>
           <span class="meta-chip">buscARTE.com.ar</span>
           <span class="meta-chip">Argentina</span>
         </div>
@@ -381,7 +382,7 @@
           <li>Para guardar favoritos, nombres del generador y preferencias básicas.</li>
           <li>Para moderar reportes, prevenir abuso y mejorar la experiencia.</li>
         </ul>
-        <p>No usamos tu información para publicidad de terceros ni la vendemos bajo ningún concepto.</p>
+        <p>No vendemos ni alquilamos tu información. Si autorizás la medición de Meta, usamos señales limitadas de actividad para evaluar y mejorar campañas propias de buscARTE; no enviamos tu email, teléfono, nombre, mensajes, bio ni el texto de tus anuncios.</p>
       </section>
 
       <section id="mensajes">
@@ -397,13 +398,19 @@
           <li><strong>Supabase:</strong> base de datos, autenticación custom/RPC y almacenamiento de archivos.</li>
           <li><strong>Netlify:</strong> hosting del sitio y funciones serverless.</li>
           <li><strong>Resend:</strong> envío de emails transaccionales.</li>
+          <li><strong>Meta:</strong> medición publicitaria opcional mediante Meta Pixel. Solo se carga si la autorizás y puede recibir la URL visitada, datos técnicos del navegador, dirección IP y eventos generales como registro, publicación o contacto.</li>
         </ul>
       </section>
 
       <section id="localstorage">
         <h2>Cookies y almacenamiento local</h2>
         <p>buscARTE puede usar almacenamiento local del navegador para recordar tu sesión, tu nombre, tu ID de usuario, preferencias simples, mensajes vistos y nombres guardados del generador.</p>
-        <p>Esto ayuda a que la experiencia sea más rápida, pero no reemplaza la información principal guardada en la base de datos.</p>
+        <p>También guardamos tu elección sobre medición. Si la permitís, Meta Pixel puede crear cookies como <strong>_fbp</strong> y <strong>_fbc</strong> para atribuir visitas y conversiones. El píxel no se carga en pantallas privadas o enlaces con datos sensibles.</p>
+        <p>Podés cambiar esta decisión cuando quieras. Estado actual: <strong data-meta-consent-status>Todavía no elegiste.</strong></p>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1rem">
+          <button class="btn-ghost" type="button" onclick="window.MetaAds && window.MetaAds.setConsent(false)">Solo necesarias</button>
+          <button class="btn-neon" type="button" onclick="window.MetaAds && window.MetaAds.setConsent(true)">Permitir medición</button>
+        </div>
       </section>
 
       <section id="seguridad">
