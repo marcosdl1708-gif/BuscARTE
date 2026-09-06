@@ -33,13 +33,15 @@ El build también funciona directamente con `node scripts/build-site.mjs`, sin i
 
 `site-files.json` contiene la lista explícita de publicación. El resultado actual es `dist/` (34 archivos incluyendo `_redirects` y el controlador de captcha), sin documentos, campañas, respaldos, `files.zip` ni herramientas internas. No modificar HTML al empaquetar. Un archivo nuevo requiere incorporarlo deliberadamente a esa lista. Si encuentra archivos inesperados en `dist/`, el build se detiene y no los elimina.
 
-Netlify usa `dist/` y `netlify/functions/`. Las funciones programadas y Node 20 conservan su configuración anterior. Nunca publicar la raíz del repositorio. No se han validado todavía estas nuevas opciones en un deploy remoto.
+Netlify usa `dist/` y `netlify/functions/`. El paquete se validó en preview y se publicó el 5/9/2026 a las 22:09 ART: deploy `6a9cbd37518d43630307438c`. Las cuatro funciones de producción conservan exactamente los binarios anteriores, runtime `nodejs24.x` y sus dos horarios. `NODE_VERSION=20` sigue en la configuración fuente histórica; no se cambió en este bloque y no debe confundirse con el runtime remoto comprobado. Nunca publicar la raíz del repositorio.
+
+Ver `docs/release-20260905.md` para verificación, contexto del CLI, comandos y reversión. Los diagnósticos `npm run verify:deploy` y `npm run test:deploy-smoke` requieren `BUSCARTE_DEPLOY_URL` con el origen exacto; el primero compara recursos/rutas y el segundo abre páginas con todo el backend simulado o bloqueado. Ambos admiten `BUSCARTE_PLAYWRIGHT_MODULE`. Los informes/capturas se guardan fuera de `dist/` mediante `BUSCARTE_VERIFY_REPORT` y `BUSCARTE_QA_OUTPUT` respectivamente.
 
 ## Forma de trabajar
 
 Un bloque por vez, con cambios pequeños y verificables. Primero reproducir el problema; luego corregir y revisar web móvil/escritorio y su efecto en la app. Una preview no aísla automáticamente los datos: no hacer altas, envíos, publicaciones ni escrituras de prueba contra usuarios reales.
 
-Los bloques de captcha y publicación de anuncios están implementados localmente en commits separados. La rama `codex/anuncios-mobile-20260905` incluye ambos y es el candidato para la próxima publicación. Ver `docs/qa-captcha-20260905.md` y `docs/qa-anuncios-20260905.md` para pruebas y límites. No se hizo push ni deploy. Primero validar técnicamente el nuevo empaquetado en preview, sin altas ni publicaciones reales; después promover dentro del alcance autorizado. La comprobación en app instalada sigue pendiente de que el dominio de producción sirva la versión nueva.
+Los bloques de captcha y publicación de anuncios están implementados en commits separados y ya publicados juntos. La rama `codex/anuncios-mobile-20260905` contiene el código publicado hasta `ac97d2d`; los commits posteriores de diagnóstico/documentación no cambian archivos públicos. Ver `docs/qa-captcha-20260905.md`, `docs/qa-anuncios-20260905.md` y `docs/release-20260905.md` para pruebas y límites. No se hizo push a GitHub: `main` remoto sigue siendo una base anterior, y no debe desplegarse encima de esta versión sin reconciliar. La comprobación física de la app instalada sigue pendiente, aunque su dominio ya sirve la versión nueva.
 
 Los demás bugs siguen pendientes, incluido el enlace general de Marketplace: mejorar el formulario de venta no corrige por sí solo ese recorrido. Mantener separados los cambios visuales, la migración Auth y los cambios de disciplinas/modelo de datos.
 

@@ -2,7 +2,7 @@
 
 Fecha: 5 de septiembre de 2026. Rama: `codex/anuncios-mobile-20260905`.
 Base: `390dcb3`, que incluye captcha y la versión publicada recuperada.
-Estado: candidato local; sin push ni deploy. Esta rama reúne captcha + anuncios como próximo corte de publicación, sin incluir los demás bloques.
+Estado actualizado: publicado el 5/9 a las 22:09 ART junto con captcha, sin incluir los demás bloques. Ver `release-20260905.md` para preview, deploy, diagnóstico remoto y reversión. No se hizo push a GitHub.
 
 ## Problemas comprobados y cambios
 

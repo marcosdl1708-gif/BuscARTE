@@ -4,6 +4,8 @@ Fecha: 5 de septiembre de 2026. Rama: `codex/captcha-mobile-20260905`.
 Base: `dad2e25` (organización) sobre `130577f` (versión publicada recuperada).
 Estado: implementado y probado localmente; sin push, preview remota ni deploy de producción.
 
+Actualización de publicación, 5/9 a las 22:09 ART: este bloque se publicó junto con anuncios, después de la preview técnica. Ver `release-20260905.md`. Los resultados y límites siguientes documentan el trabajo original; el pendiente antispam de servidor continúa separado.
+
 ## Problema confirmado en el código anterior
 
 La espera de hCaptcha reintentaba cada 300 ms indefinidamente si no había SDK. Si render fallaba, sólo escribía en consola. Las tres rutas terminaban mostrando la misma alerta de completar captcha, sin distinguir carga, error ni vencimiento. Un render pendiente podía ejecutarse después de abandonar su paso.
