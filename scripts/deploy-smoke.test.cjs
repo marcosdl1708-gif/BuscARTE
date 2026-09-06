@@ -91,7 +91,7 @@ function fakeCaptchaSdk() {
   })();`;
 }
 
-async function setup(t, { logged = false, width = 390, firstPostError = false, chatFixture = false, marketplaceFixture = false, danceFixture = false, onboardingFixture = false, progressFixture = false } = {}) {
+async function setup(t, { logged = false, width = 390, firstPostError = false, chatFixture = false, marketplaceFixture = false, danceFixture = false, onboardingFixture = false, progressFixture = false, coherenceFixture = '' } = {}) {
   const result = { test: t.name, fetched: [], redirects: [], mocked: [], forbidden: [], pageErrors: [], consoleErrors: [], networkErrors: [], posts: [], patches: [], registrations: [], emails: [], reads: [], writes: [], sdk: 0 };
   // Each smoke owns its mutable synthetic row; nothing is persisted remotely or
   // shared with another case. Return only the PATCH representation the UI asks for.
@@ -105,6 +105,15 @@ async function setup(t, { logged = false, width = 390, firstPostError = false, c
     bio: '', instrumento: '', generos: '', referentes: '', provincia: null, ciudad: null,
     barrio: '', foto_url: null, campos_especificos: '{}'
   });
+  if (coherenceFixture) {
+    assert.ok(['maquillaje', 'modelaje'].includes(coherenceFixture), 'Only explicit read-only category fixtures are available');
+    Object.assign(profiles[0], {
+      rubro: coherenceFixture, provincia: 'CABA', ciudad: 'Buenos Aires (CABA)',
+      foto_url: null, campos_especificos: '{}'
+    });
+    // Keep the stale synthetic instrument to prove it cannot complete a
+    // non-musician's role. This fixture does not authorize PATCH or signup.
+  }
   const products = [
     { id: 9101, titulo: 'Guitarra sintética usada', categoria_producto: 'Guitarra eléctrica', condicion: 'Usado', rubro: 'danza' },
     { id: 9102, titulo: 'Guitarra sintética nueva', categoria_producto: 'Guitarra eléctrica', condicion: 'Nuevo', rubro: null },
@@ -119,7 +128,7 @@ async function setup(t, { logged = false, width = 390, firstPostError = false, c
     timezoneId: 'America/Argentina/Buenos_Aires', serviceWorkers: 'block'
   });
   t.after(() => context.close());
-  await context.addInitScript(({ logged, danceFixture }) => {
+  await context.addInitScript(({ logged, fixtureRubro }) => {
     localStorage.setItem('buscarte_meta_consent_v1', 'denied');
     // Never open a native sharing surface or touch the system clipboard.
     window.__smokeSharedProfiles = [];
@@ -130,10 +139,10 @@ async function setup(t, { logged = false, width = 390, firstPostError = false, c
       localStorage.setItem('ba_logged', '1');
       localStorage.setItem('ba_user_id', 'smoke-fixture-user');
       localStorage.setItem('ba_tipo_cuenta', 'artista');
-      localStorage.setItem('ba_rubro', danceFixture ? 'danza' : 'musica');
+      localStorage.setItem('ba_rubro', fixtureRubro);
       localStorage.setItem('ba_name', 'Persona de prueba aislada');
     }
-  }, { logged, danceFixture });
+  }, { logged, fixtureRubro: profiles[0].rubro });
   if (typeof context.routeWebSocket === 'function') {
     await context.routeWebSocket('**/*', socket => { result.forbidden.push('WebSocket ' + socket.url()); socket.close(); });
   }
@@ -702,4 +711,87 @@ test('deployed mobile profile completion counts saved basics, not drafts, and su
   assert.ok(await f.page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
   assert.deepEqual(f.result.writes, ['PATCH https://xiaanchoanxmampegoay.supabase.co/rest/v1/perfiles'], 'Only the explicit synthetic owner PATCH occurs');
   await capture(f.page, 'deploy-perfil-progreso-guardado-simulado-320.png');
+});
+
+test('deployed Home URLs expose the same ten existing category destinations with artist-wide metadata', async t => {
+  const f = await setup(t, { width: 320 });
+  const categories = [
+    ['musica', 'Música'], ['actuacion', 'Actuación & escena'],
+    ['audiovisual', 'Audiovisual & fotografía'], ['modelaje', 'Modelaje'],
+    ['diseno', 'Diseño & artes visuales'], ['tatuaje', 'Tatuaje & arte corporal'],
+    ['danza', 'Danza'], ['maquillaje', 'Maquillaje, vestuario & FX'],
+    ['circo', 'Circo & artes escénicas'], ['escritura', 'Escritura & guión']
+  ];
+  for (const home of ['index.html', 'buscARTE_index.html']) {
+    await f.go('/' + home);
+    await f.page.waitForFunction(() => document.documentElement.dataset.homeSession === 'guest' && document.documentElement.dataset.homeReady === 'true');
+    assert.equal(await f.page.title(), 'buscARTE — La red de artistas argentinos');
+    for (const selector of ['meta[property="og:title"]', 'meta[name="twitter:title"]']) {
+      assert.equal(await f.page.locator(selector).getAttribute('content'), 'buscARTE — La red de artistas argentinos');
+    }
+    assert.equal(await f.page.locator('meta[name="description"]').getAttribute('content'), 'Encontrá artistas por rubro, especialidad y zona. Compartí tu trabajo, publicá anuncios y conectá con la comunidad artística de Argentina.');
+    const section = f.page.locator(home === 'index.html' ? '#explorar' : '#home-rubros');
+    const links = section.locator(home === 'index.html' ? 'a.rubro-item' : 'a.home-rubro-link');
+    assert.equal(await links.count(), categories.length);
+    for (let i = 0; i < categories.length; i++) {
+      const [key, label] = categories[i], link = links.nth(i);
+      const destination = new URL(await link.getAttribute('href'), f.page.url());
+      assert.equal(destination.origin, candidate.origin);
+      assert.match(destination.pathname, /^\/buscARTE_busqueda(?:\.html)?$/i, 'Only Netlify pretty-URL case/extension serialization may differ');
+      assert.equal(destination.search, '?rubro=' + key, 'Exact category query, without additional filters');
+      assert.equal(destination.hash, '');
+      assert.equal(destination.username + destination.password, '');
+      assert.equal(await (home === 'index.html' ? link.locator('.ri-name') : link).textContent(), label);
+      assert.equal(await link.isVisible(), true);
+      if (home === 'buscARTE_index.html') assert.equal(await link.getAttribute('data-home-rubro'), key);
+    }
+    if (home === 'buscARTE_index.html') assert.equal(await f.page.locator('#explorar.home-examples').count(), 1, 'Legacy profile examples retain their historical anchor');
+    await section.scrollIntoViewIfNeeded();
+    await f.page.evaluate(() => Promise.all(document.getAnimations()
+      .filter(animation => animation.effect?.getTiming().iterations !== Infinity)
+      .map(animation => animation.finished.catch(() => {}))));
+    assert.equal(await f.page.evaluate(() => innerWidth), 320, 'The physical mobile viewport must not auto-expand');
+    assert.ok(await f.page.evaluate(() => document.documentElement.scrollWidth <= 320));
+    const bounds = await links.evaluateAll(elements => elements.map(el => {
+      const r = el.getBoundingClientRect(); return { left: r.left, right: r.right, width: r.width, height: r.height };
+    }));
+    for (const box of bounds) assert.ok(box.left >= 0 && box.right <= 320 && box.height >= 44 && box.width >= 44, JSON.stringify(box));
+    await capture(f.page, `deploy-${home.replace('.html', '')}-diez-rubros-320.png`);
+  }
+  assert.deepEqual(f.result.writes, [], 'Category discovery and metadata never mutate a backend');
+});
+
+test('deployed non-music profiles use neutral guidance and category-specific completion without saving', async t => {
+  for (const category of [
+    { key: 'maquillaje', name: 'Maquillaje, vestuario & FX', target: 'chips-rol-maq', action: 'Elegí tu rol' },
+    { key: 'modelaje', name: 'Modelaje', target: 'chips-tipo-modelo', action: 'Elegí tu tipo de trabajo' }
+  ]) {
+    const f = await setup(t, { logged: true, width: 320, coherenceFixture: category.key });
+    await f.go('/buscARTE_perfil.html#completar');
+    await f.page.waitForFunction(() => !isLoadingProfile && !!perfilCargado && document.activeElement?.id === 'profile-progress');
+    assert.equal(await f.page.evaluate(() => rubroActivo), category.key);
+    assert.equal(await f.page.locator('#sidebar-rubro-nombre-display').textContent(), category.name);
+    assert.equal(await f.page.locator('#mi-rubro-titulo').textContent(), category.name);
+    assert.equal(await f.page.locator('#mi-rubro').isVisible(), true);
+    for (const selector of ['#musica', '#referentes-section', '#ensayo']) {
+      assert.equal(await f.page.locator(selector).isVisible(), false, selector + ' remains hidden for non-musicians');
+    }
+    assert.equal(await f.page.locator('#reg-nombre-perfil').inputValue(), 'Persona de prueba aislada');
+    assert.equal(await f.page.locator('#bio-text').inputValue(), 'Perfil sintético de smoke test.');
+    assert.equal(await f.page.locator('#bio-text').getAttribute('placeholder'), 'Contá qué hacés, qué experiencia tenés y en qué proyectos te gustaría participar.');
+    assert.equal(await f.page.locator('#profile-progress-meter').getAttribute('aria-valuenow'), '3', 'A stale instrument cannot complete a non-music role');
+    assert.doesNotMatch(await f.page.locator('#profile-progress').innerText(), /instrumento|tu música|guitarrista/i);
+    const action = f.page.locator('[data-basic="disciplina"] a');
+    assert.equal(await action.locator('span').first().textContent(), category.action);
+    assert.equal(await action.getAttribute('href'), '#' + category.target);
+    await capture(f.page, `deploy-perfil-${category.key}-checklist-320.png`);
+    await action.click();
+    assert.equal(await f.page.locator('#' + category.target).evaluate(el => el === document.activeElement), true);
+    assert.equal(await f.page.locator('#save-bar').evaluate(el => el.classList.contains('visible')), false);
+    assert.equal(await f.page.evaluate(() => innerWidth), 320);
+    assert.ok(await f.page.evaluate(() => document.documentElement.scrollWidth <= 320));
+    assert.deepEqual(f.result.writes, [], 'Reading or following completion guidance cannot save profiles, register accounts or send email');
+    assert.equal(f.result.patches.length, 0);
+    await capture(f.page, `deploy-perfil-${category.key}-campo-320.png`);
+  }
 });
