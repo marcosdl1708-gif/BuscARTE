@@ -278,21 +278,23 @@ function buildEmail(tipo, rawDatos = {}) {
   }
 
   if (tipo === 'perfil_incompleto') {
-    const nombre = clean(datos.nombre, 80) || 'artista';
+    const nombre = typeof datos.nombre === 'string' ? clean(datos.nombre, 80) : '';
     return {
-      subject: 'Tu perfil en buscARTE está casi listo 👀',
+      subject: 'Dale forma a tu perfil en buscARTE',
       html: brandShell(`
-        <h2 style="color:#d4f53c;margin:0 0 16px">Te falta poco para estar en el mapa</h2>
-        <p>Hola <strong>${escapeHtml(nombre)}</strong>, tu perfil en buscARTE está creado pero le faltan algunos datos clave.</p>
-        <p style="color:#888;margin:20px 0 8px">Los perfiles completos reciben <strong style="color:#f2ede4">hasta 3 veces más visitas</strong>. En especial:</p>
-        <ul style="color:#ccc;padding-left:22px;line-height:2">
-          <li>📸 <strong>Foto de perfil</strong> — genera confianza y te hace reconocible</li>
-          <li>🎨 <strong>Especialidad y rubro</strong> — para que te encuentren fácil</li>
-          <li>📍 <strong>Zona</strong> — para conectar con artistas cercanos</li>
-          <li>✍️ <strong>Descripción</strong> — contá quién sos y qué buscás</li>
-        </ul>
-        ${cta('Completar mi perfil →', `${BASE_URL}/buscARTE_perfil.html`)}
-        <p style="color:#555;font-size:12px;margin-top:24px">Si ya completaste tu perfil, ignorá este mail.</p>
+        <div style="font-size:16px;line-height:1.6;overflow-wrap:anywhere;word-wrap:break-word">
+          <h2 style="color:#f2ede4;font-size:28px;line-height:1.2;margin:0 0 24px">Mostrá qué hacés.</h2>
+          <p style="margin:0 0 12px">Hola${nombre ? ` <strong style="word-break:break-word">${escapeHtml(nombre)}</strong>` : ''}.</p>
+          <p style="color:#ccc;margin:0 0 16px">Tu perfil puede contar un poco más sobre vos y tu trabajo. Cuando quieras, sumá:</p>
+          <ul style="color:#ccc;padding-left:22px;margin:0 0 16px">
+            <li style="margin:0 0 12px"><strong style="color:#f2ede4">Una foto</strong> para que te reconozcan.</li>
+            <li><strong style="color:#f2ede4">Una presentación breve</strong>: qué hacés y qué te gustaría compartir o encontrar en buscARTE.</li>
+          </ul>
+          <p style="color:#ccc;margin:0 0 4px">No hace falta completar todo para empezar a usar buscARTE.</p>
+          <a href="${escapeHtml(`${BASE_URL}/buscARTE_login.html?redirect=buscARTE_perfil.html%23completar`)}" style="display:inline-block;max-width:100%;box-sizing:border-box;background:#d4f53c;color:#0a0a0a;padding:14px 20px;line-height:20px;text-align:center;text-decoration:none;font-weight:700;margin:16px 0 0;border-radius:4px">Completar mi perfil</a>
+          <p style="color:#aaa;font-size:14px;line-height:1.6;margin:16px 0 0">Para editar tu perfil, ingresá con el email y la contraseña que elegiste al registrarte.</p>
+          <p style="color:#aaa;font-size:14px;line-height:1.6;margin:24px 0 0">Si ya completaste tu perfil, no necesitás hacer nada.</p>
+        </div>
       `)
     };
   }

@@ -42,8 +42,12 @@ function sliceBetween(text, start, end) {
 }
 
 function withoutWelcome(text) {
-  return normalize(text).replace(sliceBetween(normalize(text),
+  const withoutWelcomeBranch = normalize(text).replace(sliceBetween(normalize(text),
     "  if (tipo === 'bienvenida') {", "  if (tipo === 'mensaje') {"), '<welcome-only>\n');
+  // The separately approved reminder block has its own strict 9b75b23 guard in
+  // recordatorio-perfil.test.cjs, including exact preservation of welcome.
+  return withoutWelcomeBranch.replace(sliceBetween(withoutWelcomeBranch,
+    "  if (tipo === 'perfil_incompleto') {", '  return null;'), '<separately-audited-reminder>\n');
 }
 
 function response(status, body) {
@@ -117,7 +121,7 @@ async function runHandler(options = {}, event = post()) {
   return { ...runtime, result:plain(result), sends:runtime.calls.filter(call => call.method === 'POST') };
 }
 
-test('only welcome branch changes: helpers, classification, env and handler stay identical', () => {
+test('welcome baseline preserves shared contracts; approved reminder branch is audited separately', () => {
   assert.equal(digest(withoutWelcome(source)), digest(withoutWelcome(previousSource)));
 });
 
@@ -150,7 +154,9 @@ const otherFixtures = [
     nuevosMusicos:8, nuevosAnuncios:3, mes:'Mes de prueba',
     proximosEventos:[{ titulo:'Evento sintético <sin público>', fecha:'2099-01-01', lugar:'Lugar & fixture' }] } }
 ];
-for (const type of ['mensaje', 'contacto', 'reset', 'reporte', 'novedades', 'resumen_mensual', 'perfil_incompleto']) {
+// perfil_incompleto now has dedicated baseline/content tests; do not reset this
+// historical welcome baseline or relax checks on any other template.
+for (const type of ['mensaje', 'contacto', 'reset', 'reporte', 'novedades', 'resumen_mensual']) {
   for (const fixture of otherFixtures) test(`${type}: exact baseline output (${fixture.label})`, () => {
     const current = emailRuntime(), previous = emailRuntime(previousSource);
     assert.deepEqual(plain(current.build(type, fixture.data)), plain(previous.build(type, fixture.data)));
