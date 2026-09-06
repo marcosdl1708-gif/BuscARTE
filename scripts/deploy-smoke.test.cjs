@@ -212,11 +212,31 @@ test('deployed home loads its real static assets without activating Auth migrati
   await f.page.waitForFunction(() => !!window.BuscARTEConfig && !!window.BuscARTEAuth && !!window.BuscARTEApi);
   const config = await f.page.evaluate(() => ({ mode: BuscARTEConfig.mode, network: BuscARTEConfig.networkEnabled, consent: MetaAds.getConsent() }));
   assert.deepEqual(config, { mode: 'shadow', network: false, consent: 'denied' });
-  for (const file of ['assets/js/buscarte-config.js', 'assets/js/buscarte-auth.js', 'assets/js/buscarte-api.js', 'assets/vendor/supabase-2.112.3.min.js']) {
+  for (const file of ['assets/js/buscarte-config.js', 'assets/js/buscarte-auth.js', 'assets/js/buscarte-api.js', 'assets/vendor/supabase-2.112.3.min.js', 'assets/js/inicio-sesion.js', 'assets/css/inicio-sesion.css']) {
     assert.ok(f.result.fetched.some(item => item.file === file), `${file} was fetched and hash-checked`);
   }
   await capture(f.page, 'deploy-home.png');
 });
+
+for (const home of ['index.html', 'buscARTE_index.html']) {
+  test(`deployed ${home} gives a known account useful actions instead of signup prompts`, async t => {
+    const f = await setup(t, { logged: true, width: 320 });
+    await f.go('/' + home);
+    await f.page.waitForFunction(() => document.documentElement.dataset.homeSession === 'member' && document.getElementById('hero-nombre').textContent === 'Persona');
+    assert.equal(await f.page.locator('a[href*="buscARTE_registro"]:visible').count(), 0);
+    assert.equal(await f.page.locator('#hero-logueado .home-action:visible').count(), 4);
+    assert.match(await f.page.locator('#hero-mi-perfil').getAttribute('href'), /buscARTE_perfil_publico(?:\.html)?\?id=smoke-fixture-user/);
+    for (const file of ['assets/js/inicio-sesion.js', 'assets/css/inicio-sesion.css']) {
+      assert.ok(f.result.fetched.some(item => item.file === file), `${file} was fetched and hash-checked`);
+    }
+    await f.page.locator('#nav-avatar-btn').click();
+    assert.equal(await f.page.locator('#nav-avatar-btn').getAttribute('aria-expanded'), 'true');
+    await f.page.keyboard.press('Escape');
+    assert.equal(await f.page.locator('#nav-avatar-btn').getAttribute('aria-expanded'), 'false');
+    assert.equal(f.result.posts.length, 0);
+    await capture(f.page, `deploy-${home.replace('.html', '')}-member.png`);
+  });
+}
 
 test('deployed registration serves the captcha controller, exposes loading failure and retries without any signup', async t => {
   const f = await setup(t, { width: 320 });

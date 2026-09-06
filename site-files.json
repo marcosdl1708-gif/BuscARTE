@@ -1,9 +1,11 @@
 [
   ".well-known/assetlinks.json",
   "_redirects",
+  "assets/css/inicio-sesion.css",
   "assets/js/buscarte-api.js",
   "assets/js/buscarte-auth.js",
   "assets/js/buscarte-config.js",
+  "assets/js/inicio-sesion.js",
   "assets/js/meta-pixel.js",
   "assets/js/registro-captcha.js",
   "assets/vendor/supabase-2.112.3.min.js",

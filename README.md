@@ -21,6 +21,7 @@ npm run build
 npm test
 npm run test:registro
 npm run test:anuncios
+npm run test:inicio
 ```
 
 El build también funciona directamente con `node scripts/build-site.mjs`, sin instalar dependencias: copia y verifica archivos, sin consultar servicios remotos. `npm ci` sí es necesario para instalar dependencias de las funciones en un entorno limpio.
@@ -31,7 +32,9 @@ El build también funciona directamente con `node scripts/build-site.mjs`, sin i
 
 `npm run test:anuncios` usa el mismo entorno para verificar publicación mobile, contratos de los cinco tipos de anuncios, fotos, errores y envíos repetidos. Todas las solicitudes se simulan, incluida la RPC de vencimiento que la página ejecuta al cargar: no abrir la página real como una prueba supuestamente de sólo lectura.
 
-`site-files.json` contiene la lista explícita de publicación. El resultado actual es `dist/` (34 archivos incluyendo `_redirects` y el controlador de captcha), sin documentos, campañas, respaldos, `files.zip` ni herramientas internas. No modificar HTML al empaquetar. Un archivo nuevo requiere incorporarlo deliberadamente a esa lista. Si encuentra archivos inesperados en `dist/`, el build se detiene y no los elimina.
+`npm run test:inicio` verifica ambas Home con visitantes y cuentas conocidas, datos de sesión incompletos, retorno por historial, cambio entre pestañas, enlaces al perfil, menú accesible y mensajes tardíos. Usa fixtures aisladas, sin tráfico real de backend ni escrituras de identidad. También comprueba que el modo Auth local no tome la caché legacy como una sesión validada.
+
+`site-files.json` contiene la lista explícita de publicación. El resultado actual es `dist/` (36 archivos incluyendo `_redirects`, el controlador de captcha y los dos assets compartidos del Inicio), sin documentos, campañas, respaldos, `files.zip` ni herramientas internas. No modificar HTML al empaquetar. Un archivo nuevo requiere incorporarlo deliberadamente a esa lista. Si encuentra archivos inesperados en `dist/`, el build se detiene y no los elimina.
 
 Netlify usa `dist/` y `netlify/functions/`. El paquete se validó en preview y se publicó el 5/9/2026 a las 22:09 ART: deploy `6a9cbd37518d43630307438c`. Las cuatro funciones de producción conservan exactamente los binarios anteriores, runtime `nodejs24.x` y sus dos horarios. `NODE_VERSION=20` sigue en la configuración fuente histórica; no se cambió en este bloque y no debe confundirse con el runtime remoto comprobado. Nunca publicar la raíz del repositorio.
 
@@ -46,5 +49,11 @@ Los bloques de captcha y publicación de anuncios están implementados en commit
 Netlify está conectado a `main`: un push normal puede publicar automáticamente. La sincronización de código ya publicado usa un último commit marcado `[skip netlify]` para omitir sólo ese deploy. No se desactivaron builds ni se cambió la configuración remota. Para un próximo cambio funcional, acordar y validar su publicación antes de actualizar `main`; empezar el trabajo en una rama `codex/` desde la base actual.
 
 Los demás bugs siguen pendientes, incluido el enlace general de Marketplace: mejorar el formulario de venta no corrige por sí solo ese recorrido. Mantener separados los cambios visuales, la migración Auth y los cambios de disciplinas/modelo de datos.
+
+## Siguiente bloque preparado — Inicio con sesión
+
+La rama `codex/inicio-sesion-20260905`, desde `ce51224`, mejora sólo el Inicio de las cuentas conocidas. Ambas URLs conservan sus contratos y comparten presentación: saludo, cuatro accesos útiles, exploración por rubro y cierre sin volver a pedir registro. Una caché marcada como registrada pero sin ID ofrece reingresar, no otra alta. El menú y los enlaces personalizados esperan a estar listos antes de poder usarse.
+
+Este bloque todavía es **local, no publicado**: no se hizo push a `main`, preview remota ni deploy de producción. La publicación descrita arriba corresponde a captcha + anuncios. Ver `docs/qa-inicio-20260905.md` para pruebas, capturas y límites. Al aprobar el release, verificar primero la preview y después producción; no confundir los smoke tests contra `dist` local con una verificación de Netlify.
 
 El mapa local y la ubicación del respaldo están en `../BuscARTE-ORGANIZACION.md`.

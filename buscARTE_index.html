@@ -790,6 +790,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="buscARTE">
   <link rel="apple-touch-icon" href="/icons/icon-192.svg">
+<link rel="stylesheet" href="/assets/css/inicio-sesion.css">
+<script src="/assets/js/inicio-sesion.js"></script>
 <script src="/assets/js/meta-pixel.js?v=1" defer></script>
 </head>
 <body>
@@ -806,18 +808,19 @@
     <li><a href="#como-funciona" class="nav-link">Cómo funciona</a></li>
   </ul>
   <div class="nav-right">
-    <div class="nav-guest" id="nav-guest">
+    <div class="nav-guest" id="nav-guest" data-home-guest>
       <a href="buscARTE_login.html" class="btn-ghost">Ingresar</a>
       <a href="buscARTE_registro.html" class="btn-neon">Registrarse</a>
     </div>
-    <div class="nav-user" id="nav-user" style="display:none">
-      <div class="nav-avatar-wrap" onclick="toggleUserMenu()" id="nav-avatar-btn">
+    <a href="buscARTE_login.html" class="btn-ghost" data-home-recover>Ingresar</a>
+    <div class="nav-user" id="nav-user" data-home-member inert>
+      <button type="button" class="nav-avatar-wrap" onclick="toggleUserMenu()" id="nav-avatar-btn" aria-expanded="false" aria-controls="nav-dropdown" aria-label="Abrir menú de mi cuenta">
         <div class="nav-avatar-circle" id="nav-avatar-circle">?</div>
         <span class="nav-avatar-name" id="nav-avatar-name">Mi perfil</span>
         <span class="nav-avatar-chevron">▾</span>
-      </div>
+      </button>
       <div class="nav-dropdown" id="nav-dropdown">
-        <a href="buscARTE_perfil_publico.html" class="nav-dropdown-item">👤 Mi perfil</a>
+        <a href="buscARTE_login.html" class="nav-dropdown-item" data-home-profile inert>👤 Mi perfil</a>
         <a href="buscARTE_perfil.html" class="nav-dropdown-item">⚙️ Configurar perfil</a>
         <a href="buscARTE_mensajes.html" class="nav-dropdown-item">💬 Mensajes <span class="nav-badge" id="nav-msg-badge" style="display:none"></span></a>
         <a href="buscARTE_mis_anuncios.html" class="nav-dropdown-item">📋 Mis anuncios</a>
@@ -834,41 +837,55 @@
 <section class="hero">
   <div class="hero-bg-text">ARTE</div>
 
-  <div class="hero-tag">Red de artistas argentinos</div>
+  <div class="hero-tag" data-home-guest>Red de artistas argentinos</div>
 
-  <h1>
+  <h1 data-home-guest>
     ENCONTRÁ<br>
     TU <span class="accent">LUGAR</span><br>
     EN LA <span class="rojo">ESCENA</span>
   </h1>
 
   <!-- Estado: logueado — full width, fuera del flex row -->
-  <div id="hero-logueado" style="display:none; margin-bottom:2rem;">
-    <p style="color:var(--gris);font-size:.9rem;margin-bottom:1.4rem;letter-spacing:.02em;">
-      Bienvenido de vuelta, <span id="hero-nombre" style="color:var(--blanco);font-weight:500"></span> 👋
-    </p>
-    <div class="hero-quick-nav">
-      <a href="buscARTE_busqueda.html" class="hqn-btn">
-        <span class="hqn-icon">🎵</span>
-        <span class="hqn-label">Músicos</span>
-      </a>
-      <a href="buscARTE_anuncios.html" class="hqn-btn">
-        <span class="hqn-icon">📋</span>
-        <span class="hqn-label">Anuncios</span>
-      </a>
-      <a href="buscARTE_mensajes.html" class="hqn-btn">
-        <span class="hqn-icon">💬</span>
-        <span class="hqn-label">Mensajes</span>
-      </a>
-      <a href="#" class="hqn-btn" id="hero-mi-perfil">
-        <span class="hqn-icon">👤</span>
-        <span class="hqn-label">Mi perfil</span>
-      </a>
+    <div id="hero-logueado" class="home-welcome" data-home-member>
+      <p class="home-eyebrow">Tu espacio en buscARTE</p>
+      <p class="home-greeting">Hola, <span id="hero-nombre">de nuevo</span>.</p>
+      <h1>¿QUÉ ARMAMOS<br><span class="accent">HOY?</span></h1>
+      <p class="home-intro">Buscá gente para tu próximo proyecto o retomá una conversación. Tu próximo encuentro puede empezar acá.</p>
+      <div class="home-actions" aria-label="Accesos rápidos">
+        <a href="buscARTE_busqueda.html" class="home-action home-action-primary">
+          <span class="home-action-top" aria-hidden="true"><span>01 / Explorar</span><span>↗</span></span>
+          <strong>Buscar artistas</strong><small>Encontrá gente por rubro y zona.</small>
+        </a>
+        <a href="buscARTE_anuncios.html" class="home-action">
+          <span class="home-action-top" aria-hidden="true"><span>02 / Conectar</span><span>↗</span></span>
+          <strong>Ver anuncios</strong><small>Buscá oportunidades o publicá la tuya.</small>
+        </a>
+        <a href="buscARTE_mensajes.html" class="home-action">
+          <span class="home-action-top" aria-hidden="true"><span>03 / Conversar</span><span>↗</span></span>
+          <strong>Mis mensajes</strong><small>Seguí donde quedó la charla.</small>
+        </a>
+        <a href="buscARTE_login.html" class="home-action" id="hero-mi-perfil" data-home-profile inert>
+          <span class="home-action-top" aria-hidden="true"><span>04 / Mi espacio</span><span>↗</span></span>
+          <strong>Ver mi perfil</strong><small>Mirá cómo te ve la comunidad.</small>
+        </a>
+        <div class="home-action home-profile-loading" role="status">
+          <span class="home-action-top" aria-hidden="true"><span>04 / Mi espacio</span></span>
+          <strong>Cargando tu perfil</strong><small>Estamos preparando tu acceso.</small>
+        </div>
+      </div>
     </div>
-  </div>
+    <div id="hero-recuperar" class="home-recovery" data-home-recover>
+      <p class="home-eyebrow">Tu espacio en buscARTE</p>
+      <h1>VOLVÉ A<br><span class="accent">TU ESPACIO.</span></h1>
+      <p class="home-intro">No pudimos recuperar todos los datos de tu sesión. Volvé a ingresar para acceder a tu cuenta; no hace falta registrarte otra vez.</p>
+      <div class="home-recovery-actions">
+        <a href="buscARTE_login.html" class="btn-neon">Volver a ingresar</a>
+        <a href="buscARTE_busqueda.html" class="btn-ghost">Seguir explorando</a>
+      </div>
+    </div>
 
   <!-- Estado: no logueado -->
-  <div class="hero-bottom" id="hero-invitado-wrap">
+  <div class="hero-bottom" id="hero-invitado-wrap" data-home-guest>
     <p class="hero-desc">
       La plataforma para que <strong>músicos, artistas y creativos</strong> de toda Argentina se encuentren, conecten y construyan proyectos juntos.
     </p>
@@ -1106,15 +1123,19 @@
 <!-- CTA FINAL -->
 <section class="cta-section reveal">
   <div class="cta-bg"></div>
-  <span class="cta-label">¿Listo para empezar?</span>
-  <div class="cta-title">
+  <span class="cta-label" data-home-guest>¿Listo para empezar?</span>
+  <div class="cta-title" data-home-guest>
     SUMATE A<br>
     LA <span class="accent">ESCENA</span>
   </div>
-  <p class="cta-sub">Gratis para siempre en el plan base. Sin excusas para no encontrar a los músicos que buscás.</p>
+  <p class="cta-sub" data-home-guest>Gratis para siempre en el plan base. Sin excusas para no encontrar a los músicos que buscás.</p>
+  <span class="cta-label" data-home-known>Del próximo encuentro puede salir algo grande</span>
+  <div class="cta-title" data-home-known>HAY GENTE PARA<br>TU <span class="accent">PRÓXIMA IDEA.</span></div>
+  <p class="cta-sub" data-home-known>Explorá la comunidad y encontrá con quién darle forma.</p>
   <div class="cta-domain">www.<span>buscarte</span>.com.ar</div>
   <br>
-  <a href="buscARTE_registro.html" class="btn-neon" style="font-size: 1rem; padding: 1rem 3rem;">Crear perfil gratis →</a>
+  <a href="buscARTE_registro.html" class="btn-neon" style="font-size: 1rem; padding: 1rem 3rem;" data-home-guest>Crear perfil gratis →</a>
+  <div data-home-known><a href="buscARTE_busqueda.html" class="btn-neon" style="font-size:1rem;padding:1rem 2rem">Buscar artistas →</a></div>
 </section>
 
 <!-- FOOTER -->
@@ -1156,39 +1177,17 @@
     });
   }, { threshold: 0.1 });
   reveals.forEach(el => observer.observe(el));
-  // NAV SESSION
-  (function initNav(){
-    const l=localStorage.getItem('ba_logged')==='1';
-    const n=localStorage.getItem('ba_name')||'Mi perfil';
-    const uid=localStorage.getItem('ba_user_id')||'';
-    const i=n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-    if(l){
-      const g=document.getElementById('nav-guest');
-      const u=document.getElementById('nav-user');
-      if(g)g.style.display='none';
-      if(u)u.style.display='flex';
-      const c=document.getElementById('nav-avatar-circle');
-      if(c)c.textContent=i;
-      const nm=document.getElementById('nav-avatar-name');
-      if(nm)nm.textContent=n.split(' ')[0];
-      cargarBadgeMensajes(uid);
-      // Fix Mi perfil link with real user ID
-      const miPerfilLink=document.querySelector('.nav-dropdown-item[href*="perfil_publico"]');
-      if(miPerfilLink && uid) miPerfilLink.href='buscARTE_perfil_publico.html?id='+uid;
-      // Hero logueado: mostrar accesos rápidos
-      const inv = document.getElementById('hero-invitado-wrap');
-      const log = document.getElementById('hero-logueado');
-      if(inv) inv.style.display = 'none';
-      if(log) log.style.display = 'block';
-      const hn = document.getElementById('hero-nombre');
-      if(hn) hn.textContent = n.split(' ')[0];
-      const hmp = document.getElementById('hero-mi-perfil');
-      if(hmp && uid) hmp.href = 'buscARTE_perfil_publico.html?id=' + uid;
-    }
-  })();
-  function toggleUserMenu(){const w=document.getElementById('nav-avatar-btn');const d=document.getElementById('nav-dropdown');if(w)w.classList.toggle('open');if(d)d.classList.toggle('open');}
-  document.addEventListener('click',e=>{if(!e.target.closest('#nav-user')){document.getElementById('nav-avatar-btn')?.classList.remove('open');document.getElementById('nav-dropdown')?.classList.remove('open');}});
-  function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');window.location.href='index.html';}
+  // NAV SESSION: esta URL conserva su contrato legacy, sin activar Auth.
+  let badgeRequest = 0;
+  window.BuscARTEInicio?.init({ onIdentity: cargarBadgeMensajes });
+  function toggleUserMenu() { window.BuscARTEInicio?.toggleMenu(); }
+  function logout() {
+    try {
+      localStorage.removeItem('ba_logged'); localStorage.removeItem('ba_name'); localStorage.removeItem('ba_user_id');
+    } catch (_) {}
+    window.BuscARTEInicio?.refresh();
+    window.location.href = 'index.html';
+  }
 
   // BUSCADOR DEL INDEX
   function buscarDesdeIndex() {
@@ -1236,16 +1235,19 @@
   cargarStatsIndex()
 
   async function cargarBadgeMensajes(uid) {
+    const request = ++badgeRequest;
     const badge = document.getElementById('nav-msg-badge');
+    if (badge) { badge.textContent = ''; badge.style.display = 'none'; }
     if (!badge || !uid) return;
     try {
       const lastSeen = localStorage.getItem('ba_msg_last_seen') ||
         new Date().toISOString();
       const res = await fetch(
-        `https://xiaanchoanxmampegoay.supabase.co/rest/v1/mensajes?para_user_id=eq.${uid}&created_at=gt.${lastSeen}&select=id&limit=99`,
+        `https://xiaanchoanxmampegoay.supabase.co/rest/v1/mensajes?para_user_id=eq.${encodeURIComponent(uid)}&created_at=gt.${encodeURIComponent(lastSeen)}&select=id&limit=99`,
         { headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68', 'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68` } }
       );
       const msgs = await res.json();
+      if (request !== badgeRequest) return;
       const count = Array.isArray(msgs) ? msgs.length : 0;
       if (count > 0) {
         badge.textContent = count > 99 ? '99+' : count;
@@ -1253,7 +1255,7 @@
       } else {
         badge.style.display = 'none';
       }
-    } catch(e) { badge.style.display = 'none'; }
+    } catch(e) { if (request === badgeRequest) badge.style.display = 'none'; }
   }
 </script>
 <script>

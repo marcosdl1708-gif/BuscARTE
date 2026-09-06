@@ -1,6 +1,6 @@
 // ⚠️ IMPORTANTE: subí este número en CADA deploy (v3 → v4 → v5...).
 // Si no lo cambiás, el navegador puede seguir sirviendo los archivos viejos cacheados.
-const CACHE_VERSION = 'buscarte-v9-2026-09-05-anuncios-mobile';
+const CACHE_VERSION = 'buscarte-v10-2026-09-05-inicio-sesion';
 const OFFLINE_URL = '/index.html';
 
 const SHELL = [
@@ -21,6 +21,8 @@ const SHELL = [
   '/assets/js/buscarte-auth.js',
   '/assets/js/buscarte-api.js',
   '/assets/js/registro-captcha.js',
+  '/assets/js/inicio-sesion.js',
+  '/assets/css/inicio-sesion.css',
   '/manifest.json',
   '/icons/icon-192.png',
   '/icons/icon-512.png'
