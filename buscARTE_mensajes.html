@@ -88,14 +88,19 @@
 
   .chat-panel { display:flex;flex-direction:column;overflow:hidden;background:var(--negro); }
   .mobile-chat-back { display:none; }
-  .chat-header { padding:1rem 1.8rem;border-bottom:1px solid #1c1c1c;display:none;align-items:center;gap:1rem;flex-shrink:0;background:var(--negro); }
-  .chat-header-avatar { width:42px;height:42px;font-size:.86rem; }
+  .chat-header { padding:1rem 1.8rem;border-bottom:1px solid #1c1c1c;display:none;align-items:center;flex-wrap:wrap;gap:1rem;flex-shrink:0;background:var(--negro); }
+  .chat-persona { display:flex;align-items:center;gap:.75rem;flex:1 1 180px;min-width:0;min-height:44px;color:var(--blanco);text-decoration:none; }
+  .chat-persona[href]:hover .chat-header-name { color:var(--neon);text-decoration:underline;text-underline-offset:.2em; }
+  .chat-persona:focus-visible, .chat-profile-btn:focus-visible { outline:2px solid var(--neon);outline-offset:4px; }
+  .chat-header-avatar { width:44px;height:44px;font-size:.86rem; }
   .chat-header-info { flex:1;min-width:0; }
-  .chat-header-name { font-weight:500;font-size:.95rem;margin-bottom:.12rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
-  .chat-header-meta { font-size:.72rem;color:var(--gris);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
-  .chat-header-actions { display:flex;gap:.6rem; }
+  .chat-header-name { display:block;font-weight:500;font-size:.95rem;margin-bottom:.12rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+  .chat-header-meta { display:block;font-size:.72rem;color:var(--gris);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+  .chat-header-actions { display:flex;align-items:center;gap:.6rem;flex-shrink:0;margin-left:auto; }
   .chat-action-btn { background:transparent;border:1px solid var(--gris3);color:var(--gris);padding:.42rem .85rem;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;cursor:none;transition:all .2s;font-family:var(--font-body);text-decoration:none;display:inline-block;white-space:nowrap; }
   .chat-action-btn:hover { border-color:var(--blanco);color:var(--blanco); }
+  .chat-profile-btn { min-height:44px;display:inline-flex;align-items:center;color:var(--neon);border-color:rgba(212,245,60,.35); }
+  .chat-profile-btn[hidden] { display:none; }
   .chat-context-bar { padding:.65rem 1.8rem;background:rgba(212,245,60,.035);border-bottom:1px solid rgba(212,245,60,.1);display:none;align-items:center;gap:.8rem;flex-shrink:0; }
   .chat-context-label { font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--neon);flex-shrink:0; }
   .chat-context-text { font-size:.75rem;color:var(--gris);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
@@ -179,14 +184,15 @@
     .chat-panel { position:fixed !important;top:56px;left:0;right:0;bottom:54px;z-index:300 !important;display:none !important;flex-direction:column !important;background:var(--negro) !important; }
     .chat-panel.mobile-visible { display:flex !important; }
     .mobile-chat-back { display:flex !important; align-items:center; gap:.5rem;padding:.65rem 1rem; background:rgba(8,8,8,.98);border-bottom:1px solid #1c1c1c;color:var(--neon);font-family:var(--font-body);font-size:.82rem;cursor:auto;width:100%;text-align:left;border:none;flex-shrink:0; }
-    .chat-header { padding:.75rem 1rem !important; }
+    .chat-header { padding:.75rem 1rem !important;gap:.75rem; }
+    .chat-persona { flex-basis:0; }
     .chat-context-bar { padding:.45rem 1rem !important; }
     .chat-messages { padding:1rem !important; }
     .chat-input-area { padding:.65rem 1rem !important; }
     .quick-replies { overflow-x:auto; flex-wrap:nowrap; padding-bottom:.2rem; }
     .quick-reply-label { flex:0 0 100%; }
     .msg { max-width:88% !important; }
-    .chat-header-actions .chat-action-btn:not(:first-child) { display:none; }
+    .chat-header-actions .soft, .chat-header-actions .chat-toolbar-pill { display:none; }
     .chat-input-hint { font-size:.6rem; }
   }
 </style>
@@ -260,16 +266,18 @@
   <section class="chat-panel" id="chat-panel">
     <button class="mobile-chat-back" onclick="closeMobileChat()">← Conversaciones</button>
     <header class="chat-header" id="chat-header">
-      <div class="chat-header-avatar" id="chat-header-avatar">?</div>
-      <div class="chat-header-info">
-        <div class="chat-header-name" id="chat-header-name">—</div>
-        <div class="chat-header-meta" id="chat-header-meta">—</div>
-      </div>
+      <a class="chat-persona" id="chat-persona" aria-disabled="true">
+        <span class="chat-header-avatar" id="chat-header-avatar" aria-hidden="true">?</span>
+        <span class="chat-header-info">
+          <span class="chat-header-name" id="chat-header-name">—</span>
+          <span class="chat-header-meta" id="chat-header-meta">—</span>
+        </span>
+      </a>
       <div class="chat-header-actions">
         <span class="chat-toolbar-pill" id="chat-status-pill">Activo</span>
         <button type="button" class="chat-action-btn soft" onclick="cargarMensajes(true)">Actualizar</button>
         <button type="button" class="chat-action-btn soft" onclick="reportarConversacion()">Reportar</button>
-        <a href="#" id="chat-ver-perfil" class="chat-action-btn">Ver perfil →</a>
+        <a id="chat-ver-perfil" class="chat-action-btn chat-profile-btn" hidden>Ver perfil →</a>
       </div>
     </header>
     <div class="chat-context-bar" id="chat-context-bar">
@@ -528,14 +536,16 @@
 
   function decorateConv(conv) {
     const otroId = String(conv.user1_id) === String(miUserId) ? conv.user2_id : conv.user1_id;
-    const perfil = perfilesPorId[String(otroId)] || { id: otroId, nombre:'Usuario eliminado', instrumento:'Artista' };
+    const perfilDisponible = !!perfilesPorId[String(otroId)];
+    const perfil = perfilesPorId[String(otroId)] || { id: otroId, nombre:'Perfil no disponible' };
     const anuncio = conv.anuncio_id ? anunciosPorId[String(conv.anuncio_id)] : null;
     return {
       ...conv,
       otroId,
       perfil,
+      perfilDisponible,
       nombre: perfil.nombre || 'Usuario',
-      meta: `${perfil.instrumento || 'Artista'}${perfil.ciudad ? ' · ' + perfil.ciudad : ''}`,
+      meta: perfilDisponible ? `${perfil.instrumento || 'Artista'}${perfil.ciudad ? ' · ' + perfil.ciudad : ''}` : 'Conversación existente',
       preview: conv.ultimo_mensaje || 'Nueva conversación',
       contexto: anuncio ? `📋 ${anuncio.titulo || 'Anuncio'}` : '👤 Perfil directo',
       unreadCount: unreadByUserId[String(otroId)] || 0
@@ -553,6 +563,31 @@
     const conv = conversaciones.find(c => String(c.id) === String(id));
     if (!conv) return;
     abrirConv(decorateConv(conv));
+  }
+
+  function actualizarEnlacePerfil(conv) {
+    const persona = document.getElementById('chat-persona');
+    const boton = document.getElementById('chat-ver-perfil');
+    let href = '';
+    const id = String(conv.otroId ?? '').trim();
+    // This is a navigation affordance, not an authorization check. Demo IDs and
+    // absent profiles must never become links to unrelated real accounts.
+    if (!PREVIEW_MODE && conv.perfilDisponible && id && !['null', 'undefined'].includes(id) && id !== String(miUserId)) {
+      try { href = 'buscARTE_perfil_publico.html?id=' + encodeURIComponent(id); } catch (_) {}
+    }
+    for (const link of [persona, boton]) {
+      if (href) {
+        link.href = href;
+        link.removeAttribute('aria-disabled');
+        link.setAttribute('aria-label', 'Ver perfil de ' + (conv.nombre || 'esta persona'));
+      } else {
+        link.removeAttribute('href');
+        link.setAttribute('aria-disabled', 'true');
+        link.removeAttribute('aria-label');
+      }
+    }
+    boton.hidden = !href;
+    if (PREVIEW_MODE) document.getElementById('chat-header-meta').textContent = 'Conversación de demostración';
   }
 
   async function abrirConv(conv) {
@@ -577,7 +612,7 @@
     }
     document.getElementById('chat-header-name').textContent = conv.nombre;
     document.getElementById('chat-header-meta').textContent = conv.meta;
-    document.getElementById('chat-ver-perfil').href = 'buscARTE_perfil_publico.html?id=' + encodeURIComponent(conv.otroId);
+    actualizarEnlacePerfil(conv);
 
     const ctxBar = document.getElementById('chat-context-bar');
     const ctxText = document.getElementById('chat-context-text');
@@ -600,10 +635,13 @@
       try { localStorage.setItem('ba_msg_read_by_user', JSON.stringify(readByUser)); } catch(_) {}
     }
     ultimaFirmaMsgs = '';  // forzar render al cambiar de conversación
+    document.getElementById('chat-messages').innerHTML = '<div class="chat-empty"><p class="chat-empty-sub">Cargando mensajes...</p></div>';
     renderConversaciones();
-    await cargarMensajes(true);
-    document.getElementById('chat-input').focus();
+    // Keep Back-to-chat correct even if the profile is opened before messages load.
     history.replaceState(null, '', 'buscARTE_mensajes.html?conv=' + encodeURIComponent(conv.id));
+    await cargarMensajes(true);
+    if (convActiva !== conv) return;
+    document.getElementById('chat-input').focus();
 
     if (pollingInterval) clearInterval(pollingInterval);
     pollingInterval = setInterval(() => cargarMensajes(false), 6000);
@@ -611,6 +649,7 @@
 
   async function cargarMensajes(forceScroll) {
     if (!convActiva) return;
+    const conversacionConsultada = convActiva;
     const container = document.getElementById('chat-messages');
     if (PREVIEW_MODE && window.demoMensajes) {
       const msgs = window.demoMensajes[String(convActiva.id)] || [];
@@ -622,9 +661,10 @@
     const prevScrollHeight = container.scrollHeight;
     const prevScrollTop = container.scrollTop;
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/mensajes?or=(and(de_user_id.eq.${filterValue(miUserId)},para_user_id.eq.${filterValue(convActiva.otroId)}),and(de_user_id.eq.${filterValue(convActiva.otroId)},para_user_id.eq.${filterValue(miUserId)}))&order=created_at.asc`, { headers });
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/mensajes?or=(and(de_user_id.eq.${filterValue(miUserId)},para_user_id.eq.${filterValue(conversacionConsultada.otroId)}),and(de_user_id.eq.${filterValue(conversacionConsultada.otroId)},para_user_id.eq.${filterValue(miUserId)}))&order=created_at.asc`, { headers });
       if (!res.ok) throw new Error('mensajes ' + res.status + ': ' + await res.text());
       const msgs = await res.json();
+      if (convActiva !== conversacionConsultada) return;
       // Si nada cambió (polling), no re-renderizamos: así no se rompe tu posición de scroll.
       const ultimo = msgs.length ? msgs[msgs.length - 1] : null;
       const firma = msgs.length + '|' + (ultimo ? (ultimo.id + '|' + ultimo.created_at) : '');
@@ -647,6 +687,7 @@
         try { localStorage.setItem('ba_msg_read_by_user', JSON.stringify(readByUser)); } catch(_) {}
       }
     } catch(e) {
+      if (convActiva !== conversacionConsultada) return;
       console.error('Error cargando mensajes:', e);
       container.innerHTML = `<div class="chat-empty"><span class="chat-empty-icon">⚠️</span><div class="chat-empty-title">No se pudieron cargar los mensajes</div><p class="chat-empty-sub">Revisá tu conexión e intentá de nuevo.</p></div>`;
     }
