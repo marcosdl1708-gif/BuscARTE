@@ -2,6 +2,17 @@
 
 Este seguimiento separa implementación web, validación física y resultados de uso. No reabre automáticamente bloques postergados.
 
+## Decisiones posteriores del usuario — auditoría de correo primero
+
+- Antes de avanzar con bienvenida/engagement, consultar Resend para entender el estado real de envíos, entregas, errores y configuración; contrastarlo con código. Esta consulta es de sólo lectura: no autoriza envíos, campañas, deploys ni cambios de configuración.
+- Roles técnicos: evaluar primero su inclusión como **especialidades/subrubros de rubros existentes**, no como un rubro nuevo. Revisar compatibilidad de campos/filtros antes de proponer cambios.
+- **Identidad visual/editorial postergada** por ahora. No retomarla automáticamente después de los mails.
+- **Validación física al cierre del trabajo acordado**: entregar al usuario un paso a paso único desde una cuenta nueva, con resultados esperados y puntos de control de registro/captcha, bienvenida, exploración, perfil/foto/guardado, anuncios, Marketplace y chat. El usuario hará esa pasada en el teléfono/app; esta decisión no autoriza crear cuentas ni contactar personas reales desde pruebas automáticas.
+
+Estas decisiones prevalecen sobre el orden propuesto anteriormente. Multirrubro/principal sigue postergado.
+
+**Auditoría Resend ya realizada**: se comprobaron envíos reales de bienvenida, recordatorios, resumen y mensajes; no se enviaron pruebas ni se alteró el servicio. Ver `auditoria-correos-20260906.md` para las mejoras propuestas y límites. La bienvenida nueva continúa sin publicar.
+
 ## Correcciones y mejoras web publicadas
 
 - Captcha visible/recuperable y publicación de anuncios alcanzable en móvil: `release-20260905.md`.
@@ -19,9 +30,9 @@ Preparado después del deploy v16 en `2d0f65d`: sólo texto/diseño/enlaces de b
 ## Feedback que queda, además de multirrubro
 
 1. **Engagement completo**: avisos/emails por pendientes reales del perfil, foto, disciplinas, regreso y mensajes/contactos. El checklist web ya existe y hay correos de mensajes, pero los recordatorios actuales sólo consideran foto/bio. Antes de ampliar: revisar roles elegibles, bajas, frecuencia, deduplicación, seguridad y métricas; no activar campañas con la base registrada por defecto. Retirar o respaldar afirmaciones como «hasta 3 veces más visitas» en un bloque de revisión de esa plantilla.
-2. **Roles técnicos**: evaluar FOH, monitores, iluminación, stage y stage manager, más experiencia, tipo/tamaño de venue y responsabilidades. Las categorías genéricas actuales no equivalen a todo ese pedido. A1/B1 es una referencia a investigar, no una clasificación aprobada. Diseñar impacto en campos/filtros antes de implementarlo.
-3. **Identidad visual/editorial más humana**: el Inicio mejoró, pero no es un rediseño integral ni una renovación de Instagram. Quedan personas/artistas reales, proyectos, backstage, historias y casos de uso con material y permisos disponibles. No reemplazar esa necesidad con testimonios o personas inventados.
-4. **Validación en uso**: app/dispositivo físico y recorridos reales autorizados; luego medir dónde se abandona, qué datos/fotos se completan y si la gente llega a buscar/publicar/contactar. No declarar impacto a partir de tests sintéticos.
+2. **Roles técnicos dentro de rubros existentes**: evaluar FOH, monitores, iluminación, stage y stage manager como especialidades/subrubros, no crear un rubro nuevo por defecto. Experiencia, tipo/tamaño de venue y responsabilidades requieren diseño propio. A1/B1 sigue siendo una referencia a investigar, no una clasificación aprobada. Revisar impacto en campos/filtros antes de implementar.
+3. **Identidad visual/editorial más humana — postergada**: el Inicio mejoró, pero no es un rediseño integral ni una renovación de Instagram. Material real, historias y casos de uso quedan para más adelante, con permisos disponibles.
+4. **Validación en uso — guía al cierre**: entregar un recorrido único de usuario nuevo para que el usuario pruebe en teléfono/app. Después se podrá medir abandono, completitud y llegada a buscar/publicar/contactar. No declarar impacto a partir de tests sintéticos.
 
 ## Postergado por decisión explícita
 
