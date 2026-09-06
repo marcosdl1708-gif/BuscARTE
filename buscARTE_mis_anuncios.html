@@ -451,11 +451,22 @@
   </div>
 </div>
 
+<script src="/assets/vendor/supabase-2.112.3.min.js"></script>
+<script src="/assets/js/buscarte-config.js"></script>
+<script src="/assets/js/buscarte-auth.js"></script>
+<script src="/assets/js/buscarte-api.js"></script>
 <script>
+  function authRuntimeEnabled() {
+    return window.BuscARTEConfig?.isLocalRuntime === true &&
+      window.BuscARTEConfig?.mode === 'auth' &&
+      window.BuscARTEConfig?.networkEnabled === true;
+  }
+  const AUTH_RUNTIME = authRuntimeEnabled();
+
   // PROTECCIÓN: esta página es privada porque gestiona anuncios propios.
   (function() {
     try {
-      if (localStorage.getItem('ba_logged') !== '1') {
+      if (!AUTH_RUNTIME && localStorage.getItem('ba_logged') !== '1') {
         window.location.replace('buscARTE_login.html');
       }
     } catch(e) {}
@@ -483,7 +494,7 @@
   const SUPABASE_URL = 'https://xiaanchoanxmampegoay.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68';
   const hdrs = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' };
-  const miId = localStorage.getItem('ba_user_id');
+  let miId = AUTH_RUNTIME ? null : localStorage.getItem('ba_user_id');
 
   const BADGES = { busco:'badge-busco', ofrezco:'badge-ofrezco', jam:'badge-jam', vende:'badge-vendo', vendo:'badge-vendo', clases:'badge-clases' };
   const LABELS = { busco:'🔍 Busco artista', ofrezco:'🙋 Me ofrezco', jam:'📅 Jam / Evento', vende:'🎛️ Vendo / Alquilo', vendo:'🎛️ Vendo / Alquilo', clases:'🎓 Doy clases' };
@@ -538,12 +549,14 @@
   }
 
   function hideIdLocally(id) {
+    if (AUTH_RUNTIME) return;
     const ids = new Set(getHiddenIds());
     ids.add(String(id));
     localStorage.setItem('ba_hidden_anuncios', JSON.stringify([...ids]));
   }
 
   function unhideIdLocally(id) {
+    if (AUTH_RUNTIME) return;
     const ids = getHiddenIds().filter(x => x !== String(id));
     localStorage.setItem('ba_hidden_anuncios', JSON.stringify(ids));
   }
@@ -616,6 +629,16 @@
 
   async function fetchAllMisAnuncios() {
     if (!miId) return [];
+    if (AUTH_RUNTIME) {
+      const rows = [];
+      let offset = 0;
+      while (true) {
+        const page = await window.BuscARTEApi.ownAds.list({ limit: 200, offset });
+        rows.push(...page.rows);
+        if (page.rows.length < 200) return rows;
+        offset += page.rows.length;
+      }
+    }
     const query = `${SUPABASE_URL}/rest/v1/anuncios?user_id=eq.${enc(miId)}&order=created_at.desc`;
     const res = await fetch(query, { headers: hdrs });
     if (!res.ok) {
@@ -635,10 +658,14 @@
   }
 
   function visibleForStats(a) {
-    return !isOculto(a) && estadoNorm(a.estado) !== 'eliminado' && !getHiddenIds().includes(String(a.id));
+    return !isOculto(a) && estadoNorm(a.estado) !== 'eliminado' &&
+      (AUTH_RUNTIME || !getHiddenIds().includes(String(a.id)));
   }
 
   async function gestionarAnuncioRPC(id, accion) {
+    if (AUTH_RUNTIME) {
+      return window.BuscARTEApi.ownAds.manage(id, accion);
+    }
     const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/gestionar_anuncio`, {
       method: 'POST',
       headers: { ...hdrs, 'Prefer': 'return=representation' },
@@ -705,7 +732,7 @@
 
     try {
       const anuncios = await fetchAllMisAnuncios();
-      await syncHiddenDeletes(anuncios);
+      if (!AUTH_RUNTIME) await syncHiddenDeletes(anuncios);
       updateStats(anuncios);
       const visibles = applyVisibleFilter(anuncios);
 
@@ -735,7 +762,10 @@
     btn.textContent = 'Guardando...';
     btn.disabled = true;
     try {
-      const accion = nuevoEstado === 'activo' ? 'reactivar' : 'pausar';
+      const estadoActual = btn.closest('.mi-anuncio')?.dataset.estado;
+      const accion = nuevoEstado === 'activo'
+        ? (AUTH_RUNTIME && estadoActual === 'vencido' ? 'republicar' : 'reactivar')
+        : 'pausar';
       await gestionarAnuncioRPC(id, accion);
       if (nuevoEstado === 'activo') unhideIdLocally(id);
       showToast(nuevoEstado === 'activo' ? 'Anuncio reactivado.' : 'Anuncio pausado.');
@@ -753,6 +783,7 @@
   }
 
   async function syncHiddenDeletes(anuncios) {
+    if (AUTH_RUNTIME) return;
     // Migra intentos de eliminado del hotfix anterior: si quedó oculto local pero activo en base,
     // ahora lo manda a la RPC real de Supabase.
     const hidden = getHiddenIds();
@@ -794,7 +825,12 @@
       setTimeout(() => { closeDeleteModal(); cargarMisAnuncios(); }, 240);
     } catch(e) {
       console.error(e);
-      showToast('No se pudo eliminar. Falta crear/autorizar la RPC gestionar_anuncio en Supabase.', 'err');
+      showToast(
+        AUTH_RUNTIME
+          ? 'No se pudo eliminar el anuncio. Revisá tu sesión e intentá de nuevo.'
+          : 'No se pudo eliminar. Falta crear/autorizar la RPC gestionar_anuncio en Supabase.',
+        'err'
+      );
       if (btn) { btn.textContent = oldText || 'Sí, eliminar'; btn.disabled = false; }
     }
   }
@@ -848,7 +884,7 @@
   }
 
   // NAV SESSION
-  (function initNav(){
+  if (!AUTH_RUNTIME) (function initNav(){
     const l = localStorage.getItem('ba_logged') === '1';
     const n = localStorage.getItem('ba_name') || 'Mi perfil';
     const uid = localStorage.getItem('ba_user_id') || '';
@@ -884,13 +920,70 @@
     }
   });
   function logout(){
+    if (AUTH_RUNTIME) {
+      window.BuscARTEAuth.signOut({ scope: 'local' })
+        .catch(error => console.error('No se pudo cerrar la sesión Auth:', error))
+        .finally(() => { window.location.href='index.html'; });
+      return;
+    }
     localStorage.removeItem('ba_logged');
     localStorage.removeItem('ba_name');
     localStorage.removeItem('ba_user_id');
     window.location.href='index.html';
   }
 
-  cargarMisAnuncios();
+  function renderAuthSession(state) {
+    miId = String(state.profileId);
+    const n = state.profile?.nombre || 'Mi perfil';
+    const initials = n.split(' ').filter(Boolean).map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
+    const g = document.getElementById('nav-guest');
+    const u = document.getElementById('nav-user');
+    if (g) g.style.display = 'none';
+    if (u) u.style.display = 'flex';
+    const c = document.getElementById('nav-avatar-circle');
+    if (c) c.textContent = initials;
+    const nm = document.getElementById('nav-avatar-name');
+    if (nm) nm.textContent = n.split(' ')[0];
+    const profileUrl = 'buscARTE_perfil_publico.html?id=' + enc(miId);
+    const miPerfilLink = document.querySelector('.nav-dropdown-item[href*="perfil_publico"]');
+    if (miPerfilLink) miPerfilLink.href = profileUrl;
+    const mobileProfileLink = document.getElementById('mbnp-perfil');
+    if (mobileProfileLink) mobileProfileLink.href = profileUrl;
+  }
+
+  function redirectToAuthLogin() {
+    const target = encodeURIComponent('buscARTE_mis_anuncios.html');
+    window.location.replace('buscARTE_login.html?redirect=' + target);
+  }
+
+  async function inicializarMisAnuncios() {
+    if (!AUTH_RUNTIME) {
+      await cargarMisAnuncios();
+      return;
+    }
+
+    try {
+      const state = await window.BuscARTEAuth.ready;
+      if (!state.authenticated || !state.profileId) {
+        redirectToAuthLogin();
+        return;
+      }
+      renderAuthSession(state);
+      await cargarMisAnuncios();
+    } catch (error) {
+      console.error('No se pudo validar la sesión Auth:', error);
+      redirectToAuthLogin();
+    }
+  }
+
+  if (AUTH_RUNTIME) {
+    window.addEventListener('buscarte:authchange', event => {
+      const state = event.detail;
+      if (state?.authenticated && state?.profileId) renderAuthSession(state);
+      else if (state?.status === 'anonymous') redirectToAuthLogin();
+    });
+  }
+  inicializarMisAnuncios();
 </script>
 <div class="mbn-overlay" id="mbn-overlay" onclick="closeMbnPanel()"></div>
 <div class="mbn-panel" id="mbn-panel">
@@ -919,7 +1012,11 @@
 </nav>
 <script>
 (function(){
-  var uid = localStorage.getItem('ba_user_id');
+  var authMode = window.BuscARTEConfig?.isLocalRuntime === true && window.BuscARTEConfig?.mode === 'auth' && window.BuscARTEConfig?.networkEnabled === true;
+  var authState = authMode ? window.BuscARTEAuth?.getState() : null;
+  var uid = authMode
+    ? (authState?.authenticated ? authState.profileId : '')
+    : localStorage.getItem('ba_user_id');
   var el = document.getElementById('mbnp-perfil');
   if(el && uid) el.href = 'buscARTE_perfil_publico.html?id='+uid;
   else if(el) el.href = 'buscARTE_login.html';
@@ -937,6 +1034,13 @@ function closeMbnPanel(){
   document.getElementById('mbn-overlay').classList.remove('open');
 }
 function mbnLogout(){
+  var authMode = window.BuscARTEConfig?.isLocalRuntime === true && window.BuscARTEConfig?.mode === 'auth' && window.BuscARTEConfig?.networkEnabled === true;
+  if (authMode) {
+    window.BuscARTEAuth.signOut({ scope: 'local' })
+      .catch(function(error) { console.error('No se pudo cerrar la sesión Auth:', error); })
+      .finally(function() { window.location.href='index.html'; });
+    return;
+  }
   localStorage.removeItem('ba_logged');
   localStorage.removeItem('ba_name');
   localStorage.removeItem('ba_user_id');

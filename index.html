@@ -245,10 +245,13 @@ footer { border-top:1px solid #1c1c1c;padding:2.5rem 3rem;display:flex;justify-c
   html,body { overflow-x:hidden !important; }
   .cursor,.cursor-ring { display:none !important; }
   body { cursor:auto !important; }
-  nav { padding:.75rem 1rem !important; }
+  nav { padding:.75rem 1rem !important;gap:.5rem !important; }
   .nav-links { display:none !important; }
-  .btn-ghost { padding:.45rem .9rem !important;font-size:.72rem !important; }
-  .btn-neon { padding:.45rem .9rem !important;font-size:.72rem !important; }
+  .nav-logo { flex:0 0 auto;font-size:1.25rem !important; }
+  .nav-right { min-width:0;flex:0 1 auto; }
+  .nav-guest { display:flex;align-items:center;gap:.35rem; }
+  .nav-guest .btn-ghost,
+  .nav-guest .btn-neon { padding:.45rem .55rem !important;font-size:.66rem !important;letter-spacing:.025em !important;white-space:nowrap; }
   .hero-product { min-height:auto !important;padding-top:6rem !important;padding-bottom:2.5rem !important; }
   .hero-bg-text { display:none !important; }
   h1 { font-size:clamp(1.9rem,7.5vw,4rem) !important;line-height:.9 !important; }
@@ -714,6 +717,10 @@ footer { border-top:1px solid #1c1c1c;padding:2.5rem 3rem;display:flex;justify-c
   <div class="footer-copy">© 2026 buscARTE · Hecho en Argentina 🇦🇷</div>
 </footer>
 
+<script src="/assets/vendor/supabase-2.112.3.min.js"></script>
+<script src="/assets/js/buscarte-config.js"></script>
+<script src="/assets/js/buscarte-auth.js"></script>
+<script src="/assets/js/buscarte-api.js"></script>
 <script>
   // CURSOR
   const cursor = document.getElementById('cursor');
@@ -755,7 +762,53 @@ footer { border-top:1px solid #1c1c1c;padding:2.5rem 3rem;display:flex;justify-c
   }
 
   // NAV SESSION
-  (function initNav() {
+  function authRuntimeEnabled() {
+    return window.BuscARTEConfig?.isLocalRuntime === true &&
+      window.BuscARTEConfig?.mode === 'auth' &&
+      window.BuscARTEConfig?.networkEnabled === true;
+  }
+
+  function renderAuthNav(state) {
+    const logged = Boolean(state?.authenticated && state?.profileId);
+    const g = document.getElementById('nav-guest');
+    const u = document.getElementById('nav-user');
+    const inv = document.getElementById('hero-invitado-wrap');
+    const log = document.getElementById('hero-logueado');
+
+    if (!logged) {
+      if (g) g.style.display = '';
+      if (u) u.style.display = 'none';
+      if (inv) inv.style.display = '';
+      if (log) log.style.display = 'none';
+      return;
+    }
+
+    const n = state.profile?.nombre || 'Mi perfil';
+    const uid = String(state.profileId);
+    const initials = n.split(' ').filter(Boolean).map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
+    if (g) g.style.display = 'none';
+    if (u) u.style.display = 'flex';
+    const c = document.getElementById('nav-avatar-circle');
+    if (c) c.textContent = initials;
+    const nm = document.getElementById('nav-avatar-name');
+    if (nm) nm.textContent = n.split(' ')[0];
+    const miPerfilLink = document.querySelector('.nav-dropdown-item[href*="perfil_publico"]');
+    if (miPerfilLink) miPerfilLink.href = 'buscARTE_perfil_publico.html?id=' + encodeURIComponent(uid);
+    if (inv) inv.style.display = 'none';
+    if (log) log.style.display = 'block';
+    const hn = document.getElementById('hero-nombre');
+    if (hn) hn.textContent = n.split(' ')[0];
+    const hmp = document.getElementById('hero-mi-perfil');
+    if (hmp) hmp.href = 'buscARTE_perfil_publico.html?id=' + encodeURIComponent(uid);
+  }
+
+  if (authRuntimeEnabled()) {
+    window.addEventListener('buscarte:authchange', event => renderAuthNav(event.detail));
+    window.BuscARTEAuth.ready.then(renderAuthNav).catch(error => {
+      console.error('No se pudo validar la sesión Auth:', error);
+      renderAuthNav(null);
+    });
+  } else (function initNav() {
     const l = localStorage.getItem('ba_logged') === '1';
     const n = localStorage.getItem('ba_name') || 'Mi perfil';
     const uid = localStorage.getItem('ba_user_id') || '';
@@ -784,7 +837,15 @@ footer { border-top:1px solid #1c1c1c;padding:2.5rem 3rem;display:flex;justify-c
   })();
   function toggleUserMenu(e) { if (e) e.stopPropagation(); document.getElementById('nav-avatar-btn')?.classList.toggle('open'); document.getElementById('nav-dropdown')?.classList.toggle('open'); }
   document.addEventListener('click', e => { if (!e.target.closest('#nav-user')) { document.getElementById('nav-avatar-btn')?.classList.remove('open'); document.getElementById('nav-dropdown')?.classList.remove('open'); } });
-  function logout() { localStorage.removeItem('ba_logged'); localStorage.removeItem('ba_name'); localStorage.removeItem('ba_user_id'); window.location.href = 'index.html'; }
+  function logout() {
+    if (authRuntimeEnabled()) {
+      window.BuscARTEAuth.signOut({ scope: 'local' })
+        .catch(error => console.error('No se pudo cerrar la sesión Auth:', error))
+        .finally(() => { window.location.href = 'index.html'; });
+      return;
+    }
+    localStorage.removeItem('ba_logged'); localStorage.removeItem('ba_name'); localStorage.removeItem('ba_user_id'); window.location.href = 'index.html';
+  }
 
   // STATS REALES
   const SB_URL = 'https://xiaanchoanxmampegoay.supabase.co';

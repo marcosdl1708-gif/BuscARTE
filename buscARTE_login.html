@@ -279,6 +279,10 @@
   </div>
 </div>
 
+<script src="/assets/vendor/supabase-2.112.3.min.js"></script>
+<script src="/assets/js/buscarte-config.js"></script>
+<script src="/assets/js/buscarte-auth.js"></script>
+<script src="/assets/js/buscarte-api.js"></script>
 <script>
   // CURSOR + ESTADO INICIAL
   window.addEventListener('DOMContentLoaded', function() {
@@ -325,13 +329,41 @@
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   }
 
+  const SAFE_REDIRECT_PATHS = new Set([
+    '/',
+    '/index.html',
+    '/buscARTE_index.html',
+    '/buscARTE_anuncio_detalle.html',
+    '/buscARTE_anuncios.html',
+    '/buscARTE_busqueda.html',
+    '/buscARTE_contacto.html',
+    '/buscARTE_generador.html',
+    '/buscARTE_guardados.html',
+    '/buscARTE_login.html',
+    '/buscARTE_mensajes.html',
+    '/buscARTE_mis_anuncios.html',
+    '/buscARTE_perfil_publico.html',
+    '/buscARTE_perfil.html',
+    '/buscARTE_privacidad.html',
+    '/buscARTE_recuperar.html',
+    '/buscARTE_registro.html',
+    '/buscARTE_reset.html',
+    '/buscARTE_terminos.html'
+  ]);
+
   function safeLocalRedirect(raw) {
-    if (!raw) return '';
+    if (typeof raw !== 'string' || !raw.trim()) return '';
     try {
-      const decoded = decodeURIComponent(raw);
-      if (/^(https?:)?\/\//i.test(decoded) || /^javascript:/i.test(decoded)) return '';
-      if (decoded.includes('://')) return '';
-      return decoded.replace(/^\/+/, '');
+      const target = new URL(raw.trim(), window.location.origin);
+      if (target.protocol !== 'http:' && target.protocol !== 'https:') return '';
+      if (target.origin !== window.location.origin) return '';
+      if (target.username || target.password) return '';
+      if (!SAFE_REDIRECT_PATHS.has(target.pathname)) return '';
+
+      const relativePath = target.pathname === '/'
+        ? 'index.html'
+        : target.pathname.replace(/^\/+/, '');
+      return relativePath + target.search + target.hash;
     } catch(e) {
       return '';
     }
@@ -405,6 +437,43 @@
     btn.disabled = false;
   }
 
+  function authRuntimeEnabled() {
+    return window.BuscARTEConfig?.isLocalRuntime === true &&
+      window.BuscARTEConfig?.mode === 'auth' &&
+      window.BuscARTEConfig?.networkEnabled === true;
+  }
+
+  async function loginConAuth(email, pass) {
+    try {
+      const state = await window.BuscARTEAuth.signInWithPassword(email, pass);
+      if (!state.authenticated || !state.profileId) {
+        const blocked = state.status === 'blocked';
+        await window.BuscARTEAuth.signOut({ scope: 'local' }).catch(() => {});
+        setFieldError(
+          'field-pass',
+          blocked
+            ? 'Tu cuenta fue suspendida. Contactanos si creés que es un error.'
+            : 'Tu acceso todavía no tiene un perfil habilitado.'
+        );
+        resetButton();
+        return;
+      }
+
+      const redirect = getRedirectUrl();
+      document.getElementById('success-bar')?.classList.add('show');
+      if (!localStorage.getItem('ba_msg_last_seen')) {
+        localStorage.setItem('ba_msg_last_seen', new Date().toISOString());
+      }
+      localStorage.removeItem('ba_after_login');
+      setTimeout(() => { window.location.href = redirect; }, 850);
+    } catch (error) {
+      console.error('Error Supabase Auth:', error);
+      setFieldError('field-pass', 'Email o contraseña incorrectos.');
+      showGlobal('No pudimos iniciar sesión. Revisá tus datos e intentá de nuevo.');
+      resetButton();
+    }
+  }
+
   async function login() {
     const emailInput = document.getElementById('email');
     const passInput = document.getElementById('password');
@@ -429,6 +498,11 @@
     const btn = document.getElementById('btn-submit');
     btn.classList.add('loading');
     btn.disabled = true;
+
+    if (authRuntimeEnabled()) {
+      await loginConAuth(email, pass);
+      return;
+    }
 
     try {
       const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/login_usuario`, {

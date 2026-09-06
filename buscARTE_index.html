@@ -642,18 +642,17 @@
     body { cursor: auto !important; }
 
     /* NAV */
-    nav { padding: .75rem 1rem !important; }
+    nav { padding: .75rem 1rem !important; gap: .5rem !important; }
     .nav-links { display: none !important; }
-    .btn-ghost {
-      display: inline-block !important;
-      padding: .45rem .9rem !important;
-      font-size: .72rem !important;
-      letter-spacing: .04em !important;
-    }
-    .btn-neon {
-      padding: .45rem .9rem !important;
-      font-size: .72rem !important;
-      letter-spacing: .04em !important;
+    .nav-logo { flex: 0 0 auto; font-size: 1.25rem !important; }
+    .nav-right { min-width: 0; flex: 0 1 auto; }
+    .nav-guest { display: flex; align-items: center; gap: .35rem; }
+    .nav-guest .btn-ghost,
+    .nav-guest .btn-neon {
+      padding: .45rem .55rem !important;
+      font-size: .66rem !important;
+      letter-spacing: .025em !important;
+      white-space: nowrap;
     }
 
     /* HERO — mantener overflow:hidden para que el bg-text no desborde */

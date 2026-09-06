@@ -1,6 +1,6 @@
 // ⚠️ IMPORTANTE: subí este número en CADA deploy (v3 → v4 → v5...).
 // Si no lo cambiás, el navegador puede seguir sirviendo los archivos viejos cacheados.
-const CACHE_VERSION = 'buscarte-v5-2026-06-05';
+const CACHE_VERSION = 'buscarte-v7-2026-09-04-mobile-header';
 const OFFLINE_URL = '/index.html';
 
 const SHELL = [
@@ -13,8 +13,13 @@ const SHELL = [
   '/buscARTE_perfil_publico.html',
   '/buscARTE_mensajes.html',
   '/buscARTE_login.html',
+  '/buscARTE_mis_anuncios.html',
   '/buscARTE_registro.html',
   '/buscARTE_generador.html',
+  '/assets/vendor/supabase-2.112.3.min.js',
+  '/assets/js/buscarte-config.js',
+  '/assets/js/buscarte-auth.js',
+  '/assets/js/buscarte-api.js',
   '/manifest.json',
   '/icons/icon-192.png',
   '/icons/icon-512.png'
@@ -47,6 +52,17 @@ function shouldBypass(request) {
   if (url.origin !== self.location.origin) return true;
   if (url.pathname.startsWith('/.netlify/functions/')) return true;
   if (url.hostname.includes('supabase.co')) return true;
+
+  // Los callbacks Auth nunca deben persistirse ni reutilizarse desde Cache API.
+  if (request.mode === 'navigate') {
+    const sensitiveParams = new Set(['code', 'token', 'type', 'error']);
+    for (const key of url.searchParams.keys()) {
+      const normalizedKey = key.toLowerCase();
+      if (sensitiveParams.has(normalizedKey) ||
+          normalizedKey.includes('token') ||
+          normalizedKey.startsWith('error_')) return true;
+    }
+  }
 
   return false;
 }
