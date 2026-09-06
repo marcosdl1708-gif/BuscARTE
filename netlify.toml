@@ -7,6 +7,13 @@
 # Cron en UTC. Argentina (ART) = UTC-3, así que 13:00 UTC = 10:00 ART.
 # El nombre entre comillas es el del archivo de la función sin .js.
 
+[build]
+  command = "node scripts/build-site.mjs"
+  publish = "dist"
+
+[functions]
+  directory = "netlify/functions"
+
 [build.environment]
   # @netlify/functions ^5 requiere Node >= 18. Fijamos una versión LTS para que
   # las funciones tengan fetch global y crypto disponibles.

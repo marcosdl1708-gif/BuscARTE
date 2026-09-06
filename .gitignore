@@ -1,0 +1,24 @@
+# Generated output and dependencies
+node_modules/
+dist/
+.netlify/
+
+# Local credentials and overrides
+.env
+.env.*
+!.env.example
+*.local
+*.keystore
+*.jks
+*.dpapi.xml
+
+# Android output and local database runtime (not part of this web workspace)
+.gradle/
+*.aab
+*.apk
+supabase/.temp/
+supabase/.branches/
+
+# Editor / OS artifacts
+.DS_Store
+Thumbs.db
