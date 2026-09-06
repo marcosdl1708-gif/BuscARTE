@@ -745,6 +745,21 @@
     .mbn-panel { z-index:920 !important; width:100% !important; max-width:100% !important; }
   }
 
+  /* Acciones según el perfil realmente cargado; no son permisos de backend. */
+  [hidden] { display:none !important; }
+  body[data-profile-state="loading"] .profile-hero,
+  body[data-profile-state="loading"] .profile-body,
+  body[data-profile-state="unavailable"] .profile-hero,
+  body[data-profile-state="unavailable"] .profile-body { display:none !important; }
+  .profile-state { margin:2rem auto;padding:2rem 1.25rem;max-width:760px;color:var(--gris);line-height:1.65; }
+  .profile-state a, .profile-state button { display:inline-flex;align-items:center;min-height:44px;margin:.75rem .75rem 0 0;color:var(--neon);background:none;border:0;font:inherit;text-decoration:underline; }
+  .profile-owner-note { margin-bottom:.85rem;color:var(--gris);font-size:.8rem;line-height:1.6; }
+  .profile-owner-note strong { display:block;color:var(--neon);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase; }
+  .profile-actions .btn-contact { min-height:44px;text-decoration:none;text-align:center;display:inline-flex;align-items:center;justify-content:center; }
+  .profile-actions .btn-save { min-height:44px; }
+  .profile-actions a:focus-visible, .profile-actions button:focus-visible { outline:2px solid var(--neon);outline-offset:4px; }
+  body[data-profile-state="own"] .profile-body { grid-template-columns:minmax(0,1fr); }
+  #contact-card { scroll-margin-top:80px; }
 </style>
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0a0a0a">
@@ -754,7 +769,7 @@
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <script src="/assets/js/meta-pixel.js?v=1" defer></script>
 </head>
-<body>
+<body data-profile-state="loading">
 
 <div class="cursor" id="cursor"></div>
 <div class="cursor-ring" id="cursor-ring"></div>
@@ -787,6 +802,12 @@
   </div>
 </nav>
 <div class="top-spacer"></div>
+<div id="profile-status" class="profile-state" role="status">
+  <p id="profile-status-text">Cargando perfil…</p>
+  <a id="profile-status-login" href="buscARTE_login.html" hidden>Ingresar a mi cuenta →</a>
+  <a id="profile-status-search" href="buscARTE_busqueda.html" hidden>Buscar artistas →</a>
+  <button type="button" id="profile-status-retry" onclick="cargarPerfilPublico()" hidden>Volver a intentar</button>
+</div>
 
 <!-- HERO -->
 <div class="profile-hero">
@@ -800,6 +821,7 @@
     </div>
 
     <div class="profile-main">
+      <div id="profile-owner-note" class="profile-owner-note" hidden><strong>Tu perfil público</strong>Así te ve la comunidad. Podés editarlo o compartirlo.</div>
       <div class="profile-top-row">
         <div class="profile-name" id="perfil-nombre">—</div>
         <!-- premium badge removed -->
@@ -826,9 +848,10 @@
         <div class="match-big" style="display:none">98%</div>
         <div class="match-big-label" style="display:none">afinidad</div>
       </div>
-      <button class="btn-contact" onclick="document.querySelector('.contact-form textarea').focus()">Contactar →</button>
-      <button class="btn-save" id="save-btn" onclick="toggleSave()">♡ Guardar perfil</button>
-      <button class="btn-save" id="share-btn" onclick="compartirPerfil()" style="border-color:var(--gris2)">↗ Compartir perfil</button>
+      <a class="btn-contact" id="edit-profile-link" href="buscARTE_perfil.html" hidden>Editar mi perfil →</a>
+      <button type="button" class="btn-contact" id="contact-profile-btn" onclick="enfocarContacto()" hidden>Contactar →</button>
+      <button class="btn-save" id="save-btn" onclick="toggleSave()" hidden>♡ Guardar perfil</button>
+      <button class="btn-save" id="share-btn" onclick="compartirPerfil()" style="border-color:var(--gris2)" hidden>↗ Compartir perfil</button>
     </div>
 
   </div>
@@ -898,21 +921,106 @@
   <!-- SIDEBAR -->
   <div class="profile-sidebar">
 
-    <div class="sidebar-card" id="contact-card">
+    <div class="sidebar-card" id="contact-card" hidden>
       <div class="sidebar-card-title">Enviar mensaje</div>
       <div class="contact-form">
-        <textarea placeholder="Escribí tu mensaje..."></textarea>
+        <textarea placeholder="Escribí tu mensaje..." aria-label="Mensaje para este perfil"></textarea>
         <button class="btn-send" onclick="sendMessage()">Enviar →</button>
         <p class="login-note">¿No tenés cuenta? <a href="buscARTE_registro.html">Registrate gratis</a> para contactar artistas.</p>
       </div>
     </div>
 
-    <a href="#" class="report-link" id="report-link" onclick="abrirReporte();return false">⚑ Reportar perfil</a>
+    <a href="#" class="report-link" id="report-link" onclick="abrirReporte();return false" hidden>⚑ Reportar perfil</a>
 
   </div>
 </div>
 
 <script>
+  function leerCachePerfil(key) {
+    try { return localStorage.getItem(key); } catch (_) { return null; }
+  }
+  function normalizarPerfilId(value) {
+    const id = value == null ? '' : String(value).trim();
+    if (!id || /^(null|undefined)$/i.test(id)) return '';
+    try { encodeURIComponent(id); } catch (_) { return ''; }
+    return /^\d+$/.test(id) ? id.replace(/^0+(?=\d)/, '') : id;
+  }
+  function sesionPerfilId() {
+    return leerCachePerfil('ba_logged') === '1' ? normalizarPerfilId(leerCachePerfil('ba_user_id')) : '';
+  }
+  let perfilCargado = null;
+  let perfilCargaVersion = 0;
+  let perfilObjetivoId = '';
+  let ultimoEspectador = sesionPerfilId();
+
+  function objetivoPerfilId() {
+    const params = new URLSearchParams(location.search);
+    return params.has('id') ? normalizarPerfilId(params.get('id')) : sesionPerfilId();
+  }
+  function esPerfilPropio() {
+    return !!perfilCargado && !!sesionPerfilId() && normalizarPerfilId(perfilCargado.id) === sesionPerfilId();
+  }
+  function perfilAjenoDisponible() {
+    return !!perfilCargado && document.body.dataset.profileState === 'other' && !esPerfilPropio();
+  }
+  function mostrarEstadoPerfil(texto, { login = false, retry = false } = {}) {
+    perfilCargado = null;
+    document.body.dataset.profileState = 'unavailable';
+    document.getElementById('profile-status').hidden = false;
+    document.getElementById('profile-status-text').textContent = texto;
+    document.getElementById('profile-status-login').hidden = !login;
+    document.getElementById('profile-status-search').hidden = false;
+    document.getElementById('profile-status-retry').hidden = !retry;
+    actualizarAccionesPerfil();
+  }
+  function actualizarAccionesPerfil() {
+    const ready = !!perfilCargado;
+    const own = ready && esPerfilPropio();
+    const uid = sesionPerfilId();
+    if (ready) document.body.dataset.profileState = own ? 'own' : 'other';
+    const show = (id, visible) => { const el = document.getElementById(id); if (el) el.hidden = !visible; };
+    show('profile-owner-note', own);
+    show('edit-profile-link', own);
+    show('contact-profile-btn', ready && !own);
+    show('contact-card', ready && !own);
+    show('save-btn', ready && !own && !!uid);
+    show('share-btn', ready);
+    show('report-link', ready && !own);
+    document.querySelector('.profile-sidebar').hidden = !ready || own;
+    document.querySelector('.profile-match-hero').hidden = !ready || own;
+    document.querySelector('.login-note').hidden = !!uid;
+    if (!ready || own) {
+      document.getElementById('report-overlay')?.classList.remove('open');
+    }
+    if (uid !== ultimoEspectador) {
+      document.querySelector('.contact-form textarea').value = '';
+      const send = document.querySelector('.btn-send');
+      send.textContent = 'Enviar →'; send.disabled = false;
+      send.style.background = ''; send.style.opacity = '';
+      send.onclick = sendMessage;
+      yaGuardado = false;
+      const save = document.getElementById('save-btn');
+      save.textContent = '♡ Guardar perfil'; save.style.background = ''; save.style.color = '';
+      ultimoEspectador = uid;
+      if (ready && !own && uid) verificarGuardado(perfilCargado.id);
+    }
+  }
+  function refrescarAccionesPerfil() {
+    if (objetivoPerfilId() !== perfilObjetivoId) { cargarPerfilPublico(); return; }
+    actualizarAccionesPerfil();
+  }
+  function enfocarContacto() {
+    actualizarAccionesPerfil();
+    if (!perfilAjenoDisponible()) return;
+    document.getElementById('contact-card').scrollIntoView({ behavior:'auto', block:'center' });
+    document.querySelector('.contact-form textarea').focus({ preventScroll:true });
+  }
+  window.addEventListener('storage', event => {
+    if (!event.key || ['ba_logged', 'ba_user_id'].includes(event.key)) refrescarAccionesPerfil();
+  });
+  window.addEventListener('pageshow', refrescarAccionesPerfil);
+  window.addEventListener('focus', refrescarAccionesPerfil);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) refrescarAccionesPerfil(); });
   // PROTECCIÓN: solo verificamos login para acciones, no para ver el perfil
   // Los visitantes pueden ver perfiles sin registrarse (ver plan de arquitectura)
   // Las acciones (contactar, guardar) verifican login en sus propias funciones
@@ -929,16 +1037,18 @@
   let yaGuardado = false
 
   async function toggleSave() {
-    const miId = localStorage.getItem('ba_user_id')
+    actualizarAccionesPerfil()
+    if (!perfilAjenoDisponible()) return
+    const miId = sesionPerfilId()
     if (!miId) { window.location.href = 'buscARTE_login.html'; return }
-    const params = new URLSearchParams(window.location.search)
-    const perfilId = params.get('id') || miId
+    const perfilId = normalizarPerfilId(perfilCargado.id)
     const btn = document.getElementById('save-btn')
 
     if (yaGuardado) {
       await fetch(`${SUPABASE_URL}/rest/v1/perfiles_guardados?user_id=eq.${miId}&perfil_id=eq.${perfilId}`, {
         method: 'DELETE', headers: hdrs
       })
+      if (sesionPerfilId() !== miId || normalizarPerfilId(perfilCargado?.id) !== perfilId || esPerfilPropio()) return
       yaGuardado = false
       btn.textContent = '♡ Guardar perfil'
       btn.style.background = ''
@@ -949,6 +1059,7 @@
         headers: { ...hdrs, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
         body: JSON.stringify({ user_id: parseInt(miId), perfil_id: parseInt(perfilId) })
       })
+      if (sesionPerfilId() !== miId || normalizarPerfilId(perfilCargado?.id) !== perfilId || esPerfilPropio()) return
       yaGuardado = true
       btn.textContent = '♥ Guardado'
       btn.style.background = 'rgba(255,85,85,.15)'
@@ -957,7 +1068,10 @@
   }
 
   async function compartirPerfil() {
-    const url = location.href
+    if (!perfilCargado) return
+    const destino = new URL('buscARTE_perfil_publico.html', location.href)
+    destino.searchParams.set('id', normalizarPerfilId(perfilCargado.id))
+    const url = destino.href
     const nombre = document.querySelector('.profile-name, h1')?.textContent?.trim() || 'Artista'
     const btn = document.getElementById('share-btn')
     try {
@@ -983,14 +1097,12 @@
   }
 
   async function verificarGuardado(perfilId) {
-    const miId = localStorage.getItem('ba_user_id')
-    if (!miId || miId === String(perfilId)) {
-      document.getElementById('save-btn').style.display = 'none'
-      return
-    }
+    const miId = sesionPerfilId()
+    if (!miId || !perfilAjenoDisponible()) return
     try {
       const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles_guardados?user_id=eq.${miId}&perfil_id=eq.${perfilId}&select=id`, { headers: hdrs })
       const data = await res.json()
+      if (sesionPerfilId() !== miId || normalizarPerfilId(perfilCargado?.id) !== normalizarPerfilId(perfilId) || esPerfilPropio()) return
       yaGuardado = data.length > 0
       const btn = document.getElementById('save-btn')
       if (yaGuardado) {
@@ -1115,7 +1227,7 @@
   // Aplicar rubro UI apenas carga la página, antes del fetch async
   ;(function() {
     const urlRubro = new URLSearchParams(window.location.search).get('rubro')
-    const rubro = urlRubro || localStorage.getItem('ba_rubro') || 'musica'
+    const rubro = urlRubro || leerCachePerfil('ba_rubro') || 'musica'
     inicializarRubroUI(rubro)
   })()
 
@@ -1216,7 +1328,7 @@
     if (tagline) tagline.style.display = 'none'
     // Grilla de stats artísticos (instrumento/género/exp/busca/zona)
     const stats = document.querySelector('.profile-stats')
-    if (stats) stats.style.display = 'none'
+    if (stats) stats.hidden = true
     // Tags del hero (géneros)
     const tags = document.getElementById('perfil-tags')
     if (tags) tags.style.display = 'none'
@@ -1245,24 +1357,42 @@
   // CARGAR PERFIL REAL DESDE URL
   async function cargarPerfilPublico() {
     const params = new URLSearchParams(window.location.search)
-    const id = params.get('id') || localStorage.getItem('ba_user_id')
-    if (!id) return
+    const id = objetivoPerfilId()
+    const request = ++perfilCargaVersion
+    perfilObjetivoId = id
+    perfilCargado = null
+    document.body.dataset.profileState = 'loading'
+    document.getElementById('profile-status').hidden = false
+    document.getElementById('profile-status-text').textContent = 'Cargando perfil…'
+    ;['profile-status-login', 'profile-status-search', 'profile-status-retry'].forEach(id => { document.getElementById(id).hidden = true })
+    actualizarAccionesPerfil()
+    if (!id) {
+      mostrarEstadoPerfil(params.has('id') ? 'No pudimos identificar este perfil.' : 'Ingresá a tu cuenta para ver tu perfil.', { login: !params.has('id') })
+      return
+    }
 
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${id}&select=*`, { headers: hdrs })
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${encodeURIComponent(id)}&select=*`, { headers: hdrs })
+      if (!res.ok) throw new Error('No se pudo cargar el perfil: ' + res.status)
       const [p] = await res.json()
-      if (!p) return
+      if (request !== perfilCargaVersion) return
+      if (!p || normalizarPerfilId(p.id) !== id) { mostrarEstadoPerfil('Este perfil no está disponible. Podés seguir explorando la comunidad.'); return }
       if (p.baneado) {
-        document.querySelector('.profile-hero').innerHTML = `
-          <div style="text-align:center;padding:4rem 2rem;color:var(--gris)">
-            <div style="font-size:3rem;margin-bottom:1rem">🚫</div>
-            <div style="font-family:var(--font-display);font-size:1.5rem;color:var(--blanco);margin-bottom:.5rem">Perfil suspendido</div>
-            <p>Esta cuenta fue suspendida por violar las normas de la comunidad.</p>
-          </div>`
-        document.querySelector('.profile-stats').style.display = 'none'
-        document.querySelector('.profile-body').style.display = 'none'
+        mostrarEstadoPerfil('Perfil suspendido. Esta cuenta fue suspendida por violar las normas de la comunidad.')
         return
       }
+      perfilCargado = p
+      document.getElementById('profile-status').hidden = true
+      actualizarAccionesPerfil()
+      // Restaurar sólo las secciones que el renderer visitante oculta, por si
+      // una página restaurada del historial ahora pertenece a otra cuenta.
+      document.querySelector('.profile-stats').hidden = false
+      ;['.ai-label', '#perfil-tagline', '#perfil-tags', '#section-referentes'].forEach(selector => {
+        const el = document.querySelector(selector); if (el) el.style.display = ''
+      })
+      ;['perfil-generos','perfil-videos','perfil-disponibilidad','perfil-bio-text','perfil-redes'].forEach(id => {
+        const el = document.getElementById(id)?.closest('.section'); if (el) el.style.display = ''
+      })
 
       const initials = p.nombre ? p.nombre.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) : '?'
       const generos = (p.generos||'').split(',').map(g=>g.trim()).filter(Boolean)
@@ -1285,15 +1415,6 @@
       } else {
         // Aplicar color, secciones y labels según rubro
         aplicarRubroPerfil(rubro, p)
-      }
-
-      // ¿Estoy viendo mi propio perfil? (sin id en la URL = se cargó mi perfil, o el id coincide con el mío)
-      const esPropio = !params.get('id') || String(p.id) === String(localStorage.getItem('ba_user_id'))
-      if (esPropio) {
-        const cc = document.getElementById('contact-card')
-        if (cc) cc.style.display = 'none'
-        const rl = document.getElementById('report-link')
-        if (rl) rl.style.display = 'none'
       }
 
       // Hero background name
@@ -1346,6 +1467,7 @@
 
       // Videos
       const videosEl = document.getElementById('perfil-videos')
+      if (videosEl) videosEl.innerHTML = '<div class="video-item-empty">Sin videos cargados</div>'
       if (videosEl && p.videos) {
         const links = p.videos.split(',').map(v=>v.trim()).filter(Boolean)
           .map(v=>({ url: safeUrl(v), raw: v })).filter(x=>x.url)
@@ -1404,18 +1526,19 @@
       }
 
       // % Afinidad basado en artistas favoritos compartidos
-      let miReferentes = localStorage.getItem('ba_referentes') || ''
-      let miGeneros = localStorage.getItem('ba_generos') || ''
+      let miReferentes = leerCachePerfil('ba_referentes') || ''
+      let miGeneros = leerCachePerfil('ba_generos') || ''
       // Si no está en localStorage, intentar cargar desde Supabase
-      if (!miReferentes && localStorage.getItem('ba_user_id')) {
+      if (!miReferentes && leerCachePerfil('ba_user_id')) {
         try {
-          const miRes = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${localStorage.getItem('ba_user_id')}&select=referentes,generos`, { headers: hdrs })
+          const miRes = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${leerCachePerfil('ba_user_id')}&select=referentes,generos`, { headers: hdrs })
           const [miP] = await miRes.json()
+          if (request !== perfilCargaVersion) return
           if (miP) { miReferentes = miP.referentes||''; miGeneros = miP.generos||'' }
         } catch(e) {}
       }
       const afinidadEl = document.querySelector('.match-big')
-      if (afinidadEl && p.id !== parseInt(localStorage.getItem('ba_user_id'))) {
+      if (afinidadEl && p.id !== parseInt(leerCachePerfil('ba_user_id'))) {
         const misRef = miReferentes.toLowerCase().split(',').map(r=>r.trim()).filter(Boolean)
         const susRef = (p.referentes||'').toLowerCase().split(',').map(r=>r.trim()).filter(Boolean)
         const misGen = miGeneros.toLowerCase().split(',').map(g=>g.trim()).filter(Boolean)
@@ -1440,7 +1563,11 @@
       const textarea = document.querySelector('.contact-form textarea')
       if (textarea) textarea.placeholder = `Hola ${p.nombre?.split(' ')[0]}, vi tu perfil y me interesa conectar...`
 
-    } catch(e) { console.error('Error cargando perfil:', e) }
+    } catch(e) {
+      if (request !== perfilCargaVersion) return
+      console.error('Error cargando perfil:', e)
+      mostrarEstadoPerfil('No pudimos cargar el perfil. Probá de nuevo en un momento.', { retry:true })
+    }
   }
 
 
@@ -1448,12 +1575,17 @@
   cargarPerfilPublico()
 
   async function sendMessage() {
+    actualizarAccionesPerfil()
+    if (!perfilAjenoDisponible()) return
     const ta = document.querySelector('.contact-form textarea')
     const btn = document.querySelector('.btn-send')
     const texto = ta.value.trim()
     if (!texto) { ta.focus(); return }
 
-    const miId = localStorage.getItem('ba_user_id')
+    const miId = sesionPerfilId()
+    const paraId = normalizarPerfilId(perfilCargado.id)
+    const mismoContacto = () => sesionPerfilId() === miId && perfilAjenoDisponible()
+      && normalizarPerfilId(perfilCargado.id) === paraId
 
     // Si no está logueado, redirigir al login
     if (!miId) {
@@ -1467,10 +1599,6 @@
     btn.disabled = true
 
     try {
-      // Obtener ID del perfil que se está viendo desde la URL
-      const params = new URLSearchParams(window.location.search)
-      const paraId = params.get('id')
-
       if (!paraId) {
         // Sin ID en la URL no hay destinatario: no fingir que se envió
         btn.textContent = 'Enviar →'
@@ -1486,6 +1614,7 @@
         { headers: hdrs }
       )
       let convs = await convRes.json()
+      if (!mismoContacto()) return
       let convId
 
       if (convs.length) {
@@ -1498,6 +1627,7 @@
           body: JSON.stringify({ user1_id: parseInt(miId), user2_id: parseInt(paraId), ultimo_mensaje: texto })
         })
         const [conv] = await nueva.json()
+        if (!mismoContacto()) return
         convId = conv.id
       }
 
@@ -1507,6 +1637,7 @@
         headers: { ...hdrs, 'Prefer': 'return=minimal' },
         body: JSON.stringify({ de_user_id: parseInt(miId), para_user_id: parseInt(paraId), contenido: texto })
       })
+      if (!mismoContacto()) return
 
       // Actualizar último mensaje
       await fetch(`${SUPABASE_URL}/rest/v1/conversaciones?id=eq.${convId}`, {
@@ -1514,12 +1645,14 @@
         headers: { ...hdrs, 'Prefer': 'return=minimal' },
         body: JSON.stringify({ ultimo_mensaje: texto, updated_at: new Date().toISOString() })
       })
+      if (!mismoContacto()) return
 
       btn.textContent = '✓ Mensaje enviado'
       btn.style.background = '#a8c832'
       btn.style.opacity = '1'
       ta.value = ''
       setTimeout(()=>{
+        if (!mismoContacto()) return
         btn.textContent = 'Ver en mensajes →'
         btn.style.background = ''
         btn.onclick = () => window.location.href = 'buscARTE_mensajes.html'
@@ -1527,6 +1660,7 @@
       }, 1500)
 
     } catch(e) {
+      if (!mismoContacto()) return
       alert('Error al enviar. Intentá de nuevo.')
       console.error(e)
       btn.textContent = 'Enviar →'
@@ -1539,7 +1673,7 @@
     const badge = document.getElementById('nav-msg-badge');
     if (!badge || !uid) return;
     try {
-      const lastSeen = localStorage.getItem('ba_msg_last_seen') || new Date().toISOString();
+      const lastSeen = leerCachePerfil('ba_msg_last_seen') || new Date().toISOString();
       const res = await fetch(
         `https://xiaanchoanxmampegoay.supabase.co/rest/v1/mensajes?para_user_id=eq.${uid}&created_at=gt.${lastSeen}&select=id&limit=99`,
         { headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68', 'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68` } }
@@ -1557,9 +1691,9 @@
 
   // NAV SESSION
   (function initNav(){
-    const l=localStorage.getItem('ba_logged')==='1';
-    const n=localStorage.getItem('ba_name')||'Mi perfil';
-    const uid=localStorage.getItem('ba_user_id')||'';
+    const l=leerCachePerfil('ba_logged')==='1';
+    const n=leerCachePerfil('ba_name')||'Mi perfil';
+    const uid=leerCachePerfil('ba_user_id')||'';
     const i=n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
     if(l){
       const g=document.getElementById('nav-guest');
@@ -1587,6 +1721,8 @@
   // ─── REPORTAR PERFIL ───
   let reportMotivo = '';
   function abrirReporte() {
+    actualizarAccionesPerfil();
+    if (!perfilAjenoDisponible()) return;
     const ov = document.getElementById('report-overlay');
     const formC = document.getElementById('report-form-content');
     const successC = document.getElementById('report-success');
@@ -1618,6 +1754,8 @@
     if (errorC) errorC.style.display = 'none';
   }
   async function enviarReporte() {
+    actualizarAccionesPerfil();
+    if (!perfilAjenoDisponible()) return;
     if (!reportMotivo) return;
     const send = document.getElementById('btn-send-report');
     const detalle = document.getElementById('report-detail')?.value?.trim() || '';
@@ -1639,8 +1777,8 @@
             perfilNombre: perfilNombre,
             motivo: reportMotivo,
             detalle: detalle,
-            reporterId: localStorage.getItem('ba_user_id') || 'anónimo',
-            reporterNombre: localStorage.getItem('ba_name') || 'Usuario no informado',
+            reporterId: leerCachePerfil('ba_user_id') || 'anónimo',
+            reporterNombre: leerCachePerfil('ba_name') || 'Usuario no informado',
             url: window.location.href
           }
         })
@@ -1693,7 +1831,7 @@
 </div>
 <script>
 (function(){
-  var uid = localStorage.getItem('ba_user_id');
+  var uid = leerCachePerfil('ba_user_id');
   var el = document.getElementById('mbnp-perfil');
   if(el && uid) el.href = 'buscARTE_perfil_publico.html?id='+uid;
   else if(el) el.href = 'buscARTE_login.html';
