@@ -11,7 +11,7 @@ No depende del repositorio original ni del worktree de Android para funcionar.
 - El `netlify.toml` servido por Netlify era generado; se conservó la configuración fuente, no esa copia transformada.
 - Los scripts Auth ya publicados se conservan con su configuración existente: modo shadow y red deshabilitada. Esta organización no activa la migración.
 
-Los cambios de organización posteriores son locales. No implican un push ni una publicación.
+La organización inicial fue local; después se publicaron captcha + anuncios y se sincronizó esta base con GitHub. Ver `docs/release-20260905.md` y `docs/github-sync-20260905.md` para distinguir ambas operaciones.
 
 ## Construcción local
 
@@ -41,7 +41,9 @@ Ver `docs/release-20260905.md` para verificación, contexto del CLI, comandos y 
 
 Un bloque por vez, con cambios pequeños y verificables. Primero reproducir el problema; luego corregir y revisar web móvil/escritorio y su efecto en la app. Una preview no aísla automáticamente los datos: no hacer altas, envíos, publicaciones ni escrituras de prueba contra usuarios reales.
 
-Los bloques de captcha y publicación de anuncios están implementados en commits separados y ya publicados juntos. La rama `codex/anuncios-mobile-20260905` contiene el código publicado hasta `ac97d2d`; los commits posteriores de diagnóstico/documentación no cambian archivos públicos. Ver `docs/qa-captcha-20260905.md`, `docs/qa-anuncios-20260905.md` y `docs/release-20260905.md` para pruebas y límites. No se hizo push a GitHub: `main` remoto sigue siendo una base anterior, y no debe desplegarse encima de esta versión sin reconciliar. La comprobación física de la app instalada sigue pendiente, aunque su dominio ya sirve la versión nueva.
+Los bloques de captcha y publicación de anuncios están implementados en commits separados y ya publicados juntos. El código público corresponde a `ac97d2d`; los commits posteriores de diagnóstico/documentación no cambian archivos públicos. `main` de GitHub y de esta copia canónica incorporan la base reconciliada y ambos bloques, conservando el historial. Ver `docs/qa-captcha-20260905.md`, `docs/qa-anuncios-20260905.md`, `docs/release-20260905.md` y `docs/github-sync-20260905.md` para pruebas y límites. La comprobación física de la app instalada sigue pendiente, aunque su dominio ya sirve la versión nueva.
+
+Netlify está conectado a `main`: un push normal puede publicar automáticamente. La sincronización de código ya publicado usa un último commit marcado `[skip netlify]` para omitir sólo ese deploy. No se desactivaron builds ni se cambió la configuración remota. Para un próximo cambio funcional, acordar y validar su publicación antes de actualizar `main`; empezar el trabajo en una rama `codex/` desde la base actual.
 
 Los demás bugs siguen pendientes, incluido el enlace general de Marketplace: mejorar el formulario de venta no corrige por sí solo ese recorrido. Mantener separados los cambios visuales, la migración Auth y los cambios de disciplinas/modelo de datos.
 
