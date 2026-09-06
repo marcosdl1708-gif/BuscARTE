@@ -3,9 +3,13 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
-## Estado operativo — publicación del 6/9, 12:54 ART
+## Estado operativo — onboarding local del 6/9
 
-**Marketplace + guardado/danza ya están publicados**: deploy activo `6a9d8cbb808123cc8c948eb2`, fuente pública `8957ad0`, caché v13. El usuario resolvió el saldo de Netlify y autorizó retomar; hubo un único deploy exitoso, sin preview ni push. Verificados 35 recursos, 35 rutas, cuatro exclusiones y **11/11 smoke tests sobre producción con backend simulado**, además de las 214 pruebas locales previas. Funciones y horarios intactos; sin migración Auth ni cambios Android. Informe `docs/release-marketplace-danza-20260906.md`, respaldo privado `../BuscARTE-resguardos/release-marketplace-danza-20260906`. Próximo bloque propuesto: onboarding/completitud, inicialmente local. GitHub `main` sigue pendiente de sincronizar; no disparar otro deploy por accidente.
+**Alta breve + perfil progresivo listos sólo en local**, rama `codex/onboarding-progresivo-20260906` desde `ed295b3`, implementación `28a2dd3`. El alta artística pasa de cinco/seis pantallas a cuatro por defecto, conserva detalles opcionales y ofrece empezar a explorar. El editor muestra cinco básicos con accesos a pendientes y progreso de datos guardados. **286/286 pruebas** en una corrida, build de 36 archivos y revisión móvil/escritorio. Ver `docs/qa-onboarding-progresivo-20260906.md`; evidencia/resguardo privado `../BuscARTE-resguardos/onboarding-progresivo-20260906`. Caché local v14: **sin deploy, preview ni push**, ni cambios de Auth, esquema, funciones o Android. Sólo consultas SELECT de metadatos de Supabase, sin usuarios ni escrituras. App física e integración con una cuenta de prueba autorizada pendientes. Puede agruparse antes de acordar la próxima publicación.
+
+## Última publicación verificada — 6/9, 12:54 ART
+
+**Marketplace + guardado/danza ya están publicados**: deploy activo verificado al cierre de esa publicación `6a9d8cbb808123cc8c948eb2`, fuente pública `8957ad0`, caché v13. El usuario resolvió el saldo de Netlify y autorizó retomar; hubo un único deploy exitoso, sin preview ni push. Verificados 35 recursos, 35 rutas, cuatro exclusiones y **11/11 smoke tests sobre producción con backend simulado**, además de las 214 pruebas locales previas. Funciones y horarios intactos; sin migración Auth ni cambios Android. Informe `docs/release-marketplace-danza-20260906.md`, respaldo privado `../BuscARTE-resguardos/release-marketplace-danza-20260906`. El onboarding posterior es local, como se indica arriba. GitHub `main` sigue pendiente de sincronizar; no disparar otro deploy por accidente.
 
 Las entradas siguientes registran los estados históricos previos a esta publicación, incluido el bloqueo por créditos ya resuelto.
 
@@ -44,6 +48,8 @@ npm run test:perfil
 npm run test:chat
 npm run test:marketplace
 npm run test:perfil-guardado
+npm run test:onboarding
+npm run test:perfil-progreso
 ```
 
 El build también funciona directamente con `node scripts/build-site.mjs`, sin instalar dependencias: copia y verifica archivos, sin consultar servicios remotos. `npm ci` sí es necesario para instalar dependencias de las funciones en un entorno limpio.
@@ -62,6 +68,8 @@ El build también funciona directamente con `node scripts/build-site.mjs`, sin i
 
 `npm run test:perfil-guardado` verifica el PATCH y su confirmación, recarga, valores vacíos/históricos, compatibilidad de rubros, errores, concurrencia y coherencia entre editor, perfil público y búsqueda. Todo el backend es simulado. Con `BUSCARTE_GUARDADO_BASELINE=1` ejecuta por separado tres reproducciones del fallo anterior en `60424d5`.
 
+`npm run test:onboarding` verifica alta breve/extendida, roles, rubros, datos opcionales, captcha, contrato RPC, duplicados, errores, recuperación de sesión y layout. `npm run test:perfil-progreso` verifica los cinco básicos sobre datos confirmados, acciones directas, enlaces, estados vacíos/históricos, cambios de cuenta, foto y guardado concurrente. Ambas suites simulan o rechazan toda su red; no generan cuentas, fotos ni emails reales.
+
 `site-files.json` contiene la lista explícita de publicación. El resultado actual es `dist/` (36 archivos incluyendo `_redirects`, el controlador de captcha y los dos assets compartidos del Inicio), sin documentos, campañas, respaldos, `files.zip` ni herramientas internas. No modificar HTML al empaquetar. Un archivo nuevo requiere incorporarlo deliberadamente a esa lista. Si encuentra archivos inesperados en `dist/`, el build se detiene y no los elimina.
 
 Netlify usa `dist/` y `netlify/functions/`. El paquete se validó en preview y se publicó el 5/9/2026 a las 22:09 ART: deploy `6a9cbd37518d43630307438c`. Las cuatro funciones de producción conservan exactamente los binarios anteriores, runtime `nodejs24.x` y sus dos horarios. `NODE_VERSION=20` sigue en la configuración fuente histórica; no se cambió en este bloque y no debe confundirse con el runtime remoto comprobado. Nunca publicar la raíz del repositorio.
@@ -76,7 +84,7 @@ Los bloques de captcha y publicación de anuncios están implementados en commit
 
 Netlify está conectado a `main`: un push normal puede publicar automáticamente. La sincronización de código ya publicado usa un último commit marcado `[skip netlify]` para omitir sólo ese deploy. No se desactivaron builds ni se cambió la configuración remota. Para un próximo cambio funcional, acordar y validar su publicación antes de actualizar `main`; empezar el trabajo en una rama `codex/` desde la base actual.
 
-Marketplace y el guardado de estilos de danza se implementaron después como bloques locales separados (ver estado operativo arriba). Mantener separados la migración Auth y los cambios de disciplinas/modelo de datos. Onboarding/completitud progresiva es el siguiente bloque propuesto, no incluido en estas correcciones.
+Marketplace y el guardado de estilos de danza se implementaron como bloques separados y ya están publicados (ver estado operativo arriba). Onboarding/completitud progresiva se completó después sólo en local. Mantener separados la migración Auth y los cambios de disciplinas/modelo de datos; el nuevo indicador no implementa múltiples rubros ni elección de disciplina principal.
 
 ## Histórico previo al deploy — Inicio con sesión
 
