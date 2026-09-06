@@ -5,6 +5,8 @@ No depende del repositorio original ni del worktree de Android para funcionar.
 
 ## Estado operativo — publicación del 5/9, 23:44 ART
 
+Actualización 6/9 — **Marketplace + guardado/danza siguen sin publicar**. El deploy conjunto autorizado fue rechazado con `Forbidden`: Netlify confirmó que el equipo está en créditos operativos y tiene pausadas las publicaciones de producción. No hubo nuevo deploy ID ni cambio de versión pública; no se reintentó ni se cambió de plan. Paquete listo con **214/214 pruebas locales** en una corrida, más **11/11 smoke tests locales**. Diagnóstico y condiciones para retomar: `docs/deploy-marketplace-danza-20260906.md`. Próximo período informado: 14/9, 04:00 ART. No confundir este `dist/` v13 con producción v11.
+
 Inicio + perfil propio/chat están **publicados**: deploy `6a9cd36de8ea461b8c4b7063`, fuente pública `a441167`, caché v11. Ver `docs/release-inicio-perfil-chat-20260905.md`. Se comprobaron 35 recursos, 35 rutas, cuatro exclusiones y ocho smoke tests sobre producción, además de las 152 pruebas locales. Funciones y horarios permanecen idénticos. No se creó otra preview ni se hizo push; GitHub `main` sigue pendiente de incorporar estos commits. Las secciones que describen los bloques como locales/preview registran el estado previo a esta publicación.
 
 Marketplace está implementado **sólo en local**, en `codex/marketplace-20260905` desde `584bd65`. Ambas Home abren el catálogo de productos, con foto/precio/zona, filtros propios y publicación de venta/alquiler. Conserva los datos y permisos existentes. Ver `docs/qa-marketplace-20260905.md`; caché local v12, todavía sin publicar. No ejecutar el verificador de archivos contra producción con este `dist/`: contiene otro bloque.

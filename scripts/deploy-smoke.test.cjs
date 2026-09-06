@@ -42,7 +42,7 @@ function qaOutput() {
 }
 async function capture(page, name) {
   const output = qaOutput();
-  if (output) await page.screenshot({ path: path.join(output, name) });
+  if (output) await page.screenshot({ path: path.join(output, name), animations: 'disabled' });
 }
 before(async () => {
   browser = await chromium.launch({ headless: true, channel: process.platform === 'win32' ? 'msedge' : undefined });
@@ -86,15 +86,31 @@ function fakeCaptchaSdk() {
   })();`;
 }
 
-async function setup(t, { logged = false, width = 390, firstPostError = false, chatFixture = false } = {}) {
-  const result = { test: t.name, fetched: [], redirects: [], mocked: [], forbidden: [], pageErrors: [], consoleErrors: [], networkErrors: [], posts: [], writes: [], sdk: 0 };
+async function setup(t, { logged = false, width = 390, firstPostError = false, chatFixture = false, marketplaceFixture = false, danceFixture = false } = {}) {
+  const result = { test: t.name, fetched: [], redirects: [], mocked: [], forbidden: [], pageErrors: [], consoleErrors: [], networkErrors: [], posts: [], patches: [], reads: [], writes: [], sdk: 0 };
+  // Each smoke owns its mutable synthetic row; nothing is persisted remotely or
+  // shared with another case. Return only the PATCH representation the UI asks for.
+  const profiles = structuredClone(fixtureProfiles);
+  if (danceFixture) Object.assign(profiles[0], {
+    rubro: 'danza', instrumento: '', generos: 'Contemporáneo',
+    provincia: 'CABA', ciudad: 'Buenos Aires (CABA)',
+    campos_especificos: JSON.stringify({ rol: ['Bailarín/a'], disciplina: ['Tango'], nivel: ['Profesional'] })
+  });
+  const products = [
+    { id: 9101, titulo: 'Guitarra sintética usada', categoria_producto: 'Guitarra eléctrica', condicion: 'Usado', rubro: 'danza' },
+    { id: 9102, titulo: 'Guitarra sintética nueva', categoria_producto: 'Guitarra eléctrica', condicion: 'Nuevo', rubro: null },
+    { id: 9103, titulo: 'Bajo sintético usado', categoria_producto: 'Bajo eléctrico', condicion: 'Usado', rubro: 'musica' },
+    { id: 9104, titulo: 'Búsqueda artística sintética', tipo: 'busco', rubro: 'musica' }
+  ].map(product => ({ tipo: 'vende', user_id: fixtureOther, descripcion: 'Publicación sintética, sin venta real.',
+    precio: '$150.000', precio_num: 150000, zona: 'Almagro, CABA', oculto: false, estado: 'activo',
+    created_at: fixtureTimestamp, ...product }));
   allResults.push(result);
   const context = await browser.newContext({
     viewport: { width, height: 844 }, isMobile: width < 768, hasTouch: width < 768,
     timezoneId: 'America/Argentina/Buenos_Aires', serviceWorkers: 'block'
   });
   t.after(() => context.close());
-  await context.addInitScript(logged => {
+  await context.addInitScript(({ logged, danceFixture }) => {
     localStorage.setItem('buscarte_meta_consent_v1', 'denied');
     // Never open a native sharing surface or touch the system clipboard.
     window.__smokeSharedProfiles = [];
@@ -105,10 +121,10 @@ async function setup(t, { logged = false, width = 390, firstPostError = false, c
       localStorage.setItem('ba_logged', '1');
       localStorage.setItem('ba_user_id', 'smoke-fixture-user');
       localStorage.setItem('ba_tipo_cuenta', 'artista');
-      localStorage.setItem('ba_rubro', 'musica');
+      localStorage.setItem('ba_rubro', danceFixture ? 'danza' : 'musica');
       localStorage.setItem('ba_name', 'Persona de prueba aislada');
     }
-  }, logged);
+  }, { logged, danceFixture });
   if (typeof context.routeWebSocket === 'function') {
     await context.routeWebSocket('**/*', socket => { result.forbidden.push('WebSocket ' + socket.url()); socket.close(); });
   }
@@ -185,14 +201,17 @@ async function setup(t, { logged = false, width = 390, firstPostError = false, c
     if (url.hostname === 'xiaanchoanxmampegoay.supabase.co') {
       if (request.method() === 'GET' && ['/rest/v1/perfiles', '/rest/v1/anuncios', '/rest/v1/mensajes', '/rest/v1/reacciones', '/rest/v1/perfiles_guardados', '/rest/v1/conversaciones'].includes(url.pathname)) {
         result.mocked.push(tag);
+        result.reads.push({ path: url.pathname, query: url.search });
         let rows = [];
         if (url.pathname === '/rest/v1/perfiles') {
           const filter = url.searchParams.get('id') || '';
-          if (filter.startsWith('eq.')) rows = fixtureProfiles.filter(p => p.id === filter.slice(3));
+          if (filter.startsWith('eq.')) rows = profiles.filter(p => p.id === filter.slice(3));
           else if (filter.startsWith('in.(') && filter.endsWith(')')) {
             const ids = filter.slice(4, -1).split(',');
-            rows = fixtureProfiles.filter(p => ids.includes(p.id));
+            rows = profiles.filter(p => ids.includes(p.id));
           }
+        } else if (marketplaceFixture && url.pathname === '/rest/v1/anuncios') {
+          rows = products.filter(product => url.searchParams.get('tipo') !== 'in.(vende,vendo)' || ['vende', 'vendo'].includes(product.tipo));
         } else if (chatFixture && url.pathname === '/rest/v1/conversaciones') {
           rows = [{ id: fixtureConversation, user1_id: fixtureUser, user2_id: fixtureOther,
             ultimo_mensaje: 'Mensaje sintético sin envío real', updated_at: fixtureTimestamp, anuncio_id: null }];
@@ -201,6 +220,18 @@ async function setup(t, { logged = false, width = 390, firstPostError = false, c
             contenido: 'Mensaje sintético sin envío real', created_at: fixtureTimestamp }];
         }
         return route.fulfill({ contentType: 'application/json', headers: { 'content-range': '*/0' }, body: JSON.stringify(rows) });
+      }
+      if (danceFixture && request.method() === 'PATCH' && url.pathname === '/rest/v1/perfiles') {
+        result.mocked.push(tag);
+        const requestHeaders = request.headers();
+        const patch = { query: url.search, headers: {
+          prefer: requestHeaders.prefer, 'content-type': requestHeaders['content-type']
+        }, body: request.postDataJSON() };
+        result.patches.push(patch);
+        const matchesOwner = url.searchParams.get('id') === 'eq.' + fixtureUser;
+        if (matchesOwner) Object.assign(profiles[0], patch.body);
+        return route.fulfill({ contentType: 'application/json', body: JSON.stringify(matchesOwner
+          ? [{ id: profiles[0].id, campos_especificos: profiles[0].campos_especificos }] : []) });
       }
       if (request.method() === 'POST' && url.pathname === '/rest/v1/rpc/vencer_anuncios_viejos') {
         result.mocked.push(tag);
@@ -423,4 +454,89 @@ test('deployed mobile chat opens the other profile and Back restores the same co
   assert.deepEqual(f.result.writes, [], 'Chat/profile navigation cannot send messages, emails or other backend writes');
   assert.ok(f.result.fetched.some(item => item.file === 'buscARTE_mensajes.html'));
   assert.ok(f.result.fetched.some(item => item.file === 'buscARTE_perfil_publico.html'));
+});
+
+for (const home of ['index.html', 'buscARTE_index.html']) {
+  test(`deployed ${home} opens public Marketplace products with combined filters and a clear sale action`, async t => {
+    const f = await setup(t, { width: 320, marketplaceFixture: true });
+    await f.go('/' + home);
+    await f.page.locator('#home-marketplace').focus();
+    await f.page.keyboard.press('Enter');
+    await f.page.waitForFunction(() => document.body?.dataset.marketplace === 'true' && document.querySelectorAll('#anuncios-lista .anuncio').length === 3);
+    assert.equal(new URL(f.page.url()).searchParams.get('tipo'), 'vende');
+    assert.match(new URL(f.page.url()).pathname, /^\/buscARTE_anuncios(?:\.html)?$/i);
+    const ids = () => f.page.locator('#anuncios-lista .anuncio:visible').evaluateAll(cards => cards.map(card => Number(card.dataset.id)));
+    assert.deepEqual(await ids(), [9101, 9102, 9103], 'Sale items are products, including a dancer and a null-rubro seller');
+    assert.doesNotMatch(await f.page.locator('#anuncios-lista').innerText(), /Búsqueda artística sintética/);
+    const query = f.result.reads.find(read => read.path === '/rest/v1/anuncios' && new URLSearchParams(read.query).get('select') === '*');
+    assert.ok(query, 'Marketplace fetched complete product rows, separately from Home counts');
+    assert.equal(new URLSearchParams(query.query).get('tipo'), 'in.(vende,vendo)');
+    assert.equal(await f.page.locator('.filter-panel.active').getAttribute('id'), 'fp-vende');
+    assert.match(await f.page.locator('#publish-main-btn').innerText(), /Publicar venta \/ alquiler/);
+    assert.equal(await f.page.locator('#marketplace-other-boards').getAttribute('open'), null);
+
+    await f.page.locator('#mobile-filter-btn-an').click();
+    const category = f.page.locator('#fp-vende').getByRole('button', { name: 'Guitarra eléctrica', exact: true, includeHidden: true });
+    await category.locator('xpath=ancestor::details').locator('summary').click();
+    await category.click();
+    await f.page.locator('#fp-vende').getByRole('button', { name: 'Usado', exact: true }).click();
+    const expectProducts = expected => f.page.waitForFunction(expected => JSON.stringify([...document.querySelectorAll('#anuncios-lista .anuncio')]
+      .filter(card => getComputedStyle(card).display !== 'none').map(card => Number(card.dataset.id))) === JSON.stringify(expected), expected);
+    await expectProducts([9101]);
+    await f.page.locator('#precio-max').fill('100000');
+    await expectProducts([]);
+    await f.page.locator('#precio-max').fill('200000');
+    await expectProducts([9101]);
+    await f.page.locator('#zona-vende').fill('Zona inexistente en fixtures');
+    await expectProducts([]);
+    await f.page.locator('#zona-vende').fill('almagro');
+    await expectProducts([9101]);
+    await f.page.locator('.mobile-show-results-an').click();
+    await f.page.waitForFunction(() => document.querySelectorAll('#anuncios-lista .anuncio:not([style*="display: none"])').length === 1);
+    assert.deepEqual(await ids(), [9101], 'Category, condition, price and area are combined, not OR-ed across groups');
+    assert.match(await f.page.locator('#anuncios-lista .anuncio:visible').innerText(), /150\.000/);
+    const button = await f.page.locator('#publish-main-btn').boundingBox();
+    assert.ok(button && button.height >= 44 && button.x >= 0 && button.x + button.width <= 321, 'Sale action is usable on a 320px phone');
+    assert.ok(await f.page.evaluate(() => document.documentElement.scrollWidth <= 320), 'Marketplace has no horizontal overflow');
+    assert.equal(f.result.posts.length, 0, 'Public browsing cannot publish a product');
+    assert.equal(f.result.patches.length, 0);
+    assert.ok(f.result.writes.every(write => write === 'POST https://xiaanchoanxmampegoay.supabase.co/rest/v1/rpc/vencer_anuncios_viejos'), 'Only the existing simulated expiration RPC can be requested');
+    await capture(f.page, `deploy-${home.replace('.html', '')}-marketplace-320.png`);
+  });
+}
+
+test('deployed dance editor confirms a synthetic Tango to Ballet PATCH, reload and matching public hero', async t => {
+  const f = await setup(t, { logged: true, danceFixture: true, width: 320 });
+  await f.go('/buscARTE_perfil.html');
+  const ready = () => f.page.waitForFunction(() => typeof isLoadingProfile !== 'undefined' && !isLoadingProfile && document.getElementById('reg-nombre-perfil')?.value === 'Persona de prueba aislada');
+  await ready();
+  assert.deepEqual(await f.page.locator('#chips-disc-dan .chip.selected').allTextContents(), ['Tango']);
+  await f.page.locator('#chips-disc-dan').getByRole('button', { name: 'Tango', exact: true }).click();
+  await f.page.locator('#chips-disc-dan').getByRole('button', { name: 'Ballet', exact: true }).click();
+  const save = f.page.locator('#save-bar .btn-neon');
+  const button = await save.boundingBox();
+  assert.ok(button && button.height >= 44 && button.x >= 0 && button.x + button.width <= 321, 'Save remains in the mobile viewport');
+  await save.click();
+  await f.page.waitForFunction(() => document.getElementById('profile-status')?.textContent.includes('Perfil guardado correctamente'));
+  assert.equal(f.result.patches.length, 1);
+  const patch = f.result.patches[0];
+  assert.equal(new URLSearchParams(patch.query).get('id'), 'eq.' + fixtureUser);
+  assert.equal(new URLSearchParams(patch.query).get('select'), 'id,campos_especificos');
+  assert.match(patch.headers.prefer, /return=representation/);
+  const fields = typeof patch.body.campos_especificos === 'string' ? JSON.parse(patch.body.campos_especificos) : patch.body.campos_especificos;
+  assert.deepEqual(fields.disciplina, ['Ballet']);
+  assert.ok(await f.page.evaluate(() => document.documentElement.scrollWidth <= 320), 'Editor has no horizontal overflow');
+  await capture(f.page, 'deploy-danza-guardado-simulado-320.png');
+  await f.page.reload({ waitUntil: 'load' });
+  await ready();
+  assert.deepEqual(await f.page.locator('#chips-disc-dan .chip.selected').allTextContents(), ['Ballet']);
+  await f.go('/buscARTE_perfil_publico.html?id=' + fixtureUser);
+  await f.page.waitForFunction(() => document.body?.dataset.profileState === 'own');
+  assert.match(await f.page.locator('#perfil-tags').innerText(), /Ballet/i);
+  assert.doesNotMatch(await f.page.locator('#perfil-tags').innerText(), /Tango|Contemporáneo/i);
+  assert.match(await f.page.locator('#stat-genero').innerText(), /Ballet/i);
+  assert.match(await f.page.locator('#perfil-generos').innerText(), /Ballet/i);
+  assert.deepEqual(f.result.writes, ['PATCH https://xiaanchoanxmampegoay.supabase.co/rest/v1/perfiles'], 'Only the explicit synthetic profile update was requested');
+  assert.equal(f.result.posts.length, 0);
+  await capture(f.page, 'deploy-danza-perfil-publico-320.png');
 });
