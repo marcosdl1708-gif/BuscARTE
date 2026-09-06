@@ -3,7 +3,17 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
-## Estado operativo — corte de sincronización, 6/9/2026
+## Estado operativo — roles técnicos publicados, 6/9/2026
+
+**Publicado a las 18:13 ART:** deploy `6a9dd772a759ecdf9c3c56e5`, fuente `04b584d`, caché v18. Los cinco roles técnicos ya están en Música: registro, perfil, búsqueda y Busco/Ofrezco/filtros. Conservan datos/campos existentes; no son rubros nuevos ni categorías del Marketplace. Sin migración Auth, cambios de cuentas, horarios o Android. El guardado con contraseña y los mails anteriores se conservan.
+
+Comprobaciones acotadas: 4/4 pruebas de roles, build36; cuatro páginas en producción 200 con los roles y scripts inline idénticos, SW v18 idéntico. Cuatro funciones con el mismo hash; el paquete de send-email tiene otro hash, reproducido desde el mismo código fuente normalizado y el empaquetador existente. No se declara identidad binaria con su ZIP anterior. Cinco runtimes y dos horarios iguales. Sin cuentas, guardados, anuncios, mensajes o emails reales de prueba. Ver `docs/release-roles-20260906.md`.
+
+Guía única actualizada: `docs/guia-prueba-app-usuario-nuevo.md`; ahora incluye roles dentro del recorrido normal. La prueba física sigue a cargo del usuario. El cierre de este release se sincroniza con main mediante un último commit `[skip netlify]` para no duplicar el único deploy ya realizado. Evidencia remota posterior en el resguardo privado indicado en el informe.
+
+Rama de release `codex/release-roles-20260906`; la rama previa `codex/roles-tecnicos-20260906` es histórica, no un bloque todavía pendiente de desplegar. Sesiones sin contraseña repetida, ampliación de engagement, multirrubro/principal, niveles profesionales e identidad visual siguen separados/postergados. Original y Android intactos.
+
+### Histórico — sincronización anterior a publicar roles
 
 Producción: deploy `6a9dcf37d0aeb9991f8eb446`, código `b1d35dd`, caché v17, guardado seguro y ambos mails publicados. **El usuario confirmó que ya pudo guardar** y que recibió las muestras de correo. La contraseña al guardar sigue siendo la protección temporal existente; no se activó una migración Auth ni sesiones nuevas.
 

@@ -2,6 +2,12 @@
 
 Este seguimiento separa implementación web, validación física y resultados de uso. No reabre automáticamente bloques postergados.
 
+## Actualización vigente — roles publicados y guía única
+
+El usuario aclaró que la guía debía usarse después de publicar todos los cambios y autorizó el deploy de roles. **Publicado el 6/9 a las 18:13 ART**, `6a9dd772a759ecdf9c3c56e5`/v18, fuente `04b584d`. Las cinco especialidades de Música están verificadas en las cuatro páginas públicas; sin cambiar rubros, datos, Marketplace, Auth o Android. Cuatro pruebas locales específicas y build36; no se hicieron envíos, cuentas o publicaciones de prueba reales.
+
+La guía `guia-prueba-app-usuario-nuevo.md` integra roles en el recorrido normal y ya puede utilizarse, después de cerrar/reabrir la app conectada. No se declara probada físicamente. Informe `release-roles-20260906.md`. Los pendientes de sesiones, engagement ampliado, clasificación profesional, multirrubro/principal e identidad visual siguen separados. Las notas inferiores que dicen roles sólo locales son históricas.
+
 ## Decisión y avance actuales — roles, sincronización y guía
 
 El usuario confirmó que el guardado volvió a funcionar y que recibió las muestras de correo. Pidió avanzar, en este orden, con roles como especialidades existentes, sincronización de GitHub sin otro deploy y guía física. Las notas inferiores de bloqueo o pruebas de mail pendientes son históricas.

@@ -1,5 +1,7 @@
 # Roles técnicos — preparación local del 6/9/2026
 
+**Actualización: publicados el 6/9 a las 18:13 ART**, deploy `6a9dd772a759ecdf9c3c56e5`, fuente `04b584d`, v18. El usuario autorizó explícitamente publicar antes de hacer la única pasada física. Ver `release-roles-20260906.md` y `guia-prueba-app-usuario-nuevo.md`. Las notas inferiores de rama local/publicación pendiente describen la preparación anterior, ya superada.
+
 ## Alcance autorizado
 
 Especialidades dentro de **Música**, junto a los roles existentes Técnico de sonido, Productor y Manager. No se crea un rubro nuevo ni se distribuyen automáticamente perfiles entre rubros.

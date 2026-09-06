@@ -2,12 +2,12 @@
 
 Guía del 6/9/2026. Reservá unos 25–35 minutos. **La prueba física todavía no fue realizada:** esta guía es para hacerla en tu teléfono, desde el ícono de la app instalada.
 
-**Guía preparada para la versión web v18: usar después de recibir la confirmación del deploy.** El recorrido incluye el guardado seguro, los mails nuevos y los cinco roles técnicos dentro de Música. No damos por hecho que la app instalada ya cargó esa versión ni que sus enlaces se abren como app nativa.
+**Versión web v18 publicada y verificada el 6/9 a las 18:13 ART. Ya podés hacer este recorrido completo.** Incluye el guardado seguro, los mails nuevos y los cinco roles técnicos dentro de Música. No damos por hecho que la app instalada ya cargó esa versión ni que sus enlaces se abren como app nativa.
 
 ## Antes de empezar
 
 - Guardá cualquier edición pendiente y cerrá sesión. No desinstales la app ni borres sus datos para comenzar.
-- Después de la confirmación del deploy, cerrá y volvé a abrir la app con conexión. Si no aparecen los roles que se indican abajo, anotá «posible versión anterior» y avisame; no borres datos ni crees otra cuenta para intentar resolverlo.
+- Cerrá y volvé a abrir la app con conexión para recibir la actualización. Si no aparecen los roles que se indican abajo, anotá «posible versión anterior» y avisame; no borres datos ni crees otra cuenta para intentar resolverlo.
 - Usá un email tuyo que todavía no tenga cuenta en buscARTE, una contraseña que puedas recordar y una foto propia. No me envíes la contraseña.
 - Para chat, dejá tu cuenta habitual abierta en la PC o coordiná con alguien que acepte la prueba. No contactes a desconocidos para testear.
 - Anotá modelo de teléfono, Android/iOS, versión de la app si está disponible y hora. Marcá cada paso ✅, ❌ o «no probado».
