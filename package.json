@@ -5,7 +5,8 @@
   "scripts": {
     "build": "node scripts/build-site.mjs",
     "test": "node --test scripts/build-site.test.mjs",
-    "test:registro": "node --test scripts/registro-captcha.test.cjs"
+    "test:registro": "node --test scripts/registro-captcha.test.cjs",
+    "test:anuncios": "node --test scripts/anuncios-publicacion.test.cjs"
   },
   "keywords": [],
   "author": "buscARTE",

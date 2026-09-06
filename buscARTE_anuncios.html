@@ -843,6 +843,59 @@
     .filter-group-collapsible .fg-head { font-size:.66rem !important; }
   }
 
+  /* Publicación: cabecera y acciones fuera del área desplazable. */
+  #modal { z-index:1200; top:var(--publish-top, 0px); bottom:auto; height:var(--publish-height, 100vh); height:var(--publish-height, 100dvh); padding:1rem; overscroll-behavior:contain; }
+  #modal .modal { display:flex; flex-direction:column; width:620px; max-width:100%; max-height:100% !important; min-height:0; overflow:hidden; border-radius:16px; box-shadow:0 24px 80px #0008; }
+  #modal .modal-header { position:static; flex:0 0 auto; gap:1rem; padding:1rem 1.4rem; }
+  .modal-eyebrow { color:var(--gris); font-size:.65rem; text-transform:uppercase; letter-spacing:.12em; margin-bottom:.3rem; }
+  #modal .modal-close { min-width:44px; min-height:44px; border:1px solid var(--gris3); border-radius:8px; cursor:pointer; }
+  #publish-scroll { flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; scroll-padding:1rem; }
+  #publish-fields { border:0; padding:0; margin:0; min-width:0; }
+  #modal .modal-tipo-btn { border-radius:8px; min-height:48px; cursor:pointer; white-space:normal; }
+  #modal .modal-form { padding:1.3rem 1.4rem; }
+  #modal .mfield input, #modal .mfield select, #modal .mfield textarea { border-radius:8px; }
+  #modal .mfield label { color:#bdb9b0; }
+  #modal .modal-footer { position:static; display:block; flex:0 0 auto; padding:1rem 1.4rem; background:var(--negro2); border-top:1px solid #383838; box-shadow:0 -8px 24px #0003; }
+  .publish-actions { display:flex; gap:.65rem; }
+  #modal .btn-submit { flex:1; min-height:48px; border-radius:8px; padding:.8rem 1rem; cursor:pointer; }
+  #modal .btn-cancel { flex:0 0 auto; min-height:48px; border-radius:8px; cursor:pointer; }
+  #modal button:disabled { opacity:.65; cursor:wait; }
+  #modal :focus-visible { outline:2px solid var(--neon); outline-offset:3px; }
+  #publish-status { color:#bdb9b0; font-size:.8rem; line-height:1.45; margin:0 0 .75rem; max-height:5.8em; overflow-y:auto; }
+  #publish-status[data-state="error"], #publish-status[data-state="uncertain"] { color:#ffd08a; }
+  #publish-status[data-state="success"] { color:var(--neon); font-weight:500; }
+  #publish-result-links { display:flex; flex-wrap:wrap; align-items:center; gap:.7rem; margin-bottom:.85rem; }
+  #publish-result-links[hidden], #publish-retry-confirm[hidden] { display:none; }
+  #publish-view-link, #publish-retry-confirm { color:var(--blanco); font:inherit; font-size:.8rem; text-underline-offset:3px; }
+  #publish-retry-confirm { background:none; border:1px solid var(--gris2); border-radius:6px; min-height:44px; padding:.4rem .6rem; cursor:pointer; }
+  .remove-upload { border:0; background:transparent; color:var(--gris); font:inherit; font-size:.75rem; text-decoration:underline; min-height:44px; cursor:pointer; }
+  @media(max-width:900px) {
+    #modal { padding:0; }
+    #modal .modal { height:100%; border-radius:0; }
+    #modal .modal-header { padding:.75rem 1rem !important; }
+    #modal .modal-tipo-selector { display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)) !important; overflow:visible !important; padding:1rem !important; }
+    #modal .modal-tipo-btn { width:100%; min-width:0 !important; padding:.6rem .4rem; }
+    #modal .modal-tipo-btn:last-child:nth-child(odd) { grid-column:1/-1; }
+    #modal .modal-tipo-icon { display:inline; margin-right:.25rem; font-size:1rem; }
+    #modal .modal-tipo-label { font-size:.7rem; line-height:1.3; }
+    #modal .modal-form { padding:1rem !important; }
+    #modal .mfield input, #modal .mfield select, #modal .mfield textarea { font-size:16px; }
+    #modal .modal-footer { padding:.8rem 1rem calc(.8rem + env(safe-area-inset-bottom, 0px)) !important; }
+    #modal .modal-footer .btn-cancel { flex:0 0 auto; }
+  }
+  @media(max-height:450px) {
+    #modal .modal-header { padding:.4rem .75rem !important; }
+    #modal .modal-eyebrow { display:none; }
+    #modal .modal-footer { padding:.5rem .75rem !important; }
+    #publish-status { font-size:.75rem; max-height:2.9em; margin-bottom:.4rem; }
+  }
+  /* Un teclado puede reducir visualViewport sin cambiar las media queries. */
+  #modal.publish-compact .modal-header { padding:.4rem .75rem !important; }
+  #modal.publish-compact .modal-eyebrow { display:none; }
+  #modal.publish-compact .modal-footer { padding:.5rem .75rem calc(.5rem + env(safe-area-inset-bottom, 0px)) !important; }
+  #modal.publish-compact #publish-status { font-size:.75rem; max-height:2.9em; margin-bottom:.4rem; }
+  #modal.publish-compact #publish-result-links:not([hidden]) { display:grid; grid-template-columns:1fr 1fr; gap:.4rem; margin-bottom:.4rem; }
+  #modal.publish-compact #publish-view-link, #modal.publish-compact #publish-retry-confirm { font-size:.75rem; line-height:1.3; }
 </style>
 <link href="/manifest.json" rel="manifest"/>
 <meta content="#0a0a0a" name="theme-color"/>
@@ -857,11 +910,13 @@
 <div class="cursor-ring" id="cursor-ring"></div>
 <!-- ═══ MODAL ═══ -->
 <div class="modal-overlay" id="modal" onclick="closeModalOutside(event)">
-<div class="modal">
+<div class="modal" role="dialog" aria-modal="true" aria-labelledby="publish-title" aria-describedby="publish-status" tabindex="-1">
 <div class="modal-header">
-<div class="modal-title">Publicar anuncio</div>
-<button class="modal-close" onclick="closeModal()">×</button>
+<div><div class="modal-eyebrow">Nuevo anuncio · buscARTE</div><div class="modal-title" id="publish-title">Publicar anuncio</div></div>
+<button type="button" class="modal-close" aria-label="Cerrar publicación" onclick="closeModal()">×</button>
 </div>
+<div id="publish-scroll">
+<fieldset id="publish-fields" aria-label="Datos del anuncio">
 <div class="modal-tipo-selector">
 <button class="modal-tipo-btn selected" onclick="selectTipo('busco',this)"><span class="modal-tipo-icon">🔍</span><span class="modal-tipo-label">Busco artista</span></button>
 <button class="modal-tipo-btn" onclick="selectTipo('ofrezco',this)"><span class="modal-tipo-icon">🎨</span><span class="modal-tipo-label">Me ofrezco</span></button>
@@ -951,6 +1006,7 @@
 <input accept="image/jpeg,image/png,image/webp" id="foto-jam-input" onchange="subirFotoJam(this)" style="display:none" type="file"/>
 <img id="foto-jam-preview" style="display:none;width:100%;max-height:200px;object-fit:cover"/>
 <p class="foto-upload-text" id="foto-jam-text"><strong>📸 Subir flyer del evento</strong><br/>JPG, PNG o WebP · Máx. 2MB</p>
+<button type="button" class="remove-upload" onclick="event.stopPropagation();quitarFotoAnuncio('jam',1)">Quitar imagen</button>
 </div>
 </div>
 </div>
@@ -1026,23 +1082,35 @@
     <input accept="image/jpeg,image/png,image/webp" id="foto-venta-input-1" onchange="subirFotoVenta(this,1)" style="display:none" type="file"/>
     <img id="foto-venta-preview-1" style="display:none;width:100%;height:90px;object-fit:cover"/>
     <p class="foto-upload-text" id="foto-venta-text-1" style="font-size:.7rem;padding:.5rem"><strong>📷 Foto 1</strong><br/>Principal</p>
+    <button type="button" class="remove-upload" onclick="event.stopPropagation();quitarFotoAnuncio('venta',1)">Quitar foto 1</button>
   </div>
   <div class="foto-upload" id="foto-venta-zone-2" onclick="document.getElementById('foto-venta-input-2').click()" style="cursor:pointer;min-height:90px">
     <input accept="image/jpeg,image/png,image/webp" id="foto-venta-input-2" onchange="subirFotoVenta(this,2)" style="display:none" type="file"/>
     <img id="foto-venta-preview-2" style="display:none;width:100%;height:90px;object-fit:cover"/>
     <p class="foto-upload-text" id="foto-venta-text-2" style="font-size:.7rem;padding:.5rem"><strong>📷 Foto 2</strong><br/>Opcional</p>
+    <button type="button" class="remove-upload" onclick="event.stopPropagation();quitarFotoAnuncio('venta',2)">Quitar foto 2</button>
   </div>
   <div class="foto-upload" id="foto-venta-zone-3" onclick="document.getElementById('foto-venta-input-3').click()" style="cursor:pointer;min-height:90px">
     <input accept="image/jpeg,image/png,image/webp" id="foto-venta-input-3" onchange="subirFotoVenta(this,3)" style="display:none" type="file"/>
     <img id="foto-venta-preview-3" style="display:none;width:100%;height:90px;object-fit:cover"/>
     <p class="foto-upload-text" id="foto-venta-text-3" style="font-size:.7rem;padding:.5rem"><strong>📷 Foto 3</strong><br/>Opcional</p>
+    <button type="button" class="remove-upload" onclick="event.stopPropagation();quitarFotoAnuncio('venta',3)">Quitar foto 3</button>
   </div>
 </div>
 </div>
 </div>
+</fieldset>
+</div>
 <div class="modal-footer">
-<button class="btn-cancel" onclick="closeModal()">Cancelar</button>
-<button class="btn-submit" onclick="submitAnuncio()">Publicar →</button>
+<p id="publish-status" role="status" aria-live="polite" aria-atomic="true" data-state="idle">Podés cerrar y volver: conservamos lo escrito mientras sigas en esta página.</p>
+<div id="publish-result-links" hidden>
+  <a id="publish-view-link" href="buscARTE_mis_anuncios.html" target="_blank" rel="noopener">Revisar mis anuncios</a>
+  <button type="button" id="publish-retry-confirm" onclick="confirmarReintentoPublicacion()" hidden>Ya revisé: no se publicó</button>
+</div>
+<div class="publish-actions">
+<button type="button" class="btn-cancel" onclick="closeModal()">Cerrar</button>
+<button type="button" class="btn-submit" onclick="submitAnuncio()">Publicar anuncio</button>
+</div>
 </div>
 </div>
 </div>
@@ -1362,6 +1430,13 @@
   let uploadVentaPromise3 = null
   let uploadJamPromise = null
   let currentTipo = 'busco'
+  let anuncioEnviando = false
+  let publishState = 'idle'
+  let modalFocusAnterior = null
+  let modalBodyAnterior = null
+  let modalScrollAnterior = 0
+  const formRubrosRenderizados = new Map()
+  const fotoGeneraciones = Object.create(null)
   let sidebarTipo = 'busco'
   let tipoFiltro = 'todos'
   let anunciosOffset = 0
@@ -1544,7 +1619,9 @@
 
   // MODAL
   function openModal(tipo) {
+    if (anuncioEnviando || document.getElementById('modal')?.classList.contains('open')) return
     if (!requireLogin('publicar')) return
+    if (publishState === 'uncertain') tipo = currentTipo
     tipo = canonicalTipo(tipo || 'busco')
     // Visitante: si pide un tipo no permitido (busco/ofrezco/clases), caer al primero permitido.
     const permitidos = publicarTiposPermitidos()
@@ -1561,14 +1638,36 @@
     if (!tipoMatch) { const primero = document.querySelector('.modal-tipo-btn'); if (primero) primero.classList.add('selected') }
     showForm(tipo)
     const modal = document.getElementById('modal')
+    if (modal?.classList.contains('open')) return
+    modalFocusAnterior = document.activeElement
+    modalScrollAnterior = window.scrollY
+    modalBodyAnterior = {}
+    ;['overflow','position','top','left','right','width'].forEach(key => { modalBodyAnterior[key] = document.body.style[key] })
     if (modal) modal.classList.add('open')
     document.body.style.overflow = 'hidden'
+    document.body.style.position = 'fixed'
+    document.body.style.top = `-${modalScrollAnterior}px`
+    document.body.style.left = '0'
+    document.body.style.right = '0'
+    document.body.style.width = '100%'
+    syncPublishViewport()
+    document.querySelector('#modal .modal').focus({ preventScroll:true })
   }
   function closeModal() {
+    if (anuncioEnviando) return
     const modal = document.getElementById('modal')
+    if (!modal?.classList.contains('open')) return
     if (modal) modal.classList.remove('open')
-    document.body.style.overflow = ''
+    if (modalBodyAnterior) Object.assign(document.body.style, modalBodyAnterior)
+    window.scrollTo({ top:modalScrollAnterior, behavior:'instant' })
+    modalFocusAnterior?.focus({ preventScroll:true })
+    if (publishState === 'success') resetAnuncioDraft()
+  }
+  function resetAnuncioDraft() {
+    formRubrosRenderizados.clear()
     document.querySelectorAll('.modal-form input, .modal-form textarea').forEach(el => { el.value = '' })
+    document.querySelectorAll('.modal-form select').forEach(el => { el.selectedIndex = 0 })
+    document.querySelectorAll('.modal-form .mchip').forEach(el => el.classList.remove('on'))
     document.querySelectorAll('.radio-group').forEach(group => {
       group.querySelectorAll('.radio-btn').forEach((btn, i) => btn.classList.toggle('selected', i === 0))
     })
@@ -1586,17 +1685,72 @@
     uploadVentaPromise2 = null
     uploadVentaPromise3 = null
     uploadJamPromise = null
+    ;['jam-1','venta-1','venta-2','venta-3'].forEach(key => { fotoGeneraciones[key] = (fotoGeneraciones[key] || 0) + 1 })
     resetFotoUI('jam')
     resetFotoUI('venta')
+    setPublishState('idle')
   }
   function closeModalOutside(e) { if(e.target === document.getElementById('modal')) closeModal() }
-  document.addEventListener('keydown', e=>{ if(e.key === 'Escape') closeModal() })
+  document.addEventListener('keydown', e => {
+    if (!document.getElementById('modal')?.classList.contains('open')) return
+    if (e.key === 'Escape') { e.preventDefault(); closeModal(); return }
+    if (e.key !== 'Tab') return
+    const targets = [...document.querySelectorAll('#modal button:not(:disabled), #modal a[href], #modal input:not(:disabled), #modal select:not(:disabled), #modal textarea:not(:disabled)')]
+      .filter(el => !el.matches(':disabled') && el.getClientRects().length && getComputedStyle(el).visibility !== 'hidden')
+    const first = targets[0], last = targets[targets.length - 1]
+    if (!first) { e.preventDefault(); return }
+    if (e.shiftKey && (document.activeElement === first || !targets.includes(document.activeElement))) { e.preventDefault(); last.focus() }
+    else if (!e.shiftKey && (document.activeElement === last || !targets.includes(document.activeElement))) { e.preventDefault(); first.focus() }
+  })
+
+  function syncPublishViewport() {
+    const modal = document.getElementById('modal')
+    if (!modal?.classList.contains('open')) return
+    const viewport = window.visualViewport
+    if (viewport && viewport.scale > 1.05) return // No reducir texto por pinch zoom.
+    const height = viewport?.height || window.innerHeight
+    modal.style.setProperty('--publish-height', `${height}px`)
+    modal.style.setProperty('--publish-top', `${viewport?.offsetTop || 0}px`)
+    modal.classList.toggle('publish-compact', height <= 450)
+  }
+  window.addEventListener('resize', syncPublishViewport)
+  window.visualViewport?.addEventListener('resize', syncPublishViewport)
+  window.visualViewport?.addEventListener('scroll', syncPublishViewport)
+
+  function setPublishState(state, message, anuncioId) {
+    publishState = state
+    const status = document.getElementById('publish-status')
+    status.dataset.state = state
+    status.textContent = message || 'Podés cerrar y volver: conservamos lo escrito mientras sigas en esta página.'
+    const busy = state === 'publishing'
+    document.getElementById('publish-fields').disabled = busy || state === 'success'
+    document.getElementById('publish-fields').setAttribute('aria-busy', String(busy))
+    document.querySelectorAll('#modal .modal-close, #modal .btn-cancel').forEach(btn => { btn.disabled = busy })
+    const submit = document.querySelector('#modal .btn-submit')
+    submit.disabled = busy || state === 'success' || state === 'uncertain'
+    submit.textContent = busy ? 'Publicando…' : state === 'success' ? '✓ Publicado' : 'Publicar anuncio'
+    const resultLinks = document.getElementById('publish-result-links')
+    resultLinks.hidden = !['success','uncertain'].includes(state)
+    const link = document.getElementById('publish-view-link')
+    link.href = state === 'success' && anuncioId ? `buscARTE_anuncio_detalle.html?id=${encodeURIComponent(anuncioId)}` : 'buscARTE_mis_anuncios.html'
+    link.textContent = state === 'success' ? 'Ver mi anuncio →' : 'Revisar mis anuncios →'
+    document.getElementById('publish-retry-confirm').hidden = state !== 'uncertain'
+  }
+  function confirmarReintentoPublicacion() {
+    if (anuncioEnviando || publishState !== 'uncertain') return
+    setPublishState('idle', 'Si comprobaste que no aparece en Mis anuncios, podés volver a publicarlo. Lo escrito sigue acá.')
+  }
 
   function selectTipo(tipo, el) {
+    if (anuncioEnviando || ['success','uncertain'].includes(publishState)) return
+    const permitidos = publicarTiposPermitidos()
+    if (permitidos && !permitidos.includes(canonicalTipo(tipo))) return
     currentTipo = canonicalTipo(tipo)
     document.querySelectorAll('.modal-tipo-btn').forEach(b=>b.classList.remove('selected'))
     if (el) el.classList.add('selected')
     showForm(currentTipo)
+    if (publishState === 'error') setPublishState('idle')
+    document.getElementById('publish-scroll').scrollTop = 0
   }
 
   function showForm(tipo) {
@@ -1607,7 +1761,7 @@
 
     const miRubro = localStorage.getItem('ba_rubro') || 'musica'
 
-    if (tipo === 'busco') {
+    if (tipo === 'busco' && formRubrosRenderizados.get(tipo) !== (buscoRubroSeleccionado || 'musica')) {
       // "Busco" deja elegir a quién buscás (cualquier rubro). Siempre mostramos el selector
       // y dejamos marcado el chip del rubro activo para que se vea el estado actual.
       const rb = buscoRubroSeleccionado || 'musica'
@@ -1618,10 +1772,13 @@
     }
 
     // ofrezco / clases / jam: tu propia disciplina (lo que publicás es de tu rubro)
-    if (tipo === 'ofrezco') renderOfrecerChips(miRubro)
-    if (tipo === 'clases') renderClasesChips(miRubro)
-    if (tipo === 'jam') renderJamChips(miRubro)
-    if (tipo === 'vende') renderVendeCategorias()
+    if (formRubrosRenderizados.get(tipo) !== miRubro && tipo !== 'busco') {
+      if (tipo === 'ofrezco') renderOfrecerChips(miRubro)
+      if (tipo === 'clases') renderClasesChips(miRubro)
+      if (tipo === 'jam') renderJamChips(miRubro)
+      if (tipo === 'vende') renderVendeCategorias()
+      formRubrosRenderizados.set(tipo, miRubro)
+    }
 
     // Actualizar título del modal según el tipo seleccionado
     actualizarTituloModal(tipo)
@@ -1655,13 +1812,13 @@
     if (tipo === 'jam') {
       const preview = document.getElementById('foto-jam-preview')
       const text = document.getElementById('foto-jam-text')
-      if (preview) { preview.style.display = 'none'; preview.src = '' }
+      if (preview) { preview.style.display = 'none'; preview.removeAttribute('src') }
       if (text) { text.style.display = 'block'; text.innerHTML = '<strong>📸 Subir flyer del evento</strong><br>JPG, PNG o WebP · se optimiza automático' }
     } else {
       [1,2,3].forEach(n => {
         const preview = document.getElementById(`foto-venta-preview-${n}`)
         const text = document.getElementById(`foto-venta-text-${n}`)
-        if (preview) { preview.style.display = 'none'; preview.src = '' }
+        if (preview) { preview.style.display = 'none'; preview.removeAttribute('src') }
         if (text) {
           text.style.display = 'block'
           text.innerHTML = n === 1
@@ -1706,19 +1863,45 @@
     return new File([blob], safeName + '.jpg', { type: 'image/jpeg' })
   }
 
+  async function conLimitePublicacion(tarea, limiteMs = 60000) {
+    const controller = new AbortController()
+    let timer
+    try {
+      return await Promise.race([
+        Promise.resolve().then(() => tarea(controller.signal)),
+        new Promise((_, reject) => {
+          timer = setTimeout(() => {
+            controller.abort()
+            reject(new Error('La conexión tardó demasiado. Lo escrito sigue acá.'))
+          }, limiteMs)
+        })
+      ])
+    } finally { clearTimeout(timer) }
+  }
+
   async function uploadAnuncioImage(input, tipo, slot) {
+    if (anuncioEnviando) return
     if (!input.files || !input.files[0]) return null
     const original = input.files[0]
     const slotN = slot || 1
+    input.value = '' // Permite volver a elegir la misma imagen después de un error.
+    const key = `${tipo}-${slotN}`
+    const generation = (fotoGeneraciones[key] || 0) + 1
+    fotoGeneraciones[key] = generation
+    const vigente = () => fotoGeneraciones[key] === generation
+    asignarFotoAnuncio(tipo, slotN, null)
     const previewId = tipo === 'jam' ? 'foto-jam-preview' : `foto-venta-preview-${slotN}`
     const textId    = tipo === 'jam' ? 'foto-jam-text'    : `foto-venta-text-${slotN}`
     const preview = document.getElementById(previewId)
     const text = document.getElementById(textId)
     try {
+      return await conLimitePublicacion(async signal => {
       const dataUrl = await fileToDataURL(original)
+      if (!vigente() || signal.aborted) return
       if (preview) { preview.src = dataUrl; preview.style.display = 'block' }
       if (text) { text.style.display = 'block'; text.innerHTML = '⏳ Optimizando y subiendo...' }
       const file = await optimizeImage(original)
+      if (!vigente() || signal.aborted) return
       const extMap = { 'image/png':'png', 'image/webp':'webp', 'image/jpeg':'jpg' }
       const ext = extMap[file.type] || 'jpg'
       const random = (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now())
@@ -1726,36 +1909,70 @@
       const res = await fetch(`${SUPABASE_URL}/storage/v1/object/fotos-anuncios/${fileName}`, {
         method:'POST',
         headers:{ ...SB_HEADERS, 'Content-Type':file.type, 'x-upsert':'true' },
-        body:file
+        body:file,
+        signal
       })
       if (!res.ok) {
         const errText = await res.text().catch(()=> '')
         throw new Error(errText || 'Error de Storage')
       }
       const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/fotos-anuncios/${fileName}`
+      if (!vigente() || signal.aborted) return
+      asignarFotoAnuncio(tipo, slotN, publicUrl)
       if (text) text.innerHTML = tipo === 'jam' ? '✅ Flyer listo' : '✅ Foto lista'
       return publicUrl
+      })
     } catch(e) {
+      if (!vigente()) return
       console.error('Error subiendo imagen:', e)
-      if (text) text.innerHTML = '❌ Error al subir. Probá con otra imagen.'
+      if (text) text.textContent = 'No se pudo subir. Volvé a elegir la imagen o quitala para publicar sin ella.'
       return null
     }
   }
 
   function subirFotoJam(input) {
-    uploadJamPromise = uploadAnuncioImage(input, 'jam').then(url => { fotoJamUrl = url; return url })
+    if (anuncioEnviando || !input.files?.length) return
+    uploadJamPromise = uploadAnuncioImage(input, 'jam')
   }
   function subirFotoVenta(input, n) {
+    if (anuncioEnviando || !input.files?.length) return
     const slot = n || 1
-    const promise = uploadAnuncioImage(input, 'venta', slot).then(url => {
-      if (slot === 1) fotoVentaUrl = url
-      else if (slot === 2) fotoVentaUrl2 = url
-      else if (slot === 3) fotoVentaUrl3 = url
-      return url
-    })
+    const promise = uploadAnuncioImage(input, 'venta', slot)
     if (slot === 1) uploadVentaPromise = promise
     else if (slot === 2) uploadVentaPromise2 = promise
     else if (slot === 3) uploadVentaPromise3 = promise
+  }
+
+  function asignarFotoAnuncio(tipo, slot, url) {
+    if (tipo === 'jam') fotoJamUrl = url
+    else if (slot === 1) fotoVentaUrl = url
+    else if (slot === 2) fotoVentaUrl2 = url
+    else if (slot === 3) fotoVentaUrl3 = url
+  }
+  function quitarFotoAnuncio(tipo, slot = 1) {
+    if (anuncioEnviando || publishState === 'success') return
+    const key = `${tipo}-${slot}`
+    fotoGeneraciones[key] = (fotoGeneraciones[key] || 0) + 1
+    asignarFotoAnuncio(tipo, slot, null)
+    if (tipo === 'jam') uploadJamPromise = null
+    else if (slot === 1) uploadVentaPromise = null
+    else if (slot === 2) uploadVentaPromise2 = null
+    else if (slot === 3) uploadVentaPromise3 = null
+    const prefix = tipo === 'jam' ? 'foto-jam' : 'foto-venta'
+    const suffix = tipo === 'jam' ? '' : `-${slot}`
+    const preview = document.getElementById(`${prefix}-preview${suffix}`)
+    const text = document.getElementById(`${prefix}-text${suffix}`)
+    const input = document.getElementById(`${prefix}-input${suffix}`)
+    if (preview) { preview.style.display = 'none'; preview.removeAttribute('src') }
+    if (input) input.value = ''
+    if (text) { text.style.display = 'block'; text.textContent = tipo === 'jam' ? 'Elegir flyer (opcional)' : `Elegir foto ${slot}` }
+  }
+
+  async function esperarFotoAnuncio(promise, previousUrl) {
+    if (!promise) return previousUrl || null
+    const url = await promise
+    if (!url) throw new Error('Hay una imagen que no terminó de subir. Volvé a elegirla o quitala antes de publicar. Lo escrito sigue acá.')
+    return url
   }
 
   function getSelectedTexts(root, selector = '.mchip.on') {
@@ -1763,6 +1980,7 @@
   }
 
   async function submitAnuncio() {
+    if (anuncioEnviando || ['success','uncertain'].includes(publishState)) return
     if (!requireLogin('publicar')) return
     const btn = document.querySelector('.btn-submit')
     const formActivo = document.querySelector('.modal-form.active')
@@ -1774,6 +1992,11 @@
       return
     }
     const miId = normalizeId(localStorage.getItem('ba_user_id'))
+    if (!miId) { setPublishState('error', 'No pudimos identificar tu cuenta. Volvé a ingresar antes de publicar.'); return }
+    anuncioEnviando = true
+    setPublishState('publishing', 'Estamos preparando tu anuncio y esperando las imágenes. No vuelvas a enviarlo.')
+    let envioIniciado = false
+    try {
     let datos = { tipo, estado:'activo', user_id: miId }
     // Rubro de quien publica (su disciplina). Define el tablón para ofrezco/clases/jam.
     // El marketplace (vende) es transversal: vive en la sección Compra-venta y no necesita
@@ -1821,14 +2044,15 @@
       datos.generos = getSelectedTexts(document.getElementById('jam-generos')).join(', ')
       const fechaInput = document.getElementById('jam-fecha')?.value
       const horaInput = document.getElementById('jam-hora')?.value || '18:00'
-      datos.fecha_evento = fechaInput ? new Date(fechaInput + 'T' + horaInput).toISOString() : null
+      const fechaEvento = fechaInput ? new Date(fechaInput + 'T' + horaInput) : null
+      if (fechaEvento && isNaN(fechaEvento.getTime())) throw new Error('Revisá la fecha y la hora del evento.')
+      datos.fecha_evento = fechaEvento ? fechaEvento.toISOString() : null
       datos.lugar = document.getElementById('jam-lugar')?.value?.trim()
       datos.precio_entrada = document.getElementById('jam-precio')?.value?.trim()
       datos.link_evento = document.getElementById('jam-link')?.value?.trim()
       datos.contacto_evento = document.getElementById('jam-contacto')?.value?.trim()
       if (!datos.titulo) datos.titulo = datos.lugar ? `Jam en ${datos.lugar}` : 'Jam / Zapada'
-      if (uploadJamPromise) datos.foto_url = await uploadJamPromise
-      else datos.foto_url = fotoJamUrl || null
+      datos.foto_url = await esperarFotoAnuncio(uploadJamPromise, fotoJamUrl)
     }
 
     if (tipo === 'vende') {
@@ -1844,54 +2068,57 @@
       datos.zona = form.querySelector('input[placeholder*="Caballito"]')?.value?.trim()
       datos.descripcion = form.querySelector('textarea')?.value?.trim()
       datos.titulo = datos.categoria_producto ? `Vendo ${datos.categoria_producto}${datos.marca ? ' ' + datos.marca : ''}` : 'Vendo equipo'
-      if (uploadVentaPromise) datos.foto_url = await uploadVentaPromise
-      else datos.foto_url = fotoVentaUrl || null
-      if (uploadVentaPromise2) datos.foto_url_2 = await uploadVentaPromise2
-      else datos.foto_url_2 = fotoVentaUrl2 || null
-      if (uploadVentaPromise3) datos.foto_url_3 = await uploadVentaPromise3
-      else datos.foto_url_3 = fotoVentaUrl3 || null
+      datos.foto_url = await esperarFotoAnuncio(uploadVentaPromise, fotoVentaUrl)
+      datos.foto_url_2 = await esperarFotoAnuncio(uploadVentaPromise2, fotoVentaUrl2)
+      datos.foto_url_3 = await esperarFotoAnuncio(uploadVentaPromise3, fotoVentaUrl3)
     }
 
-    if (!datos.titulo) { alert('Completá el título del anuncio.'); return }
+    if (!datos.titulo) throw new Error('Completá el título del anuncio.')
     if (!datos.descripcion && ['busco','ofrezco','jam','clases'].includes(tipo)) {
-      if (!confirm('El anuncio no tiene descripción. ¿Publicarlo igual?')) return
+      if (!confirm('El anuncio no tiene descripción. ¿Publicarlo igual?')) { setPublishState('idle', 'Podés agregar una descripción antes de publicarlo.'); return }
     }
 
-    btn.textContent = 'Publicando...'
-    btn.style.opacity = '0.7'
-    btn.disabled = true
-
-    try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/anuncios`, {
-        method:'POST',
-        headers:{ ...SB_HEADERS, 'Content-Type':'application/json', 'Prefer':'return=representation' },
-        body: JSON.stringify(datos)
+      setPublishState('publishing', 'Publicando tu anuncio… Esperá la confirmación antes de salir.')
+      envioIniciado = true
+      const resultado = await conLimitePublicacion(async signal => {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/anuncios`, {
+          method:'POST',
+          headers:{ ...SB_HEADERS, 'Content-Type':'application/json', 'Prefer':'return=representation' },
+          body: JSON.stringify(datos),
+          signal
+        })
+        if (!res.ok) return { ok:false, status:res.status, error:await res.text().catch(() => '') }
+        return { ok:true, data:await res.json().catch(() => null) }
       })
-      if (!res.ok) {
-        const errText = await res.text().catch(()=> '')
-        console.error('Error publicando anuncio:', res.status, errText)
-        alert('No se pudo publicar. Revisá los datos e intentá de nuevo.')
+      if (!resultado.ok) {
+        console.error('Error publicando anuncio:', resultado.status, resultado.error)
+        if ([408,502,503,504].includes(resultado.status)) setPublishState('uncertain', 'El servicio no pudo confirmar el resultado. Revisá Mis anuncios antes de repetir para evitar duplicados. Lo escrito sigue acá.')
+        else setPublishState('error', 'No se pudo publicar. Conservamos los datos y las fotos: revisá el formulario e intentá de nuevo.')
         return
       }
-      window.MetaAds?.trackCustom('PublishAd', {
-        ad_type: tipo,
-        category: datos.rubro_buscado || datos.rubro || 'general'
-      })
-      btn.textContent = '✓ Publicado'
-      btn.style.background = '#a8c832'
-      setTimeout(() => {
-        closeModal()
-        btn.textContent = 'Publicar →'
-        btn.style.background = ''
-        anunciosOffset = 0
-        cargarAnuncios(false)
-      }, 900)
+      const data = resultado.data
+      const creado = Array.isArray(data) ? data[0] : data
+      if (!creado || !['string','number'].includes(typeof creado.id) || !String(creado.id).trim()) {
+        setPublishState('uncertain', 'El servidor respondió, pero falta la confirmación del anuncio. Revisá Mis anuncios antes de repetir para evitar duplicados.')
+        return
+      }
+      setPublishState('success', '¡Tu anuncio ya está publicado! Podés abrirlo desde acá, aunque no coincida con los filtros del tablón.', String(creado.id))
+      try {
+        window.MetaAds?.trackCustom('PublishAd', { ad_type:tipo, category:datos.rubro_buscado || datos.rubro || 'general' })
+      } catch (_) { /* La medición nunca debe convertir una publicación exitosa en error. */ }
+      anunciosOffset = 0
+      cargarAnuncios(false)
     } catch(e) {
       console.error(e)
-      alert('No se pudo conectar. Verificá tu conexión.')
+      if (envioIniciado) setPublishState('uncertain', 'Se cortó la conexión y no podemos confirmar si se publicó. Lo escrito sigue acá. Revisá Mis anuncios antes de volver a enviar.')
+      else setPublishState('error', e.message || 'No pudimos preparar el anuncio. Lo escrito sigue acá; intentá de nuevo.')
     } finally {
-      btn.style.opacity = '1'
-      btn.disabled = false
+      anuncioEnviando = false
+      // El resultado gobierna el botón: éxito/resultado incierto no habilitan otro POST.
+      document.querySelectorAll('#modal .modal-close, #modal .btn-cancel').forEach(el => { el.disabled = false })
+      document.getElementById('publish-fields').disabled = publishState === 'success'
+      document.getElementById('publish-fields').setAttribute('aria-busy', 'false')
+      btn.disabled = ['success','uncertain'].includes(publishState)
     }
   }
 
@@ -2610,6 +2837,8 @@
   }
 
   function seleccionarRubroBusco(rubro, btn) {
+    if (anuncioEnviando) return
+    formRubrosRenderizados.set('busco', rubro)
     buscoRubroSeleccionado = rubro
     document.querySelectorAll('#busco-rubro-chips .mchip').forEach(c => c.classList.remove('on'))
     if (btn) btn.classList.add('on')
