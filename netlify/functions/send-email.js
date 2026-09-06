@@ -88,19 +88,23 @@ function buildEmail(tipo, rawDatos = {}) {
   const datos = rawDatos || {};
 
   if (tipo === 'bienvenida') {
-    const nombre = clean(datos.nombre, 80) || 'artista';
+    const nombre = typeof datos.nombre === 'string' ? clean(datos.nombre, 80) : '';
     return {
-      subject: `¡Bienvenido/a a buscARTE, ${stripForSubject(nombre, 60)}!`,
+      subject: 'Ya estás en buscARTE. ¿Por dónde empezamos?',
       html: brandShell(`
-        <h2 style="color:#d4f53c;margin:0 0 16px">¡Ya sos parte de la escena!</h2>
-        <p>Hola <strong>${escapeHtml(nombre)}</strong>, tu perfil en buscARTE ya está activo.</p>
-        <p style="color:#888;margin:22px 0 8px">Ahora podés:</p>
-        <ul style="color:#ccc;padding-left:22px;line-height:1.8">
-          <li>Completar tu perfil para aparecer mejor en las búsquedas.</li>
-          <li>Explorar artistas de todos los rubros y conectar con colaboradores.</li>
-          <li>Publicar anuncios, jams, clases o compra/venta de equipos.</li>
-        </ul>
-        ${cta('Explorar artistas →', `${BASE_URL}/buscARTE_busqueda.html`)}
+        <div style="font-size:16px;line-height:1.6;overflow-wrap:anywhere;word-wrap:break-word">
+          <h2 style="color:#f2ede4;font-size:28px;line-height:1.2;margin:0 0 24px">Qué bueno tenerte por acá.</h2>
+          <p style="margin:0 0 12px">Hola${nombre ? ` <strong style="word-break:break-word">${escapeHtml(nombre)}</strong>` : ''}.</p>
+          <p style="color:#ccc;margin:0 0 16px">Tu cuenta y tu perfil inicial ya están creados. Podés empezar a conocer la comunidad.</p>
+          <p style="color:#ccc;margin:0 0 4px">Elegí un rubro y encontrá artistas por especialidad y zona.</p>
+          <a href="${escapeHtml(`${BASE_URL}/index.html#explorar`)}" style="display:inline-block;max-width:100%;box-sizing:border-box;background:#d4f53c;color:#0a0a0a;padding:14px 20px;line-height:20px;text-align:center;text-decoration:none;font-weight:700;margin:16px 0 0;border-radius:4px">Explorar artistas</a>
+          <div style="border-top:1px solid #444;margin-top:32px;padding-top:24px">
+            <h3 style="color:#f2ede4;font-size:18px;line-height:1.4;margin:0 0 12px">Tu perfil, a tu ritmo</h3>
+            <p style="color:#ccc;margin:0 0 8px">Cuando quieras, sumá una foto y unas líneas sobre tu trabajo. No hace falta completar todo para empezar.</p>
+            <a href="${escapeHtml(`${BASE_URL}/buscARTE_login.html?redirect=buscARTE_perfil.html%23completar`)}" style="display:inline-block;max-width:100%;box-sizing:border-box;color:#d4f53c;padding:12px 0;line-height:20px;text-decoration:underline;font-weight:700">Completar mi perfil</a>
+            <p style="color:#aaa;font-size:14px;line-height:1.6;margin:8px 0 0">Para editar tu perfil, ingresá con el email y la contraseña que elegiste al registrarte.</p>
+          </div>
+        </div>
       `)
     };
   }
