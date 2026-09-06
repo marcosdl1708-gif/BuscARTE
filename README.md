@@ -3,7 +3,11 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
-## Estado operativo — publicación del 5/9, 23:44 ART
+## Estado operativo — publicación del 6/9, 12:54 ART
+
+**Marketplace + guardado/danza ya están publicados**: deploy activo `6a9d8cbb808123cc8c948eb2`, fuente pública `8957ad0`, caché v13. El usuario resolvió el saldo de Netlify y autorizó retomar; hubo un único deploy exitoso, sin preview ni push. Verificados 35 recursos, 35 rutas, cuatro exclusiones y **11/11 smoke tests sobre producción con backend simulado**, además de las 214 pruebas locales previas. Funciones y horarios intactos; sin migración Auth ni cambios Android. Informe `docs/release-marketplace-danza-20260906.md`, respaldo privado `../BuscARTE-resguardos/release-marketplace-danza-20260906`. Próximo bloque propuesto: onboarding/completitud, inicialmente local. GitHub `main` sigue pendiente de sincronizar; no disparar otro deploy por accidente.
+
+Las entradas siguientes registran los estados históricos previos a esta publicación, incluido el bloqueo por créditos ya resuelto.
 
 Actualización 6/9 — **Marketplace + guardado/danza siguen sin publicar**. El deploy conjunto autorizado fue rechazado con `Forbidden`: Netlify confirmó que el equipo está en créditos operativos y tiene pausadas las publicaciones de producción. No hubo nuevo deploy ID ni cambio de versión pública; no se reintentó ni se cambió de plan. Paquete listo con **214/214 pruebas locales** en una corrida, más **11/11 smoke tests locales**. Diagnóstico y condiciones para retomar: `docs/deploy-marketplace-danza-20260906.md`. Próximo período informado: 14/9, 04:00 ART. No confundir este `dist/` v13 con producción v11.
 

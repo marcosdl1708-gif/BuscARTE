@@ -1,5 +1,7 @@
 # Publicación pendiente — Marketplace + guardado de danza
 
+**Actualización posterior:** el usuario resolvió el saldo y autorizó retomar. Se publicó y verificó el deploy `6a9d8cbb808123cc8c948eb2` el 6/9 a las 12:54 ART. Ver `release-marketplace-danza-20260906.md`. Lo siguiente conserva el diagnóstico histórico del intento rechazado; ya no es un bloqueo vigente.
+
 El usuario autorizó publicar ambos bloques juntos. El 6/9/2026 se hizo **un intento de deploy**, rechazado por Netlify con `JSONHTTPError: Forbidden` (exit 1). **No se publicó este paquete ni se obtuvo un nuevo deploy ID.**
 
 ## Causa y estado seguro
