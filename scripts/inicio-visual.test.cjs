@@ -8,6 +8,10 @@ const { chromium } = require(process.env.BUSCARTE_PLAYWRIGHT_MODULE || 'playwrig
 const root = path.resolve(__dirname, '..');
 const pages = ['index.html', 'buscARTE_index.html'];
 const baselineCommit = '91608ad';
+// Explicit exception for the later single-category consistency block: only the
+// ten established index destinations may be added to the legacy Home, once each.
+const legacyRubroAdditions = ['musica','actuacion','audiovisual','modelaje','diseno','tatuaje','danza','maquillaje','circo','escritura']
+  .map(key => 'buscARTE_busqueda.html?rubro=' + key);
 const baselineMode = process.env.BUSCARTE_INICIO_VISUAL_BASELINE === '1';
 const origin = 'https://buscarte.test';
 const allowedFiles = new Set(JSON.parse(fs.readFileSync(path.join(root, 'site-files.json'), 'utf8')));
@@ -125,7 +129,9 @@ if (baselineMode) {
         assert.ok(index >= 0, `Existing destination occurrence preserved: ${href}`);
         remaining.splice(index, 1);
       }
-      for (const href of remaining) assert.ok(contracts.previous.hrefs.includes(href), `New shortcut only duplicates an existing destination: ${href}`);
+      const allowedAdditions = file === 'buscARTE_index.html' ? legacyRubroAdditions : [];
+      for (const href of allowedAdditions) assert.equal(remaining.filter(value => value === href).length, 1, `Exactly one approved category entry: ${href}`);
+      for (const href of remaining) assert.ok(contracts.previous.hrefs.includes(href) || allowedAdditions.includes(href), `New shortcut only duplicates an existing destination or the explicitly approved category entry: ${href}`);
       assert.deepEqual(contracts.current.scripts, contracts.previous.scripts, 'Inline logic and script imports unchanged');
       assert.deepEqual(contracts.current.fields, contracts.previous.fields, 'Search fields, defaults and every option keep the existing contract');
       assert.deepEqual(contracts.current.handlers, contracts.previous.handlers, 'Existing event handlers are neither removed nor changed');

@@ -134,6 +134,16 @@ html[data-home-session="recover"] .hero-content { width: 100%; }
 .home-clarity .ri-name { color: #e5e5dc; line-height: 1.3; font-size: .96rem; }
 .home-clarity .ri-sub { color: #a5a69c; line-height: 1.6; letter-spacing: 0; text-transform: none; font-size: .75rem; }
 .home-clarity .ri-emoji { font-size: 1.5rem; }
+.home-clarity .home-rubro-nav { padding-top: 2rem; padding-bottom: 2.5rem; border-bottom: 1px solid #25271f; }
+.home-clarity .home-rubro-nav .home-section-copy { max-width: none; margin-top: .75rem; }
+.home-clarity .home-rubro-links { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .6rem; margin-top: 1.25rem; }
+.home-clarity .home-rubro-link {
+  display: flex; align-items: center; min-height: 52px; min-width: 0; padding: .7rem .85rem;
+  border: 1px solid #3a3d31; border-radius: 6px; color: #e5e5dc; background: #11120f;
+  font-size: .86rem; line-height: 1.45; text-decoration: none;
+}
+.home-clarity .home-rubro-link:hover { border-color: var(--neon); background: #1b1e14; }
+.home-clarity .home-musical-note { margin-top: 1rem; }
 .home-clarity .intent-grid { border: 0; background: transparent; gap: .75rem; }
 .home-clarity .intent-card, .home-clarity .step {
   border: 1px solid #30322a; border-radius: 8px; background: #11120f;
@@ -166,6 +176,7 @@ html[data-home-session="recover"] .home-clarity nav a[data-home-recover] { displ
 .home-clarity #nav-guest { display: flex; align-items: center; gap: .4rem; }
 /* La navegación intermedia no debe partir los accesos ni tapar el kicker. */
 @media (min-width: 769px) and (max-width: 1024px) {
+  .home-clarity .home-rubro-links { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .home-clarity nav { padding: .9rem 1.25rem; gap: 1rem; }
   .home-clarity .nav-logo { flex-shrink: 0; font-size: 1.3rem; }
   .home-clarity .nav-links { gap: 1.25rem !important; }
@@ -191,6 +202,8 @@ html[data-home-session="recover"] .home-clarity nav a[data-home-recover] { displ
   .home-clarity .rubro-item { padding: 1rem .75rem !important; }
   .home-clarity .ri-name { font-size: .85rem !important; }
   .home-clarity .ri-sub { font-size: .72rem !important; }
+  .home-clarity .home-rubro-links { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
+  .home-clarity .home-rubro-link { padding: .7rem .65rem; font-size: .82rem; }
   .home-clarity .intent-card, .home-clarity .step { padding: 1.25rem !important; min-height: 0; }
   .home-clarity .home-community-stats .stat-item { padding: 1.25rem !important; }
   .home-clarity .cta-section { padding: 3rem 1.25rem !important; }

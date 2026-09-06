@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- SEO -->
-  <meta name="description" content="Encontrá músicos por instrumento, género y zona. Publicá anuncios, organizá jams y conectá con otros artistas. Gratis para siempre.">
+  <meta name="description" content="Encontrá artistas por rubro, especialidad y zona. Compartí tu trabajo, publicá anuncios y conectá con la comunidad artística de Argentina.">
   <meta name="robots" content="index, follow">
   <meta name="author" content="buscARTE">
   <link rel="canonical" href="https://buscarte.com.ar/">
@@ -12,8 +12,8 @@
   <!-- Open Graph (WhatsApp, Facebook, Instagram) -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://buscarte.com.ar/">
-  <meta property="og:title" content="buscARTE — La red de músicos argentinos">
-  <meta property="og:description" content="Encontrá músicos por instrumento, género y zona. Publicá anuncios, organizá jams y conectá con otros artistas. Gratis para siempre.">
+  <meta property="og:title" content="buscARTE — La red de artistas argentinos">
+  <meta property="og:description" content="Encontrá artistas por rubro, especialidad y zona. Compartí tu trabajo, publicá anuncios y conectá con la comunidad artística de Argentina.">
   <meta property="og:image" content="https://buscarte.com.ar/og-image.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -22,10 +22,10 @@
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="buscARTE — La red de músicos argentinos">
-  <meta name="twitter:description" content="Encontrá músicos por instrumento, género y zona. Publicá anuncios, organizá jams y conectá con otros artistas. Gratis para siempre.">
+  <meta name="twitter:title" content="buscARTE — La red de artistas argentinos">
+  <meta name="twitter:description" content="Encontrá artistas por rubro, especialidad y zona. Compartí tu trabajo, publicá anuncios y conectá con la comunidad artística de Argentina.">
   <meta name="twitter:image" content="https://buscarte.com.ar/og-image.jpg">
-<title>buscARTE — La red de músicos argentinos</title>
+<title>buscARTE — La red de artistas argentinos</title>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -898,6 +898,25 @@
 
 </section>
 
+<!-- ACCESOS GENERALES: mismos rubros y destinos que la Home principal -->
+<section class="section home-rubro-nav" id="home-rubros" aria-labelledby="home-rubros-title">
+  <div class="section-label">Explorá por rubro</div>
+  <h2 class="section-title" id="home-rubros-title">¿A quién buscás?</h2>
+  <p class="home-section-copy">Elegí un rubro y encontrá artistas por especialidad y zona.</p>
+  <div class="home-rubro-links">
+    <a class="home-rubro-link" data-home-rubro="musica" href="buscARTE_busqueda.html?rubro=musica">Música</a>
+    <a class="home-rubro-link" data-home-rubro="actuacion" href="buscARTE_busqueda.html?rubro=actuacion">Actuación &amp; escena</a>
+    <a class="home-rubro-link" data-home-rubro="audiovisual" href="buscARTE_busqueda.html?rubro=audiovisual">Audiovisual &amp; fotografía</a>
+    <a class="home-rubro-link" data-home-rubro="modelaje" href="buscARTE_busqueda.html?rubro=modelaje">Modelaje</a>
+    <a class="home-rubro-link" data-home-rubro="diseno" href="buscARTE_busqueda.html?rubro=diseno">Diseño &amp; artes visuales</a>
+    <a class="home-rubro-link" data-home-rubro="tatuaje" href="buscARTE_busqueda.html?rubro=tatuaje">Tatuaje &amp; arte corporal</a>
+    <a class="home-rubro-link" data-home-rubro="danza" href="buscARTE_busqueda.html?rubro=danza">Danza</a>
+    <a class="home-rubro-link" data-home-rubro="maquillaje" href="buscARTE_busqueda.html?rubro=maquillaje">Maquillaje, vestuario &amp; FX</a>
+    <a class="home-rubro-link" data-home-rubro="circo" href="buscARTE_busqueda.html?rubro=circo">Circo &amp; artes escénicas</a>
+    <a class="home-rubro-link" data-home-rubro="escritura" href="buscARTE_busqueda.html?rubro=escritura">Escritura &amp; guión</a>
+  </div>
+</section>
+
 <!-- CÓMO FUNCIONA -->
 <section class="section" id="como-funciona">
   <div class="section-header reveal">
@@ -1005,8 +1024,9 @@
 
 <!-- BÚSQUEDA -->
 <section class="search-section reveal">
-  <div class="section-label">Búsqueda musical</div>
-  <div class="section-title" style="font-family: var(--font-display); font-size: clamp(2.8rem, 5vw, 4.5rem); line-height: 0.92; letter-spacing: -0.02em; margin-bottom: 0;">Encontrá con<br>quién tocar.</div>
+  <div class="section-label">Búsqueda específica · música</div>
+  <h2 class="section-title" style="font-family: var(--font-display); font-size: clamp(2.8rem, 5vw, 4.5rem); line-height: 0.92; letter-spacing: -0.02em; margin-bottom: 0;">Encontrá con<br>quién tocar.</h2>
+  <p class="home-section-copy home-musical-note">Opcional: usá estos filtros si buscás músicos por instrumento, género y zona.</p>
 
   <div class="search-box">
     <input class="search-input" id="index-search" type="text" aria-label="Buscar músicos" placeholder="Ej: bajista de rock en Buenos Aires" onkeydown="if(event.key==='Enter') buscarDesdeIndex()">

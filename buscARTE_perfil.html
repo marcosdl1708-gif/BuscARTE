@@ -763,15 +763,16 @@
     padding:2rem;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;
     position:relative;
   }
-  .rubro-modal-title { font-family:var(--font-display);font-size:1.3rem;margin-bottom:.4rem;letter-spacing:-.02em; }
+  .rubro-modal-title { font-family:var(--font-display);font-size:1.3rem;margin-bottom:.4rem;letter-spacing:-.02em;padding-right:2rem; }
   .rubro-modal-sub { color:var(--gris);font-size:.82rem;margin-bottom:1.5rem;line-height:1.5; }
-  .rubro-modal-grid { display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:1.2rem; }
+  .rubro-modal-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.5rem;margin-bottom:1.2rem; }
   .rubro-modal-btn {
     border:1px solid #2a2a2a;background:transparent;color:var(--gris);
     padding:.85rem 1rem;display:flex;align-items:center;gap:.6rem;
     font-family:var(--font-body);font-size:.82rem;cursor:pointer;
-    transition:all .15s;text-align:left;width:100%;
+    transition:all .15s;text-align:left;width:100%;min-width:0;min-height:48px;
   }
+  .rubro-modal-btn > span:last-child { min-width:0;overflow-wrap:anywhere; }
   .rubro-modal-btn:hover { border-color:#555;color:var(--blanco); }
   .rubro-modal-btn.current { border-color:var(--neon);color:var(--neon);background:rgba(212,245,60,.05); }
   .rubro-modal-btn .rmb-emoji { font-size:1.2rem;flex-shrink:0; }
@@ -781,6 +782,10 @@
   }
   .rubro-modal-close:hover { color:var(--blanco); }
   .rubro-modal-note { font-size:.75rem;color:var(--gris2);line-height:1.5;padding-top:.8rem;border-top:1px solid #1c1c1c; }
+  @media (max-width:480px) {
+    .rubro-modal { padding:1.25rem; }
+    .rubro-modal-grid { grid-template-columns:minmax(0,1fr); }
+  }
 
   /* CODEO perfil fixes */
   .form-status {
@@ -982,7 +987,7 @@
         <label for="bio-text">
           Bio <span class="optional">— Contales quién sos en pocas palabras</span>
         </label>
-        <textarea id="bio-text" placeholder="Ej: Guitarrista con 8 años de experiencia, influenciada por el jazz y el rock progresivo. Busco banda con onda para tocar en vivo y grabar. Tengo local de ensayo en Almagro." oninput="countBio()"></textarea>
+        <textarea id="bio-text" placeholder="Contá qué hacés, qué experiencia tenés y en qué proyectos te gustaría participar." oninput="countBio()"></textarea>
         <div class="char-count"><span id="bio-count">0</span> / 300 caracteres</div>
       </div>
 
@@ -1219,7 +1224,7 @@
     <!-- REDES SOCIALES -->
     <div class="config-section" id="redes">
       <div class="section-title"><span class="s-icon">🔗</span> Redes sociales y contacto</div>
-      <p class="section-desc">Agregá tus perfiles para que otros músicos puedan escucharte y conocerte mejor. Todo opcional.</p>
+      <p class="section-desc">Sumá tus redes para que otras personas conozcan tu trabajo y puedan encontrarte. Todo opcional.</p>
 
       <div class="field" style="margin-bottom:1.2rem">
         <label>📱 WhatsApp / Celular <span style="color:var(--gris);font-size:.75rem">— si lo ponés, aparece en tu perfil público</span></label>
@@ -1324,13 +1329,13 @@
 <div class="rubro-modal-overlay" id="rubro-modal-overlay" onclick="if(event.target===this)cerrarSelectorRubro()">
   <div class="rubro-modal">
     <button class="rubro-modal-close" onclick="cerrarSelectorRubro()">✕</button>
-    <div class="rubro-modal-title">¿Qué perfil querés configurar?</div>
-    <p class="rubro-modal-sub">Cada rubro tiene su propio perfil, campos y tablón. Elegí cuál querés editar ahora.</p>
+    <div class="rubro-modal-title">¿Qué rubro querés configurar?</div>
+    <p class="rubro-modal-sub">Elegir un rubro cambia el editor. Al guardar, actualizás el rubro de tu perfil actual; no creás otro perfil.</p>
     <div class="rubro-modal-grid" id="rubro-modal-grid">
       <!-- Se rellena por JS -->
     </div>
     <div class="rubro-modal-note">
-      💡 Podés tener tantos perfiles como rubros quieras. Los cambios se guardan por separado para cada uno. La actualización completa de perfiles múltiples llega el 14 de junio.
+      Este selector no crea perfiles adicionales. Los perfiles con varios rubros todavía no están disponibles.
     </div>
   </div>
 </div>
@@ -1405,7 +1410,7 @@
       sidebarLabel: 'Mi música',
       coachText: 'Foto, bio, instrumentos, géneros, referentes y al menos un video hacen que tu perfil sea mucho más fácil de entender y contactar.',
       videosTitle: 'Mis videos tocando',
-      videosDesc: 'Esta es tu vidriera. Mostrá cómo tocás y diferenciarte del resto.',
+      videosDesc: 'Mostrá interpretaciones, presentaciones o ensayos para que conozcan tu trabajo.',
       disponibilidad: [
         { icon:'🎸', title:'Banda estable', desc:'Busco o me sumo a una banda con proyección' },
         { icon:'🎤', title:'Proyecto propio', desc:'Tengo un proyecto y busco músicos' },
@@ -2173,6 +2178,19 @@
     const sections = { actuacion:'chips-rol-act', audiovisual:'chips-rol-av', modelaje:'chips-tipo-modelo',
       diseno:'chips-rol-dis', tatuaje:'chips-rol-tatu', danza:'chips-disc-dan', maquillaje:'chips-rol-maq',
       circo:'chips-rol-cir', escritura:'chips-rol-esc' };
+    const disciplinaCopy = {
+      musica: ['Instrumento o voz', 'Elegí instrumento o voz'],
+      actuacion: ['Tu rol', 'Elegí tu rol'],
+      audiovisual: ['Tu rol', 'Elegí tu rol'],
+      modelaje: ['Tipo de trabajo', 'Elegí tu tipo de trabajo'],
+      diseno: ['Tu rol', 'Elegí tu rol'],
+      tatuaje: ['Tu rol', 'Elegí tu rol'],
+      danza: ['Estilos de danza', 'Elegí tus estilos de danza'],
+      maquillaje: ['Tu rol', 'Elegí tu rol'],
+      circo: ['Tu especialidad', 'Elegí tu especialidad'],
+      escritura: ['Tu rol', 'Elegí tu rol']
+    };
+    const [disciplinaLabel, disciplinaAction] = disciplinaCopy[rubro] || ['Tu disciplina', 'Contá qué hacés'];
     let disciplina = tieneOpcion(p.instrumento);
     if (rubro !== 'musica') {
       let campos = {};
@@ -2189,7 +2207,7 @@
       { key:'foto', label:'Foto de perfil', action:'Agregá una foto', target:'foto-input', done:foto },
       { key:'bio', label:'Presentación breve', action:'Contá quién sos', target:'bio-text', done:tieneTexto(p.bio) },
       { key:'ubicacion', label:'Provincia y ciudad', action:'Agregá tu ubicación', target:'perfil-provincia', done:tieneTexto(p.provincia) && tieneTexto(p.ciudad) },
-      { key:'disciplina', label:rubro === 'musica' ? 'Instrumento o voz' : 'Tu disciplina', action:rubro === 'musica' ? 'Elegí instrumento o voz' : 'Contá qué hacés', target:rubro === 'musica' ? 'chips-inst' : sections[rubro], done:disciplina }
+      { key:'disciplina', label:disciplinaLabel, action:disciplinaAction, target:rubro === 'musica' ? 'chips-inst' : sections[rubro], done:disciplina }
     ];
   }
 
@@ -2537,13 +2555,13 @@
   const RUBROS_LISTA = [
     { key:'musica',     emoji:'🎵', label:'Música' },
     { key:'actuacion',  emoji:'🎭', label:'Actuación & escena' },
-    { key:'audiovisual',emoji:'🎬', label:'Audiovisual & foto' },
+    { key:'audiovisual',emoji:'🎬', label:'Audiovisual & fotografía' },
     { key:'modelaje',   emoji:'👗', label:'Modelaje' },
-    { key:'diseno',     emoji:'✏️', label:'Diseño & artes' },
-    { key:'tatuaje',    emoji:'🖋️', label:'Tatuaje' },
+    { key:'diseno',     emoji:'✏️', label:'Diseño & artes visuales' },
+    { key:'tatuaje',    emoji:'🖋️', label:'Tatuaje & arte corporal' },
     { key:'danza',      emoji:'💃', label:'Danza' },
-    { key:'maquillaje', emoji:'💄', label:'Maquillaje & vestuario' },
-    { key:'circo',      emoji:'🎪', label:'Circo & escénicas' },
+    { key:'maquillaje', emoji:'💄', label:'Maquillaje, vestuario & FX' },
+    { key:'circo',      emoji:'🎪', label:'Circo & artes escénicas' },
     { key:'escritura',  emoji:'✍️', label:'Escritura & guión' },
   ];
 
@@ -2590,7 +2608,7 @@
 
   function agregarRubro() {
     // Multi-perfil (varios rubros por cuenta) todavía no está disponible.
-    alert('Pronto vas a poder tener más de un rubro en la misma cuenta. Por ahora podés cambiar el rubro de tu perfil con "Cambiar rubro".');
+    alert('Todavía no se pueden tener varios rubros en una misma cuenta. Cambiar de rubro no crea un perfil adicional.');
   }
 
   // Cargar al entrar

@@ -15,6 +15,20 @@ const roles = {
 };
 const rpcKeys = ['p_email', 'p_password', 'p_nombre', 'p_provincia', 'p_ciudad', 'p_barrio', 'p_instrumento',
   'p_generos', 'p_disponibilidad', 'p_referentes', 'p_bio', 'p_tipo_cuenta', 'p_rubro', 'p_campos_especificos'].sort();
+// Independent expectations: presentation can broaden a label without renaming
+// the established rubro values, section IDs or serialized profile keys.
+const artistRubros = {
+  musica: { title:'Tu música 🎸', success:'🎵 músicos', objective:'Banda estable', sections:[] },
+  actuacion: { title:'Actuación & escena 🎭', success:'🎭 artistas de escena', objective:'Busco obra/proyecto', sections:[['chips-rol-actuacion','rol','Actor/Actriz'],['chips-tipo-escena','tipo_escena','Drama']] },
+  audiovisual: { title:'Audiovisual & fotografía 🎬', success:'🎬 artistas audiovisuales y fotógrafos', objective:'Busco proyectos', sections:[['chips-rol-av','rol','Videomaker'],['chips-esp-av','especialidad','Publicidad']] },
+  modelaje: { title:'Modelaje 👗', success:'👗 modelos', objective:'Proyecto estable', sections:[['chips-tipo-modelo','tipo_trabajo','Editorial'],['chips-genero-modelo','genero','Hombre']] },
+  diseno: { title:'Diseño & artes visuales ✏️', success:'✏️ artistas visuales', objective:'Proyecto estable', sections:[['chips-rol-diseno','rol','Ilustrador / Dibujante'],['chips-estilo-diseno','estilo','Realismo'],['chips-soporte-diseno','soporte','Digital']] },
+  tatuaje: { title:'Tatuaje & arte corporal 🖋️', success:'🖋️ artistas de tatuaje y arte corporal', objective:'Proyecto estable', sections:[['chips-rol-tatu','rol','Tatuador'],['chips-estilo-tatu','estilo','Realismo'],['chips-color-tatu','color','Blanco y negro']] },
+  danza: { title:'Danza 💃', success:'💃 artistas de danza', objective:'Proyecto estable', sections:[['chips-rol-danza','rol','Bailarín/a'],['chips-disciplina-danza','disciplina','Contemporáneo'],['chips-nivel-danza','nivel','Amateur']] },
+  maquillaje: { title:'Maquillaje, vestuario & FX 💄', success:'💄 artistas de maquillaje, vestuario y FX', objective:'Proyecto estable', sections:[['chips-rol-maq','rol','Maquillador artístico'],['chips-esp-maq','especialidad','Artístico']] },
+  circo: { title:'Circo & artes escénicas 🎪', success:'🎪 artistas de circo y artes escénicas', objective:'Proyecto estable', sections:[['chips-rol-circo','especialidad','Acróbata'],['chips-modalidad-circo','modalidad','Calle']] },
+  escritura: { title:'Escritura & guión ✍️', success:'✍️ escritores, guionistas y letristas', objective:'Proyecto estable', sections:[['chips-rol-escritura','rol','Guionista'],['chips-formato-escritura','formato','Guion cine / TV']] }
+};
 let browser;
 before(async () => { browser = await chromium.launch({ headless: true, channel: process.platform === 'win32' ? 'msedge' : undefined }); });
 after(async () => { await browser?.close(); });
@@ -148,11 +162,37 @@ async function setup(t, options = {}) {
   return { page, calls, start, final, active, next, back, captcha, solve, submit, noSession, releaseRpc };
 }
 
-for (const rubro of ['musica', 'danza']) {
-  test(`${rubro}: four-screen quick signup accepts only account details and chosen category`, async t => {
-    const f = await setup(t);
+async function assertFits(page, width, selectors) {
+  assert.equal(await page.evaluate(() => innerWidth), width, 'Physical viewport must not auto-shrink');
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'No horizontal overflow');
+  for (const selector of selectors) {
+    for (const item of await page.locator(selector).all()) {
+      const box = await item.boundingBox();
+      assert.ok(box && box.x >= -1 && box.x + box.width <= width + 1, `${selector} fits ${width}px: ${JSON.stringify(box)}`);
+    }
+  }
+}
+
+async function captureRubro(page, name) {
+  if (!process.env.BUSCARTE_QA_OUTPUT) return;
+  const output = path.resolve(process.env.BUSCARTE_QA_OUTPUT);
+  const relative = path.relative(root, output);
+  assert.ok(relative.startsWith('..' + path.sep) || path.isAbsolute(relative), 'Rubro captures stay outside the repository');
+  fs.mkdirSync(output, { recursive:true });
+  await page.screenshot({ path:path.join(output, name), animations:'disabled' });
+}
+
+for (const [rubro, expected] of Object.entries(artistRubros)) for (const width of [320, 390, 1280]) {
+  test(`${rubro}: four-screen quick signup accepts only account details and chosen category at ${width}px`, async t => {
+    const f = await setup(t, { width });
     await f.final('artista', rubro);
     assert.equal(await f.page.locator('#registro-perfil-opcional').getAttribute('open'), null);
+    assert.equal(await f.page.locator('#step-musica').isVisible(), false);
+    assert.equal(await f.page.locator('#step-referentes').isVisible(), false);
+    assert.equal(await f.page.locator('#step-campos').isVisible(), false, 'The quick route does not force artistic detail screens');
+    assert.match(await f.page.locator('#registro-progreso').innerText(), /Paso 4 de 4/);
+    assert.doesNotMatch(await f.page.locator('#step-rubro .form-subtitle').textContent(), /instrument|música|principal/i, 'Shared rubro instructions apply to every artist');
+    await assertFits(f.page, width, ['#step-perfil .form-title','#step-perfil .captcha-panel','#step-perfil .btn-next','#registro-perfil-opcional']);
     await f.submit();
     assert.equal(f.calls.rpc.length, 0, 'Skipping optional fields cannot bypass captcha');
     await f.solve();
@@ -174,8 +214,67 @@ for (const rubro of ['musica', 'danza']) {
     assert.equal(await f.page.locator('#exito-btn').getAttribute('href'), 'buscARTE_busqueda.html?rubro=' + rubro);
     assert.equal(await f.page.locator('#exito-completar').isVisible(), true);
     assert.equal(await f.page.locator('#exito-completar').getAttribute('href'), 'buscARTE_perfil.html#completar');
+    assert.equal(await f.page.locator('#exito-sub').innerText(), `Tu cuenta y tu perfil inicial ya están creados. Empezá a buscar ${expected.success} o completá tu presentación a tu ritmo.`);
+    await assertFits(f.page, width, ['#exito-sub','#exito-btn','#exito-completar']);
+    await captureRubro(f.page, `registro-${rubro}-rapido-exito-${width}.png`);
     await f.page.locator('#exito-btn').click();
     await f.page.waitForURL(origin + '/buscARTE_busqueda.html?rubro=' + rubro);
+  });
+}
+
+for (const [rubro, expected] of Object.entries(artistRubros)) {
+  test(`${rubro}: optional mobile details show only their own fields and preserve existing payload keys`, async t => {
+    const f = await setup(t, { width:320 });
+    await f.start(); await f.next('cuenta'); await f.active('rubro');
+    await f.page.locator(`#rubro-grid button[onclick*="seleccionarRubro('${rubro}'"]`).click();
+    await f.page.locator('#registro-detalles-artisticos').click();
+    const optionalStep = rubro === 'musica' ? 'musica' : 'campos';
+    await f.active(optionalStep);
+    assert.match(await f.page.locator('#registro-progreso').innerText(), /Detalles opcionales/);
+    assert.equal(await f.page.locator('#step-' + optionalStep + ' .form-title').innerText(), expected.title);
+    const campos = {};
+    if (rubro === 'musica') {
+      assert.equal(await f.page.locator('#step-campos').isVisible(), false);
+      await f.page.locator('#chips-instrumentos').getByRole('button', { name:'Guitarra', exact:true }).click();
+      await f.page.locator('#chips-generos').getByRole('button', { name:'Rock', exact:true }).click();
+      await assertFits(f.page, 320, ['#step-musica .chip','#step-musica .btn-next']);
+      await captureRubro(f.page, 'registro-musica-detalles-320.png');
+      await f.next('musica'); await f.active('referentes');
+      await f.next('referentes');
+    } else {
+      assert.equal(await f.page.locator('#step-musica').isVisible(), false);
+      assert.equal(await f.page.locator('#step-referentes').isVisible(), false);
+      assert.equal(await f.page.locator('#chips-instrumentos').isVisible(), false);
+      assert.deepEqual(await f.page.locator('#campos-contenido .chips').evaluateAll(groups => groups.map(group => group.id)), expected.sections.map(section => section[0]));
+      for (const [id, key, value] of expected.sections) {
+        assert.equal(await f.page.locator('#' + id).isVisible(), true);
+        await f.page.locator('#' + id).getByRole('button', { name:value, exact:true }).click();
+        campos[key] = [value];
+      }
+      await assertFits(f.page, 320, ['#step-campos .form-title','#campos-contenido .chip','#step-campos .btn-next']);
+      await captureRubro(f.page, `registro-${rubro}-detalles-320.png`);
+      await f.next('campos');
+    }
+    await f.active('perfil'); await f.captcha('ready');
+    await f.page.locator('#registro-perfil-opcional > summary').click();
+    assert.equal(await f.page.locator('#objetivo-grid .objetivo-title').first().innerText(), expected.objective);
+    if (rubro !== 'musica') assert.doesNotMatch(await f.page.locator('#objetivo-grid').innerText(), /banda estable|busco músicos|zapada|solo tocar/i);
+    await f.page.locator('#objetivo-grid .objetivo-card').first().click();
+    await f.solve(); await f.submit(); await f.active('exito');
+    assert.equal(f.calls.rpc.length, 1);
+    const body = f.calls.rpc[0];
+    assert.deepEqual(Object.keys(body).sort(), rpcKeys);
+    assert.equal(body.p_rubro, rubro);
+    assert.equal(body.p_tipo_cuenta, 'artista');
+    assert.deepEqual(body.p_campos_especificos, campos);
+    assert.equal(body.p_disponibilidad, expected.objective);
+    assert.equal(body.p_instrumento, rubro === 'musica' ? 'Guitarra' : '');
+    assert.equal(body.p_generos, rubro === 'musica' ? 'Rock' : '');
+    assert.equal(body.p_referentes, '');
+    assert.deepEqual(f.calls.optional, [], 'No unrelated references, photo or profile writes');
+    assert.equal(f.calls.emails.length, 1, 'The existing welcome flow remains exactly once');
+    assert.ok((await f.page.locator('#exito-sub').innerText()).includes(expected.success));
+    assert.equal(await f.page.locator('#exito-btn').getAttribute('href'), 'buscARTE_busqueda.html?rubro=' + rubro);
   });
 }
 

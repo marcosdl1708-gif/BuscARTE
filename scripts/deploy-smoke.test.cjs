@@ -433,6 +433,13 @@ test('deployed own mobile profile replaces self-contact with editing and shares 
   for (const selector of ['#contact-profile-btn', '#contact-card', '#save-btn', '#report-link']) {
     assert.equal(await f.page.locator(selector).isVisible(), false, `${selector} cannot invite an action against the owner`);
   }
+  // Read settled geometry: the existing fadeUp translation can report
+  // 43.99997px for a 44px button midway through the animation.
+  await f.page.evaluate(() => Promise.all(
+    document.getAnimations()
+      .filter(animation => animation.effect?.getTiming().iterations !== Infinity)
+      .map(animation => animation.finished.catch(() => {}))
+  ));
   for (const selector of ['#edit-profile-link', '#share-btn']) {
     const box = await f.page.locator(selector).boundingBox();
     assert.ok(box && box.height >= 44 && box.width >= 44, `${selector} has a usable mobile touch target`);

@@ -15,6 +15,7 @@
     "test:perfil-guardado": "node --test scripts/perfil-guardado.test.cjs",
     "test:onboarding": "node --test scripts/onboarding.test.cjs",
     "test:perfil-progreso": "node --test scripts/perfil-progreso.test.cjs",
+    "test:coherencia-rubros": "node --test scripts/coherencia-rubros.test.cjs",
     "test:deploy-smoke": "node --test scripts/deploy-smoke.test.cjs",
     "verify:deploy": "node scripts/verify-deploy-files.mjs"
   },
