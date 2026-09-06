@@ -13,6 +13,7 @@
     "test:chat": "node --test scripts/chat-perfil.test.cjs",
     "test:marketplace": "node --test scripts/marketplace.test.cjs",
     "test:perfil-guardado": "node --test scripts/perfil-guardado.test.cjs",
+    "test:guardado-seguro": "node --test scripts/guardar-perfil-servidor.test.mjs scripts/perfil-guardado-seguro.test.cjs",
     "test:onboarding": "node --test scripts/onboarding.test.cjs",
     "test:perfil-progreso": "node --test scripts/perfil-progreso.test.cjs",
     "test:coherencia-rubros": "node --test scripts/coherencia-rubros.test.cjs",

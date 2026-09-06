@@ -504,6 +504,16 @@
   #profile-save-feedback:not(:empty) { display:block; }
   #profile-save-feedback.error { color:#ffaaa0; }
   .save-actions button { min-height:44px; }
+  .profile-reauth-dialog { margin:auto; width:min(440px, calc(100% - 2rem)); max-height:calc(100dvh - 2rem); overflow:auto; padding:1.5rem; border:1px solid #404040; border-radius:8px; background:var(--negro2); color:var(--blanco); }
+  .profile-reauth-dialog::backdrop { background:rgba(0,0,0,.78); }
+  .profile-reauth-dialog h2 { font-family:var(--font-display); font-size:1.2rem; margin-bottom:.75rem; }
+  .profile-reauth-dialog p { color:var(--gris); font-size:.85rem; line-height:1.5; margin-bottom:1rem; }
+  .profile-reauth-dialog label { display:block; margin:.85rem 0 .4rem; font-size:.85rem; }
+  .profile-reauth-dialog input { width:100%; min-width:0; min-height:44px; padding:.7rem; font-size:16px; color:var(--blanco); background:#0a0a0a; border:1px solid #555; border-radius:3px; }
+  .profile-reauth-dialog input:read-only { color:var(--gris); }
+  .profile-reauth-actions { display:flex; flex-wrap:wrap; gap:.6rem; margin-top:1.25rem; }
+  .profile-reauth-actions button { flex:1 1 140px; min-height:44px; padding:.75rem; cursor:pointer; }
+  .profile-reauth-dialog :focus-visible { outline:2px solid var(--neon); outline-offset:3px; }
   #mi-rubro-contenido .chip { min-height:44px; white-space:normal; text-align:left; }
 
   /* HINT */
@@ -1342,6 +1352,20 @@
 </div>
 
 <!-- SAVE BAR -->
+<dialog id="profile-reauth-dialog" class="profile-reauth-dialog" aria-labelledby="profile-reauth-title" aria-describedby="profile-reauth-description" oncancel="event.preventDefault(); cancelarConfirmacionPerfil()">
+  <form id="profile-reauth-form" onsubmit="confirmarCredencialesPerfil(event)">
+    <h2 id="profile-reauth-title">Confirmá tu contraseña</h2>
+    <p id="profile-reauth-description">Para guardar de forma segura, ingresá la contraseña actual de esta cuenta. No necesitás crear otra cuenta.</p>
+    <label for="profile-reauth-email">Tu email</label>
+    <input id="profile-reauth-email" type="email" autocomplete="username" readonly required>
+    <label for="profile-reauth-password">Contraseña actual</label>
+    <input id="profile-reauth-password" type="password" autocomplete="current-password" required maxlength="256" autofocus>
+    <div class="profile-reauth-actions">
+      <button type="button" class="btn-ghost" onclick="cancelarConfirmacionPerfil()">Cancelar</button>
+      <button type="submit" class="btn-neon">Confirmar y guardar</button>
+    </div>
+  </form>
+</dialog>
 <div class="save-bar" id="save-bar">
   <div class="save-bar-text"><span id="profile-save-label">Tenés <strong>cambios sin guardar</strong></span><div id="profile-save-feedback" role="status" aria-live="polite"></div></div>
   <div class="save-actions">
@@ -1378,6 +1402,87 @@
   let profileSaveTimer = null;
   let profileLoadVersion = 0;
   let profileCompletionEntryPending = location.hash === '#completar';
+  let profileReauthPending = null;
+  let profileReauthCredentials = null;
+
+  function limpiarCredencialesPerfil() {
+    document.getElementById('profile-reauth-password').value = '';
+    if (profileReauthCredentials) profileReauthCredentials.password = '';
+    profileReauthCredentials = null;
+  }
+
+  function cancelarConfirmacionPerfil() {
+    const pending = profileReauthPending;
+    profileReauthPending = null;
+    limpiarCredencialesPerfil();
+    const dialog = document.getElementById('profile-reauth-dialog');
+    if (dialog.open) dialog.close();
+    if (pending) pending.resolve(null);
+  }
+
+  function solicitarConfirmacionPerfil(profileId) {
+    if (profileReauthPending || !mismaCuentaPerfil(profileId)) return Promise.resolve(null);
+    let email = perfilCargado?.email || '';
+    try { if (!email) email = localStorage.getItem('ba_email') || ''; } catch (_) {}
+    if (typeof email !== 'string' || !email.trim()) {
+      showStatus('Necesitamos el email de tu cuenta para guardar. Volvé a ingresar; no hace falta crear otra cuenta.', 'error');
+      return Promise.resolve(null);
+    }
+    limpiarCredencialesPerfil();
+    document.getElementById('profile-reauth-email').value = email.trim();
+    return new Promise(resolve => {
+      profileReauthPending = { profileId:String(profileId), version:profileLoadVersion, resolve };
+      document.getElementById('profile-reauth-dialog').showModal();
+      document.getElementById('profile-reauth-password').focus();
+    });
+  }
+
+  function confirmarCredencialesPerfil(event) {
+    event.preventDefault();
+    const pending = profileReauthPending;
+    if (!pending) return;
+    if (!mismaCuentaPerfil(pending.profileId) || pending.version !== profileLoadVersion) {
+      cancelarConfirmacionPerfil();
+      showStatus('La cuenta cambió. Recargá tu perfil antes de guardar.', 'error');
+      return;
+    }
+    if (!document.getElementById('profile-reauth-form').reportValidity()) return;
+    profileReauthCredentials = {
+      email:document.getElementById('profile-reauth-email').value,
+      password:document.getElementById('profile-reauth-password').value
+    };
+    profileReauthPending = null;
+    document.getElementById('profile-reauth-password').value = '';
+    document.getElementById('profile-reauth-dialog').close();
+    pending.resolve(profileReauthCredentials);
+  }
+
+  function invalidarConfirmacionPerfil() {
+    if (profileReauthPending && !mismaCuentaPerfil(profileReauthPending.profileId)) cancelarConfirmacionPerfil();
+    if (profileReauthCredentials && !mismaCuentaPerfil(perfilCargado?.id)) limpiarCredencialesPerfil();
+  }
+  window.addEventListener('storage', event => {
+    if (!event.key || ['ba_logged','ba_user_id','ba_email','ba_rubro','ba_tipo_cuenta'].includes(event.key)) cancelarConfirmacionPerfil();
+  });
+  window.addEventListener('pageshow', invalidarConfirmacionPerfil);
+  window.addEventListener('focus', invalidarConfirmacionPerfil);
+  window.addEventListener('pagehide', cancelarConfirmacionPerfil);
+
+  function enviarCambiosPerfilSeguro(credentials, profileId, changes, signal, operation) {
+    if (!credentials?.password || !mismaCuentaPerfil(profileId)) throw new Error('La cuenta cambió. Recargá tu perfil antes de guardar.');
+    return fetch('/.netlify/functions/guardar-perfil', {
+      method:'POST', headers:{ 'Content-Type':'application/json' }, cache:'no-store', redirect:'error',
+      body:JSON.stringify({ email:credentials.email, password:credentials.password, profileId, changes, ...(operation ? { operation } : {}) }),
+      signal
+    });
+  }
+
+  function mensajeGuardadoSeguro(status) {
+    if (status === 401) return 'La contraseña no coincide. Tus cambios siguen acá; revisala y volvé a guardar.';
+    if (status === 403) return 'No pudimos verificar que esta cuenta sea la del perfil. Volvé a ingresar antes de guardar.';
+    if (status === 400) return 'No pudimos guardar estos datos. Revisá los campos y volvé a intentar.';
+    return 'No pudimos confirmar el guardado. Conservamos tus cambios; revisá tu perfil antes de volver a guardar.';
+  }
 
   // Estos guardas evitan mezclar formularios/cuentas, no sustituyen permisos del servidor.
   function mismaCuentaPerfil(id) {
@@ -1848,7 +1953,7 @@
 
   // SUBIR FOTO DE PERFIL
   async function subirFoto(input) {
-    if (!input.files || !input.files[0] || isUploadingPhoto) return;
+    if (!input.files || !input.files[0] || isUploadingPhoto || isSavingProfile || profileReauthPending) return;
     const photoUserId = String(perfilCargado?.id || '');
     const photoLoadVersion = profileLoadVersion;
     const currentPhotoAccount = () => !isLoadingProfile && photoLoadVersion === profileLoadVersion &&
@@ -1862,12 +1967,25 @@
     input.disabled = true;
     const controller = new AbortController();
     let requestTimeout;
-    setUploadState('⏳', '<strong>Optimizando foto...</strong><br>Esto ayuda especialmente en imágenes de celular.');
+    let credentials;
+    const saveButton = document.querySelector('#save-bar .btn-neon');
+    if (saveButton) saveButton.disabled = true;
     try {
+      credentials = await solicitarConfirmacionPerfil(photoUserId);
+      if (!credentials) return;
+      if (!currentPhotoAccount()) throw new Error('La cuenta cambió. Recargá tu perfil antes de continuar.');
+      // Verificar la contraseña antes de subir bytes; esta operación no modifica el perfil.
+      requestTimeout = setTimeout(() => controller.abort(), 20000);
+      const verifyRes = await enviarCambiosPerfilSeguro(credentials, photoUserId, {}, controller.signal, 'verify');
+      if (!verifyRes.ok) throw new Error(mensajeGuardadoSeguro(verifyRes.status));
+      const verified = await verifyRes.json();
+      if (!Array.isArray(verified) || verified.length !== 1 || String(verified[0]?.id) !== photoUserId || !currentPhotoAccount()) {
+        throw new Error('No pudimos verificar tu cuenta antes de subir la foto.');
+      }
+      setUploadState('⏳', '<strong>Optimizando foto...</strong><br>Esto ayuda especialmente en imágenes de celular.');
       const file = await optimizeProfileImage(originalFile);
       if (!currentPhotoAccount()) throw new Error('La cuenta cambió. Recargá tu perfil antes de continuar.');
       if (file.size > 4 * 1024 * 1024) throw new Error('La imagen sigue siendo demasiado pesada. Probá con otra foto.');
-      requestTimeout = setTimeout(() => controller.abort(), 20000);
       setUploadState('⏳', '<strong>Subiendo foto...</strong>');
       const safeExt = (file.type.split('/')[1] || 'jpg').replace('jpeg', 'jpg');
       const fileName = photoUserId + '-' + Date.now() + '.' + safeExt;
@@ -1880,11 +1998,8 @@
       if (!res.ok) throw new Error('No pudimos subir la imagen. Intentá de nuevo.');
       if (!currentPhotoAccount()) throw new Error('La cuenta cambió. Recargá tu perfil antes de continuar.');
       const fotoUrl = SUPABASE_URL + '/storage/v1/object/public/fotos-perfil/' + encodeURIComponent(fileName);
-      const patchRes = await fetch(SUPABASE_URL + '/rest/v1/perfiles?id=eq.' + encodeURIComponent(photoUserId) + '&select=id,foto_url', {
-        method: 'PATCH', headers: { ...hdrs, 'Prefer': 'return=representation' },
-        body: JSON.stringify({ foto_url: fotoUrl }), signal: controller.signal
-      });
-      if (!patchRes.ok) throw new Error('No pudimos confirmar la foto guardada. Revisá tu perfil antes de volver a subirla.');
+      const patchRes = await enviarCambiosPerfilSeguro(credentials, photoUserId, { foto_url: fotoUrl }, controller.signal);
+      if (!patchRes.ok) throw new Error(mensajeGuardadoSeguro(patchRes.status));
       const rows = await patchRes.json();
       if (!Array.isArray(rows) || rows.length !== 1 || String(rows[0]?.id) !== photoUserId || rows[0]?.foto_url !== fotoUrl) {
         throw new Error('No pudimos confirmar la foto guardada. Revisá tu perfil antes de volver a subirla.');
@@ -1907,9 +2022,12 @@
       actualizarCompletitud(perfilCargado);
     } finally {
       clearTimeout(requestTimeout);
+      if (credentials) credentials.password = '';
+      limpiarCredencialesPerfil();
       isUploadingPhoto = false;
       input.disabled = false;
       input.value = '';
+      if (saveButton) saveButton.disabled = false;
     }
   }
 
@@ -2292,7 +2410,7 @@
 
   // GUARDAR PERFIL
   async function saveProfile() {
-    if (isSavingProfile) return;
+    if (isSavingProfile || isUploadingPhoto || profileReauthPending) return;
     if (!Object.hasOwn(RUBROS_PERFIL_CONFIG, rubroActivo)) {
       showStatus('No pudimos identificar el rubro del perfil. Elegí un rubro válido antes de guardar.', 'error');
       return;
@@ -2379,12 +2497,20 @@
     if (btn) { btn.textContent = 'Guardando...'; btn.disabled = true; }
     const discard = saveBar?.querySelector('.btn-ghost');
     if (discard) discard.disabled = true;
+    const photoInput = document.getElementById('foto-input');
+    if (photoInput) photoInput.disabled = true;
     saveBar?.classList.add('visible', 'saving');
-    showStatus('Guardando tus cambios…');
     const controller = new AbortController();
-    const requestTimeout = setTimeout(() => controller.abort(), 20000);
+    let requestTimeout;
+    let credentials;
     let failureMessage = 'No pudimos confirmar el guardado. Conservamos tus cambios; revisá tu perfil antes de volver a guardar.';
     try {
+      credentials = await solicitarConfirmacionPerfil(miIdActual);
+      if (!credentials) return;
+      if (!mismaCuentaPerfil(miIdActual)) throw new Error('La cuenta cambió.');
+      showStatus('Guardando tus cambios…');
+      // El plazo empieza al confirmar, no mientras la persona escribe su contraseña.
+      requestTimeout = setTimeout(() => controller.abort(), 20000);
       const payload = {
         nombre,
         bio,
@@ -2408,17 +2534,10 @@
         ...(rubroActivo !== 'musica' ? { campos_especificos } : {})
       };
 
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${encodeURIComponent(miIdActual)}&select=id,campos_especificos`, {
-        method: 'PATCH',
-        headers: { ...hdrs, 'Prefer': 'return=representation' },
-        body: JSON.stringify(payload),
-        signal: controller.signal
-      });
+      const res = await enviarCambiosPerfilSeguro(credentials, miIdActual, payload, controller.signal);
 
       if (!res.ok) {
-        failureMessage = res.status >= 500
-          ? 'No pudimos confirmar el guardado. Conservamos tus cambios; revisá tu perfil antes de volver a guardar.'
-          : 'No se pudieron guardar los cambios. Conservamos tu selección; revisá tu sesión e intentá de nuevo.';
+        failureMessage = mensajeGuardadoSeguro(res.status);
         throw new Error('HTTP ' + res.status);
       }
       const rows = await res.json();
@@ -2459,9 +2578,12 @@
       showStatus(mismaCuentaPerfil(miIdActual) ? failureMessage : 'La cuenta cambió durante el guardado. Recargá tu perfil para revisar el resultado.', 'error');
     } finally {
       clearTimeout(requestTimeout);
+      if (credentials) credentials.password = '';
+      limpiarCredencialesPerfil();
       isSavingProfile = false;
       if (btn) { btn.textContent = 'Guardar cambios'; btn.disabled = false; }
       if (discard) discard.disabled = false;
+      if (photoInput) photoInput.disabled = false;
       saveBar?.classList.remove('saving');
     }
   }
@@ -2575,6 +2697,7 @@
   }
 
   function abrirSelectorRubro() {
+    if (isSavingProfile || isUploadingPhoto || profileReauthPending) return;
     const grid = document.getElementById('rubro-modal-grid');
     if (grid) {
       grid.innerHTML = RUBROS_LISTA.map(r => `
@@ -2593,6 +2716,7 @@
   }
 
   function cambiarRubro(nuevoRubro) {
+    if (isSavingProfile || isUploadingPhoto || profileReauthPending) return;
     if (nuevoRubro === rubroActivo) {
       cerrarSelectorRubro();
       return;

@@ -125,8 +125,10 @@ test('welcome baseline preserves shared contracts; approved reminder branch is a
   assert.equal(digest(withoutWelcome(source)), digest(withoutWelcome(previousSource)));
 });
 
-test('registration caller and existing login/profile entry contracts remain unchanged', () => {
-  for (const file of ['buscARTE_registro.html', 'buscARTE_login.html', 'buscARTE_perfil.html']) {
+test('registration caller and existing login entry contract remain unchanged', () => {
+  // Profile editing now has a separately approved secure-save incident repair.
+  // Its isolated browser/server tests cover that change; login/registration stay fixed.
+  for (const file of ['buscARTE_registro.html', 'buscARTE_login.html']) {
     assert.equal(digest(read(file)), digest(baseline(file)), `${file} is outside this block`);
   }
   const registration = read('buscARTE_registro.html');

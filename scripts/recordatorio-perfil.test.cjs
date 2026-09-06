@@ -109,12 +109,15 @@ test('all scheduled/reset callers and cron configuration remain identical to 9b7
   }
 });
 
-test('all 36 public files and the publication allowlist stay unchanged, including login/Auth and callers', () => {
+test('public files outside the separately approved profile-save fix stay unchanged, including login/Auth and callers', () => {
   const files = JSON.parse(baseline('site-files.json'));
   assert.equal(textDigest(read('site-files.json')), textDigest(baseline('site-files.json')));
   assert.equal(files.length, 36);
   for (const file of files) {
     assert(!path.isAbsolute(file) && !file.split(/[\\/]/).includes('..'));
+    // The incident repair is tested in perfil-guardado-seguro and its server suite.
+    // Only that editor and its cache version are outside this email-only baseline.
+    if (file === 'buscARTE_perfil.html' || file === 'sw.js') continue;
     const current = fs.readFileSync(path.join(root, file));
     const previous = baselineBytes(file);
     // Historical og-image.jpg is actually SVG text (Git: i/lf w/crlf).
