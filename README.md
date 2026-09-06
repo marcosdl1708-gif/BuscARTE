@@ -3,7 +3,13 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
-## Estado operativo — coherencia entre rubros publicada
+## Estado operativo — bienvenida preparada sólo en local
+
+Continuar en `codex/bienvenida-20260906`, desde el cierre de release `e59623a`, implementación `2d0f65d`. **Sólo cambia la plantilla bienvenida**: copy general más breve, explorar los diez rubros primero y completar el perfil mediante el login existente después. No modifica handler, helpers compartidos, destinatarios, cadencia, otras siete plantillas, páginas/Auth/datos ni Android. **105/105 pruebas locales** en una corrida (70 contratos/contenido, 20 visuales y 15 empaquetado), build36. QA y límites: `docs/qa-bienvenida-20260906.md`; evidencia/resguardo privado `../BuscARTE-resguardos/bienvenida-20260906`. Sin envío real ni deploy/preview/push de bienvenida. Probar clientes de correo reales con autorización antes del próximo corte; no certificar entrega o compatibilidad nativa con el render de Edge.
+
+Producción sigue en el release v16 inferior, comprobado nuevamente al cierre: **no contiene este nuevo mail**. El dist estático sí sigue siendo idéntico; la diferencia pendiente está en `netlify/functions/send-email.js`. No publicar accidentalmente esa carpeta ni sincronizar main. Feedback pendiente ordenado en `docs/feedback-mobile-seguimiento-20260906.md`: engagement completo, roles técnicos/niveles, identidad visual/editorial humana y validación física; multirrubro/principal permanece postergado.
+
+### Última publicación — coherencia entre rubros
 
 **Publicado el 6/9/2026 a las 15:42 ART**: deploy activo verificado `6a9db430d7eed8dbdc9489d2`, fuente pública `e4783b7`, HEAD de publicación `d5352f4`, caché v16. Un único deploy de producción autorizado, sin preview ni push. Regresión final **412/412**, smokes **16/16 locales y 16/16 en producción** con backend simulado; 35 recursos, 35 rutas y cuatro exclusiones comprobados. Las cuatro funciones, hashes/runtimes y dos horarios permanecen idénticos. Ver `docs/release-coherencia-rubros-20260906.md`; evidencia privada `../BuscARTE-resguardos/release-coherencia-rubros-20260906`. Sin cambios Auth, datos o Android; app física e integración real pendientes. GitHub main sigue sin sincronizar: no disparar otro deploy mediante push accidental.
 
@@ -80,6 +86,8 @@ npm run test:perfil-guardado
 npm run test:onboarding
 npm run test:perfil-progreso
 npm run test:coherencia-rubros
+npm run test:bienvenida
+npm run test:bienvenida-visual
 ```
 
 El build también funciona directamente con `node scripts/build-site.mjs`, sin instalar dependencias: copia y verifica archivos, sin consultar servicios remotos. `npm ci` sí es necesario para instalar dependencias de las funciones en un entorno limpio.
