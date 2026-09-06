@@ -465,9 +465,9 @@
     <!-- ─── STEP MUSICA: Instrumento y géneros ─── -->
     <div class="form-step" id="step-musica">
       <div class="form-title">Tu música 🎸</div>
-      <p class="form-subtitle">Contanos qué tocás y qué géneros son los tuyos. Podés elegir varios.</p>
+      <p class="form-subtitle">Contanos tu instrumento, voz o rol en el equipo musical y qué géneros son los tuyos. Podés elegir varios.</p>
 
-      <span class="chips-label">¿Qué instrumento/s tocás o cuál es tu rol?</span>
+      <span class="chips-label">Instrumento, voz o rol técnico</span>
       <div class="chips" id="chips-instrumentos">
         <button type="button" class="chip" onclick="toggleChip(this)">Guitarra</button>
         <button type="button" class="chip" onclick="toggleChip(this)">Bajo</button>
@@ -493,6 +493,11 @@
         <button type="button" class="chip" onclick="toggleChip(this)">Ukelele</button>
         <button type="button" class="chip" onclick="toggleChip(this)">Controlador MIDI</button>
         <button type="button" class="chip" onclick="toggleChip(this)">Técnico de sonido</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Operador de sonido FOH</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Operador de sonido de monitores</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Operador de iluminación</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Stage / Asistente de escenario</button>
+        <button type="button" class="chip" onclick="toggleChip(this)">Stage Manager</button>
         <button type="button" class="chip" onclick="toggleChip(this)">Compositor / Arreglador</button>
         <button type="button" class="chip" onclick="toggleChip(this)">Productor</button>
         <button type="button" class="chip" onclick="toggleChip(this)">Mix & Mastering</button>
@@ -909,7 +914,7 @@ const leftPanelContent = {
   tipo:    { label: 'Paso 1', title: '¿QUIÉN\nSOS?',        desc: 'Elegí cómo querés usar buscARTE.', bg: '01', step: 1 },
   cuenta:  { label: 'Paso 2', title: 'TU\nCUENTA',          desc: 'Tus datos de acceso y tu provincia. Lo demás puede esperar.', bg: '02', step: 2 },
   rubro:   { label: 'Paso 3', title: 'TU\nRUBRO',           desc: 'Elegí el rubro artístico de este perfil.', bg: '03', step: 3 },
-  musica:  { label: 'Opcional', title: 'TU\nMÚSICA',       desc: 'Sumá instrumentos y géneros si querés. También podés seguir sin completarlos.', bg: '+', step: 3 },
+  musica:  { label: 'Opcional', title: 'TU\nMÚSICA',       desc: 'Sumá instrumentos, voz o roles técnicos y géneros si querés. También podés seguir sin completarlos.', bg: '+', step: 3 },
   referentes: { label: 'Opcional', title: 'TUS\nREFERENTES', desc: 'Compartí algunas influencias, ahora o más adelante desde Mi perfil.', bg: '+', step: 3 },
   campos:  { label: 'Opcional', title: 'TU\nARTE',         desc: 'Contanos sobre tu trabajo y especialidad. Podés hacerlo después.', bg: '+', step: 3 },
   negocio: { label: 'Paso 3', title: 'TU\nESPACIO',         desc: 'Contanos sobre tu lugar o servicio.', bg: '03', step: 3 },
