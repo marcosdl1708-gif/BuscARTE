@@ -3,7 +3,13 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
-## Estado operativo — onboarding + Inicio publicados el 6/9, 14:46 ART
+## Estado operativo — coherencia entre rubros, sólo local
+
+Preparación local en `codex/coherencia-rubros-20260906`, desde `f070ba3`, implementación `4668dd5` y ajuste tipográfico `e4783b7`: registro/perfil/Inicio coherentes con los diez rubros existentes, textos compartidos neutrales, acciones de completitud específicas, selector legible y diez accesos generales también en legacy. No cambia taxonomía, filtros, datos, Auth ni Android; multirrubro/principal sigue postergado. Caché local v16; **sin deploy, preview ni push**. Regresión 412/412 antes del último ajuste de título mobile, seguida de 99/99 pruebas afectadas y 14/14 smokes locales definitivos; build36. Alcance, revisión tipográfica y límites en `docs/qa-coherencia-rubros-20260906.md`. Evidencia/resguardo privado `../BuscARTE-resguardos/coherencia-rubros-20260906`. No confundir este dist con la publicación v15 inferior ni verificarlo contra producción como si ya estuviera publicado. App física e integración real con cuenta autorizada pendientes.
+
+El bloque de bienvenida quedó después de esta revisión: **propuesto, no iniciado**, sólo plantilla/enlaces con pruebas locales y sin envíos, conservando destinatarios y cadencia. La publicación y la sincronización de main se acuerdan por separado para no disparar otro deploy accidental.
+
+### Última publicación verificada — onboarding + Inicio, 6/9, 14:46 ART
 
 **Onboarding + Inicio visual ya publicados**, deploy activo verificado `6a9da7082372f367b398b7c3`, fuente pública `5b26d0a`, HEAD de publicación `dbfb132`, caché v15. Un único deploy de producción autorizado, sin preview ni push. **334/334 pruebas locales en una corrida**, 14/14 smokes locales y 14/14 sobre producción, 35 recursos, 35 rutas y cuatro exclusiones verificados. Funciones/runtimes/horarios idénticos; sin migración Auth, cambios de datos ni Android. Informe `docs/release-onboarding-inicio-20260906.md`; evidencia/resguardo privado `../BuscARTE-resguardos/release-onboarding-inicio-20260906`. Validación física/app e integración con una cuenta real autorizada pendientes. GitHub main aún no sincronizado; no disparar otro deploy por push accidental.
 
@@ -67,6 +73,7 @@ npm run test:marketplace
 npm run test:perfil-guardado
 npm run test:onboarding
 npm run test:perfil-progreso
+npm run test:coherencia-rubros
 ```
 
 El build también funciona directamente con `node scripts/build-site.mjs`, sin instalar dependencias: copia y verifica archivos, sin consultar servicios remotos. `npm ci` sí es necesario para instalar dependencias de las funciones en un entorno limpio.
@@ -88,6 +95,8 @@ El build también funciona directamente con `node scripts/build-site.mjs`, sin i
 `npm run test:perfil-guardado` verifica el PATCH y su confirmación, recarga, valores vacíos/históricos, compatibilidad de rubros, errores, concurrencia y coherencia entre editor, perfil público y búsqueda. Todo el backend es simulado. Con `BUSCARTE_GUARDADO_BASELINE=1` ejecuta por separado tres reproducciones del fallo anterior en `60424d5`.
 
 `npm run test:onboarding` verifica alta breve/extendida, roles, rubros, datos opcionales, captcha, contrato RPC, duplicados, errores, recuperación de sesión y layout. `npm run test:perfil-progreso` verifica los cinco básicos sobre datos confirmados, acciones directas, enlaces, estados vacíos/históricos, cambios de cuenta, foto y guardado concurrente. Ambas suites simulan o rechazan toda su red; no generan cuentas, fotos ni emails reales.
+
+`npm run test:coherencia-rubros` verifica los diez rubros en el editor y ambas Home: campos correctos, textos, progreso, foco, selector, destinos y estados de sesión sin escrituras. Onboarding también cubre las altas mínimas de los diez rubros a 320/390/1280 y los detalles opcionales propios. `BUSCARTE_COHERENCIA_BASELINE=1` ejecuta por separado dos reproducciones históricas de copy/navegación en `f070ba3`. Capturas mediante `BUSCARTE_QA_OUTPUT`, fuera del repositorio; toda la aplicación se simula o bloquea.
 
 `site-files.json` contiene la lista explícita de publicación. El resultado actual es `dist/` (36 archivos incluyendo `_redirects`, el controlador de captcha y los dos assets compartidos del Inicio), sin documentos, campañas, respaldos, `files.zip` ni herramientas internas. No modificar HTML al empaquetar. Un archivo nuevo requiere incorporarlo deliberadamente a esa lista. Si encuentra archivos inesperados en `dist/`, el build se detiene y no los elimina.
 
