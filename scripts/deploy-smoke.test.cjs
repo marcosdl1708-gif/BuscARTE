@@ -223,7 +223,8 @@ for (const home of ['index.html', 'buscARTE_index.html']) {
     const f = await setup(t, { logged: true, width: 320 });
     await f.go('/' + home);
     await f.page.waitForFunction(() => document.documentElement.dataset.homeSession === 'member' && document.getElementById('hero-nombre').textContent === 'Persona');
-    assert.equal(await f.page.locator('a[href*="buscARTE_registro"]:visible').count(), 0);
+    assert.equal(await f.page.locator('a[href*="registro" i]:visible').count(), 0);
+    assert.doesNotMatch(await f.page.locator('body').innerText(), /probá sin registrarte|crear perfil gratis|sin registro para mirar|el registro aparece cuando/i);
     assert.equal(await f.page.locator('#hero-logueado .home-action:visible').count(), 4);
     assert.match(await f.page.locator('#hero-mi-perfil').getAttribute('href'), /buscARTE_perfil_publico(?:\.html)?\?id=smoke-fixture-user/);
     for (const file of ['assets/js/inicio-sesion.js', 'assets/css/inicio-sesion.css']) {
