@@ -3,7 +3,17 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
-## Estado operativo — guardado seguro y mails publicados
+## Estado operativo — corte de sincronización, 6/9/2026
+
+Producción: deploy `6a9dcf37d0aeb9991f8eb446`, código `b1d35dd`, caché v17, guardado seguro y ambos mails publicados. **El usuario confirmó que ya pudo guardar** y que recibió las muestras de correo. La contraseña al guardar sigue siendo la protección temporal existente; no se activó una migración Auth ni sesiones nuevas.
+
+El corte `codex/sync-publicado-20260906` lleva a GitHub main el historial hasta `f3cc54d` y documentación actualizada, **sin cambiar el código publicado ni incluir roles nuevos**. El último commit usa `[skip netlify]`; procedimiento y verificaciones en `docs/sync-publicado-20260906.md`. No repetir deploy como consecuencia de esta sincronización.
+
+Roles técnicos listos sólo en la rama local `codex/roles-tecnicos-20260906`, implementación `5855c8c`: cinco especialidades de Música, compatibles con los campos existentes y disponibles en registro/perfil/búsqueda/anuncios. Cuatro pruebas específicas aprobadas y build36; sin backend real ni prueba física. No están en main ni producción. Al retomar ese bloque, integrar la documentación de main y verificar el estado antes de acordar su publicación y actualizar el service worker.
+
+Guía física entregable: `docs/guia-prueba-app-usuario-nuevo.md`. Distingue el recorrido disponible hoy del anexo de roles pendientes de publicar. Preparar la guía no equivale a haber hecho la prueba en un teléfono. Multirrubro/principal, sesiones, ampliación de engagement, clasificación profesional e identidad visual continúan separados/postergados. No tocar el original ni Android.
+
+### Histórico — publicación de guardado seguro y mails
 
 **Publicado 6/9, 17:38 ART:** deploy activo `6a9dcf37d0aeb9991f8eb446`, fuente `b1d35dd`, caché v17. Guardado con contraseña verificada por servidor + bienvenida/recordatorio; sin RLS/migración, cambios de cuentas, horarios, Android ni variables remotas. Verificación esencial local y chequeo de rechazo de credenciales en producción aprobados, sin escrituras de perfiles desde herramientas. Falta confirmación positiva del usuario con su cuenta. Informe `docs/guardado-seguro-mails-20260906.md`; rama `codex/guardado-seguro-20260906`. No repetir deploy ni enviar mails de muestra. GitHub main continúa pendiente de sincronización.
 

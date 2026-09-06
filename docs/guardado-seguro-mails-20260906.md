@@ -2,6 +2,8 @@
 
 El usuario autorizó reparar, terminar los mails y publicar, con validación local mínima. Base `58e48fd`, rama `codex/guardado-seguro-20260906`.
 
+**Confirmación posterior:** el usuario informó «sí, ahora me dejó», validando un guardado positivo con su cuenta. También confirmó recepción de las dos muestras de correo. Los párrafos inferiores que dejan esa confirmación pendiente describen el estado al publicar. Esto no certifica aún todos los campos, rubros ni el dispositivo físico. La confirmación de contraseña al guardar sigue vigente; el cambio de sesiones queda separado.
+
 ## Reparación
 
 - El editor pide confirmar la contraseña actual, sólo en memoria para esa operación. Se borra al terminar/cancelar/cambiar de cuenta y no se incorpora a URLs, logs ni almacenamiento local.

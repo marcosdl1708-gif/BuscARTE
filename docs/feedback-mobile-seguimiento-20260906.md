@@ -2,6 +2,15 @@
 
 Este seguimiento separa implementación web, validación física y resultados de uso. No reabre automáticamente bloques postergados.
 
+## Decisión y avance actuales — roles, sincronización y guía
+
+El usuario confirmó que el guardado volvió a funcionar y que recibió las muestras de correo. Pidió avanzar, en este orden, con roles como especialidades existentes, sincronización de GitHub sin otro deploy y guía física. Las notas inferiores de bloqueo o pruebas de mail pendientes son históricas.
+
+- **Roles preparados, no publicados:** cinco especialidades dentro de Música, rama local `codex/roles-tecnicos-20260906`, commit `5855c8c`. Registro, editor, búsqueda y Busco/Ofrezco/filtros conservan el contrato existente. Sin nuevo rubro, categorías de Marketplace, cambios Auth/datos/Android ni clasificación A1/B1. Cuatro pruebas específicas y build36 aprobados; prueba física pendiente después de publicar.
+- **Corte de sincronización de main:** historial publicado hasta `f3cc54d` más documentación; código idéntico a la fuente de producción `b1d35dd`. Los roles locales quedan fuera. Último commit con `[skip netlify]`; ver `sync-publicado-20260906.md` para la protección y comprobación posterior.
+- **Guía lista:** `guia-prueba-app-usuario-nuevo.md`, una pasada desde la app instalada con cuenta nueva y resultados esperados. Incluye registro/captcha, Inicio, mails/enlaces, guardado/foto, perfiles, chat, anuncios, Marketplace y reapertura. La prueba física sigue a cargo del usuario; no se crearon cuentas ni se enviaron mensajes o publicaciones reales desde herramientas.
+- Sesiones para evitar contraseña repetida, ampliación de engagement, multirrubro/principal, niveles profesionales e identidad visual **no forman parte de este corte**.
+
 ## Actualización posterior — arreglo y mails publicados
 
 El 6/9 a las17:38 ART se publicó `6a9dcf37d0aeb9991f8eb446`/v17: guardado verificado por contraseña en servidor y ambas plantillas de correo. No se modificaron RLS, cuentas, migración Auth, cadencia ni Android. Comprobaciones esenciales y configuración real/rechazo de credenciales aprobados; falta que el usuario confirme guardar y recargar con su cuenta. Ver `guardado-seguro-mails-20260906.md`. No repetir publicación ni muestras. Los apartados siguientes sobre bloqueo/local registran estados anteriores, superados por este corte.
