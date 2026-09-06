@@ -7,7 +7,9 @@ No depende del repositorio original ni del worktree de Android para funcionar.
 
 Inicio + perfil propio/chat están **publicados**: deploy `6a9cd36de8ea461b8c4b7063`, fuente pública `a441167`, caché v11. Ver `docs/release-inicio-perfil-chat-20260905.md`. Se comprobaron 35 recursos, 35 rutas, cuatro exclusiones y ocho smoke tests sobre producción, además de las 152 pruebas locales. Funciones y horarios permanecen idénticos. No se creó otra preview ni se hizo push; GitHub `main` sigue pendiente de incorporar estos commits. Las secciones que describen los bloques como locales/preview registran el estado previo a esta publicación.
 
-Siguiente bloque autorizado: Marketplace, en local y separado del deploy anterior.
+Marketplace está implementado **sólo en local**, en `codex/marketplace-20260905` desde `584bd65`. Ambas Home abren el catálogo de productos, con foto/precio/zona, filtros propios y publicación de venta/alquiler. Conserva los datos y permisos existentes. Ver `docs/qa-marketplace-20260905.md`; caché local v12, todavía sin publicar. No ejecutar el verificador de archivos contra producción con este `dist/`: contiene otro bloque.
+
+Cierre local del 6/9, 00:07 ART: **183/183 pruebas aprobadas**, build de 36 archivos y revisión visual móvil/escritorio. No hubo segundo deploy, nueva preview ni push. Resguardo privado: `../BuscARTE-resguardos/marketplace-20260905`. La app instalada/dispositivo físico sigue pendiente de comprobar.
 
 ## Procedencia verificada — 5 de septiembre de 2026
 
@@ -30,6 +32,7 @@ npm run test:anuncios
 npm run test:inicio
 npm run test:perfil
 npm run test:chat
+npm run test:marketplace
 ```
 
 El build también funciona directamente con `node scripts/build-site.mjs`, sin instalar dependencias: copia y verifica archivos, sin consultar servicios remotos. `npm ci` sí es necesario para instalar dependencias de las funciones en un entorno limpio.
@@ -43,6 +46,8 @@ El build también funciona directamente con `node scripts/build-site.mjs`, sin i
 `npm run test:inicio` verifica ambas Home con visitantes y cuentas conocidas, datos de sesión incompletos, retorno por historial, cambio entre pestañas, enlaces al perfil, menú accesible y mensajes tardíos. Usa fixtures aisladas, sin tráfico real de backend ni escrituras de identidad. También comprueba que el modo Auth local no tome la caché legacy como una sesión validada.
 
 `npm run test:perfil` verifica la presentación propia/ajena, edición, compartir con ID explícito, contacto y cambios de cuenta. `npm run test:chat` verifica los accesos al perfil, mobile, historial y respuestas tardías. Ambas suites usan servicios simulados y rechazan toda solicitud no prevista; los casos de envío nunca contactan usuarios reales.
+
+`npm run test:marketplace` verifica las dos Home y URLs históricas, catálogo público, filtros combinados, publicación por rol, productos sin foto/precio, paginación y respuestas tardías. Incluye revisión de layout a 320, 390 y 1280 px. Toda su red es simulada o rechazada; navegar no puede generar publicaciones inadvertidas sin hacer fallar la prueba.
 
 `site-files.json` contiene la lista explícita de publicación. El resultado actual es `dist/` (36 archivos incluyendo `_redirects`, el controlador de captcha y los dos assets compartidos del Inicio), sin documentos, campañas, respaldos, `files.zip` ni herramientas internas. No modificar HTML al empaquetar. Un archivo nuevo requiere incorporarlo deliberadamente a esa lista. Si encuentra archivos inesperados en `dist/`, el build se detiene y no los elimina.
 
@@ -58,9 +63,9 @@ Los bloques de captcha y publicación de anuncios están implementados en commit
 
 Netlify está conectado a `main`: un push normal puede publicar automáticamente. La sincronización de código ya publicado usa un último commit marcado `[skip netlify]` para omitir sólo ese deploy. No se desactivaron builds ni se cambió la configuración remota. Para un próximo cambio funcional, acordar y validar su publicación antes de actualizar `main`; empezar el trabajo en una rama `codex/` desde la base actual.
 
-Los demás bugs siguen pendientes, incluido el enlace general de Marketplace: mejorar el formulario de venta no corrige por sí solo ese recorrido. Mantener separados los cambios visuales, la migración Auth y los cambios de disciplinas/modelo de datos.
+Marketplace se implementó después como bloque local separado (ver estado operativo arriba). El guardado de estilo de danza sigue pendiente. Mantener separados los cambios visuales, la migración Auth y los cambios de disciplinas/modelo de datos.
 
-## Bloque pendiente de publicación — Inicio con sesión
+## Histórico previo al deploy — Inicio con sesión
 
 La rama `codex/inicio-sesion-20260905`, desde `ce51224`, mejora sólo el Inicio de las cuentas conocidas. Ambas URLs conservan sus contratos y comparten presentación: saludo, cuatro accesos útiles, exploración por rubro y cierre sin volver a pedir registro. Una caché marcada como registrada pero sin ID ofrece reingresar, no otra alta. El menú y los enlaces personalizados esperan a estar listos antes de poder usarse.
 
@@ -68,7 +73,7 @@ Este bloque ya está **validado en preview, no publicado en producción**. El c�
 
 El mapa local y la ubicación del respaldo están en `../BuscARTE-ORGANIZACION.md`.
 
-## Bloque local siguiente — Perfil propio y chat → perfil
+## Histórico previo al deploy — Perfil propio y chat → perfil
 
 Continuación desde `8cd3947` en `codex/perfil-chat-20260905`, que incluye el Inicio todavía pendiente de publicación. Cambios separados: `9deecd4` (perfil propio/acciones) y `c764b34` (chat → perfil). El perfil propio muestra **Editar mi perfil** y compartir, sin invitar a contactarse, guardarse o reportarse. En el chat, **Ver perfil** sigue visible en mobile; nombre/avatar también enlazan y volver conserva la conversación.
 
