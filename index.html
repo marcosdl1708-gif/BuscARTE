@@ -336,7 +336,7 @@ footer { border-top:1px solid #1c1c1c;padding:2.5rem 3rem;display:flex;justify-c
 <script src="/assets/js/inicio-sesion.js"></script>
 <script src="/assets/js/meta-pixel.js?v=1" defer></script>
 </head>
-<body>
+<body class="home-clarity">
 
 <div class="cursor" id="cursor"></div>
 <div class="cursor-ring" id="cursor-ring"></div>
@@ -380,16 +380,11 @@ footer { border-top:1px solid #1c1c1c;padding:2.5rem 3rem;display:flex;justify-c
   <div class="hero-bg-text">ARTE</div>
 
   <div class="hero-content">
-    <div class="hero-kicker-row" data-home-guest>
-      <span class="hero-kicker-pill strong">Gratis</span>
-      <span class="hero-kicker-pill">Músicos · Actores · Fotógrafos · Bailarines · Tatuadores</span>
-      <span class="hero-kicker-pill">10 disciplinas · Todo el país</span>
-    </div>
+    <p class="home-guest-kicker" data-home-guest>La comunidad artística, cerca tuyo</p>
 
-    <h1 data-home-guest>
-      ENCONTRÁ<br>
-      TU <span class="accent">LUGAR</span><br>
-      EN LA <span class="rojo">ESCENA</span>
+    <h1 class="home-guest-title" data-home-guest>
+      Tu próximo proyecto<br>
+      <span class="accent">empieza con alguien.</span>
     </h1>
 
     <!-- Logueado -->
@@ -397,7 +392,7 @@ footer { border-top:1px solid #1c1c1c;padding:2.5rem 3rem;display:flex;justify-c
       <p class="home-eyebrow">Tu espacio en buscARTE</p>
       <p class="home-greeting">Hola, <span id="hero-nombre">de nuevo</span>.</p>
       <h1>¿QUÉ ARMAMOS<br><span class="accent">HOY?</span></h1>
-      <p class="home-intro">Buscá gente para tu próximo proyecto o retomá una conversación. Tu próximo encuentro puede empezar acá.</p>
+      <p class="home-intro">Buscá artistas, mirá oportunidades o seguí una conversación.</p>
       <div class="home-actions" aria-label="Accesos rápidos">
         <a href="buscARTE_busqueda.html" class="home-action home-action-primary">
           <span class="home-action-top" aria-hidden="true"><span>01 / Explorar</span><span>↗</span></span>
@@ -433,34 +428,28 @@ footer { border-top:1px solid #1c1c1c;padding:2.5rem 3rem;display:flex;justify-c
 
     <!-- No logueado -->
     <div id="hero-invitado-wrap" data-home-guest>
-      <p class="hero-desc-wide">
-        La red gratuita para <strong>artistas argentinos</strong>. Músicos, actores, fotógrafos, diseñadores, bailarines, tatuadores y más — conectados por rubro, zona y afinidad.
+      <p class="hero-desc-wide home-guest-desc">
+        Encontrá artistas, compartí lo que hacés y conectá con gente para crear.
       </p>
-      <div class="hero-main-actions" id="hero-invitado">
-        <a href="#explorar" class="btn-neon">Explorar gratis</a>
+      <div class="hero-main-actions home-guest-actions" id="hero-invitado">
+        <a href="#explorar" class="btn-neon">Buscar artistas <span aria-hidden="true">→</span></a>
         <a href="buscARTE_anuncios.html" class="btn-ghost">Ver anuncios</a>
-        <a href="buscARTE_registro.html" class="btn-ghost">Crear perfil</a>
+        <a href="buscARTE_registro.html" class="home-text-link">Crear mi perfil</a>
       </div>
-      <div class="hero-proof">
-        <span><strong>Sin comisiones</strong></span>
-        <span>Sin algoritmos raros</span>
-        <span><strong>10</strong> rubros artísticos</span>
-        <span>Hecho en Argentina 🇦🇷</span>
-      </div>
+      <p class="home-guest-note">Gratis. Podés mirar sin crear una cuenta.</p>
     </div>
   </div>
 
-  <div class="hero-scroll">scroll</div>
 </section>
 
 <!-- SECCIÓN: ELEGÍ TU RUBRO — la gran novedad -->
 <section class="rubros-section reveal" id="explorar">
   <div class="rubros-intro">
     <div>
-      <div class="section-label"><span data-home-guest>Probá sin registrarte</span><span data-home-known>La comunidad, por rubro</span></div>
-      <div class="section-title" style="font-family:var(--font-display);font-size:clamp(2.8rem,5vw,4.5rem);line-height:.92;letter-spacing:-.02em"><span data-home-guest>¿DE QUÉ<br>RUBRO SOS?</span><span data-home-known>¿A QUIÉN<br>BUSCÁS?</span></div>
+      <div class="section-label">Explorá por rubro</div>
+      <h2 class="section-title"><span data-home-guest>¿A quién buscás?</span><span data-home-known>Gente para tu proyecto</span></h2>
     </div>
-    <p style="color:var(--gris);font-size:.9rem;line-height:1.7;max-width:280px;text-align:right"><span data-home-guest>Entrá al tablón de tu disciplina y encontrá artistas de tu rubro en todo el país. El registro aparece cuando querés publicar o contactar.</span><span data-home-known>Elegí un rubro y encontrá artistas para tu próximo proyecto. Podés explorar todas las disciplinas.</span></p>
+    <p class="home-section-copy">Elegí un rubro. Después podés filtrar por especialidad y zona.</p>
   </div>
 
   <div class="rubros-grid">
@@ -517,81 +506,22 @@ footer { border-top:1px solid #1c1c1c;padding:2.5rem 3rem;display:flex;justify-c
   </div>
 </section>
 
-<!-- STATS -->
-<div class="stats-bar reveal">
-  <div class="stat-item">
-    <div class="stat-num" id="stat-musicos">—<span>+</span></div>
-    <div class="stat-label">Artistas registrados</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-num">23<span></span></div>
-    <div class="stat-label">Provincias + CABA</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-num" id="stat-anuncios">—<span>+</span></div>
-    <div class="stat-label">Anuncios publicados</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-num">10<span></span></div>
-    <div class="stat-label">Rubros artísticos</div>
-  </div>
-</div>
-
-<!-- TICKER — disciplinas artísticas -->
-<div class="ticker-wrap">
-  <div class="ticker">
-    <div class="ticker-item"><span class="ticker-text">Guitarristas</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Actores</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Fotógrafos</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Bailarines</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Tatuadores</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Ilustradores</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Cantantes</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Videomakers</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Malabaristas</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Diseñadores</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Modelos</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Guionistas</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Bateristas</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Maquilladores</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Muralistas</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Escritores</span><span class="ticker-sep">✦</span></div>
-    <!-- duplicado para loop continuo -->
-    <div class="ticker-item"><span class="ticker-text">Guitarristas</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Actores</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Fotógrafos</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Bailarines</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Tatuadores</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Ilustradores</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Cantantes</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Videomakers</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Malabaristas</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Diseñadores</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Modelos</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Guionistas</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Bateristas</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Maquilladores</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Muralistas</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Escritores</span><span class="ticker-sep">✦</span></div>
-  </div>
-</div>
-
 <!-- CÓMO FUNCIONA -->
 <section class="section" id="como-funciona">
   <div class="section-header reveal">
     <div>
-      <div class="section-label">Entrá por donde necesites</div>
-      <div class="section-title">MENOS<br>VUELTAS.<br>MÁS ARTE.</div>
+      <div class="section-label">También en buscARTE</div>
+      <h2 class="section-title">Dale lugar a tu idea</h2>
     </div>
-    <p class="section-sub"><span data-home-guest>Encontrá artistas, publicá anuncios, explorá eventos o usá nuestras herramientas. Sin registro para mirar.</span><span data-home-known>Perfiles, oportunidades y encuentros. Elegí por dónde seguir con tu próximo proyecto.</span></p>
+    <p class="section-sub">Colaboraciones, clases, encuentros y materiales para crear.</p>
   </div>
 
   <div class="intent-grid reveal">
     <a class="intent-card" href="buscARTE_busqueda.html">
       <div>
         <span class="intent-icon">🎨</span>
-        <div class="intent-title">BUSCO<br>ARTISTAS</div>
-        <p class="intent-desc">Filtrá por rubro, especialidad, zona y disponibilidad. Músicos, actores, fotógrafos, bailarines y más.</p>
+        <div class="intent-title">Encontrá artistas</div>
+        <p class="intent-desc">Explorá perfiles por rubro, especialidad y zona.</p>
       </div>
       <div class="intent-meta">Explorar perfiles</div>
     </a>
@@ -599,15 +529,15 @@ footer { border-top:1px solid #1c1c1c;padding:2.5rem 3rem;display:flex;justify-c
     <a class="intent-card" href="buscARTE_registro.html" data-home-guest>
       <div>
         <span class="intent-icon">🙋</span>
-        <div class="intent-title">ME<br>OFREZCO</div>
-        <p class="intent-desc">Creá tu perfil artístico y dejá claro qué hacés, qué buscás y cómo conectar con vos.</p>
+        <div class="intent-title">Mostrá lo que hacés</div>
+        <p class="intent-desc">Presentá tu trabajo y dejá que otros te encuentren.</p>
       </div>
       <div class="intent-meta">Crear perfil gratis</div>
     </a>
     <a class="intent-card" href="buscARTE_login.html" data-home-member data-home-profile inert>
       <div>
         <span class="intent-icon" aria-hidden="true">🙋</span>
-        <div class="intent-title">MI<br>PERFIL</div>
+        <div class="intent-title">Tu perfil</div>
         <p class="intent-desc">Tu lugar en la comunidad. Mirá cómo se presenta tu perfil a quienes te encuentran.</p>
       </div>
       <div class="intent-meta">Ver mi perfil</div>
@@ -615,7 +545,7 @@ footer { border-top:1px solid #1c1c1c;padding:2.5rem 3rem;display:flex;justify-c
     <a class="intent-card" href="buscARTE_login.html" data-home-recover>
       <div>
         <span class="intent-icon" aria-hidden="true">↩</span>
-        <div class="intent-title">VOLVER A<br>MI CUENTA</div>
+        <div class="intent-title">Volvé a tu cuenta</div>
         <p class="intent-desc">Ingresá de nuevo para recuperar el acceso a tu perfil y tus conversaciones.</p>
       </div>
       <div class="intent-meta">Volver a ingresar</div>
@@ -624,37 +554,34 @@ footer { border-top:1px solid #1c1c1c;padding:2.5rem 3rem;display:flex;justify-c
     <a class="intent-card" href="buscARTE_anuncios.html">
       <div>
         <span class="intent-icon">📋</span>
-        <div class="intent-title">VER<br>ANUNCIOS</div>
-        <p class="intent-desc">Castings, busco colaborador, me ofrezco — publicados por artistas de todos los rubros en todo el país.</p>
+        <div class="intent-title">Oportunidades</div>
+        <p class="intent-desc">Buscá colaboradores, ofrecé tu trabajo o publicá una propuesta.</p>
       </div>
       <div class="intent-meta">Mirar tablón</div>
     </a>
 
     <a class="intent-card" href="buscARTE_anuncios.html">
       <div>
-        <span class="intent-rubro-note">✦ Para todos los rubros</span>
         <span class="intent-icon">📅</span>
-        <div class="intent-title">EVENTOS<br>Y JAMS</div>
-        <p class="intent-desc">Jams, muestras, ensayos abiertos, castings, shootings, zapadas. Elegís tu rubro al entrar.</p>
+        <div class="intent-title">Eventos y jams</div>
+        <p class="intent-desc">Encontrá encuentros y propuestas para compartir con otros artistas.</p>
       </div>
       <div class="intent-meta">Buscar eventos</div>
     </a>
 
     <a class="intent-card" href="buscARTE_anuncios.html">
       <div>
-        <span class="intent-rubro-note">✦ Para todos los rubros</span>
         <span class="intent-icon">🎓</span>
-        <div class="intent-title">CLASES<br>Y TALLERES</div>
-        <p class="intent-desc">Clases de guitarra, actuación, fotografía, danza, tatuaje y más. Presencial u online. Elegís el rubro al entrar.</p>
+        <div class="intent-title">Clases y talleres</div>
+        <p class="intent-desc">Aprendé algo nuevo o compartí lo que sabés.</p>
       </div>
       <div class="intent-meta">Buscar clases</div>
     </a>
 
     <a class="intent-card" id="home-marketplace" href="buscARTE_anuncios.html?tipo=vende">
       <div>
-        <span class="intent-rubro-note">✦ Para todos los rubros</span>
         <span class="intent-icon">🛒</span>
-        <div class="intent-title">MARKETPLACE</div>
+        <div class="intent-title">Marketplace</div>
         <p class="intent-desc">Instrumentos, equipos, vestuario y materiales: comprá, vendé o alquilá entre artistas.</p>
       </div>
       <div class="intent-meta">Ver productos</div>
@@ -663,13 +590,13 @@ footer { border-top:1px solid #1c1c1c;padding:2.5rem 3rem;display:flex;justify-c
 </section>
 
 <!-- PERFILES: 3 rubros distintos -->
-<section class="profiles-section" id="comunidad">
+<section class="profiles-section home-examples" id="comunidad">
   <div class="section-header reveal">
     <div>
-      <div class="section-label">Cómo se ve la comunidad</div>
-      <div class="section-title">ASÍ SE<br>VEN LOS<br>PERFILES.</div>
+      <div class="section-label">Perfiles de ejemplo</div>
+      <h2 class="section-title">Un espacio para tu trabajo</h2>
     </div>
-    <p class="section-sub"><strong>Músicos, bailarines, tatuadores</strong> y más conectando en todo el país.</p>
+    <p class="section-sub">Estas tarjetas son ilustrativas, no usuarios reales. Así podés mostrar tu trabajo, tus estilos y lo que buscás.</p>
   </div>
 
   <div class="profiles-grid reveal">
@@ -690,7 +617,7 @@ footer { border-top:1px solid #1c1c1c;padding:2.5rem 3rem;display:flex;justify-c
       </div>
       <div class="profile-footer">
         <div class="profile-looking">Busca <strong>banda estable</strong></div>
-        <span class="match" style="background:rgba(212,245,60,.1);color:#d4f53c">98% afinidad</span>
+        <span class="match" style="background:rgba(212,245,60,.1);color:#d4f53c">Ejemplo</span>
       </div>
     </div>
 
@@ -710,7 +637,7 @@ footer { border-top:1px solid #1c1c1c;padding:2.5rem 3rem;display:flex;justify-c
       </div>
       <div class="profile-footer">
         <div class="profile-looking">Busca <strong>guest spots</strong></div>
-        <span class="match" style="background:rgba(196,91,255,.1);color:#c45bff">Agenda abierta</span>
+        <span class="match" style="background:rgba(196,91,255,.1);color:#c45bff">Ejemplo</span>
       </div>
     </div>
 
@@ -730,11 +657,31 @@ footer { border-top:1px solid #1c1c1c;padding:2.5rem 3rem;display:flex;justify-c
       </div>
       <div class="profile-footer">
         <div class="profile-looking">Busca <strong>compañía</strong></div>
-        <span class="match" style="background:rgba(91,212,255,.1);color:#5bd4ff">Doy clases</span>
+        <span class="match" style="background:rgba(91,212,255,.1);color:#5bd4ff">Ejemplo</span>
       </div>
     </div>
   </div>
 </section>
+
+<!-- Cifras de contexto, después de las acciones y ejemplos. -->
+<div class="stats-bar home-community-stats reveal" role="region" aria-label="La comunidad en números">
+  <div class="stat-item">
+    <div class="stat-num" id="stat-musicos">—<span>+</span></div>
+    <div class="stat-label">Artistas registrados</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">23<span></span></div>
+    <div class="stat-label">Provincias + CABA</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num" id="stat-anuncios">—<span>+</span></div>
+    <div class="stat-label">Anuncios publicados</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">10<span></span></div>
+    <div class="stat-label">Rubros artísticos</div>
+  </div>
+</div>
 
 <!-- CTA FINAL -->
 <section class="cta-section reveal">
@@ -744,7 +691,7 @@ footer { border-top:1px solid #1c1c1c;padding:2.5rem 3rem;display:flex;justify-c
     SUMATE A<br>
     LA <span class="accent">ESCENA</span>
   </div>
-  <p class="cta-sub" data-home-guest>Gratis, sin comisiones y hecho para la escena local. Sin excusas para no conectar con los artistas que buscás.</p>
+  <p class="cta-sub" data-home-guest>Creá tu perfil y empezá a conectar. Tu presentación puede crecer con vos.</p>
   <span class="cta-label" data-home-known>Del próximo encuentro puede salir algo grande</span>
   <div class="cta-title" data-home-known>HAY GENTE PARA<br>TU <span class="accent">PRÓXIMA IDEA.</span></div>
   <p class="cta-sub" data-home-known>Explorá la comunidad y encontrá con quién darle forma.</p>

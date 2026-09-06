@@ -8,6 +8,7 @@
     "test:registro": "node --test scripts/registro-captcha.test.cjs",
     "test:anuncios": "node --test scripts/anuncios-publicacion.test.cjs",
     "test:inicio": "node --test scripts/inicio-sesion.test.cjs",
+    "test:inicio-visual": "node --test scripts/inicio-visual.test.cjs",
     "test:perfil": "node --test scripts/perfil-propio.test.cjs",
     "test:chat": "node --test scripts/chat-perfil.test.cjs",
     "test:marketplace": "node --test scripts/marketplace.test.cjs",

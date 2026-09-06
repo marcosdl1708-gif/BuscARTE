@@ -796,7 +796,7 @@
 <script src="/assets/js/inicio-sesion.js"></script>
 <script src="/assets/js/meta-pixel.js?v=1" defer></script>
 </head>
-<body>
+<body class="home-clarity">
 
 <div class="cursor" id="cursor"></div>
 <div class="cursor-ring" id="cursor-ring"></div>
@@ -805,7 +805,7 @@
 <nav>
   <a href="index.html" class="nav-logo">busc<span>ARTE</span></a>
   <ul class="nav-links">
-    <li><a href="buscARTE_busqueda.html" class="nav-link">Músicos</a></li>
+    <li><a href="buscARTE_busqueda.html" class="nav-link">Artistas</a></li>
     <li><a href="buscARTE_anuncios.html" class="nav-link">Anuncios</a></li>
     <li><a href="#como-funciona" class="nav-link">Cómo funciona</a></li>
   </ul>
@@ -839,12 +839,10 @@
 <section class="hero">
   <div class="hero-bg-text">ARTE</div>
 
-  <div class="hero-tag" data-home-guest>Red de artistas argentinos</div>
+  <div class="hero-tag home-guest-kicker" data-home-guest>La comunidad artística, cerca tuyo</div>
 
-  <h1 data-home-guest>
-    ENCONTRÁ<br>
-    TU <span class="accent">LUGAR</span><br>
-    EN LA <span class="rojo">ESCENA</span>
+  <h1 class="home-guest-title" data-home-guest>
+    Tu próximo proyecto<br><span class="accent">empieza con alguien.</span>
   </h1>
 
   <!-- Estado: logueado — full width, fuera del flex row -->
@@ -852,7 +850,7 @@
       <p class="home-eyebrow">Tu espacio en buscARTE</p>
       <p class="home-greeting">Hola, <span id="hero-nombre">de nuevo</span>.</p>
       <h1>¿QUÉ ARMAMOS<br><span class="accent">HOY?</span></h1>
-      <p class="home-intro">Buscá gente para tu próximo proyecto o retomá una conversación. Tu próximo encuentro puede empezar acá.</p>
+      <p class="home-intro">Buscá artistas, mirá oportunidades o seguí una conversación.</p>
       <div class="home-actions" aria-label="Accesos rápidos">
         <a href="buscARTE_busqueda.html" class="home-action home-action-primary">
           <span class="home-action-top" aria-hidden="true"><span>01 / Explorar</span><span>↗</span></span>
@@ -888,115 +886,60 @@
 
   <!-- Estado: no logueado -->
   <div class="hero-bottom" id="hero-invitado-wrap" data-home-guest>
-    <p class="hero-desc">
-      La plataforma para que <strong>músicos, artistas y creativos</strong> de toda Argentina se encuentren, conecten y construyan proyectos juntos.
+    <p class="hero-desc home-guest-desc">
+      Encontrá artistas, compartí lo que hacés y conectá con gente para crear.
     </p>
-    <div class="hero-actions" id="hero-invitado">
-      <a href="buscARTE_registro.html" class="btn-neon" style="font-size:0.95rem; padding: 0.9rem 2.2rem;">Crear perfil gratis</a>
-      <a href="#explorar" class="btn-ghost" style="font-size:0.95rem; padding: 0.9rem 2.2rem;">Explorar →</a>
+    <div class="hero-actions home-guest-actions" id="hero-invitado">
+      <a href="buscARTE_busqueda.html" class="btn-neon">Buscar artistas</a>
+      <a href="buscARTE_registro.html" class="btn-ghost">Crear perfil gratis</a>
+      <a href="#explorar" class="home-text-link">Ver perfiles de ejemplo</a>
     </div>
   </div>
 
-  <div class="hero-scroll">scroll</div>
 </section>
-
-<!-- STATS -->
-<div class="stats-bar reveal">
-  <div class="stat-item">
-    <div class="stat-num" id="stat-musicos">—<span>+</span></div>
-    <div class="stat-label">Músicos registrados</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-num">23<span></span></div>
-    <div class="stat-label">Provincias de Argentina</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-num" id="stat-anuncios">—<span>+</span></div>
-    <div class="stat-label">Anuncios publicados</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-num">100<span>%</span></div>
-    <div class="stat-label">Gratis para empezar</div>
-  </div>
-</div>
-
-<!-- TICKER DE GÉNEROS -->
-<div class="ticker-wrap">
-  <div class="ticker">
-    <div class="ticker-item"><span class="ticker-text">Rock Nacional</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Folklore</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Jazz</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Tango</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Metal</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Cumbia</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Indie</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Electrónica</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Reggae</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Funk</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Hip Hop</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Pop</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Punk</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Tropical</span><span class="ticker-sep">✦</span></div>
-    <!-- duplicate for seamless loop -->
-    <div class="ticker-item"><span class="ticker-text">Rock Nacional</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Folklore</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Jazz</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Tango</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Metal</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Cumbia</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Indie</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Electrónica</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Reggae</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Funk</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Hip Hop</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Pop</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Punk</span><span class="ticker-sep">✦</span></div>
-    <div class="ticker-item"><span class="ticker-text">Tropical</span><span class="ticker-sep">✦</span></div>
-  </div>
-</div>
 
 <!-- CÓMO FUNCIONA -->
 <section class="section" id="como-funciona">
   <div class="section-header reveal">
     <div>
       <div class="section-label">¿Qué podés hacer?</div>
-      <div class="section-title">TODO EN<br>UN SOLO<br>LUGAR.</div>
+      <div class="section-title">Elegí por<br>dónde empezar.</div>
     </div>
-    <p class="section-sub">buscARTE es mucho más que un buscador de músicos. Es la plataforma completa para todo lo que necesita un artista.</p>
+    <p class="section-sub">Personas, oportunidades y herramientas para tu próximo proyecto.</p>
   </div>
 
   <div class="steps reveal">
-    <div class="step" data-num="01" onclick="irA('buscARTE_busqueda.html')" style="cursor:pointer">
+    <button type="button" class="step" data-num="01" onclick="irA('buscARTE_busqueda.html')" style="cursor:pointer">
       <span class="step-icon">🎸</span>
-      <div class="step-title">ENCONTRÁ MÚSICOS</div>
-      <p class="step-desc">Buscá por instrumento, género, barrio y disponibilidad. El sistema de matching por afinidad musical te sugiere los músicos más afines a tu estilo y referentes.</p>
-    </div>
-    <div class="step" data-num="02" onclick="irA('buscARTE_anuncios.html')" style="cursor:pointer">
+      <span class="step-title">Buscá artistas</span>
+      <span class="step-desc">Explorá perfiles por rubro y zona para encontrar con quién crear.</span>
+    </button>
+    <button type="button" class="step" data-num="02" onclick="irA('buscARTE_anuncios.html')" style="cursor:pointer">
       <span class="step-icon">📋</span>
-      <div class="step-title">PUBLICÁ ANUNCIOS</div>
-      <p class="step-desc">"Busco bajista para banda de rock", "me ofrezco para sesiones", "jam de jazz este sábado en Palermo". Cuatro tipos de anuncios para cubrir todas las situaciones.</p>
-    </div>
-    <div class="step" data-num="03" onclick="irA('buscARTE_anuncios.html?tipo=jam')" style="cursor:pointer">
+      <span class="step-title">Mirá oportunidades</span>
+      <span class="step-desc">Encontrá búsquedas, ofrecé tu trabajo o publicá una oportunidad.</span>
+    </button>
+    <button type="button" class="step" data-num="03" onclick="irA('buscARTE_anuncios.html?tipo=jam')" style="cursor:pointer">
       <span class="step-icon">🥁</span>
-      <div class="step-title">ORGANIZÁ JAMS</div>
-      <p class="step-desc">Publicá eventos abiertos con fecha, lugar y precio de entrada. Desde zapadas en el parque hasta jam sessions en bares — conectá con músicos para tocar ya.</p>
-    </div>
+      <span class="step-title">Compartí una jam</span>
+      <span class="step-desc">Buscá encuentros para tocar o invitá a otros músicos a sumarse.</span>
+    </button>
     <a class="step step-marketplace" id="home-marketplace" data-num="04" href="buscARTE_anuncios.html?tipo=vende" style="cursor:pointer">
       <span class="step-icon">🎛️</span>
-      <div class="step-title">COMPRÁ Y VENDÉ</div>
-      <p class="step-desc">Instrumentos, equipos, vestuario y materiales para crear. Comprá, vendé o alquilá entre personas de la comunidad.</p>
+      <div class="step-title">Comprá y vendé</div>
+      <p class="step-desc">Instrumentos, equipos, vestuario y materiales de la comunidad.</p>
     </a>
   </div>
 </section>
 
 <!-- PERFILES -->
-<section class="profiles-section" id="explorar">
+<section class="profiles-section home-examples" id="explorar">
   <div class="section-header reveal">
     <div>
-      <div class="section-label">Músicos en buscARTE</div>
-      <div class="section-title">CONOCÉ<br>LA COMUNIDAD</div>
+      <div class="section-label">Perfiles de ejemplo</div>
+      <h2 class="section-title">Así se ve<br>un perfil musical.</h2>
     </div>
-    <p class="section-sub">Miles de músicos de todo el país esperando conectar con alguien como vos.</p>
+    <p class="section-sub">Estos perfiles son ilustrativos; no representan usuarios reales.</p>
   </div>
 
   <div class="profiles-grid reveal">
@@ -1016,7 +959,7 @@
       </div>
       <div class="profile-footer">
         <div class="profile-looking">Busca <strong>banda estable</strong></div>
-        <span class="match">98% afinidad</span>
+        <span class="match">Ejemplo</span>
       </div>
     </div>
 
@@ -1035,7 +978,7 @@
       </div>
       <div class="profile-footer">
         <div class="profile-looking">Busca <strong>proyecto serio</strong></div>
-        <span class="match">91% afinidad</span>
+        <span class="match">Ejemplo</span>
       </div>
     </div>
 
@@ -1054,7 +997,7 @@
       </div>
       <div class="profile-footer">
         <div class="profile-looking">Busca <strong>músicos y productor</strong></div>
-        <span class="match">87% afinidad</span>
+        <span class="match">Ejemplo</span>
       </div>
     </div>
   </div>
@@ -1062,16 +1005,16 @@
 
 <!-- BÚSQUEDA -->
 <section class="search-section reveal">
-  <div class="section-label">Buscador</div>
-  <div class="section-title" style="font-family: var(--font-display); font-size: clamp(2.8rem, 5vw, 4.5rem); line-height: 0.92; letter-spacing: -0.02em; margin-bottom: 0;">ENCONTRÁ<br>LO QUE BUSCÁS</div>
+  <div class="section-label">Búsqueda musical</div>
+  <div class="section-title" style="font-family: var(--font-display); font-size: clamp(2.8rem, 5vw, 4.5rem); line-height: 0.92; letter-spacing: -0.02em; margin-bottom: 0;">Encontrá con<br>quién tocar.</div>
 
   <div class="search-box">
-    <input class="search-input" id="index-search" type="text" placeholder="Ej: bajista de rock en Buenos Aires, baterista de jazz..." onkeydown="if(event.key==='Enter') buscarDesdeIndex()">
-    <button class="search-btn" onclick="buscarDesdeIndex()">BUSCAR</button>
+    <input class="search-input" id="index-search" type="text" aria-label="Buscar músicos" placeholder="Ej: bajista de rock en Buenos Aires" onkeydown="if(event.key==='Enter') buscarDesdeIndex()">
+    <button class="search-btn" onclick="buscarDesdeIndex()">Buscar músicos</button>
   </div>
 
   <div class="filters">
-    <select class="filter-select" id="index-instrumento">
+    <select class="filter-select" id="index-instrumento" aria-label="Instrumento">
       <option value="">Todos los instrumentos</option>
       <option>Guitarra</option>
       <option>Bajo</option>
@@ -1084,7 +1027,7 @@
       <option>Percusión</option>
       <option>DJ / Productor</option>
     </select>
-    <select class="filter-select" id="index-genero">
+    <select class="filter-select" id="index-genero" aria-label="Género musical">
       <option value="">Todos los géneros</option>
       <option>Rock Nacional</option>
       <option>Metal</option>
@@ -1099,7 +1042,7 @@
       <option>Funk</option>
       <option>Reggae</option>
     </select>
-    <select class="filter-select" id="index-provincia">
+    <select class="filter-select" id="index-provincia" aria-label="Zona">
       <option value="">Todo el país</option>
       <option>Buenos Aires (CABA)</option>
       <option>Gran Buenos Aires</option>
@@ -1111,7 +1054,7 @@
       <option>Tucumán</option>
       <option>Salta</option>
     </select>
-    <select class="filter-select" id="index-objetivo">
+    <select class="filter-select" id="index-objetivo" aria-label="Objetivo">
       <option value="">Cualquier objetivo</option>
       <option>Banda estable</option>
       <option>Proyecto propio</option>
@@ -1122,18 +1065,38 @@
   </div>
 </section>
 
+<!-- STATS: contexto después de las acciones principales -->
+<div class="stats-bar home-community-stats reveal" role="region" aria-label="La comunidad en números">
+  <div class="stat-item">
+    <div class="stat-num" id="stat-musicos">—<span>+</span></div>
+    <div class="stat-label">Perfiles registrados</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">23<span></span></div>
+    <div class="stat-label">Provincias de Argentina</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num" id="stat-anuncios">—<span>+</span></div>
+    <div class="stat-label">Anuncios publicados</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">100<span>%</span></div>
+    <div class="stat-label">Gratis para empezar</div>
+  </div>
+</div>
+
 <!-- CTA FINAL -->
 <section class="cta-section reveal">
   <div class="cta-bg"></div>
   <span class="cta-label" data-home-guest>¿Listo para empezar?</span>
   <div class="cta-title" data-home-guest>
-    SUMATE A<br>
-    LA <span class="accent">ESCENA</span>
+    Dale lugar a<br>
+    tu <span class="accent">próxima idea.</span>
   </div>
-  <p class="cta-sub" data-home-guest>Gratis para siempre en el plan base. Sin excusas para no encontrar a los músicos que buscás.</p>
-  <span class="cta-label" data-home-known>Del próximo encuentro puede salir algo grande</span>
-  <div class="cta-title" data-home-known>HAY GENTE PARA<br>TU <span class="accent">PRÓXIMA IDEA.</span></div>
-  <p class="cta-sub" data-home-known>Explorá la comunidad y encontrá con quién darle forma.</p>
+  <p class="cta-sub" data-home-guest>Creá tu perfil gratis y compartí lo que hacés, a tu ritmo.</p>
+  <span class="cta-label" data-home-known>Seguimos creando</span>
+  <div class="cta-title" data-home-known>Encontrá con quién<br><span class="accent">dar el próximo paso.</span></div>
+  <p class="cta-sub" data-home-known>Explorá perfiles y conectá con la comunidad.</p>
   <div class="cta-domain">www.<span>buscarte</span>.com.ar</div>
   <br>
   <a href="buscARTE_registro.html" class="btn-neon" style="font-size: 1rem; padding: 1rem 3rem;" data-home-guest>Crear perfil gratis →</a>
