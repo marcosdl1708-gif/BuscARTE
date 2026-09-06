@@ -2,6 +2,10 @@
 
 Este seguimiento separa implementación web, validación física y resultados de uso. No reabre automáticamente bloques postergados.
 
+## Prioridad posterior — guardado bloqueado, deploy pausado
+
+El usuario recibió ambas muestras de correo, pero reportó fallo al editar géneros en PC y otro reporte similar. La respuesta del editor es `[]`; la política UPDATE real exige una identidad JWT que el guardado legacy no envía. Diagnóstico de sólo lectura en `diagnostico-guardado-perfil-20260906.md`. No está reparado: requiere acordar cómo validar al dueño del perfil sin abrir permisos ni activar toda la migración Auth. No dar por completa la integración real del bloque danza/guardado a partir de sus pruebas simuladas. Pausar publicación de mails y nuevos bloques hasta resolverlo; no reenviar muestras.
+
 ## Decisiones posteriores del usuario — auditoría de correo primero
 
 - Antes de avanzar con bienvenida/engagement, consultar Resend para entender el estado real de envíos, entregas, errores y configuración; contrastarlo con código. Esta consulta es de sólo lectura: no autoriza envíos, campañas, deploys ni cambios de configuración.
@@ -24,6 +28,8 @@ Estas decisiones prevalecen sobre el orden propuesto anteriormente. Multirrubro/
 Pruebas web con datos sintéticos y verificación de archivos publicados no prueban toda la app instalada, teclado nativo ni la integración real de captcha/RPC/RLS/Storage/email. Eso sigue pendiente de dispositivo y cuenta/entorno expresamente autorizados. Tampoco hay medición que demuestre aún mayor completitud de perfiles o contratación.
 
 ## Bloque actual — bienvenida y recordatorio, sólo local
+
+Actualización posterior: dos muestras reales autorizadas al correo del usuario figuran Delivered en Resend; falta que el usuario revise Gmail móvil y destinos antes de un deploy conjunto. Ver `muestras-correos-20260906.md`. No reenviar, activar campañas ni publicar automáticamente. Las notas de preparación siguientes son históricas respecto de las muestras, pero los templates de producción aún no cambiaron.
 
 Preparado después del deploy v16 en `2d0f65d`: sólo texto/diseño/enlaces de bienvenida en local, sin envío real ni otra publicación. Exploración general de rubros primero; foto/presentación y retorno mediante login después. Registro, Auth, destinatarios, cadencia, configuración, handler y los otros siete correos intactos. 105/105 pruebas; límites de clientes reales y entrega en `qa-bienvenida-20260906.md`.
 
