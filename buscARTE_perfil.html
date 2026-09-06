@@ -206,6 +206,21 @@
   .coach-link { border:1px solid var(--gris3);color:var(--gris);text-decoration:none;padding:.55rem .9rem;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;transition:all .2s;white-space:nowrap; }
   .coach-link:hover { border-color:var(--neon);color:var(--neon); }
   .coach-link.primary { border-color:var(--neon);color:var(--neon);background:rgba(212,245,60,.04); }
+  .profile-progress[hidden], .preview-complete[hidden] { display:none !important; }
+  .profile-progress { margin-top:1rem;padding:1.2rem;border:1px solid var(--gris3);border-radius:12px;background:var(--negro2); }
+  .profile-progress { scroll-margin-top:110px; }
+  .profile-progress h2 { margin:0 0 .5rem;font-size:1rem;font-weight:500; }
+  .profile-progress p { color:var(--gris);font-size:.82rem;line-height:1.6;margin:.5rem 0; }
+  .profile-progress .complete-bar { width:100%;margin:.75rem 0;height:6px; }
+  .profile-progress .complete-fill { width:0; }
+  .progress-list { display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:.5rem;list-style:none;padding:0;margin:1rem 0 0; }
+  .progress-list a, .progress-list .progress-done { display:flex;align-items:center;justify-content:space-between;gap:.75rem;min-height:48px;padding:.7rem .8rem;border:1px solid var(--gris3);border-radius:8px;font-size:.82rem;line-height:1.4; }
+  .progress-list a { color:var(--blanco);text-decoration:none; }
+  .progress-list a:hover, .progress-list a:focus-visible { border-color:var(--neon);outline:2px solid var(--neon);outline-offset:2px; }
+  .progress-list .progress-done { color:var(--gris);border-color:transparent; }
+  .progress-list .progress-mark { color:var(--neon);white-space:nowrap;font-size:.75rem; }
+  .photo-upload-zone:focus-within { outline:2px solid var(--neon);outline-offset:3px; }
+  #foto-input, #reg-nombre-perfil, #bio-text, #perfil-provincia, #chips-inst, #mi-rubro-contenido .chips { scroll-margin-top:130px; }
 
   /* SECCIONES */
   .config-section {
@@ -873,10 +888,10 @@
       <div class="preview-avatar" id="sidebar-avatar">?</div>
       <div class="preview-name" id="sidebar-nombre">Tu nombre</div>
       <div class="preview-meta" id="sidebar-meta">Artista · —</div>
-      <div class="preview-complete">
-        <span>45%</span>
+      <div class="preview-complete" hidden>
+        <span>—</span>
         <div class="complete-bar"><div class="complete-fill" id="complete-fill"></div></div>
-        <span>completo</span>
+        <span>de lo básico</span>
       </div>
     </div>
 
@@ -920,15 +935,22 @@
     <div class="page-header">
       <div class="page-label">Tu espacio en buscARTE</div>
       <div class="page-title">CONFIGURAR<br>PERFIL</div>
-      <p class="page-sub">Completá tu perfil para aparecer en más búsquedas y conectar con artistas afines. Cuanto más completo, mejor el matching.</p>
+      <p class="page-sub">Dale forma a tu presentación, a tu ritmo. Ya podés explorar la comunidad y volver cuando quieras.</p>
+      <section class="profile-progress" id="profile-progress" hidden tabindex="-1" aria-labelledby="profile-progress-title">
+        <h2 id="profile-progress-title">Tu presentación</h2>
+        <p id="profile-progress-summary" role="status" aria-live="polite"></p>
+        <div class="complete-bar" id="profile-progress-meter" role="progressbar" aria-label="Datos básicos guardados" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0"><div class="complete-fill" id="profile-progress-fill"></div></div>
+        <p>Podés seguir explorando y completar esto cuando quieras. El progreso refleja lo que ya guardaste; los demás datos son opcionales.</p>
+        <ol class="progress-list" id="profile-progress-list"></ol>
+      </section>
       <div class="profile-coach">
         <div>
-          <div class="coach-kicker">Prioridad buscARTE</div>
-          <div class="coach-text" id="coach-text">Foto, bio y completar tu rubro hacen que tu perfil sea mucho más fácil de entender y contactar.</div>
+          <div class="coach-kicker">Seguí a tu ritmo</div>
+          <div class="coach-text" id="coach-text">Después podés sumar trabajos o links. No hace falta completar todo para usar buscARTE.</div>
         </div>
         <div class="coach-actions">
           <a href="buscARTE_perfil_publico.html" class="coach-link primary" id="quick-public-link">Ver perfil público</a>
-          <a href="#videos" class="coach-link">Sumar videos</a>
+          <a href="#videos" class="coach-link">Sumar portfolio</a>
         </div>
       </div>
       <div class="form-status" id="profile-status"></div>
@@ -945,19 +967,19 @@
           <span id="avatar-initials">?</span>
         </div>
         <div class="photo-upload-zone" id="upload-zone">
-          <input type="file" id="foto-input" accept="image/*" onchange="subirFoto(this)">
+          <input type="file" id="foto-input" accept="image/*" aria-label="Elegir foto de perfil" onchange="subirFoto(this)">
           <span class="upload-icon" id="upload-icon">📸</span>
           <p class="upload-text" id="upload-text"><strong>Hacé click o arrastrá una foto</strong><br>JPG, PNG, WebP o foto de celular · se optimiza automáticamente</p>
         </div>
       </div>
 
       <div class="field">
-        <label>Nombre artístico o nombre completo</label>
+        <label for="reg-nombre-perfil">Nombre artístico o nombre completo</label>
         <input type="text" id="reg-nombre-perfil" placeholder="Tu nombre artístico o completo" oninput="showSaveBar()">
       </div>
 
       <div class="field">
-        <label>
+        <label for="bio-text">
           Bio <span class="optional">— Contales quién sos en pocas palabras</span>
         </label>
         <textarea id="bio-text" placeholder="Ej: Guitarrista con 8 años de experiencia, influenciada por el jazz y el rock progresivo. Busco banda con onda para tocar en vivo y grabar. Tengo local de ensayo en Almagro." oninput="countBio()"></textarea>
@@ -965,7 +987,7 @@
       </div>
 
       <div class="field">
-        <label>Provincia</label>
+        <label for="perfil-provincia">Provincia</label>
         <select id="perfil-provincia" onchange="perfilUpdateCiudades()" oninput="showSaveBar()">
           <option value="" disabled selected>¿En qué provincia estás?</option>
           <option>Buenos Aires</option>
@@ -995,13 +1017,13 @@
         </select>
       </div>
       <div class="field" id="perfil-field-ciudad" style="display:none">
-        <label>Ciudad / Localidad</label>
+        <label for="perfil-ciudad">Ciudad / Localidad</label>
         <select id="perfil-ciudad" onchange="perfilUpdateBarrios()" oninput="showSaveBar()">
           <option value="" disabled selected>¿En qué ciudad?</option>
         </select>
       </div>
       <div class="field" id="perfil-field-barrio" style="display:none">
-        <label>Barrio / Zona <span class="optional">opcional</span></label>
+        <label for="perfil-barrio">Barrio / Zona <span class="optional">opcional</span></label>
         <select id="perfil-barrio" oninput="showSaveBar()">
           <option value="" disabled selected>¿En qué barrio?</option>
         </select>
@@ -1343,11 +1365,13 @@
 
   let isLoadingProfile = true;
   let isSavingProfile = false;
+  let isUploadingPhoto = false;
   let perfilCargado = null;
   let camposPerfilCargados = {};
   let profileEditRevision = 0;
   let profileSaveTimer = null;
   let profileLoadVersion = 0;
+  let profileCompletionEntryPending = location.hash === '#completar';
 
   // Estos guardas evitan mezclar formularios/cuentas, no sustituyen permisos del servidor.
   function mismaCuentaPerfil(id) {
@@ -1628,7 +1652,7 @@
 
     // Coach text
     const coachEl = document.getElementById('coach-text');
-    if (coachEl && config.coachText) coachEl.textContent = config.coachText;
+    if (coachEl) coachEl.textContent = 'Después podés sumar trabajos o links. No hace falta completar todo para usar buscARTE.';
 
     // Videos section
     const videosTitle = document.getElementById('videos-section-title');
@@ -1818,81 +1842,69 @@
 
   // SUBIR FOTO DE PERFIL
   async function subirFoto(input) {
-    if (!input.files || !input.files[0]) return;
+    if (!input.files || !input.files[0] || isUploadingPhoto) return;
+    const photoUserId = String(perfilCargado?.id || '');
+    const photoLoadVersion = profileLoadVersion;
+    const currentPhotoAccount = () => !isLoadingProfile && photoLoadVersion === profileLoadVersion &&
+      String(perfilCargado?.id || '') === photoUserId && mismaCuentaPerfil(photoUserId);
+    if (!photoUserId || !currentPhotoAccount()) {
+      showStatus('Esperá a que cargue tu perfil o volvé a ingresar antes de subir una foto.', 'error');
+      return;
+    }
     const originalFile = input.files[0];
-
-    // Preview inmediato con archivo original
-    const reader = new FileReader();
-    reader.onload = e => {
-      const img = document.getElementById('preview-img');
-      if (img) {
-        img.src = e.target.result;
-        img.style.display = 'block';
+    isUploadingPhoto = true;
+    input.disabled = true;
+    const controller = new AbortController();
+    let requestTimeout;
+    setUploadState('⏳', '<strong>Optimizando foto...</strong><br>Esto ayuda especialmente en imágenes de celular.');
+    try {
+      const file = await optimizeProfileImage(originalFile);
+      if (!currentPhotoAccount()) throw new Error('La cuenta cambió. Recargá tu perfil antes de continuar.');
+      if (file.size > 4 * 1024 * 1024) throw new Error('La imagen sigue siendo demasiado pesada. Probá con otra foto.');
+      requestTimeout = setTimeout(() => controller.abort(), 20000);
+      setUploadState('⏳', '<strong>Subiendo foto...</strong>');
+      const safeExt = (file.type.split('/')[1] || 'jpg').replace('jpeg', 'jpg');
+      const fileName = photoUserId + '-' + Date.now() + '.' + safeExt;
+      const res = await fetch(SUPABASE_URL + '/storage/v1/object/fotos-perfil/' + encodeURIComponent(fileName), {
+        method: 'POST',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Content-Type': file.type || 'image/jpeg', 'x-upsert': 'true' },
+        body: file, signal: controller.signal
+      });
+      if (!res.ok) throw new Error('No pudimos subir la imagen. Intentá de nuevo.');
+      if (!currentPhotoAccount()) throw new Error('La cuenta cambió. Recargá tu perfil antes de continuar.');
+      const fotoUrl = SUPABASE_URL + '/storage/v1/object/public/fotos-perfil/' + encodeURIComponent(fileName);
+      const patchRes = await fetch(SUPABASE_URL + '/rest/v1/perfiles?id=eq.' + encodeURIComponent(photoUserId) + '&select=id,foto_url', {
+        method: 'PATCH', headers: { ...hdrs, 'Prefer': 'return=representation' },
+        body: JSON.stringify({ foto_url: fotoUrl }), signal: controller.signal
+      });
+      if (!patchRes.ok) throw new Error('No pudimos confirmar la foto guardada. Revisá tu perfil antes de volver a subirla.');
+      const rows = await patchRes.json();
+      if (!Array.isArray(rows) || rows.length !== 1 || String(rows[0]?.id) !== photoUserId || rows[0]?.foto_url !== fotoUrl) {
+        throw new Error('No pudimos confirmar la foto guardada. Revisá tu perfil antes de volver a subirla.');
       }
+      if (!currentPhotoAccount()) throw new Error('La cuenta cambió. Recargá tu perfil para revisar el resultado.');
+      perfilCargado = { ...perfilCargado, foto_url: fotoUrl };
+      const img = document.getElementById('preview-img');
+      if (img) { img.src = fotoUrl; img.style.display = 'block'; }
       const initials = document.getElementById('avatar-initials');
       if (initials) initials.style.display = 'none';
-    };
-    reader.readAsDataURL(originalFile);
-
-    setUploadState('⏳', '<strong>Optimizando foto...</strong><br>Esto ayuda especialmente en imágenes de celular.');
-
-    try {
-      const miId = localStorage.getItem('ba_user_id');
-      if (!miId) throw new Error('No se encontró tu sesión. Volvé a ingresar.');
-
-      const file = await optimizeProfileImage(originalFile);
-      if (file.size > 4 * 1024 * 1024) {
-        throw new Error('La imagen sigue siendo demasiado pesada. Probá con otra foto.');
-      }
-
-      setUploadState('⏳', '<strong>Subiendo foto...</strong>');
-
-      const safeExt = (file.type.split('/')[1] || 'jpg').replace('jpeg', 'jpg');
-      const fileName = `${miId}-${Date.now()}.${safeExt}`;
-
-      const res = await fetch(
-        `${SUPABASE_URL}/storage/v1/object/fotos-perfil/${encodeURIComponent(fileName)}`,
-        {
-          method: 'POST',
-          headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Content-Type': file.type || 'image/jpeg',
-            'x-upsert': 'true'
-          },
-          body: file
-        }
-      );
-
-      if (!res.ok) {
-        const errText = await res.text().catch(() => '');
-        throw new Error(`Storage respondió ${res.status}. ${errText}`);
-      }
-
-      const fotoUrl = `${SUPABASE_URL}/storage/v1/object/public/fotos-perfil/${encodeURIComponent(fileName)}`;
-
-      const patchRes = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${encodeURIComponent(miId)}`, {
-        method: 'PATCH',
-        headers: { ...hdrs, 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ foto_url: fotoUrl })
-      });
-
-      if (!patchRes.ok && patchRes.status !== 204) {
-        const errText = await patchRes.text().catch(() => '');
-        throw new Error(`No se pudo guardar la foto en tu perfil. ${errText}`);
-      }
-
+      actualizarCompletitud(perfilCargado);
       setUploadState('✅', '<strong>✓ Foto guardada</strong>');
       showStatus('Foto de perfil actualizada.');
-      setTimeout(() => {
-        setUploadState('📸', '<strong>Cambiá tu foto</strong><br>JPG, PNG, WebP o foto de celular · se optimiza automáticamente');
-      }, 2200);
     } catch(e) {
-      setUploadState('❌', `<strong>Error al subir.</strong><br>${escapeHtml(e.message || 'Intentá de nuevo.')}`);
-      showStatus('No pudimos subir la foto. Probá con otra imagen o intentá desde Chrome.', 'error');
-      console.error(e);
+      const message = e.name === 'AbortError'
+        ? 'No pudimos confirmar la subida. Revisá tu perfil antes de volver a subir la foto.'
+        : (e.message || 'No pudimos guardar la foto. Intentá de nuevo.');
+      setUploadState('❌', '<strong>No pudimos confirmar la foto.</strong><br>' + escapeHtml(message));
+      showStatus(message, 'error');
+      actualizarCompletitud(perfilCargado);
+    } finally {
+      clearTimeout(requestTimeout);
+      isUploadingPhoto = false;
+      input.disabled = false;
+      input.value = '';
     }
-    showSaveBar();
   }
 
   // VIDEO INPUT
@@ -1932,11 +1944,12 @@
 
   // CARGAR PERFIL AL ENTRAR
   async function cargarPerfil() {
-    if (isSavingProfile) return;
+    if (isSavingProfile || isUploadingPhoto) return;
     if (!miId) { isLoadingProfile = false; return; }
     const loadVersion = ++profileLoadVersion;
     perfilCargado = null;
     isLoadingProfile = true;
+    actualizarCompletitud(null);
     resetFormSelections();
 
     // Adaptar UI al rubro ANTES de cargar datos
@@ -2084,19 +2097,29 @@
       if (p.provincia) {
         const selProv = document.getElementById('perfil-provincia');
         if (selProv) {
-          selProv.value = p.provincia;
+          seleccionarUbicacionGuardada(selProv, p.provincia);
           perfilUpdateCiudades();
           if (p.ciudad) {
             const selCiudad = document.getElementById('perfil-ciudad');
             if (selCiudad) {
-              selCiudad.value = p.ciudad;
+              seleccionarUbicacionGuardada(selCiudad, p.ciudad);
               perfilUpdateBarrios();
               if (p.barrio) {
                 const selBarrio = document.getElementById('perfil-barrio');
-                if (selBarrio) selBarrio.value = p.barrio;
+                if (selBarrio) seleccionarUbicacionGuardada(selBarrio, p.barrio);
               }
             }
           }
+        }
+      }
+
+      // Algunos perfiles históricos guardaron ciudad sin provincia. Mostrarla sin inventar una provincia.
+      if (!p.provincia && p.ciudad) {
+        seleccionarUbicacionGuardada(document.getElementById('perfil-ciudad'), p.ciudad);
+        document.getElementById('perfil-field-ciudad').style.display = 'block';
+        if (p.barrio) {
+          seleccionarUbicacionGuardada(document.getElementById('perfil-barrio'), p.barrio);
+          document.getElementById('perfil-field-barrio').style.display = 'block';
         }
       }
 
@@ -2120,8 +2143,8 @@
       const rubroLabel = (RUBROS_PERFIL_CONFIG[rubroActivo] || {}).label || 'Artista';
       if (sideMeta) sideMeta.textContent = `${rubroActivo === 'musica' ? (p.instrumento || 'Músico').split(',')[0] : rubroLabel} · ${p.ciudad || '—'}`;
 
-      actualizarCompletitud(p);
       perfilCargado = p;
+      actualizarCompletitud(p);
       profileEditRevision = 0;
       hideSaveBar();
     } catch(e) {
@@ -2133,24 +2156,119 @@
     }
   }
 
-  function actualizarCompletitud(p = {}) {
-    let checks;
-    if (rubroActivo === 'musica') {
-      checks = [
-        !!p.nombre, !!p.foto_url, !!p.bio, !!p.instrumento,
-        !!p.generos, !!p.disponibilidad, !!p.referentes, !!p.videos, !!p.redes
-      ];
-    } else {
-      checks = [
-        !!p.nombre, !!p.foto_url, !!p.bio, !!p.campos_especificos,
-        !!p.disponibilidad, !!p.videos, !!p.redes
-      ];
+  // Sólo básicos guardados: nunca confundir JSON vacío, previews o borradores con datos completos.
+  function basicosPerfil(p = {}, rubro = rubroActivo) {
+    const tieneTexto = value => typeof value === 'string' && !!value.trim();
+    const tieneOpcion = (value, depth = 0) => {
+      if (depth > 5) return false;
+      if (Array.isArray(value)) return value.every(item => typeof item === 'string') && value.some(item => tieneOpcion(item, depth + 1));
+      if (!tieneTexto(value)) return false;
+      const text = value.trim();
+      if (/^(null|undefined|true|false)$/i.test(text)) return false;
+      if (/^[\[{"]/.test(text)) {
+        try { return tieneOpcion(JSON.parse(text), depth + 1); } catch (_) { return false; }
+      }
+      return text.split(',').some(item => !!item.trim());
+    };
+    const sections = { actuacion:'chips-rol-act', audiovisual:'chips-rol-av', modelaje:'chips-tipo-modelo',
+      diseno:'chips-rol-dis', tatuaje:'chips-rol-tatu', danza:'chips-disc-dan', maquillaje:'chips-rol-maq',
+      circo:'chips-rol-cir', escritura:'chips-rol-esc' };
+    let disciplina = tieneOpcion(p.instrumento);
+    if (rubro !== 'musica') {
+      let campos = {};
+      try { campos = parseCamposPerfil(p.campos_especificos); } catch (_) {}
+      const section = sections[rubro];
+      const key = SECTION_KEYS[section];
+      const legacy = [section, ...(SECTION_LEGACY_IDS[section] || [])].find(alias => Object.hasOwn(campos, alias));
+      disciplina = !!section && tieneOpcion(Object.hasOwn(campos, key) ? campos[key] : campos[legacy]);
     }
-    const pct = Math.round((checks.filter(Boolean).length / checks.length) * 100);
-    const fill = document.getElementById('complete-fill');
-    const text = document.querySelector('.preview-complete span:first-child');
-    if (fill) fill.style.width = pct + '%';
-    if (text) text.textContent = pct + '%';
+    let foto = false;
+    try { foto = tieneTexto(p.foto_url) && ['http:', 'https:'].includes(new URL(p.foto_url).protocol); } catch (_) {}
+    return [
+      { key:'nombre', label:'Tu nombre', action:'Agregá tu nombre', target:'reg-nombre-perfil', done:tieneTexto(p.nombre) },
+      { key:'foto', label:'Foto de perfil', action:'Agregá una foto', target:'foto-input', done:foto },
+      { key:'bio', label:'Presentación breve', action:'Contá quién sos', target:'bio-text', done:tieneTexto(p.bio) },
+      { key:'ubicacion', label:'Provincia y ciudad', action:'Agregá tu ubicación', target:'perfil-provincia', done:tieneTexto(p.provincia) && tieneTexto(p.ciudad) },
+      { key:'disciplina', label:rubro === 'musica' ? 'Instrumento o voz' : 'Tu disciplina', action:rubro === 'musica' ? 'Elegí instrumento o voz' : 'Contá qué hacés', target:rubro === 'musica' ? 'chips-inst' : sections[rubro], done:disciplina }
+    ];
+  }
+
+  function actualizarCompletitud(p) {
+    const card = document.getElementById('profile-progress');
+    const sidebar = document.querySelector('.preview-complete');
+    const valid = !!p && !!perfilCargado && String(p.id) === String(perfilCargado.id) && mismaCuentaPerfil(p.id) &&
+      tipoCuentaActivo === 'artista' && (!p.tipo_cuenta || p.tipo_cuenta === 'artista') &&
+      Object.hasOwn(RUBROS_PERFIL_CONFIG, rubroActivo) && (!p.rubro || p.rubro === rubroActivo);
+    if (card) card.hidden = !valid;
+    if (sidebar) sidebar.hidden = !valid;
+    if (!valid) return;
+    const checks = basicosPerfil(p);
+    const done = checks.filter(item => item.done).length;
+    const pct = Math.round(done / checks.length * 100);
+    document.getElementById('profile-progress-summary').textContent = done === 5
+      ? '5 de 5 básicos guardados. Tu presentación ya tiene lo esencial.'
+      : done + ' de 5 básicos guardados. Elegí el próximo paso.';
+    document.getElementById('profile-progress-meter').setAttribute('aria-valuenow', String(done));
+    document.getElementById('profile-progress-meter').setAttribute('aria-valuetext', done + ' de 5 básicos guardados');
+    document.getElementById('profile-progress-fill').style.width = pct + '%';
+    document.getElementById('complete-fill').style.width = pct + '%';
+    sidebar.querySelector('span:first-child').textContent = pct + '%';
+    const list = document.getElementById('profile-progress-list');
+    list.replaceChildren();
+    checks.forEach(item => {
+      const li = document.createElement('li');
+      li.dataset.basic = item.key;
+      const action = document.createElement(item.done ? 'span' : 'a');
+      action.className = item.done ? 'progress-done' : 'progress-action';
+      const label = document.createElement('span');
+      label.textContent = item.done ? item.label : item.action;
+      const mark = document.createElement('span');
+      mark.className = 'progress-mark';
+      mark.textContent = item.done ? '✓ Listo' : 'Completar →';
+      action.append(label, mark);
+      if (!item.done) {
+        action.href = '#' + item.target;
+        action.addEventListener('click', event => {
+          event.preventDefault();
+          if (!mismaCuentaPerfil(p.id)) { actualizarCompletitud(null); return; }
+          const target = document.getElementById(item.target);
+          if (!target) return;
+          if (!target.matches('input, select, textarea, button')) {
+            target.tabIndex = -1;
+            target.setAttribute('role', 'group');
+            target.setAttribute('aria-label', item.label);
+          }
+          target.focus({ preventScroll:true });
+          target.scrollIntoView({ behavior:'instant', block:'start' });
+        });
+      }
+      li.append(action); list.append(li);
+    });
+    // El enlace de bienvenida llega antes de la lectura del perfil. Enfocar una sola vez,
+    // después de tener datos válidos; guardar o volver a la pestaña no roba el foco.
+    if (profileCompletionEntryPending) {
+      profileCompletionEntryPending = false;
+      requestAnimationFrame(() => {
+        if (card.hidden || !mismaCuentaPerfil(p.id)) return;
+        card.focus({ preventScroll:true });
+        card.scrollIntoView({ behavior:'instant', block:'start' });
+      });
+    }
+  }
+  // Ocultar inmediatamente las recomendaciones de otra cuenta; no crear ni validar sesiones.
+  window.addEventListener('storage', () => actualizarCompletitud(perfilCargado));
+  window.addEventListener('pageshow', () => actualizarCompletitud(perfilCargado));
+  window.addEventListener('focus', () => actualizarCompletitud(perfilCargado));
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) actualizarCompletitud(perfilCargado); });
+
+  function seleccionarUbicacionGuardada(select, value) {
+    if (!select || typeof value !== 'string' || !value.trim()) return;
+    if (![...select.options].some(option => option.value === value)) {
+      const option = document.createElement('option');
+      option.value = value; option.textContent = value;
+      select.append(option);
+    }
+    select.value = value;
   }
 
   // GUARDAR PERFIL

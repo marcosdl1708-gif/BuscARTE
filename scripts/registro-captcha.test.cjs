@@ -116,6 +116,9 @@ async function setup(t, { width = 390, mode = 'ready', rpcFailure = false } = {}
     await page.evaluate(({ role, step }) => {
       tipoCuenta = role;
       rubroSeleccionado = 'danza';
+      // This suite jumps directly to the final step: keep prerequisite data
+      // valid so it continues testing captcha rather than business validation.
+      if (role === 'negocio') document.getElementById('neg-tipo').value = 'Sala de ensayo';
       goStep(step);
     }, { role, step: paths[role].step });
   }

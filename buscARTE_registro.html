@@ -200,13 +200,39 @@
   .captcha-retry:focus-visible { outline: 2px solid var(--neon); outline-offset: 2px; }
   .captcha-retry:disabled { opacity: .65; cursor: wait; }
   .captcha-actions { display: flex; gap: .75rem; flex-wrap: wrap; }
+  /* Alta breve: primero entrar, después enriquecer el perfil. */
+  .right-panel { min-width: 0; }
+  #step-cuenta .field-row { grid-template-columns: 1fr; }
+  .onboarding-progress { margin-bottom: 1.5rem; font-size: .78rem; color: var(--neon); letter-spacing: .04em; }
+  .onboarding-progress span { display: block; margin-top: .5rem; color: var(--gris); line-height: 1.5; letter-spacing: 0; }
+  .onboarding-optional { border: 1px solid #333; border-radius: 10px; padding: 0 1rem; margin: 1.1rem 0; }
+  .onboarding-optional summary { min-height: 48px; padding: .9rem 0; color: var(--blanco); font-size: .87rem; line-height: 1.5; cursor: pointer; }
+  .onboarding-optional[open] summary { margin-bottom: .75rem; border-bottom: 1px solid #333; }
+  .onboarding-optional p { color: var(--gris); font-size: .82rem; line-height: 1.6; margin-bottom: 1rem; }
+  .onboarding-secondary { width: 100%; min-height: 44px; background: transparent; border: 1px solid #444; color: var(--blanco); border-radius: 6px; padding: .8rem; font: inherit; font-size: .84rem; cursor: pointer; margin-top: 1rem; }
+  .onboarding-optional summary:focus-visible, .onboarding-secondary:focus-visible, .btn-next:focus-visible, .btn-back:focus-visible, .tipo-card:focus-visible, .rubro-card:focus-visible { outline: 2px solid var(--neon); outline-offset: 3px; }
+  .form-title:focus { outline: none; }
+  .form-actions .btn-next, .form-actions .btn-back { min-height: 44px; justify-content: center; white-space: normal; }
+  .onboarding-next { border: 1px solid #333; border-radius: 12px; padding: 1.2rem; margin-top: 1rem; text-align: left; }
+  .onboarding-next p { color: var(--gris); line-height: 1.6; font-size: .85rem; margin: .5rem 0; }
+  .onboarding-next a { display: inline-flex; align-items: center; min-height: 44px; color: var(--neon); font-size: .88rem; }
+  [hidden] { display: none !important; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .form-step, .success-icon { animation: none; } }
   /* RESPONSIVE */
   @media (max-width: 768px) {
     .cursor, .cursor-ring { display: none !important; }
     body { cursor: auto !important; }
     .page { grid-template-columns: 1fr !important; }
     .left-panel { display: none !important; }
-    .right-panel { padding: 1.5rem 1.25rem !important; min-height: 100vh !important; }
+    nav { min-height: 64px; padding: .6rem 1.25rem; gap: .75rem; }
+    .nav-logo { flex-shrink: 0; font-size: 1.2rem; }
+    .nav-back { display: flex; align-items: center; justify-content: flex-end; min-height: 44px; font-size: .7rem; letter-spacing: .02em; line-height: 1.4; text-align: right; }
+    .top-spacer { height: 64px; }
+    .right-panel { padding: 1.5rem 1.25rem !important; min-height: calc(100vh - 64px) !important; min-height: calc(100dvh - 64px) !important; }
+    .success-screen { padding: 1rem 0; }
+    .success-title { font-size: 2.2rem; }
+    .success-icon { margin-bottom: 1.5rem; }
+    .success-sub { margin-bottom: 1.5rem; }
     .form-title { font-size: 1.5rem !important; }
     .form-subtitle { font-size: .85rem !important; }
     .field-row { grid-template-columns: 1fr !important; gap: 0 !important; }
@@ -282,11 +308,12 @@
 
   <!-- ═══ PANEL DERECHO ═══ -->
   <div class="right-panel">
+    <div class="onboarding-progress" id="registro-progreso" role="status" aria-live="polite" aria-atomic="true">Paso 1 de 4 · Cómo querés participar<span>Creá lo básico. Después podés seguir completando tu perfil.</span></div>
 
     <!-- ─── STEP TIPO: ¿Quién sos? ─── -->
     <div class="form-step active" id="step-tipo">
       <div class="form-title">¿Cómo querés usar buscARTE?</div>
-      <p class="form-subtitle">Elegí una opción para empezar. Esto determina qué tipo de perfil vas a crear.</p>
+      <p class="form-subtitle">Elegí cómo querés participar. Empezamos por lo básico para que puedas entrar y explorar.</p>
 
       <div class="tipo-grid">
         <button type="button" class="tipo-card" id="tipo-artista" onclick="seleccionarTipo('artista')">
@@ -322,29 +349,25 @@
     <!-- ─── STEP CUENTA: Datos básicos (igual para todos) ─── -->
     <div class="form-step" id="step-cuenta">
       <div class="form-title">Bienvenido/a 👋</div>
-      <p class="form-subtitle">Creá tu cuenta en buscARTE. Es gratis y siempre lo será.</p>
+      <p class="form-subtitle">Sólo tus datos de acceso y tu provincia para empezar. Crear tu cuenta es gratis.</p>
 
       <div class="field-row">
         <div class="field">
-          <label id="label-nombre">Nombre artístico o cómo querés aparecer</label>
-          <input type="text" id="reg-nombre" placeholder="Ej: Lucía Moreno, La Maga, Los Piojos...">
-        </div>
-        <div class="field">
-          <label>Apellido <span style="color:var(--gris);font-size:.75rem;font-weight:300">(opcional)</span></label>
-          <input type="text" id="reg-apellido" placeholder="Ej: Moreno">
+          <label id="label-nombre" for="reg-nombre">Nombre artístico o cómo querés aparecer</label>
+          <input type="text" id="reg-nombre" autocomplete="name" placeholder="Ej: Lucía Moreno, La Maga, Los Piojos...">
         </div>
       </div>
       <div class="field">
-        <label>Email</label>
-        <input type="email" id="reg-email" placeholder="tu@email.com">
+        <label for="reg-email">Email</label>
+        <input type="email" id="reg-email" autocomplete="email" inputmode="email" placeholder="tu@email.com">
       </div>
       <div class="field">
-        <label>Contraseña</label>
-        <input type="password" id="reg-password" placeholder="Mínimo 8 caracteres" oninput="validarPassword(this)">
+        <label for="reg-password">Contraseña</label>
+        <input type="password" id="reg-password" autocomplete="new-password" placeholder="Mínimo 8 caracteres" oninput="validarPassword(this)">
         <div id="pass-feedback" style="font-size:.75rem;margin-top:.4rem;height:1rem"></div>
       </div>
       <div class="field">
-        <label>Provincia</label>
+        <label for="sel-provincia">Provincia</label>
         <select id="sel-provincia" onchange="updateCiudades()">
           <option value="" disabled selected>¿En qué provincia estás?</option>
           <option>Buenos Aires</option><option>CABA</option><option>Córdoba</option>
@@ -357,8 +380,14 @@
           <option>La Pampa</option><option>Santa Cruz</option><option>Tierra del Fuego</option>
         </select>
       </div>
+      <details class="onboarding-optional" id="registro-cuenta-opcional">
+        <summary>Agregar apellido o ubicación más precisa · opcional</summary>
+        <div class="field">
+          <label for="reg-apellido">Apellido (opcional)</label>
+          <input type="text" id="reg-apellido" autocomplete="family-name" placeholder="Ej: Moreno">
+        </div>
       <div class="field" id="field-ciudad" style="display:none">
-        <label>Ciudad / Localidad</label>
+        <label for="sel-ciudad">Ciudad / Localidad</label>
         <select id="sel-ciudad" onchange="updateBarrios()">
           <option value="" disabled selected>¿En qué ciudad?</option>
         </select>
@@ -369,6 +398,7 @@
           <option value="" disabled selected>¿En qué barrio o zona?</option>
         </select>
       </div>
+      </details>
 
       <div class="form-actions">
         <button type="button" class="btn-back" onclick="goStep('tipo')">← Atrás</button>
@@ -380,7 +410,7 @@
     <!-- ─── STEP RUBRO: Elegí tu rubro (solo artistas) ─── -->
     <div class="form-step" id="step-rubro">
       <div class="form-title">¿En qué rubro sos artista? 🎨</div>
-      <p class="form-subtitle">Elegí tu disciplina principal. Después vas a poder agregar más perfiles desde tu cuenta.</p>
+      <p class="form-subtitle">Elegí el rubro de este perfil. Tus instrumentos, estilos y especialidades pueden esperar: los completás desde Mi perfil cuando quieras.</p>
 
       <div class="rubro-grid" id="rubro-grid">
         <button type="button" class="rubro-card" onclick="seleccionarRubro('musica', this)">
@@ -429,6 +459,7 @@
         <button type="button" class="btn-back" onclick="goStep('cuenta')">← Atrás</button>
         <button type="button" class="btn-next" onclick="avanzarDesdeRubro()">Siguiente →</button>
       </div>
+      <button type="button" class="onboarding-secondary" id="registro-detalles-artisticos" onclick="avanzarDesdeRubro(true)">Agregar detalles artísticos ahora · opcional</button>
     </div>
 
     <!-- ─── STEP MUSICA: Instrumento y géneros ─── -->
@@ -676,8 +707,11 @@
 
     <!-- ─── STEP PERFIL: Bio, foto y objetivo (todos los artistas) ─── -->
     <div class="form-step" id="step-perfil">
-      <div class="form-title">Tu perfil ✨</div>
-      <p class="form-subtitle" id="perfil-subtitle">Últimos detalles. Contales a los demás qué buscás.</p>
+      <div class="form-title">Todo listo para entrar</div>
+      <p class="form-subtitle" id="perfil-subtitle">Verificá que sos una persona y creá tu perfil. La foto, la bio y los demás detalles se pueden completar después.</p>
+
+      <details class="onboarding-optional" id="registro-perfil-opcional">
+        <summary>Agregar foto, bio y qué buscás · opcional</summary>
 
       <div class="field">
         <label>Bio corta (aparece en tu perfil)</label>
@@ -700,6 +734,7 @@
         <img id="reg-foto-preview" style="display:none;width:80px;height:80px;border-radius:50%;object-fit:cover;margin:0 auto">
         <p class="photo-text" id="reg-foto-text"><strong>Subí tu foto de perfil</strong><br>JPG, PNG o WebP · Máx. 2MB · Opcional</p>
       </div>
+      </details>
 
       <div class="form-actions" style="flex-direction:column;align-items:stretch;gap:1rem">
         <section class="captcha-panel" tabindex="-1" aria-labelledby="captcha-title-perfil" aria-describedby="captcha-status-perfil">
@@ -723,7 +758,11 @@
         <p class="success-sub" id="exito-sub">Tu perfil está listo. Ya podés explorar artistas, publicar anuncios y conectar con la escena argentina.</p>
         <a href="buscARTE_busqueda.html" class="btn-next" id="exito-btn" style="display:inline-flex;text-decoration:none;font-size:1rem;padding:1rem 2.5rem;margin-bottom:1rem;">Explorar →</a>
         <br>
-        <a href="buscARTE_perfil.html" style="color:var(--gris);font-size:0.82rem;text-decoration:none;">Completar mi perfil más tarde</a>
+        <div class="onboarding-next" id="exito-completar-panel">
+          <strong>Tu próximo paso, cuando quieras</strong>
+          <p>Una foto y unas líneas sobre tu trabajo ayudan a que otros te conozcan. No hace falta completar todo ahora.</p>
+          <a href="buscARTE_perfil.html#completar" id="exito-completar">Completar mi perfil →</a>
+        </div>
       </div>
     </div>
 
@@ -739,7 +778,10 @@ let tipoCuenta = null;      // 'artista' | 'negocio' | 'visitante'
 let rubroSeleccionado = null; // 'musica' | 'actuacion' | etc.
 let artists = [];
 let fotoRegistroUrl = null;
+let fotoNegocioUrl = null;
 let dropdownIdx = -1;
+let registroEnCurso = false;
+let registroCreado = false;
 
 // ═══════════════════════════════════════
 // hCAPTCHA — Render explícito por widget (soporta múltiples captchas)
@@ -752,6 +794,7 @@ function resetCaptcha(containerId) {
 // NAVEGACIÓN PRINCIPAL
 // ═══════════════════════════════════════
 function goStep(stepId) {
+  if ((registroEnCurso || registroCreado) && stepId !== 'exito') return;
   document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
   const stepEl = document.getElementById('step-' + stepId);
   stepEl.classList.add('active');
@@ -759,13 +802,19 @@ function goStep(stepId) {
   // Sólo se renderiza el widget del paso visible, cuando el SDK esté listo.
   const box = stepEl.querySelector('.h-captcha');
   window.RegistroCaptcha.show(box ? box.id : null);
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  const heading = stepEl.querySelector('.form-title, .success-title');
+  if (heading) { heading.tabIndex = -1; heading.focus({ preventScroll: true }); }
+  window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
 function seleccionarTipo(tipo) {
+  if (registroEnCurso || registroCreado) return;
   tipoCuenta = tipo;
   document.querySelectorAll('.tipo-card').forEach(c => c.classList.remove('selected'));
   document.getElementById('tipo-' + tipo).classList.add('selected');
+  document.querySelectorAll('.tipo-card').forEach(c => c.setAttribute('aria-pressed', String(c.id === 'tipo-' + tipo)));
+  document.documentElement.style.setProperty('--neon', tipo === 'artista' ? RUBRO_COLORS[rubroSeleccionado] || '#d4f53c' : '#d4f53c');
+  updateLeftPanel('tipo');
   // Adaptar label del nombre según tipo
   if (tipo === 'negocio') {
     document.getElementById('label-nombre').textContent = 'Nombre del negocio o espacio';
@@ -782,18 +831,28 @@ function avanzarDesdeTipo() {
 }
 
 function avanzarDesdeCuenta() {
+  if (!validarDatosCuenta()) return;
+  if (tipoCuenta === 'artista') goStep('rubro');
+  else if (tipoCuenta === 'negocio') {
+    const field = document.getElementById('neg-nombre');
+    if (!field.value.trim() || field.value === field.dataset.nombreAutomatico) {
+      field.value = document.getElementById('reg-nombre').value.trim();
+      field.dataset.nombreAutomatico = field.value;
+    }
+    goStep('negocio');
+  } else if (tipoCuenta === 'visitante') goStep('visitante');
+}
+
+function validarDatosCuenta() {
   const nombre = document.getElementById('reg-nombre').value.trim();
   const email = document.getElementById('reg-email').value.trim();
   const pass = document.getElementById('reg-password').value;
   const prov = document.getElementById('sel-provincia').value;
-  if (!nombre) { alert('Por favor ingresá tu nombre.'); return; }
-  if (!email || !email.includes('@')) { alert('Por favor ingresá un email válido.'); return; }
-  if (pass.length < 8) { alert('La contraseña debe tener al menos 8 caracteres.'); return; }
-  if (!prov) { alert('Por favor seleccioná tu provincia.'); return; }
-
-  if (tipoCuenta === 'artista') goStep('rubro');
-  else if (tipoCuenta === 'negocio') goStep('negocio');
-  else if (tipoCuenta === 'visitante') goStep('visitante');
+  if (!nombre) { alert('Por favor ingresá tu nombre.'); goStep('cuenta'); return false; }
+  if (!email || !document.getElementById('reg-email').checkValidity()) { alert('Por favor ingresá un email válido.'); goStep('cuenta'); return false; }
+  if (pass.length < 8) { alert('La contraseña debe tener al menos 8 caracteres.'); goStep('cuenta'); return false; }
+  if (!prov) { alert('Por favor seleccioná tu provincia.'); goStep('cuenta'); return false; }
+  return true;
 }
 
 // COLORES POR RUBRO
@@ -804,26 +863,30 @@ const RUBRO_COLORS = {
 };
 
 function seleccionarRubro(rubro, btn) {
+  if (registroEnCurso || registroCreado) return;
   rubroSeleccionado = rubro;
   document.querySelectorAll('.rubro-card').forEach(c => c.classList.remove('selected'));
   btn.classList.add('selected');
+  document.querySelectorAll('.rubro-card').forEach(c => c.setAttribute('aria-pressed', String(c === btn)));
   // Cambiar paleta de colores según rubro seleccionado
   document.documentElement.style.setProperty('--neon', RUBRO_COLORS[rubro] || '#d4f53c');
 }
 
-function avanzarDesdeRubro() {
+function avanzarDesdeRubro(conDetalles = false) {
   if (!rubroSeleccionado) { alert('Por favor elegí tu rubro.'); return; }
-  if (rubroSeleccionado === 'musica') {
+  renderObjetivos();
+  if (rubroSeleccionado !== 'musica') renderCamposRubro(rubroSeleccionado);
+  if (!conDetalles) {
+    goStep('perfil');
+  } else if (rubroSeleccionado === 'musica') {
     goStep('musica');
   } else {
-    renderCamposRubro(rubroSeleccionado);
     goStep('campos');
   }
 }
 
 function avanzarDesdeMusica() {
-  const instrumentos = [...document.querySelectorAll('#chips-instrumentos .chip.selected')];
-  if (instrumentos.length === 0) { alert('Por favor seleccioná al menos un instrumento o rol.'); return; }
+  // Artistic details are optional in both the short and expanded paths.
   goStep('referentes');
 }
 
@@ -836,8 +899,7 @@ function avanzarDesdeNegocio() {
 }
 
 function volverDesdePerfil() {
-  if (rubroSeleccionado === 'musica') goStep('referentes');
-  else goStep('campos');
+  goStep('rubro');
 }
 
 // ═══════════════════════════════════════
@@ -845,48 +907,47 @@ function volverDesdePerfil() {
 // ═══════════════════════════════════════
 const leftPanelContent = {
   tipo:    { label: 'Paso 1', title: '¿QUIÉN\nSOS?',        desc: 'Elegí cómo querés usar buscARTE.', bg: '01', step: 1 },
-  cuenta:  { label: 'Paso 2', title: 'TU\nCUENTA',          desc: 'Empezá con lo básico. Solo te lleva un minuto.', bg: '02', step: 2 },
+  cuenta:  { label: 'Paso 2', title: 'TU\nCUENTA',          desc: 'Tus datos de acceso y tu provincia. Lo demás puede esperar.', bg: '02', step: 2 },
   rubro:   { label: 'Paso 3', title: 'TU\nRUBRO',           desc: 'Elegí tu disciplina artística principal.', bg: '03', step: 3 },
-  musica:  { label: 'Paso 4', title: 'TU\nMÚSICA',          desc: 'Contanos qué tocás y qué géneros son los tuyos.', bg: '04', step: 4 },
-  referentes: { label: 'Paso 5', title: 'TUS\nREFERENTES', desc: 'Tus artistas favoritos definen el matching.', bg: '05', step: 5 },
-  campos:  { label: 'Paso 4', title: 'TU\nARTE',            desc: 'Contanos sobre tu trabajo y especialidad.', bg: '04', step: 4 },
+  musica:  { label: 'Opcional', title: 'TU\nMÚSICA',       desc: 'Sumá instrumentos y géneros si querés. También podés seguir sin completarlos.', bg: '+', step: 3 },
+  referentes: { label: 'Opcional', title: 'TUS\nREFERENTES', desc: 'Compartí algunas influencias, ahora o más adelante desde Mi perfil.', bg: '+', step: 3 },
+  campos:  { label: 'Opcional', title: 'TU\nARTE',         desc: 'Contanos sobre tu trabajo y especialidad. Podés hacerlo después.', bg: '+', step: 3 },
   negocio: { label: 'Paso 3', title: 'TU\nESPACIO',         desc: 'Contanos sobre tu lugar o servicio.', bg: '03', step: 3 },
   'negocio-contacto': { label: 'Paso 4', title: 'CON\nTACTO', desc: 'Cómo van a encontrarte los artistas.', bg: '04', step: 4 },
   visitante: { label: 'Último paso', title: 'TU\nCUENTA', desc: 'Confirmá que sos humano y entrá a buscARTE.', bg: '✓', step: 3 },
-  perfil:  { label: 'Último paso', title: 'TU\nPERFIL',     desc: 'Últimos detalles para que te encuentren.', bg: '✓', step: 5 },
+  perfil:  { label: 'Último paso', title: 'YA CASI\nESTÁS', desc: 'Creá tu perfil inicial y empezá a explorar. Podés enriquecerlo a tu ritmo.', bg: '✓', step: 4 },
   exito:   { label: '¡Listo!', title: 'BIE\nNVE\nNIDO',     desc: 'Ya sos parte de la comunidad buscARTE.', bg: '✓', step: 6 },
 };
 
 function updateLeftPanel(stepId) {
   const c = leftPanelContent[stepId];
   if (!c) return;
-  document.getElementById('left-label').textContent = c.label;
+  const total = tipoCuenta === 'visitante' ? 3 : 4;
+  const optional = ['musica', 'referentes', 'campos'].includes(stepId);
+  const currentStep = ({ tipo: 1, cuenta: 2, rubro: 3, musica: 3, referentes: 3, campos: 3, negocio: 3, 'negocio-contacto': 4, visitante: 3, perfil: 4, exito: total + 1 })[stepId];
+  const phase = stepId === 'exito' ? 'Cuenta creada' : optional ? 'Detalles opcionales' : `Paso ${currentStep} de ${total}`;
+  document.getElementById('left-label').textContent = phase;
   document.getElementById('left-title').innerHTML = c.title.replace(/\n/g, '<br>');
   document.getElementById('left-desc').textContent = c.desc;
   document.getElementById('left-bg').textContent = c.bg;
 
-  // Actualizar labels de pasos según tipo de cuenta
-  if (tipoCuenta === 'negocio') {
-    document.getElementById('ps-2-label').textContent = 'Tus datos';
-    document.getElementById('ps-3-label').textContent = 'Tu espacio';
-    document.getElementById('ps-4-label').textContent = 'Contacto';
-  } else if (tipoCuenta === 'artista' && rubroSeleccionado === 'musica') {
-    document.getElementById('ps-2-label').textContent = 'Tus datos';
-    document.getElementById('ps-3-label').textContent = 'Tu rubro';
-    document.getElementById('ps-4-label').textContent = 'Tu perfil';
-  } else {
-    document.getElementById('ps-2-label').textContent = 'Tus datos';
-    document.getElementById('ps-3-label').textContent = 'Tu rubro';
-    document.getElementById('ps-4-label').textContent = 'Tu perfil';
-  }
+  document.getElementById('ps-2-label').textContent = 'Datos básicos';
+  document.getElementById('ps-3-label').textContent = tipoCuenta === 'negocio' ? 'Tu espacio' : tipoCuenta === 'visitante' ? 'Crear cuenta' : 'Tu rubro';
+  document.getElementById('ps-4-label').textContent = 'Crear perfil';
+  const progress = document.getElementById('registro-progreso');
+  progress.replaceChildren(document.createTextNode(phase + (stepId === 'exito' ? ' · Ya podés explorar' : ' · ' + (optional ? 'Podés completarlos después' : 'Tu cuenta, paso a paso'))));
+  const help = document.createElement('span');
+  help.textContent = tipoCuenta === 'artista' ? 'Foto, bio y detalles artísticos: cuando quieras, desde Mi perfil.' : 'Verificá tus datos y empezá a explorar la comunidad.';
+  progress.appendChild(help);
 
   // Progress dots
-  const currentStep = c.step;
   for (let i = 1; i <= 4; i++) {
     const ps = document.getElementById('ps-' + i);
+    ps.hidden = i > total;
     ps.classList.remove('active', 'done');
+    ps.removeAttribute('aria-current');
     if (i < currentStep) ps.classList.add('done');
-    else if (i === currentStep) ps.classList.add('active');
+    else if (i === currentStep) { ps.classList.add('active'); ps.setAttribute('aria-current', 'step'); }
   }
 }
 
@@ -922,6 +983,8 @@ const objetivosXRubro = {
 
 function renderObjetivos() {
   const grid = document.getElementById('objetivo-grid');
+  if (grid.dataset.rubro === rubroSeleccionado) return;
+  grid.dataset.rubro = rubroSeleccionado;
   const opts = objetivosXRubro[rubroSeleccionado] || objetivosXRubro.default;
   grid.innerHTML = opts.map(o => `
     <button type="button" class="objetivo-card" onclick="selectObjetivo(this)">
@@ -1016,6 +1079,9 @@ const rubrosConfig = {
 function renderCamposRubro(rubro) {
   const config = rubrosConfig[rubro];
   if (!config) return;
+  const contenido = document.getElementById('campos-contenido');
+  if (contenido.dataset.rubro === rubro) return;
+  contenido.dataset.rubro = rubro;
   document.getElementById('campos-title').textContent = config.titulo;
   document.getElementById('campos-subtitle').textContent = config.subtitulo;
 
@@ -1071,6 +1137,9 @@ const SUPABASE_URL = 'https://xiaanchoanxmampegoay.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68';
 
 async function crearPerfil(btn) {
+  if (registroEnCurso || registroCreado) return;
+  if (!validarDatosCuenta()) return;
+  if (tipoCuenta !== 'artista' || !Object.hasOwn(RUBRO_COLORS, rubroSeleccionado)) { alert('Por favor elegí tu tipo de cuenta y rubro.'); goStep('rubro'); return; }
   const email = document.getElementById('reg-email')?.value?.trim();
   const nombre = document.getElementById('reg-nombre')?.value?.trim();
   const apellido = document.getElementById('reg-apellido')?.value?.trim();
@@ -1103,6 +1172,7 @@ async function crearPerfil(btn) {
   const edadRegistro = parseInt(document.getElementById('edad-registro')?.value || '', 10) || null;
   const camposEspecificos = collectCamposEspecificos();
 
+  registroEnCurso = true;
   btn.textContent = 'Guardando...';
   btn.style.opacity = '0.7';
   btn.disabled = true;
@@ -1154,6 +1224,12 @@ async function crearPerfil(btn) {
     }
 
     const usuario = Array.isArray(data) ? data[0] : data;
+    if (!registroTieneId(usuario)) {
+      alert('No pudimos confirmar la creación. Intentá ingresar con tu email antes de volver a registrarte.');
+      resetCaptcha('hcaptcha-box-perfil');
+      return;
+    }
+    registroCreado = true;
     // La RPC registrar_usuario no toma edad: la guardamos por PATCH (opcional)
     if (usuario?.id && edadRegistro) {
       fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${usuario.id}`, {
@@ -1174,14 +1250,9 @@ async function crearPerfil(btn) {
       }).catch(e => console.error('Error subiendo foto:', e));
     }
 
-    localStorage.setItem('ba_logged', '1');
-    localStorage.setItem('ba_name', nombreCompleto);
-    if (usuario?.id) localStorage.setItem('ba_user_id', String(usuario.id));
-    localStorage.setItem('ba_referentes', artists.join(','));
-    localStorage.setItem('ba_generos', generos);
-    localStorage.setItem('ba_tipo_cuenta', tipoCuenta || 'artista');
-    localStorage.setItem('ba_rubro', rubroSeleccionado || 'musica');
-    if (artists.length) guardarArtistasEnSupabase(artists);
+    guardarSesionRegistro(usuario.id, nombreCompleto, 'artista', rubroSeleccionado,
+      rubroSeleccionado === 'musica' ? artists.join(',') : '', generos);
+    if (rubroSeleccionado === 'musica' && artists.length) guardarArtistasEnSupabase(artists);
 
     // Email bienvenida
     fetch('/.netlify/functions/send-email', {
@@ -1199,13 +1270,15 @@ async function crearPerfil(btn) {
     goStep('exito');
 
   } catch (e) {
+    if (registroCreado) { mostrarRegistroSinSesion(); return; }
     alert('No se pudo conectar. Verificá tu conexión e intentá de nuevo.');
     console.error(e);
     resetCaptcha('hcaptcha-box-perfil');
   } finally {
+    registroEnCurso = false;
     btn.textContent = '🎉 Crear mi perfil';
     btn.style.opacity = '1';
-    btn.disabled = false;
+    btn.disabled = registroCreado;
   }
 }
 
@@ -1213,6 +1286,9 @@ async function crearPerfil(btn) {
 // CREAR NEGOCIO
 // ═══════════════════════════════════════
 async function crearNegocio(btn) {
+  if (registroEnCurso || registroCreado) return;
+  if (!validarDatosCuenta()) return;
+  if (tipoCuenta !== 'negocio' || !document.getElementById('neg-tipo').value) { alert('Por favor elegí el tipo de negocio.'); goStep('negocio'); return; }
   const captchaResponse = window.RegistroCaptcha.requireResponse('hcaptcha-box');
   if (!captchaResponse) return;
 
@@ -1229,6 +1305,7 @@ async function crearNegocio(btn) {
   const _negWeb = document.getElementById('neg-web')?.value?.trim(); if (_negWeb) camposNegocio.web = _negWeb;
   const _negPre = document.getElementById('neg-precio')?.value?.trim(); if (_negPre) camposNegocio.precio = _negPre;
 
+  registroEnCurso = true;
   btn.textContent = 'Guardando...';
   btn.style.opacity = '0.7';
   btn.disabled = true;
@@ -1275,13 +1352,16 @@ async function crearNegocio(btn) {
     }
 
     const usuario = Array.isArray(data) ? data[0] : data;
-    localStorage.setItem('ba_logged', '1');
-    localStorage.setItem('ba_name', nombre);
-    if (usuario?.id) localStorage.setItem('ba_user_id', String(usuario.id));
-    localStorage.setItem('ba_tipo_cuenta', 'negocio');
+    if (!registroTieneId(usuario)) {
+      alert('No pudimos confirmar la creación. Intentá ingresar con tu email antes de volver a registrarte.');
+      resetCaptcha('hcaptcha-box');
+      return;
+    }
+    registroCreado = true;
+    guardarSesionRegistro(usuario.id, nombre, 'negocio');
 
-    if (fotoRegistroUrl && usuario?.id) {
-      subirFotoRegistro(usuario.id).then(fotoUrl => {
+    if (fotoNegocioUrl && usuario?.id) {
+      subirFotoRegistro(usuario.id, fotoNegocioUrl).then(fotoUrl => {
         if (fotoUrl) {
           fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${usuario.id}`, {
             method: 'PATCH',
@@ -1295,13 +1375,15 @@ async function crearNegocio(btn) {
     personalizarExito();
     goStep('exito');
   } catch(e) {
+    if (registroCreado) { mostrarRegistroSinSesion(); return; }
     alert('No se pudo conectar. Verificá tu conexión.');
     console.error(e);
     resetCaptcha('hcaptcha-box');
   } finally {
+    registroEnCurso = false;
     btn.textContent = '🏢 Crear mi perfil';
     btn.style.opacity = '1';
-    btn.disabled = false;
+    btn.disabled = registroCreado;
   }
 }
 
@@ -1309,6 +1391,9 @@ async function crearNegocio(btn) {
 // CREAR VISITANTE (mínimo)
 // ═══════════════════════════════════════
 async function crearVisitante(btn) {
+  if (registroEnCurso || registroCreado) return;
+  if (!validarDatosCuenta()) return;
+  if (tipoCuenta !== 'visitante') return;
   const captchaResponse = window.RegistroCaptcha.requireResponse('hcaptcha-box-visitante');
   if (!captchaResponse) return;
 
@@ -1317,6 +1402,7 @@ async function crearVisitante(btn) {
   const nombre = document.getElementById('reg-nombre')?.value?.trim();
   const provincia = document.getElementById('sel-provincia')?.value || '';
 
+  registroEnCurso = true;
   if (btn) { btn.textContent = 'Creando...'; btn.style.opacity = '0.7'; btn.disabled = true; }
   const restoreBtn = () => { if (btn) { btn.textContent = '🛒 Crear mi cuenta'; btn.style.opacity = '1'; btn.disabled = false; } };
 
@@ -1350,40 +1436,82 @@ async function crearVisitante(btn) {
     }
 
     const usuario = Array.isArray(data) ? data[0] : data;
-    if (!usuario?.id) {
-      alert('Hubo un error al crear tu cuenta. Intentá de nuevo.');
+    if (!registroTieneId(usuario)) {
+      alert('No pudimos confirmar la creación. Intentá ingresar con tu email antes de volver a registrarte.');
       resetCaptcha('hcaptcha-box-visitante');
       restoreBtn();
       return;
     }
 
-    localStorage.setItem('ba_logged', '1');
-    localStorage.setItem('ba_name', nombre || '');
-    localStorage.setItem('ba_user_id', String(usuario.id));
-    localStorage.setItem('ba_tipo_cuenta', 'visitante');
+    registroCreado = true;
+    guardarSesionRegistro(usuario.id, nombre || '', 'visitante');
 
     personalizarExito();
     goStep('exito');
   } catch(e) {
+    if (registroCreado) { mostrarRegistroSinSesion(); return; }
     alert('No se pudo conectar. Verificá tu conexión e intentá de nuevo.');
     console.error(e);
     resetCaptcha('hcaptcha-box-visitante');
     restoreBtn();
+  } finally {
+    registroEnCurso = false;
+    if (!registroCreado) restoreBtn();
   }
+}
+
+// The existing RPC returns a row/object ID. Never invent a successful session
+// from an empty/malformed 2xx response, nor resubmit automatically.
+function registroTieneId(usuario) {
+  const id = usuario?.id;
+  return (typeof id === 'string' && id.trim().length > 0) || (typeof id === 'number' && Number.isFinite(id) && id > 0);
+}
+
+function guardarSesionRegistro(id, nombre, tipo, rubro = '', referentes = '', generos = '') {
+  // Keep the existing legacy cache contract. The marker is written last so a
+  // partial storage failure cannot present a newly created, incomplete session.
+  const keys = ['ba_logged', 'ba_user_id', 'ba_name', 'ba_tipo_cuenta', 'ba_rubro', 'ba_referentes', 'ba_generos'];
+  try {
+    localStorage.removeItem('ba_logged');
+    localStorage.setItem('ba_user_id', String(id));
+    localStorage.setItem('ba_name', nombre);
+    localStorage.setItem('ba_tipo_cuenta', tipo);
+    for (const [key, value] of [['ba_rubro', rubro], ['ba_referentes', referentes], ['ba_generos', generos]]) {
+      if (tipo === 'artista' || value) localStorage.setItem(key, value); else localStorage.removeItem(key);
+    }
+    localStorage.setItem('ba_logged', '1');
+  } catch (error) {
+    for (const key of keys) { try { localStorage.removeItem(key); } catch (_) {} }
+    throw error;
+  }
+}
+
+function mostrarRegistroSinSesion() {
+  // The server already created the account: offer login instead of another POST.
+  document.getElementById('exito-icon').textContent = '✓';
+  document.getElementById('exito-sub').textContent = 'Tu cuenta fue creada. Este navegador no pudo mantener el ingreso: entrá con tu email y contraseña. No hace falta registrarte de nuevo.';
+  const button = document.getElementById('exito-btn');
+  button.textContent = 'Ingresar a mi cuenta →';
+  button.href = 'buscARTE_login.html';
+  document.getElementById('exito-completar-panel').hidden = true;
+  goStep('exito');
 }
 
 // ═══════════════════════════════════════
 // PANTALLA ÉXITO — Personalizada por tipo
 // ═══════════════════════════════════════
 function personalizarExito() {
-  const registroId = localStorage.getItem('ba_user_id') || `${tipoCuenta || 'artista'}:${Date.now()}`;
-  window.MetaAds?.trackOnce('CompleteRegistration', {
-    account_type: tipoCuenta || 'artista'
-  }, `registration:${registroId}`);
+  try {
+    const registroId = localStorage.getItem('ba_user_id');
+    if (registroId) window.MetaAds?.trackOnce('CompleteRegistration', {
+      account_type: tipoCuenta || 'artista'
+    }, `registration:${registroId}`);
+  } catch (_) { /* Optional tracking must never block a confirmed account. */ }
 
   const iconEl = document.getElementById('exito-icon');
   const subEl = document.getElementById('exito-sub');
   const btnEl = document.getElementById('exito-btn');
+  document.getElementById('exito-completar-panel').hidden = tipoCuenta !== 'artista';
 
   if (tipoCuenta === 'negocio') {
     iconEl.textContent = '🏢';
@@ -1393,15 +1521,15 @@ function personalizarExito() {
   } else if (tipoCuenta === 'visitante') {
     iconEl.textContent = '🛒';
     subEl.textContent = 'Tu cuenta está lista. Podés explorar artistas, ver anuncios y publicar en el marketplace.';
-    btnEl.textContent = 'Ver anuncios →';
-    btnEl.href = 'buscARTE_anuncios.html';
+    btnEl.textContent = 'Explorar Marketplace →';
+    btnEl.href = 'buscARTE_anuncios.html?tipo=vende';
   } else {
     const rubrosLabels = { musica: '🎵 músicos', actuacion: '🎭 artistas de escena', audiovisual: '🎬 artistas audiovisuales', modelaje: '👗 modelos', diseno: '✏️ artistas visuales', tatuaje: '🖋️ tatuadores', danza: '💃 bailarines', maquillaje: '💄 artistas de maquillaje', circo: '🎪 artistas de circo', escritura: '✍️ escritores' };
     const rubroLabel = rubrosLabels[rubroSeleccionado] || 'artistas';
     iconEl.textContent = '🎉';
-    subEl.textContent = `Tu perfil está listo. Ya podés explorar ${rubroLabel}, publicar anuncios y conectar con la escena argentina.`;
-    btnEl.textContent = 'Explorar →';
-    btnEl.href = 'buscARTE_busqueda.html';
+    subEl.textContent = `Tu cuenta y tu perfil inicial ya están creados. Empezá a buscar ${rubroLabel} o completá tu presentación a tu ritmo.`;
+    btnEl.textContent = 'Empezar a explorar →';
+    btnEl.href = 'buscARTE_busqueda.html?rubro=' + encodeURIComponent(rubroSeleccionado);
   }
 }
 
@@ -1435,7 +1563,7 @@ function previewFotoNegocio(input) {
   if (file.size > 2 * 1024 * 1024) { alert('La imagen no puede superar 2MB.'); return; }
   const reader = new FileReader();
   reader.onload = e => {
-    fotoRegistroUrl = e.target.result;
+    fotoNegocioUrl = e.target.result;
     document.getElementById('neg-foto-icon').style.display = 'none';
     document.getElementById('neg-foto-text').innerHTML = '<strong>Logo cargado ✓</strong><br><span style="font-size:.8rem;color:var(--neon)">Clickeá para cambiarlo</span>';
     const prev = document.getElementById('neg-foto-preview');
@@ -1461,10 +1589,10 @@ function previewFotoRegistro(input) {
   reader.readAsDataURL(file);
 }
 
-async function subirFotoRegistro(userId) {
-  if (!fotoRegistroUrl || !userId) return null;
+async function subirFotoRegistro(userId, fotoUrl = fotoRegistroUrl) {
+  if (!fotoUrl || !userId) return null;
   try {
-    const blob = await (await fetch(fotoRegistroUrl)).blob();
+    const blob = await (await fetch(fotoUrl)).blob();
     const ext = blob.type === 'image/png' ? 'png' : (blob.type === 'image/webp' ? 'webp' : 'jpg');
     const fileName = `${userId}_registro.${ext}`;
     const res = await fetch(`${SUPABASE_URL}/storage/v1/object/fotos-perfil/${fileName}`, {
