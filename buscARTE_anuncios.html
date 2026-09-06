@@ -896,6 +896,50 @@
   #modal.publish-compact #publish-status { font-size:.75rem; max-height:2.9em; margin-bottom:.4rem; }
   #modal.publish-compact #publish-result-links:not([hidden]) { display:grid; grid-template-columns:1fr 1fr; gap:.4rem; margin-bottom:.4rem; }
   #modal.publish-compact #publish-view-link, #modal.publish-compact #publish-retry-confirm { font-size:.75rem; line-height:1.3; }
+  /* Marketplace: presentación de productos, sin cambiar los demás tablones. */
+  body[data-marketplace="true"] .tipo-tabs { display:none !important; }
+  body[data-marketplace="true"] .anuncios-intro { border-color:#41432f; border-radius:12px; }
+  body[data-marketplace="true"] .anuncios-intro-title { font-size:1.35rem; }
+  #anuncios-heading-label { color:inherit; }
+  body[data-marketplace="true"] .anuncios-lista { background:transparent; gap:1rem; }
+  body[data-marketplace="true"] .marketplace-product { display:grid; grid-template-columns:minmax(150px,32%) minmax(0,1fr); gap:1.1rem; padding:1rem !important; border:1px solid #303030; border-radius:12px; background:var(--negro2); }
+  body[data-marketplace="true"] .marketplace-product-media { display:flex; align-items:center; justify-content:center; min-width:0; min-height:180px; border-radius:8px; background:#181818; text-decoration:none; color:#a7a39a; font-size:.8rem; overflow:hidden; }
+  body[data-marketplace="true"] .marketplace-product-media img { display:block; width:100%; height:200px; object-fit:contain; }
+  body[data-marketplace="true"] .marketplace-product-info { min-width:0; }
+  body[data-marketplace="true"] .marketplace-product .anuncio-titulo { padding:0; margin:.25rem 0 .5rem; font-size:1.08rem; overflow-wrap:anywhere; }
+  body[data-marketplace="true"] .marketplace-product-price { font-family:var(--font-display); color:var(--blanco); font-size:1.45rem; line-height:1.25; margin:.4rem 0; overflow-wrap:anywhere; }
+  body[data-marketplace="true"] .marketplace-product-specs { display:flex; flex-wrap:wrap; gap:.35rem .75rem; color:#bdb9b0; font-size:.78rem; margin:.5rem 0 .7rem; overflow-wrap:anywhere; }
+  body[data-marketplace="true"] .marketplace-product .anuncio-desc { margin-bottom:.5rem; }
+  body[data-marketplace="true"] .marketplace-product .anuncio-meta { border-top:1px solid #303030; padding-top:.5rem; gap:.6rem; }
+  body[data-marketplace="true"] .marketplace-product .anuncio-autor { min-height:44px; max-width:100%; }
+  body[data-marketplace="true"] .marketplace-product .autor-name { overflow-wrap:anywhere; }
+  body[data-marketplace="true"] .marketplace-product .anuncio-respond { display:inline-flex; align-items:center; justify-content:center; min-height:44px; color:var(--neon); border-color:#555b32; border-radius:6px; }
+  body[data-marketplace="true"] :is(.fchip,.filter-clear,.btn-publish,.btn-load,.mini-link,.empty-action,.mobile-filter-btn,.mobile-show-results-an,.publish-type,.btn-publish-full) { min-height:44px; cursor:pointer; }
+  body[data-marketplace="true"] :is(.mini-link,.empty-action) { display:inline-flex; align-items:center; justify-content:center; white-space:normal; }
+  body[data-marketplace="true"] :is(a,button,summary):focus-visible { outline:2px solid var(--neon); outline-offset:3px; }
+  body[data-marketplace="true"] .filter-group-collapsible summary { min-height:44px; display:flex; align-items:center; cursor:pointer; }
+  body[data-marketplace="true"] #marketplace-category-groups .fg-head { width:100%; }
+  body[data-marketplace="true"] #marketplace-category-groups .fg-label { color:#d2cec5; font-size:.8rem; letter-spacing:.02em; line-height:1.4; text-transform:none; }
+  #marketplace-other-boards, #marketplace-other-boards > .filter-chips { display:contents; }
+  #marketplace-other-boards > summary { display:none; }
+  body[data-marketplace="true"] #marketplace-other-boards { display:block; width:100%; }
+  body[data-marketplace="true"] #marketplace-other-boards > summary { display:flex; align-items:center; justify-content:space-between; min-height:44px; color:#c3bfb6; cursor:pointer; font-size:.77rem; }
+  body[data-marketplace="true"] #marketplace-other-boards > summary::after { content:'+'; margin-left:.5rem; font-size:1rem; }
+  body[data-marketplace="true"] #marketplace-other-boards[open] > summary::after { content:'−'; }
+  body[data-marketplace="true"] #marketplace-other-boards > .filter-chips { display:flex; padding-top:.4rem; }
+  body[data-marketplace="true"] #board-selector-label { display:none; }
+  body[data-marketplace="true"] #fp-vende input { min-height:44px; font-size:16px; }
+  body[data-marketplace="true"] #fp-vende .fchip { white-space:normal; text-align:left; line-height:1.35; }
+  body[data-marketplace="true"] .anuncios-intro-actions { flex-wrap:wrap; }
+  #anuncios-intro-account[hidden] { display:none !important; }
+  @media(max-width:600px) {
+    body[data-marketplace="true"] .marketplace-product { grid-template-columns:minmax(0,1fr); gap:.8rem; }
+    body[data-marketplace="true"] .marketplace-product-media { min-height:170px; }
+    body[data-marketplace="true"] .marketplace-product-media img { height:210px; }
+    body[data-marketplace="true"] .marketplace-product .anuncio-respond { width:100%; }
+    body[data-marketplace="true"] .marketplace-product .anuncio-time { width:auto !important; margin-left:auto !important; }
+    body[data-marketplace="true"] .anuncios-intro-actions { display:flex !important; }
+  }
 </style>
 <link href="/manifest.json" rel="manifest"/>
 <meta content="#0a0a0a" name="theme-color"/>
@@ -905,7 +949,7 @@
 <link href="/icons/icon-192.png" rel="apple-touch-icon"/>
 <script src="/assets/js/meta-pixel.js?v=1" defer></script>
 </head>
-<body>
+<body data-marketplace="false">
 <div class="cursor" id="cursor"></div>
 <div class="cursor-ring" id="cursor-ring"></div>
 <!-- ═══ MODAL ═══ -->
@@ -1159,9 +1203,12 @@
 </div>
 <!-- ═══ SELECTOR DE RUBRO GLOBAL (siempre visible, fuera de los paneles por categoría) ═══ -->
 <div class="filter-group" id="fp-rubro-global">
-<span class="filter-group-label">Rubro</span>
+<span class="filter-group-label" id="board-selector-label">Rubro</span>
 <div class="filter-chips">
 <button class="fchip" data-rubro="marketplace" onclick="filtrarPorRubro(this)" style="width:100%;justify-content:center;margin-bottom:.35rem">🛒 Compra-venta de equipos</button>
+<details id="marketplace-other-boards" open>
+<summary>Otros tablones artísticos</summary>
+<div class="filter-chips">
 <button class="fchip" data-rubro="musica" onclick="filtrarPorRubro(this)">🎵 Música</button>
 <button class="fchip" data-rubro="actuacion" onclick="filtrarPorRubro(this)">🎭 Actuación</button>
 <button class="fchip" data-rubro="audiovisual" onclick="filtrarPorRubro(this)">🎬 Audiovisual</button>
@@ -1172,6 +1219,8 @@
 <button class="fchip" data-rubro="maquillaje" onclick="filtrarPorRubro(this)">💄 Maquillaje</button>
 <button class="fchip" data-rubro="circo" onclick="filtrarPorRubro(this)">🎪 Circo</button>
 <button class="fchip" data-rubro="escritura" onclick="filtrarPorRubro(this)">✍️ Escritura</button>
+</div>
+</details>
 </div>
 </div>
 <div class="filter-divider"></div>
@@ -1235,44 +1284,29 @@
 <div class="filter-panel" id="fp-vende">
 <div class="filter-group">
 <span class="filter-group-label">Categoría</span>
-<div class="filter-chips">
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Guitarra</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Bajo</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Batería</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Teclado</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Vientos</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Cuerdas</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Amplificador</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Pedalera</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Micrófono</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Equipo PA</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Home Studio</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Sala ensayo</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Accesorios</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Otro</button>
-</div>
+<div id="marketplace-category-groups"></div>
 </div>
 <div class="filter-divider"></div>
 <div class="filter-group">
 <span class="filter-group-label">Condición</span>
 <div class="filter-chips">
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Nuevo</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Usado</button>
-<button class="fchip" onclick="this.classList.toggle('on');anunciosOffset=0;cargarAnuncios(false)">Para reparar</button>
+<button class="fchip" data-marketplace-filter="condition" data-value="Nuevo" aria-pressed="false" onclick="toggleMarketplaceFilter(this)">Nuevo</button>
+<button class="fchip" data-marketplace-filter="condition" data-value="Usado" aria-pressed="false" onclick="toggleMarketplaceFilter(this)">Usado</button>
+<button class="fchip" data-marketplace-filter="condition" data-value="Para reparar" aria-pressed="false" onclick="toggleMarketplaceFilter(this)">Para reparar</button>
 </div>
 </div>
 <div class="filter-divider"></div>
 <div class="filter-group">
 <span class="filter-group-label">Rango de precio</span>
 <div class="price-range">
-<input id="precio-min" oninput="anunciosOffset=0;cargarAnuncios(false)" placeholder="Mínimo $" type="number"/>
-<input id="precio-max" oninput="anunciosOffset=0;cargarAnuncios(false)" placeholder="Máximo $" type="number"/>
+<input id="precio-min" aria-label="Precio mínimo" min="0" oninput="anunciosOffset=0;cargarAnuncios(false)" placeholder="Mínimo $" type="number"/>
+<input id="precio-max" aria-label="Precio máximo" min="0" oninput="anunciosOffset=0;cargarAnuncios(false)" placeholder="Máximo $" type="number"/>
 </div>
 </div>
 <div class="filter-divider"></div>
 <div class="filter-group">
 <span class="filter-group-label">Zona</span>
-<input id="zona-vende" oninput="anunciosOffset=0;cargarAnuncios(false)" placeholder="Ciudad o barrio (ej: Caballito)" type="text"/>
+<input id="zona-vende" aria-label="Zona del producto" oninput="anunciosOffset=0;cargarAnuncios(false)" placeholder="Ciudad o barrio (ej: Caballito)" type="text"/>
 </div>
 </div>
 <!-- FILTROS: DOY CLASES -->
@@ -1338,19 +1372,19 @@
 <div class="anuncios-main">
 <div class="main-header">
 <div>
-<div class="main-title"><span id="anuncios-count">—</span> anuncios</div>
+<div class="main-title"><span id="anuncios-count">—</span> <span id="anuncios-heading-label">anuncios</span></div>
 <div class="main-sub" id="main-sub-text">cargando...</div>
 </div>
-<button class="btn-publish" onclick="openModal('busco')">+ Publicar anuncio</button>
+<button class="btn-publish" id="publish-main-btn" onclick="openModal(tipoPublicacionDelTablon())">+ Publicar anuncio</button>
 </div>
 <div class="anuncios-intro">
 <div>
-<div class="anuncios-intro-title">Anuncios de la escena</div>
-<div class="anuncios-intro-copy">Buscá artistas, ofrecete, encontrá eventos, clases o equipos. Navegar es abierto; para publicar o responder necesitás cuenta.</div>
+<div class="anuncios-intro-title" id="anuncios-intro-title">Anuncios de la escena</div>
+<div class="anuncios-intro-copy" id="anuncios-intro-copy">Buscá artistas, ofrecete, encontrá eventos, clases o equipos. Navegar es abierto; para publicar o responder necesitás cuenta.</div>
 </div>
 <div class="anuncios-intro-actions">
-<a class="mini-link" href="buscARTE_busqueda.html">🎨 Artistas</a>
-<a class="mini-link" href="buscARTE_registro.html">+ Crear perfil</a>
+<a class="mini-link" id="anuncios-board-link" href="buscARTE_busqueda.html">🎨 Artistas</a>
+<a class="mini-link" id="anuncios-intro-account" href="buscARTE_registro.html">+ Crear perfil</a>
 </div>
 </div>
 <button class="mobile-filter-btn" id="mobile-filter-btn-an" onclick="toggleMobileFiltersAn()">⚙ Filtros</button>
@@ -1373,8 +1407,8 @@
 <!-- SIDEBAR -->
 <aside class="right-sidebar">
 <div class="sidebar-card">
-<div class="sidebar-card-title">Publicar anuncio</div>
-<div class="sidebar-card-sub">¿Buscás alguien, te ofrecés, querés organizar una jam o vender algo?</div>
+<div class="sidebar-card-title" id="publish-sidebar-title">Publicar anuncio</div>
+<div class="sidebar-card-sub" id="publish-sidebar-copy">¿Buscás alguien, te ofrecés, querés organizar una jam o vender algo?</div>
 <div class="publish-types">
 <button class="publish-type selected" onclick="selectPublishType(this,'busco')"><span class="ptype-icon">🔍</span><div><span class="ptype-label">Busco artista</span><span class="ptype-desc">Músico, actor, fotógrafo, bailarín...</span></div></button>
 <button class="publish-type" onclick="selectPublishType(this,'ofrezco')"><span class="ptype-icon">🎨</span><div><span class="ptype-label">Me ofrezco</span><span class="ptype-desc">Estoy disponible para proyectos</span></div></button>
@@ -1382,7 +1416,7 @@
 <button class="publish-type" onclick="selectPublishType(this,'vende')"><span class="ptype-icon">🎛️</span><div><span class="ptype-label">Vendo / Alquilo</span><span class="ptype-desc">Instrumentos, equipos, sala</span></div></button>
 <button class="publish-type" onclick="selectPublishType(this,'clases')"><span class="ptype-icon">🎓</span><div><span class="ptype-label">Doy clases</span><span class="ptype-desc">Música, danza, actuación, arte...</span></div></button>
 </div>
-<button class="btn-publish-full" onclick="openModalFromSidebar()">Publicar gratis →</button>
+<button class="btn-publish-full" id="publish-sidebar-btn" onclick="openModalFromSidebar()">Publicar gratis →</button>
 </div>
 <div class="sidebar-card">
 <div style="font-size:.63rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gris2);margin-bottom:1rem;">Actividad en buscARTE</div>
@@ -1399,8 +1433,12 @@
 
   // ─── RUBRO DESDE URL + COLORES ───
   const RUBROS_VALIDOS_ANUN = ['musica','actuacion','audiovisual','modelaje','diseno','tatuaje','danza','maquillaje','circo','escritura']
-  const _rubroParamAnun = new URLSearchParams(window.location.search).get('rubro')
+  const parametrosTablon = new URLSearchParams(window.location.search)
+  const _rubroParamAnun = parametrosTablon.get('rubro')
   const rubroFiltro = RUBROS_VALIDOS_ANUN.includes(_rubroParamAnun) ? _rubroParamAnun : null
+  // Marketplace es una sección del tablón, nunca una disciplina del autor.
+  const marketplaceInicial = ['vende','vendo'].includes(parametrosTablon.get('tipo')) || _rubroParamAnun === 'marketplace'
+  const tituloTablonOriginal = document.title
   const RUBRO_COLORS = {
     musica:'#d4f53c', actuacion:'#ff6b5b', audiovisual:'#5b9fff',
     modelaje:'#4de8c4', diseno:'#ffaa5b', tatuaje:'#c45bff',
@@ -1413,13 +1451,14 @@
   }
   // Rubro inicial: el de la URL, o el rubro de la cuenta (si es un rubro artístico válido), o ninguno (todos)
   const _rubroCuenta = localStorage.getItem('ba_rubro')
-  const rubroInicial = rubroFiltro || (RUBRO_COLORS[_rubroCuenta] ? _rubroCuenta : null)
+  const rubroArtisticoInicial = rubroFiltro || (RUBRO_COLORS[_rubroCuenta] ? _rubroCuenta : null)
+  const rubroInicial = marketplaceInicial ? 'marketplace' : rubroArtisticoInicial
   if (rubroInicial && RUBRO_COLORS[rubroInicial]) {
     document.documentElement.style.setProperty('--neon', RUBRO_COLORS[rubroInicial])
   }
 
   // Rubro seleccionado en el modal "busco artista" — por defecto, tu propia disciplina
-  let buscoRubroSeleccionado = rubroInicial || 'musica'
+  let buscoRubroSeleccionado = rubroArtisticoInicial || 'musica'
 
   let fotoVentaUrl = null
   let fotoVentaUrl2 = null
@@ -1440,6 +1479,9 @@
   let sidebarTipo = 'busco'
   let tipoFiltro = 'todos'
   let anunciosOffset = 0
+  let anunciosCargaVersion = 0
+  let anunciosCargando = false
+  let anunciosMostradosIds = new Set()
   // Tipo de cuenta del usuario (artista / negocio / visitante). Gobierna qué puede publicar.
   // Se cachea en localStorage y se refresca desde la DB en cada carga (ver cargarTipoCuenta()).
   window.__baTipoCuenta = localStorage.getItem('ba_tipo_cuenta') || null
@@ -1530,6 +1572,57 @@
   }
   const CONDICIONES = ['Nuevo','Usado','Para reparar']
 
+  function esMarketplace() { return getRubroFiltroEfectivo() === 'marketplace' }
+  function tipoPublicacionDelTablon() { return esMarketplace() ? 'vende' : 'busco' }
+
+  function renderMarketplaceFiltros() {
+    const container = document.getElementById('marketplace-category-groups')
+    if (!container || container.dataset.ready === '1') return
+    container.innerHTML = MARKETPLACE_GRUPOS.map(grupo =>
+      `<details class="filter-group-collapsible"><summary><span class="fg-head"><span class="fg-label">${escapeHtml(grupo.label)}</span><span class="fg-chevron">▾</span></span></summary><div class="filter-chips">` +
+      grupo.cats.map(cat => `<button class="fchip" data-marketplace-filter="category" data-value="${escapeHtml(cat)}" aria-pressed="false" onclick="toggleMarketplaceFilter(this)">${escapeHtml(cat)}</button>`).join('') + '</div></details>'
+    ).join('')
+    container.dataset.ready = '1'
+  }
+
+  function toggleMarketplaceFilter(btn) {
+    btn.classList.toggle('on')
+    btn.setAttribute('aria-pressed', String(btn.classList.contains('on')))
+    anunciosOffset = 0
+    cargarAnuncios(false)
+  }
+
+  function actualizarPresentacionTablon() {
+    const marketplace = esMarketplace()
+    document.body.dataset.marketplace = String(marketplace)
+    document.title = marketplace ? 'Marketplace — compra, venta y alquiler entre artistas | buscARTE' : tituloTablonOriginal
+    document.getElementById('anuncios-heading-label').textContent = marketplace ? 'publicaciones' : 'anuncios'
+    document.getElementById('anuncios-intro-title').textContent = marketplace ? 'Marketplace' : 'Anuncios de la escena'
+    document.getElementById('anuncios-intro-copy').textContent = marketplace
+      ? 'Instrumentos, equipos y materiales para crear. Explorá ventas y alquileres de todos los rubros y consultá directamente a quien publica.'
+      : 'Buscá artistas, ofrecete, encontrá eventos, clases o equipos. Navegar es abierto; para publicar o responder necesitás cuenta.'
+    document.getElementById('publish-main-btn').textContent = marketplace ? '+ Publicar venta / alquiler' : '+ Publicar anuncio'
+    document.getElementById('board-selector-label').textContent = marketplace ? 'Explorar secciones' : 'Rubro'
+    document.getElementById('marketplace-other-boards').open = !marketplace
+    const link = document.getElementById('anuncios-board-link')
+    link.href = marketplace ? 'buscARTE_anuncios.html' : 'buscARTE_busqueda.html'
+    link.textContent = marketplace ? 'Anuncios artísticos' : '🎨 Artistas'
+    const account = document.getElementById('anuncios-intro-account')
+    account.hidden = marketplace && isLogged()
+    account.textContent = marketplace ? '+ Crear cuenta' : '+ Crear perfil'
+    const subtitle = document.getElementById('main-sub-text')
+    if (marketplace) subtitle.textContent = 'Venta y alquiler · todos los rubros'
+  }
+
+  function actualizarURLTablon() {
+    const url = new URL(window.location.href)
+    url.searchParams.delete('tipo')
+    url.searchParams.delete('rubro')
+    if (esMarketplace()) url.searchParams.set('tipo', 'vende')
+    else if (getRubroFiltroEfectivo()) url.searchParams.set('rubro', getRubroFiltroEfectivo())
+    history.replaceState(history.state, '', url.pathname + url.search + url.hash)
+  }
+
   function escapeHtml(value) {
     return String(value ?? '')
       .replaceAll('&','&amp;')
@@ -1577,6 +1670,19 @@
   // TABS + FILTROS
   function setTab(el, tipo) {
     const uiTipo = tipo || 'todos'
+    if (canonicalTipo(uiTipo) === 'vende' && !esMarketplace()) {
+      const marketplaceChip = document.querySelector('#fp-rubro-global [data-rubro="marketplace"]')
+      if (marketplaceChip) filtrarPorRubro(marketplaceChip)
+      return
+    }
+    // El catálogo no mezcla tipos artísticos aunque llegue un parámetro incompatible.
+    if (esMarketplace()) {
+      tipoFiltro = 'vende'
+      clearFilters({ reload:false })
+      anunciosOffset = 0
+      cargarAnuncios(false)
+      return
+    }
     document.querySelectorAll('.tipo-tab').forEach(t=>t.classList.remove('active'))
     if (el) el.classList.add('active')
     else {
@@ -1602,6 +1708,7 @@
     // El rubro es un selector de tablón global y persistente: clearFilters NO lo toca.
     // Solo limpia los filtros secundarios (chips de campos, zona, precio).
     document.querySelectorAll('.filters-panel .fchip.on:not([data-rubro])').forEach(c=>c.classList.remove('on'))
+    document.querySelectorAll('[data-marketplace-filter]').forEach(c=>c.setAttribute('aria-pressed', 'false'))
     document.querySelectorAll('.filters-panel input').forEach(i => { i.value = '' })
     document.querySelectorAll('.filters-panel select').forEach(s => { s.selectedIndex = 0 })
     if (opts.reload !== false) {
@@ -1614,6 +1721,7 @@
     document.querySelectorAll('.publish-type').forEach(t=>t.classList.remove('selected'))
     el.classList.add('selected')
     sidebarTipo = canonicalTipo(tipo)
+    if (esMarketplace()) document.getElementById('publish-sidebar-btn').textContent = sidebarTipo === 'vende' ? 'Publicar venta / alquiler →' : 'Publicar anuncio →'
   }
   function openModalFromSidebar() { openModal(sidebarTipo) }
 
@@ -2143,6 +2251,7 @@
 
   function buildAnuncioCard(a, autorNombre) {
     const tipo = canonicalTipo(a.tipo)
+    if (tipo === 'vende') return buildMarketplaceCard(a, autorNombre)
     const badge = BADGES[tipo] || 'badge-busco'
     // Para "busco": mostrar el rubro buscado dinámicamente
     const label = tipo === 'busco' ? getLabelBusco(a) : tipo === 'jam' ? getLabelJam(a) : tipo === 'ofrezco' ? getLabelOfrezco(a) : (LABELS[tipo] || escapeHtml(tipo))
@@ -2183,17 +2292,63 @@
     </div>`
   }
 
-  function buildQuery() {
+  function buildMarketplaceCard(a, autorNombre) {
+    const detalleUrl = `buscARTE_anuncio_detalle.html?id=${qs(a.id)}`
+    const precioTexto = String(a.precio || '').trim()
+    const precioNumerico = parseMoney(a.precio_num ?? a.precio)
+    const precio = precioTexto && /[^\d\s$.,-]/.test(precioTexto)
+      ? precioTexto
+      : Number.isFinite(precioNumerico) && precioNumerico >= 0
+        ? '$' + precioNumerico.toLocaleString('es-AR', { maximumFractionDigits:2 })
+        : 'Consultar precio'
+    const titulo = a.titulo || a.categoria_producto || 'Producto publicado'
+    let foto = ''
+    if (a.foto_url) {
+      try {
+        const url = new URL(String(a.foto_url), window.location.href)
+        if (['http:','https:'].includes(url.protocol)) foto = url.href
+      } catch(e) { /* Un dato de foto inválido no impide abrir el anuncio. */ }
+    }
+    const media = foto
+      ? `<img src="${escapeHtml(foto)}" alt="${escapeHtml(titulo)}" loading="lazy">`
+      : '<span>Sin foto todavía</span>'
+    const autor = a.user_id
+      ? `<a class="anuncio-autor" href="buscARTE_perfil_publico.html?id=${qs(a.user_id)}" onclick="event.stopPropagation()"><span class="autor-name">Publicado por ${escapeHtml(autorNombre || 'Usuario')}</span></a>`
+      : '<span class="autor-name">Publicado en la comunidad</span>'
+    return `<div class="anuncio marketplace-product" data-tipo="vende" data-id="${escapeHtml(a.id)}" data-autor-id="${escapeHtml(a.user_id || '')}" onclick="openAnuncioDetalle(event,this.dataset.id)">
+      <a class="marketplace-product-media" href="${detalleUrl}" onclick="event.stopPropagation()" aria-label="Ver ${escapeHtml(titulo)}">${media}</a>
+      <div class="marketplace-product-info">
+        <span class="anuncio-tipo-badge badge-vendo">Venta / alquiler</span>
+        <div class="anuncio-titulo"><a href="${detalleUrl}" onclick="event.stopPropagation()" style="color:inherit;text-decoration:none">${escapeHtml(titulo)}</a></div>
+        <div class="marketplace-product-price">${escapeHtml(precio)}</div>
+        <div class="marketplace-product-specs">
+          ${a.categoria_producto ? `<span>${escapeHtml(a.categoria_producto)}</span>` : ''}
+          ${a.condicion ? `<span>${escapeHtml(a.condicion)}</span>` : ''}
+          ${a.zona ? `<span>📍 ${escapeHtml(a.zona)}</span>` : ''}
+        </div>
+        <div class="anuncio-desc">${escapeHtml(a.descripcion || '')}</div>
+        <div class="anuncio-meta">
+          ${autor}<span class="anuncio-time">${escapeHtml(timeAgo(a.created_at))}</span>
+          <span class="anuncio-likes" id="likes-${escapeHtml(a.id)}" style="display:none"></span>
+          <a class="anuncio-respond" href="${detalleUrl}" onclick="event.stopPropagation()">Ver / consultar →</a>
+        </div>
+      </div>
+    </div>`
+  }
+
+  function buildQuery(offset = anunciosOffset) {
     // Traemos una tanda amplia (200) y filtramos el resto en cliente. Subimos el límite y
     // excluimos ocultos en el server para que, al filtrar por rubro, no queden anuncios de un
     // rubro "escondidos" más allá de la primera tanda (el filtro de cliente igual revalida estado/oculto).
-    const order = 'created_at.desc'
-    return `${SUPABASE_URL}/rest/v1/anuncios?select=*&oculto=not.is.true&order=${order}&limit=200&offset=${anunciosOffset}`
+    const order = 'created_at.desc,id.desc'
+    const tipos = esMarketplace() ? '&tipo=in.(vende,vendo)' : ''
+    return `${SUPABASE_URL}/rest/v1/anuncios?select=*&oculto=not.is.true${tipos}&order=${order}&limit=200&offset=${offset}`
   }
 
-  function buildFallbackQuery() {
-    // Fallback ultra mínimo si el order o algún parámetro llegara a fallar.
-    return `${SUPABASE_URL}/rest/v1/anuncios?select=*&limit=60`
+  function buildFallbackQuery(offset = anunciosOffset) {
+    // Reducir sólo la tanda. Cambiar filtros u orden invalidaría el cursor ya consumido.
+    const tipos = esMarketplace() ? '&tipo=in.(vende,vendo)' : ''
+    return `${SUPABASE_URL}/rest/v1/anuncios?select=*&oculto=not.is.true${tipos}&order=created_at.desc,id.desc&limit=60&offset=${offset}`
   }
 
   function getActiveFilterChips(panel) {
@@ -2259,7 +2414,21 @@
     return true
   }
 
+  function matchesMarketplaceGroups(a, panel) {
+    const valores = group => [...panel.querySelectorAll(`[data-marketplace-filter="${group}"].on`)]
+      .map(chip => chip.dataset.value.trim().toLowerCase())
+    const categorias = valores('category')
+    const condiciones = valores('condition')
+    const categoria = String(a.categoria_producto || '').trim().toLowerCase()
+    const condicion = String(a.condicion || '').trim().toLowerCase()
+    // OR dentro de cada grupo; AND entre categoría, condición, precio y zona.
+    if (categorias.length && !categorias.includes(categoria)) return false
+    if (condiciones.length && !condiciones.some(valor => condicion === valor || condicion.startsWith(valor + ' ') || condicion.startsWith(valor + '—'))) return false
+    return true
+  }
+
   function anuncioVisibleCliente(a) {
+    if (!a || typeof a !== 'object' || a.id == null || String(a.id).trim() === '') return false
     if (getHiddenAnuncioIds().includes(String(a.id))) return false
     if (a.oculto === true || String(a.oculto || '').toLowerCase() === 'true') return false
     const estado = String(a.estado || '').toLowerCase().trim()
@@ -2313,6 +2482,7 @@
       if (!matchesEntradaFilter(a, chipsOn)) return false
     }
     if (!matchesPriceRange(a)) return false
+    if (rfActivo === 'marketplace') return matchesMarketplaceGroups(a, panelActivo)
 
     if (chipsOn.length) {
       const hayTexto = [a.instrumentos, a.instrumento, a.generos, a.categoria_producto, a.nivel, a.modalidad, a.condicion, a.tags]
@@ -2503,20 +2673,29 @@
         pubItems.push({ tipo:'vende', icon:'🛒', label:'Vendo equipo', desc:'Publicá en Compra-venta' })
       }
     }
+    const selectedTipo = esMarketplace() ? 'vende' : (pubItems.some(item => item.tipo === sidebarTipo) ? sidebarTipo : pubItems[0].tipo)
+    document.getElementById('publish-sidebar-btn').textContent = esMarketplace() ? 'Publicar venta / alquiler →' : 'Publicar gratis →'
+    document.getElementById('publish-sidebar-title').textContent = esMarketplace() ? 'Publicá lo que ofrecés' : 'Publicar anuncio'
+    document.getElementById('publish-sidebar-copy').textContent = esMarketplace()
+      ? 'Mostrá el producto, agregá fotos y recibí consultas. Sin intermediarios: coordinás con la otra persona.'
+      : '¿Buscás alguien, te ofrecés, querés organizar una jam o vender algo?'
     const publishEl = document.querySelector('.publish-types')
     if (publishEl) {
-      publishEl.innerHTML = pubItems.map((item, i) =>
-        `<button class="publish-type${i === 0 ? ' selected' : ''}" onclick="selectPublishType(this,'${item.tipo}')">` +
+      // El atajo de este catálogo ofrece venta. El modal conserva todos los tipos permitidos.
+      const sidebarItems = esMarketplace() ? pubItems.filter(item => item.tipo === 'vende') : pubItems
+      publishEl.innerHTML = sidebarItems.map((item, i) =>
+        `<button class="publish-type${item.tipo === selectedTipo ? ' selected' : ''}" onclick="selectPublishType(this,'${item.tipo}')">` +
         `<span class="ptype-icon">${item.icon}</span>` +
         `<div><span class="ptype-label">${item.label}</span><span class="ptype-desc">${item.desc}</span></div>` +
         `</button>`
       ).join('')
-      sidebarTipo = pubItems[0].tipo
+      sidebarTipo = selectedTipo
     }
     const modalTipoEl = document.querySelector('.modal-tipo-selector')
     if (modalTipoEl) {
+      const modalTipo = document.getElementById('modal')?.classList.contains('open') ? currentTipo : selectedTipo
       modalTipoEl.innerHTML = pubItems.map((item, i) =>
-        `<button class="modal-tipo-btn${i === 0 ? ' selected' : ''}" onclick="selectTipo('${item.tipo}',this)">` +
+        `<button class="modal-tipo-btn${item.tipo === modalTipo ? ' selected' : ''}" onclick="selectTipo('${item.tipo}',this)">` +
         `<span class="modal-tipo-icon">${item.icon}</span>` +
         `<span class="modal-tipo-label">${item.label}</span>` +
         `</button>`
@@ -2568,15 +2747,15 @@
     // 2 + 3. UI de publicar (sidebar + modal) según TU rubro y tipo de cuenta.
     renderPublishUI()
 
-    // Resetear tab activo a Todos
-    tipoFiltro = 'todos'
-    // ...y dejar visible el panel de filtros que corresponde a "Todos" (fp-musico).
-    // Si no, tras cambiar de rubro podía quedar activo el panel de otra pestaña (clases/jam/vende).
+    // Marketplace siempre usa tipo venta y su panel; no es un rubro artístico.
+    tipoFiltro = rubro === 'marketplace' ? 'vende' : 'todos'
     document.querySelectorAll('.filter-panel').forEach(p => p.classList.remove('active'))
-    const fpDefault = document.getElementById('fp-musico')
+    const fpDefault = document.getElementById(rubro === 'marketplace' ? 'fp-vende' : 'fp-musico')
     if (fpDefault) fpDefault.classList.add('active')
     const catLabel = document.getElementById('filter-category-label')
-    if (catLabel) catLabel.textContent = rubro === 'marketplace' ? 'Compra-venta' : 'Todos los anuncios'
+    if (catLabel) catLabel.textContent = rubro === 'marketplace' ? 'Productos · venta y alquiler' : 'Todos los anuncios'
+    renderMarketplaceFiltros()
+    actualizarPresentacionTablon()
   }
 
   // ─── RUBRO EN MODAL BUSCO ARTISTA ───
@@ -2649,18 +2828,14 @@
   }
 
   function renderFiltrosPanel(rubro) {
+    if (rubro === 'marketplace') { renderMarketplaceFiltros(); return }
     const container = document.getElementById('fp-rubro-campos')
     if (!container) return
-    const grupos = rubro === 'marketplace'
-      ? MARKETPLACE_GRUPOS.map(function(g){ return { label: g.label, chips: g.cats } })
-      : (RUBROS_FILTROS_PANEL[rubro] || RUBROS_FILTROS_PANEL.musica)
-    // En Compra-venta los grupos son muy largos → colapsados por defecto (solo se ven los
-    // encabezados). En los demás rubros quedan abiertos como antes, pero plegables.
-    const colapsar = rubro === 'marketplace'
+    const grupos = RUBROS_FILTROS_PANEL[rubro] || RUBROS_FILTROS_PANEL.musica
+    // Los filtros artísticos mantienen sus grupos abiertos y plegables.
     let html = ''
     grupos.forEach((grupo) => {
-      const openAttr = colapsar ? '' : ' open'
-      html += '<details class="filter-group-collapsible"' + openAttr + '>' +
+      html += '<details class="filter-group-collapsible" open>' +
         '<summary><span class="fg-head"><span class="fg-label">' + grupo.label + '</span>' +
         '<span class="fg-chevron">▾</span></span></summary>' +
         '<div class="filter-chips">' +
@@ -2867,6 +3042,9 @@
       rubroFiltroActivo = null
       document.documentElement.style.setProperty('--neon', '#d4f53c')
     }
+    // Los filtros secundarios no viajan de un tablón a otro.
+    clearFilters({ reload:false })
+    actualizarURLTablon()
     // Adaptar tabs, sidebar, modal y filtros al rubro seleccionado
     actualizarTabsYSidebar(rubroFiltroActivo || 'musica')
     renderFiltrosPanel(rubroFiltroActivo || 'musica')
@@ -2892,10 +3070,10 @@
     renderJamFiltros(rubroInicial || 'musica')
 
     // Pre-seleccionar rubro buscado en el modal según el rubro inicial
-    if (rubroInicial) {
-      const btn = document.querySelector('#busco-rubro-chips .mchip[onclick*="' + rubroInicial + '"]')
-      if (btn) seleccionarRubroBusco(rubroInicial, btn)
-      else seleccionarRubroBusco(rubroInicial, null)
+    if (rubroArtisticoInicial) {
+      const btn = document.querySelector('#busco-rubro-chips .mchip[onclick*="' + rubroArtisticoInicial + '"]')
+      if (btn) seleccionarRubroBusco(rubroArtisticoInicial, btn)
+      else seleccionarRubroBusco(rubroArtisticoInicial, null)
     }
     // Marcar el chip del rubro inicial en el selector de rubro global
     if (rubroInicial) {
@@ -2914,44 +3092,48 @@
 
   async function cargarAnuncios(append = false) {
     const lista = document.getElementById('anuncios-lista')
-    if (!lista) return
+    if (!lista || (append && anunciosCargando)) return
+    const version = ++anunciosCargaVersion
+    const vigente = () => version === anunciosCargaVersion
+    const btnMore = document.getElementById('btn-load-more')
+    anunciosCargando = true
+    lista.setAttribute('aria-busy', 'true')
+    if (btnMore) btnMore.disabled = true
     if (!append) {
       lista.innerHTML = '<div style="padding:3rem;text-align:center;color:var(--gris);font-size:.88rem">Cargando anuncios...</div>'
       anunciosOffset = 0
+      anunciosMostradosIds = new Set()
+      document.getElementById('anuncios-count').textContent = '—'
+      if (btnMore) btnMore.style.display = 'none'
     }
+    lista.querySelector('#anuncios-append-error')?.remove()
+    const offset = anunciosOffset
+    // Ambas consultas pertenecen al mismo estado, aunque el usuario cambie filtros mientras llegan.
+    const query = buildQuery(offset)
+    const fallbackQuery = buildFallbackQuery(offset)
+    let batchLimit = 200
 
     try {
-      let res = await fetch(buildQuery(), { headers: SB_HEADERS, cache: 'no-store' })
+      let res = await fetch(query, { headers: SB_HEADERS, cache: 'no-store' })
+      if (!vigente()) return
       if (!res.ok) {
         const errText = await res.text().catch(()=> '')
+        if (!vigente()) return
         console.warn('Query simple de anuncios falló, probando fallback:', res.status, errText)
-        res = await fetch(buildFallbackQuery(), { headers: SB_HEADERS, cache: 'no-store' })
+        batchLimit = 60
+        res = await fetch(fallbackQuery, { headers: SB_HEADERS, cache: 'no-store' })
+        if (!vigente()) return
       }
       if (!res.ok) {
         const errText = await res.text().catch(()=> '')
         throw new Error(`Supabase ${res.status}: ${errText}`)
       }
 
-      let data = await res.json()
+      const data = await res.json()
+      if (!vigente()) return
       if (!Array.isArray(data)) throw new Error('Respuesta inesperada de Supabase en anuncios')
-      let anuncios = data.filter(anuncioVisibleCliente)
-
-      if (!append) lista.innerHTML = ''
-
-      if (!anuncios.length && !append) {
-        lista.innerHTML = `<div style="padding:4rem 1.5rem;text-align:center">
-          <div style="font-size:2rem;margin-bottom:1rem">📋</div>
-          <div style="font-family:var(--font-display);font-size:1.4rem;margin-bottom:.5rem">Sin anuncios con esos filtros</div>
-          <div style="color:var(--gris);font-size:.88rem;line-height:1.6">Probá limpiar filtros o publicá lo que estás buscando.</div>
-          <div class="empty-actions">
-            <button class="empty-action" onclick="clearFilters()">Limpiar filtros</button>
-            <button class="empty-action primary" onclick="openModal('busco')">Publicar gratis</button>
-          </div>
-        </div>`
-        const n = document.querySelector('.main-title span'); if (n) n.textContent = '0'
-        const btnMore = document.getElementById('btn-load-more'); if (btnMore) btnMore.style.display = 'none'
-        return
-      }
+      const anuncios = data.filter(anuncioVisibleCliente).filter(a => !anunciosMostradosIds.has(String(a.id)))
+      const hayMas = data.length >= batchLimit
 
       const userIds = [...new Set(anuncios.map(a=>a.user_id).filter(Boolean))]
       let autores = {}
@@ -2962,52 +3144,78 @@
             const pRes = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=in.(${ids})&select=id,nombre`, { headers: SB_HEADERS, cache:'no-store' })
             if (pRes.ok) {
               const perfiles = await pRes.json()
+              if (!vigente()) return
               if (Array.isArray(perfiles)) perfiles.forEach(p => autores[p.id] = p.nombre)
             }
           } catch(e) { console.warn('No se pudieron cargar autores', e) }
         }
       }
+      if (!vigente()) return
+      if (!append) lista.innerHTML = ''
+      if (anuncios.length) lista.querySelector('#anuncios-empty')?.remove()
 
-      let rendered = 0
       anuncios.forEach(a => {
+        if (anunciosMostradosIds.has(String(a.id))) return
         try {
           lista.insertAdjacentHTML('beforeend', buildAnuncioCard(a, autores[a.user_id]))
-          rendered++
+          anunciosMostradosIds.add(String(a.id))
         } catch(cardErr) {
           console.warn('Anuncio omitido por error de render:', a && a.id, cardErr)
         }
       })
 
+      const rendered = lista.querySelectorAll('.anuncio[data-id]').length
+      if (!rendered) {
+        lista.innerHTML = `<div id="anuncios-empty" style="padding:3rem 1.2rem;text-align:center">
+          <div style="font-size:2rem;margin-bottom:1rem">${esMarketplace() ? '🛒' : '📋'}</div>
+          <div style="font-family:var(--font-display);font-size:1.4rem;margin-bottom:.5rem">${hayMas ? 'Todavía no hay coincidencias en esta tanda' : esMarketplace() ? 'Sin productos con esos filtros' : 'Sin anuncios con esos filtros'}</div>
+          <div style="color:var(--gris);font-size:.88rem;line-height:1.6">${hayMas ? 'Quedan publicaciones por revisar. Cargá más resultados o limpiá los filtros.' : esMarketplace() ? 'Probá otra categoría o zona. También podés publicar lo que tenés para vender o alquilar.' : 'Probá limpiar filtros o publicá lo que estás buscando.'}</div>
+          <div class="empty-actions">
+            <button class="empty-action" onclick="clearFilters()">Limpiar filtros</button>
+            <button class="empty-action primary" onclick="openModal(tipoPublicacionDelTablon())">${esMarketplace() ? 'Publicar venta / alquiler' : 'Publicar gratis'}</button>
+          </div>
+        </div>`
+      }
+
       // Cargar contadores de reacciones en segundo plano
       cargarContadoresReacciones(anuncios.map(a => a.id).filter(Boolean))
 
       const titleNum = document.getElementById('anuncios-count') || document.querySelector('.main-title span')
-      if (titleNum) titleNum.textContent = append ? String(anunciosOffset + rendered) : String(rendered)
+      if (titleNum) titleNum.textContent = String(rendered)
       const sub = document.getElementById('main-sub-text') || document.querySelector('.main-sub')
       const efRubro = getRubroFiltroEfectivo()
       const rubroLabel = efRubro ? (RUBROS_LABELS[efRubro] || efRubro) : null
       if (sub) {
-        if (efRubro === 'marketplace') sub.textContent = 'compra-venta de equipos'
+        if (efRubro === 'marketplace') sub.textContent = 'Venta y alquiler · todos los rubros'
         else if (rubroLabel && tipoFiltro === 'todos') sub.textContent = `anuncios de ${rubroLabel}`
         else if (tipoFiltro === 'todos') sub.textContent = 'explorá todas las categorías'
         else sub.textContent = filterLabels[tipoFiltro] || 'anuncios activos'
       }
-      anunciosOffset += data.length
-      const btnMore = document.getElementById('btn-load-more')
-      if (btnMore) btnMore.style.display = data.length >= 200 ? 'inline-block' : 'none'
+      anunciosOffset = offset + data.length
+      if (btnMore) btnMore.style.display = hayMas ? 'inline-block' : 'none'
     } catch(e) {
+      if (!vigente()) return
       console.error('Error real cargando anuncios:', e)
-      lista.innerHTML = `<div style="padding:3rem;text-align:center;color:var(--gris);line-height:1.7">
-        Error al cargar anuncios.<br>
-        <span style="font-size:.75rem;color:#555">${escapeHtml(e.message || String(e))}</span><br>
-        <button class="empty-action" style="margin-top:1rem" onclick="cargarAnuncios(false)">Reintentar</button>
+      const errorHTML = `<div id="anuncios-append-error" role="status" style="padding:2rem 1rem;text-align:center;color:var(--gris);line-height:1.7">
+        ${append ? 'No pudimos cargar más resultados. Las publicaciones anteriores siguen acá.' : esMarketplace() ? 'No pudimos cargar los productos. Intentá de nuevo.' : 'Error al cargar anuncios.'}<br>
+        <button class="empty-action" style="margin-top:1rem" onclick="cargarAnuncios(${append ? 'true' : 'false'})">Reintentar</button>
       </div>`
+      if (append) lista.insertAdjacentHTML('beforeend', errorHTML)
+      else { lista.innerHTML = errorHTML; document.getElementById('anuncios-count').textContent = '—' }
+      if (btnMore) btnMore.style.display = append ? 'inline-block' : 'none'
+    } finally {
+      if (vigente()) {
+        anunciosCargando = false
+        lista.setAttribute('aria-busy', 'false')
+        if (btnMore) { btnMore.disabled = false; btnMore.textContent = 'Cargar más anuncios' }
+      }
     }
   }
 
   function loadMoreAnuncios(btn) {
+    if (anunciosCargando) return
     btn.textContent = 'Cargando...'
-    cargarAnuncios(true).finally(() => { btn.textContent = 'Cargar más anuncios' })
+    cargarAnuncios(true)
   }
 
   function openAnuncioDetalle(event, id) {
@@ -3151,14 +3359,18 @@
   }
 
   async function initAnunciosPage() {
+    const versionInicial = anunciosCargaVersion
     await vencerAnunciosViejos();
     const params = new URLSearchParams(window.location.search)
     const tipoParam = canonicalTipo(params.get('tipo'))
-    if (tipoParam && tipoParam !== 'todos') {
-      const uiTipo = tipoParam === 'busco' ? 'musico' : tipoParam
-      setTab(null, uiTipo)
-    } else {
-      cargarAnuncios(false)
+    // Una navegación ya iniciada mientras llegaba la RPC no debe reiniciarse.
+    if (versionInicial === anunciosCargaVersion) {
+      if (tipoParam && tipoParam !== 'todos') {
+        const uiTipo = tipoParam === 'busco' ? 'musico' : tipoParam
+        setTab(null, uiTipo)
+      } else {
+        cargarAnuncios(false)
+      }
     }
     cargarStatsSidebar()
     cargarTipoCuenta()
@@ -3168,7 +3380,7 @@
   // Safety net por si algún browser/cache raro no dispara el init como esperamos
   setTimeout(() => {
     const lista = document.getElementById('anuncios-lista')
-    if (lista && /Cargando anuncios/i.test(lista.textContent || '')) cargarAnuncios(false)
+    if (lista && !anunciosCargando && /Cargando anuncios/i.test(lista.textContent || '')) cargarAnuncios(false)
   }, 1200)
 </script>
 <div class="mbn-overlay" id="mbn-overlay" onclick="closeMbnPanel()"></div>

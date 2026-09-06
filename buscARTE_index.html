@@ -337,6 +337,8 @@
     transition: background 0.3s;
   }
   .step:hover { background: var(--negro2); }
+  .step-marketplace { display:block;color:inherit;text-decoration:none; }
+  .step-marketplace:focus-visible { outline:2px solid var(--neon);outline-offset:-4px; }
   .step::before {
     content: attr(data-num);
     position: absolute;
@@ -979,11 +981,11 @@
       <div class="step-title">ORGANIZÁ JAMS</div>
       <p class="step-desc">Publicá eventos abiertos con fecha, lugar y precio de entrada. Desde zapadas en el parque hasta jam sessions en bares — conectá con músicos para tocar ya.</p>
     </div>
-    <div class="step" data-num="04" onclick="irA('buscARTE_anuncios.html?tipo=vende')" style="cursor:pointer">
+    <a class="step step-marketplace" id="home-marketplace" data-num="04" href="buscARTE_anuncios.html?tipo=vende" style="cursor:pointer">
       <span class="step-icon">🎛️</span>
       <div class="step-title">COMPRÁ Y VENDÉ</div>
-      <p class="step-desc">Guitarra, amplificador, pedalera, sala de ensayo. El marketplace de instrumentos y equipos para músicos argentinos. Sin intermediarios, directo entre músicos.</p>
-    </div>
+      <p class="step-desc">Instrumentos, equipos, vestuario y materiales para crear. Comprá, vendé o alquilá entre personas de la comunidad.</p>
+    </a>
   </div>
 </section>
 
