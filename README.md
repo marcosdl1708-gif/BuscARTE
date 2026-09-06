@@ -3,7 +3,13 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
-## Estado operativo — Inicio visual + onboarding locales del 6/9
+## Estado operativo — onboarding + Inicio publicados el 6/9, 14:46 ART
+
+**Onboarding + Inicio visual ya publicados**, deploy activo verificado `6a9da7082372f367b398b7c3`, fuente pública `5b26d0a`, HEAD de publicación `dbfb132`, caché v15. Un único deploy de producción autorizado, sin preview ni push. **334/334 pruebas locales en una corrida**, 14/14 smokes locales y 14/14 sobre producción, 35 recursos, 35 rutas y cuatro exclusiones verificados. Funciones/runtimes/horarios idénticos; sin migración Auth, cambios de datos ni Android. Informe `docs/release-onboarding-inicio-20260906.md`; evidencia/resguardo privado `../BuscARTE-resguardos/release-onboarding-inicio-20260906`. Validación física/app e integración con una cuenta real autorizada pendientes. GitHub main aún no sincronizado; no disparar otro deploy por push accidental.
+
+Siguiente bloque **propuesto, no iniciado**: mejorar sólo el email de bienvenida para acompañar el alta breve, inicialmente en local y sin envíos. Copy/diseño mobile y enlaces para explorar/completar, contemplando reingreso. Conservar destinatarios y frecuencia; no activar campañas ni cambiar el resto de los correos como efecto colateral. Multirrubro/principal entre rubros sigue postergado.
+
+### Histórico previo a esta publicación — Inicio visual local
 
 **Inicio más claro implementado sólo en local**, rama `codex/inicio-visual-20260906` desde `91608ad`, implementación `5b26d0a`. Incluye el onboarding anterior: primer pantallazo más breve, búsqueda prioritaria, menos repeticiones, estadísticas más abajo y perfiles ilustrativos identificados como ejemplos. Ambas Home conservan sus URLs, sesión, destinos de anclas y contratos. **334 casos cubiertos**: regresión 334/334 previa a los últimos ajustes de CSS, más repetición definitiva 80/80 de Inicio y 16/16 escenarios con fuentes reales. Build de 36 archivos. Ver `docs/qa-inicio-visual-20260906.md`; evidencia/resguardo privado `../BuscARTE-resguardos/inicio-visual-20260906`. Caché local v15; **sin deploy, preview ni push**, ni cambios de backend/Auth, datos, funciones o Android. Validación física de la app pendiente. No publicar ni sincronizar automáticamente; acordar un corte conjunto de onboarding + Inicio.
 
@@ -15,9 +21,9 @@ No depende del repositorio original ni del worktree de Android para funcionar.
 
 El usuario confirmó **postergar disciplinas múltiples/multirrubro y elección de principal entre rubros**. No retomarlo como siguiente mejora automática: requiere una decisión explícita y diseño separado de identidad del perfil, aparición en búsquedas y disciplina de cada anuncio. Conservar los contratos de rubro único y no mezclarlo con la migración Auth. Varios estilos dentro del mismo rubro no son lo mismo que varios rubros por cuenta.
 
-El usuario autorizó con «Go» el bloque siguiente: jerarquía visual y claridad del Inicio mobile. **Ya implementado localmente**, como indica el estado operativo. Se preservan sesión, destinos, filtros, permisos y datos, y ambas Home (`index.html` y `buscARTE_index.html`) mantienen sus URLs y el distinto significado de `#explorar`; no se fusionaron. No implica un rediseño completo, material de personas inventado ni cambios de taxonomía/roles técnicos. Onboarding e Inicio siguen locales y pendientes de validación física; cualquier publicación conjunta requiere acordar el corte y verificarlo. Esta decisión prevalece sobre los órdenes históricos inferiores.
+El usuario autorizó con «Go» el bloque alternativo de jerarquía visual y claridad del Inicio mobile, y posteriormente su deploy conjunto con onboarding. **Ya publicados**, como indica el estado operativo. Se preservan sesión, destinos, filtros, permisos y datos, y ambas Home (`index.html` y `buscARTE_index.html`) mantienen sus URLs y el distinto significado de `#explorar`; no se fusionaron. No implica un rediseño completo, material de personas inventado ni cambios de taxonomía/roles técnicos. Sigue pendiente validación física de la app. Esta decisión prevalece sobre los órdenes históricos inferiores.
 
-## Última publicación verificada — 6/9, 12:54 ART
+## Publicación anterior — 6/9, 12:54 ART
 
 **Marketplace + guardado/danza ya están publicados**: deploy activo verificado al cierre de esa publicación `6a9d8cbb808123cc8c948eb2`, fuente pública `8957ad0`, caché v13. El usuario resolvió el saldo de Netlify y autorizó retomar; hubo un único deploy exitoso, sin preview ni push. Verificados 35 recursos, 35 rutas, cuatro exclusiones y **11/11 smoke tests sobre producción con backend simulado**, además de las 214 pruebas locales previas. Funciones y horarios intactos; sin migración Auth ni cambios Android. Informe `docs/release-marketplace-danza-20260906.md`, respaldo privado `../BuscARTE-resguardos/release-marketplace-danza-20260906`. El onboarding posterior es local, como se indica arriba. GitHub `main` sigue pendiente de sincronizar; no disparar otro deploy por accidente.
 
