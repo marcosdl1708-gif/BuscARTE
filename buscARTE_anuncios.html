@@ -989,7 +989,7 @@
 <div class="mfield"><label>Descripción</label><textarea placeholder="Qué buscás, experiencia requerida, frecuencia de ensayo..."></textarea></div>
 <div class="mfield" id="busco-chips-especificos">
 <!-- Se rellena dinámicamente por seleccionarRubroBusco() -->
-<label>Instrumento/s buscado/s <span class="opt">— podés elegir varios</span></label>
+<label>Instrumento / Rol <span class="opt">— podés elegir varios</span></label>
 <div class="mchips">
 <button class="mchip" onclick="this.classList.toggle('on')">Guitarra</button>
 <button class="mchip" onclick="this.classList.toggle('on')">Bajo</button>
@@ -1009,6 +1009,11 @@
 <button class="mchip" onclick="this.classList.toggle('on')">Acordeón</button>
 <button class="mchip" onclick="this.classList.toggle('on')">Contrabajo</button>
 <button class="mchip" onclick="this.classList.toggle('on')">Clarinete</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Operador de sonido FOH</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Operador de sonido de monitores</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Operador de iluminación</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Stage / Asistente de escenario</button>
+<button class="mchip" onclick="this.classList.toggle('on')">Stage Manager</button>
 <button class="mchip" onclick="this.classList.toggle('on')">Compositor / Arreglador</button>
 <button class="mchip" onclick="this.classList.toggle('on')">Productor</button>
 <button class="mchip" onclick="this.classList.toggle('on')">Mix &amp; Mastering</button>
@@ -1541,7 +1546,7 @@
     clases: 'fp-clases'
   }
 
-  const INSTRUMENTOS = ['Guitarra','Bajo','Batería','Teclado','Teclado / Piano','Voz / Canto','Saxo','Violín','Trompeta','Flauta','Percusión','DJ','DJ / Productor','Bandoneón','Charango','Cello','Arpa','Acordeón','Contrabajo','Clarinete','Cajón','Bombo leguero','Quena / Zampoña','Ukelele','Controlador MIDI','Técnico de sonido','Compositor / Arreglador','Productor','Mix & Mastering','Manager','Otro']
+  const INSTRUMENTOS = ['Guitarra','Bajo','Batería','Teclado','Teclado / Piano','Voz / Canto','Saxo','Violín','Trompeta','Flauta','Percusión','DJ','DJ / Productor','Bandoneón','Charango','Cello','Arpa','Acordeón','Contrabajo','Clarinete','Cajón','Bombo leguero','Quena / Zampoña','Ukelele','Controlador MIDI','Técnico de sonido','Operador de sonido FOH','Operador de sonido de monitores','Operador de iluminación','Stage / Asistente de escenario','Stage Manager','Compositor / Arreglador','Productor','Mix & Mastering','Manager','Otro']
   const GENEROS = ['Rock','Rock Nacional','Metal','Jazz','Folklore','Tango','Cumbia','Indie','Pop','Electrónica','Funk','Punk','Blues','Prog','R&B','Rap / Hip Hop','Reggae','Tropical','Clásica','Bossanova','Soul','House','Tech House','Techno','Trance','Melodic House & Techno','Minimal Deep/Tech','Indie Dance','Variado','Otro']
   const CATEGORIAS_VENTA_POR_RUBRO = {
     musica: ['Guitarra eléctrica','Guitarra acústica','Guitarra clásica','Bajo eléctrico','Bajo acústico','Batería acústica','Batería electrónica','Percusión','Teclado / Piano','Piano acústico','Saxo','Trompeta','Trombón','Flauta','Clarinete','Violín','Cello','Viola','Bandoneón / Acordeón','Charango / Guitarra folk','Amplificador guitarra','Amplificador bajo','Pedalera multiefectos','Pedal individual','Micrófono','Interfaz de audio','Equipo PA / Sonido','Monitores / Parlantes','Home Studio / Grabación','Sala de ensayo','Cuerdas / Púas / Accesorios','Estuche / Funda','Otro'],
@@ -2767,7 +2772,7 @@
   const RUBROS_FILTROS_PANEL = {
     musica: [
       { label:'Instrumento / Rol',
-        chips:['Guitarra','Bajo','Batería','Teclado / Piano','Voz / Canto','Saxo','Violín','Trompeta','Percusión','DJ / Productor','Bandoneón','Charango','Flauta','Cello','Arpa','Acordeón','Contrabajo','Clarinete','Cajón','Ukelele','Compositor / Arreglador','Producción musical','Técnico de sonido','Mix & Mastering','Manager'] },
+        chips:['Guitarra','Bajo','Batería','Teclado / Piano','Voz / Canto','Saxo','Violín','Trompeta','Percusión','DJ / Productor','Bandoneón','Charango','Flauta','Cello','Arpa','Acordeón','Contrabajo','Clarinete','Cajón','Ukelele','Compositor / Arreglador','Producción musical','Técnico de sonido','Operador de sonido FOH','Operador de sonido de monitores','Operador de iluminación','Stage / Asistente de escenario','Stage Manager','Mix & Mastering','Manager'] },
       { label:'Género',
         chips:['Rock','Rock Nacional','Metal','Jazz','Folklore','Tango','Cumbia','Indie','Pop','Electrónica','Funk','R&B','Rap / Hip Hop','Blues','Punk','Prog','Reggae','Bossanova','Soul','Clásica','House','Techno','Variado','Otro'] },
     ],
@@ -2970,8 +2975,8 @@
 
   const BUSCO_RUBRO_CHIPS = {
     musica: {
-      label: 'Instrumento/s buscado/s <span class="opt">— podés elegir varios</span>',
-      chips: ['Guitarra','Bajo','Batería','Teclado / Piano','Voz / Canto','Saxo','Violín','Trompeta','Percusión','DJ / Productor','Bandoneón','Charango','Flauta','Cello','Acordeón','Contrabajo','Compositor / Arreglador','Productor','Mix & Mastering','Manager','Otro']
+      label: 'Instrumento / Rol <span class="opt">— podés elegir varios</span>',
+      chips: ['Guitarra','Bajo','Batería','Teclado / Piano','Voz / Canto','Saxo','Violín','Trompeta','Percusión','DJ / Productor','Bandoneón','Charango','Flauta','Cello','Acordeón','Contrabajo','Operador de sonido FOH','Operador de sonido de monitores','Operador de iluminación','Stage / Asistente de escenario','Stage Manager','Compositor / Arreglador','Productor','Mix & Mastering','Manager','Otro']
     },
     actuacion: {
       label: 'Rol buscado',

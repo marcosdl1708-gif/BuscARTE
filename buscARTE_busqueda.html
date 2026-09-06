@@ -732,14 +732,14 @@
   const RUBROS_BUSQUEDA_CONFIG = {
     musica: {
       emoji:'🎵', label:'Músicos', labelSingular:'músico', bgText:'MUSICOS', color:'#d4f53c',
-      introSpan:'músicos',
-      introCopy:'Buscá perfiles por instrumento, género, zona o referentes.',
+      introSpan:'músicos y equipo técnico',
+      introCopy:'Buscá perfiles por instrumento o rol técnico, género, zona o referentes.',
       searchPlaceholder:'Ej: bajista de jazz en Palermo...',
       cardSubtitle: p => p.instrumento || 'Músico',
       cardTags: p => splitList(p.generos).slice(0,3),
       cardRefs: p => splitList(p.referentes).slice(0,3),
       filtrosPrincipales: [
-        { label:'Instrumento', hint:'Elegí uno o varios.', chips:['Guitarra','Bajo','Batería','Teclado','Voz / Canto','Saxo','Violín','Cello','Trompeta','Flauta','Percusión','DJ/Prod.','Bandoneón','Charango','Arpa','Acordeón','Contrabajo','Clarinete','Cajón','Bombo leguero','Quena / Zampoña','Ukelele','Técnico de sonido','Compositor / Arreglador','Productor','Mix & Mastering','Manager','Otro'] },
+        { label:'Instrumento / Rol', hint:'Elegí uno o varios.', chips:['Guitarra','Bajo','Batería','Teclado','Voz / Canto','Saxo','Violín','Cello','Trompeta','Flauta','Percusión','DJ/Prod.','Bandoneón','Charango','Arpa','Acordeón','Contrabajo','Clarinete','Cajón','Bombo leguero','Quena / Zampoña','Ukelele','Técnico de sonido','Operador de sonido FOH','Operador de sonido de monitores','Operador de iluminación','Stage / Asistente de escenario','Stage Manager','Compositor / Arreglador','Productor','Mix & Mastering','Manager','Otro'] },
         { label:'Género', hint:'También podés escribir directo en el buscador.', chips:['Rock','Rock Nacional','Metal','Jazz','Folklore','Tango','Cumbia','Indie','Pop','Electrónica','R&B','Rap / Hip Hop','Funk','Soul','Reggae','Punk','Blues','Prog','Bossanova','Clásica','House','Tech House','Techno','Trance','Melodic House & Techno','Otro'] },
         { label:'Busca', chips:['Banda','Sesiones','Zapada','Proyecto','Clases'] },
       ],
@@ -1018,7 +1018,7 @@
   let perfilesCache = null;
   let activeFilters = { instrumentos: [], generos: [], ciudad: '', barrio: '', busca: [], referente: '', rubros_chips: [] };
 
-  const INSTR_LABELS = ['Guitarra', 'Bajo', 'Batería', 'Teclado', 'Voz / Canto', 'Saxo', 'Violín', 'Cello', 'Trompeta', 'Flauta', 'Percusión', 'DJ/Prod.', 'Bandoneón', 'Charango', 'Arpa', 'Acordeón', 'Contrabajo', 'Clarinete', 'Cajón', 'Bombo leguero', 'Quena / Zampoña', 'Ukelele', 'Controlador MIDI', 'Técnico de sonido', 'Compositor / Arreglador', 'Productor', 'Mix & Mastering', 'Manager', 'Otro'];
+  const INSTR_LABELS = ['Guitarra', 'Bajo', 'Batería', 'Teclado', 'Voz / Canto', 'Saxo', 'Violín', 'Cello', 'Trompeta', 'Flauta', 'Percusión', 'DJ/Prod.', 'Bandoneón', 'Charango', 'Arpa', 'Acordeón', 'Contrabajo', 'Clarinete', 'Cajón', 'Bombo leguero', 'Quena / Zampoña', 'Ukelele', 'Controlador MIDI', 'Técnico de sonido', 'Operador de sonido FOH', 'Operador de sonido de monitores', 'Operador de iluminación', 'Stage / Asistente de escenario', 'Stage Manager', 'Compositor / Arreglador', 'Productor', 'Mix & Mastering', 'Manager', 'Otro'];
   const BUSCA_LABELS = ['Banda', 'Sesiones', 'Zapada', 'Proyecto', 'Clases'];
 
   const INSTR_MAP = {

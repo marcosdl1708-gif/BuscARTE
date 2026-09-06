@@ -1066,7 +1066,7 @@
       <p class="section-desc">Cuanto más detallado, mejor el matching. Esto es lo que la IA de buscARTE usa para conectarte con músicos afines.</p>
 
       <div class="field">
-        <label>Instrumento/s principal/es</label>
+        <label>Instrumento, voz o rol técnico</label>
       </div>
       <div class="chips" id="chips-inst">
         <button class="chip" onclick="toggleChip(this)">Guitarra</button>
@@ -1093,6 +1093,11 @@
         <button class="chip" onclick="toggleChip(this)">Ukelele</button>
         <button class="chip" onclick="toggleChip(this)">Controlador MIDI</button>
         <button class="chip" onclick="toggleChip(this)">Técnico de sonido</button>
+        <button class="chip" onclick="toggleChip(this)">Operador de sonido FOH</button>
+        <button class="chip" onclick="toggleChip(this)">Operador de sonido de monitores</button>
+        <button class="chip" onclick="toggleChip(this)">Operador de iluminación</button>
+        <button class="chip" onclick="toggleChip(this)">Stage / Asistente de escenario</button>
+        <button class="chip" onclick="toggleChip(this)">Stage Manager</button>
         <button class="chip" onclick="toggleChip(this)">Compositor / Arreglador</button>
         <button class="chip" onclick="toggleChip(this)">Productor</button>
         <button class="chip" onclick="toggleChip(this)">Mix & Mastering</button>
@@ -1139,7 +1144,7 @@
 
       <div style="margin-top: 1.8rem;">
         <div class="field">
-          <label>Años de experiencia tocando</label>
+          <label>Años de experiencia</label>
         </div>
         <div class="exp-slider-wrap">
           <div class="exp-labels"><span>Estoy arrancando</span><span>Toda la vida</span></div>
@@ -1514,9 +1519,9 @@
     musica: {
       emoji: '🎸', label: 'Música',
       sidebarLabel: 'Mi música',
-      coachText: 'Foto, bio, instrumentos, géneros, referentes y al menos un video hacen que tu perfil sea mucho más fácil de entender y contactar.',
-      videosTitle: 'Mis videos tocando',
-      videosDesc: 'Mostrá interpretaciones, presentaciones o ensayos para que conozcan tu trabajo.',
+      coachText: 'Foto, bio, instrumentos o roles técnicos, géneros, referentes y al menos un video hacen que tu perfil sea mucho más fácil de entender y contactar.',
+      videosTitle: 'Mi trabajo en música',
+      videosDesc: 'Mostrá interpretaciones, presentaciones, ensayos o trabajo técnico para que conozcan lo que hacés.',
       disponibilidad: [
         { icon:'🎸', title:'Banda estable', desc:'Busco o me sumo a una banda con proyección' },
         { icon:'🎤', title:'Proyecto propio', desc:'Tengo un proyecto y busco músicos' },
@@ -2298,7 +2303,7 @@
       diseno:'chips-rol-dis', tatuaje:'chips-rol-tatu', danza:'chips-disc-dan', maquillaje:'chips-rol-maq',
       circo:'chips-rol-cir', escritura:'chips-rol-esc' };
     const disciplinaCopy = {
-      musica: ['Instrumento o voz', 'Elegí instrumento o voz'],
+      musica: ['Instrumento, voz o rol', 'Elegí instrumento, voz o rol'],
       actuacion: ['Tu rol', 'Elegí tu rol'],
       audiovisual: ['Tu rol', 'Elegí tu rol'],
       modelaje: ['Tipo de trabajo', 'Elegí tu tipo de trabajo'],

@@ -31,7 +31,7 @@ const rubros = [
 const homeHrefs = rubros.map(rubro => 'buscARTE_busqueda.html?rubro=' + rubro.key);
 const genericBiography = 'Contá qué hacés, qué experiencia tenés y en qué proyectos te gustaría participar.';
 const primaryCopy = {
-  musica:['Instrumento o voz','Elegí instrumento o voz'],
+  musica:['Instrumento, voz o rol','Elegí instrumento, voz o rol'],
   modelaje:['Tipo de trabajo','Elegí tu tipo de trabajo'],
   danza:['Estilos de danza','Elegí tus estilos de danza'],
   circo:['Tu especialidad','Elegí tu especialidad']
