@@ -4,7 +4,8 @@
   "description": "buscARTE — red de artistas argentinos (sitio estático + Netlify Functions)",
   "scripts": {
     "build": "node scripts/build-site.mjs",
-    "test": "node --test scripts/build-site.test.mjs"
+    "test": "node --test scripts/build-site.test.mjs",
+    "test:registro": "node --test scripts/registro-captcha.test.cjs"
   },
   "keywords": [],
   "author": "buscARTE",
@@ -12,5 +13,8 @@
   "type": "commonjs",
   "dependencies": {
     "@netlify/functions": "^5.2.2"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
   }
 }

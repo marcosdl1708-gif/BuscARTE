@@ -188,6 +188,18 @@
   /* CHIPS fix */
   .fchip, .chip, .mchip, .ref-suger-chip { white-space: normal !important; line-height: 1.3 !important; text-align: center !important; max-width: 160px !important; }
 
+  /* Verificación visible y recuperable, sin escalar el iframe del proveedor. */
+  .captcha-panel { border: 1px solid var(--gris2); border-radius: 12px; background: var(--negro2); padding: 1rem; min-width: 0; scroll-margin: 1rem; }
+  .captcha-panel:focus { outline: 2px solid var(--neon); outline-offset: 3px; }
+  .captcha-title { font-size: .92rem; font-weight: 500; margin-bottom: .45rem; }
+  .captcha-status { color: var(--blanco); font-size: .82rem; line-height: 1.5; margin-bottom: .9rem; }
+  .captcha-panel[data-state="error"], .captcha-panel[data-state="expired"] { border-color: #dba85a; }
+  .captcha-panel[data-state="verified"] { border-color: var(--neon); }
+  .h-captcha { display: flex; justify-content: center; min-height: 78px; min-width: 0; }
+  .captcha-retry { display: block; width: 100%; min-height: 44px; margin-top: .8rem; border: 1px solid var(--gris2); border-radius: 6px; background: transparent; color: var(--blanco); font: inherit; font-size: .8rem; cursor: pointer; padding: .65rem; }
+  .captcha-retry:focus-visible { outline: 2px solid var(--neon); outline-offset: 2px; }
+  .captcha-retry:disabled { opacity: .65; cursor: wait; }
+  .captcha-actions { display: flex; gap: .75rem; flex-wrap: wrap; }
   /* RESPONSIVE */
   @media (max-width: 768px) {
     .cursor, .cursor-ring { display: none !important; }
@@ -215,10 +227,9 @@
     /* Rubro cards */
     .rubro-card { padding: .85rem 1rem !important; }
     .rubro-card-label { font-size: .8rem !important; }
-    .h-captcha { transform: scale(0.92); transform-origin: center center; }
+    .captcha-actions { flex-direction: column; }
   }
 </style>
-  <script src="https://js.hcaptcha.com/1/api.js?render=explicit" async defer></script>
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0a0a0a">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -631,8 +642,13 @@
       </div>
 
       <div class="form-actions" style="flex-direction:column;align-items:stretch;gap:1rem">
-        <div class="h-captcha" data-sitekey="d314e4d0-234a-4454-bbd2-2bacefee8694" id="hcaptcha-box" style="display:flex;justify-content:center"></div>
-        <div style="display:flex;gap:.75rem">
+        <section class="captcha-panel" tabindex="-1" aria-labelledby="captcha-title-negocio" aria-describedby="captcha-status-negocio">
+          <h2 class="captcha-title" id="captcha-title-negocio">Una última verificación</h2>
+          <p class="captcha-status" id="captcha-status-negocio" role="status" aria-live="polite" aria-atomic="true">La verificación aparecerá acá antes de crear tu perfil.</p>
+          <div class="h-captcha" id="hcaptcha-box"></div>
+          <button type="button" class="captcha-retry">Reintentar verificación</button>
+        </section>
+        <div class="captcha-actions">
           <button type="button" class="btn-back" onclick="goStep('negocio')">← Atrás</button>
           <button type="button" class="btn-next" onclick="crearNegocio(this)" style="font-size:1rem;padding:0.9rem 2.5rem;">🏢 Crear mi perfil</button>
         </div>
@@ -645,8 +661,13 @@
       <p class="form-subtitle">Confirmá que no sos un robot y creá tu cuenta para empezar a comprar, vender y publicar.</p>
 
       <div class="form-actions" style="flex-direction:column;align-items:stretch;gap:1rem">
-        <div class="h-captcha" data-sitekey="d314e4d0-234a-4454-bbd2-2bacefee8694" id="hcaptcha-box-visitante" style="display:flex;justify-content:center"></div>
-        <div style="display:flex;gap:.75rem">
+        <section class="captcha-panel" tabindex="-1" aria-labelledby="captcha-title-visitante" aria-describedby="captcha-status-visitante">
+          <h2 class="captcha-title" id="captcha-title-visitante">Una última verificación</h2>
+          <p class="captcha-status" id="captcha-status-visitante" role="status" aria-live="polite" aria-atomic="true">La verificación aparecerá acá antes de crear tu cuenta.</p>
+          <div class="h-captcha" id="hcaptcha-box-visitante"></div>
+          <button type="button" class="captcha-retry">Reintentar verificación</button>
+        </section>
+        <div class="captcha-actions">
           <button type="button" class="btn-back" onclick="goStep('cuenta')">← Atrás</button>
           <button type="button" class="btn-next" onclick="crearVisitante(this)" style="font-size:1rem;padding:0.9rem 2.5rem;">🛒 Crear mi cuenta</button>
         </div>
@@ -681,8 +702,13 @@
       </div>
 
       <div class="form-actions" style="flex-direction:column;align-items:stretch;gap:1rem">
-        <div class="h-captcha" data-sitekey="d314e4d0-234a-4454-bbd2-2bacefee8694" id="hcaptcha-box-perfil" style="display:flex;justify-content:center"></div>
-        <div style="display:flex;gap:.75rem">
+        <section class="captcha-panel" tabindex="-1" aria-labelledby="captcha-title-perfil" aria-describedby="captcha-status-perfil">
+          <h2 class="captcha-title" id="captcha-title-perfil">Una última verificación</h2>
+          <p class="captcha-status" id="captcha-status-perfil" role="status" aria-live="polite" aria-atomic="true">La verificación aparecerá acá antes de crear tu perfil.</p>
+          <div class="h-captcha" id="hcaptcha-box-perfil"></div>
+          <button type="button" class="captcha-retry">Reintentar verificación</button>
+        </section>
+        <div class="captcha-actions">
           <button type="button" class="btn-back" id="btn-back-perfil" onclick="volverDesdePerfil()">← Atrás</button>
           <button type="button" class="btn-next" onclick="crearPerfil(this)" style="background: var(--neon); font-size: 1rem; padding: 0.9rem 2.5rem;">🎉 Crear mi perfil</button>
         </div>
@@ -704,6 +730,7 @@
   </div><!-- end right-panel -->
 </div><!-- end page -->
 
+<script src="/assets/js/registro-captcha.js"></script>
 <script>
 // ═══════════════════════════════════════
 // STATE
@@ -717,31 +744,8 @@ let dropdownIdx = -1;
 // ═══════════════════════════════════════
 // hCAPTCHA — Render explícito por widget (soporta múltiples captchas)
 // ═══════════════════════════════════════
-const HCAPTCHA_SITEKEY = 'd314e4d0-234a-4454-bbd2-2bacefee8694';
-const hcaptchaWidgets = {}; // containerId -> widgetId
-
-function renderCaptchaBox(containerId) {
-  if (hcaptchaWidgets[containerId] != null) return; // ya renderizado
-  if (!(window.hcaptcha && typeof window.hcaptcha.render === 'function')) {
-    setTimeout(() => renderCaptchaBox(containerId), 300); // la API todavía no cargó
-    return;
-  }
-  const el = document.getElementById(containerId);
-  if (!el) return;
-  try {
-    hcaptchaWidgets[containerId] = window.hcaptcha.render(containerId, { sitekey: HCAPTCHA_SITEKEY });
-  } catch (e) { console.error('hCaptcha render:', e); }
-}
-
-function getCaptchaResponse(containerId) {
-  const id = hcaptchaWidgets[containerId];
-  if (id == null || !window.hcaptcha) return '';
-  try { return window.hcaptcha.getResponse(id) || ''; } catch (e) { return ''; }
-}
-
 function resetCaptcha(containerId) {
-  const id = hcaptchaWidgets[containerId];
-  if (id != null && window.hcaptcha) { try { window.hcaptcha.reset(id); } catch (e) {} }
+  window.RegistroCaptcha.reset(containerId);
 }
 
 // ═══════════════════════════════════════
@@ -752,9 +756,9 @@ function goStep(stepId) {
   const stepEl = document.getElementById('step-' + stepId);
   stepEl.classList.add('active');
   updateLeftPanel(stepId);
-  // Renderizar el captcha de este paso (si tiene), una sola vez
+  // Sólo se renderiza el widget del paso visible, cuando el SDK esté listo.
   const box = stepEl.querySelector('.h-captcha');
-  if (box && box.id) renderCaptchaBox(box.id);
+  window.RegistroCaptcha.show(box ? box.id : null);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -1080,8 +1084,8 @@ async function crearPerfil(btn) {
   if (!password || password.length < 8) { alert('La contraseña debe tener al menos 8 caracteres.'); goStep('cuenta'); return; }
 
   // Validar captcha (widget específico de este paso)
-  const captchaResponse = getCaptchaResponse('hcaptcha-box-perfil');
-  if (!captchaResponse) { alert('Por favor completá el captcha para continuar.'); return; }
+  const captchaResponse = window.RegistroCaptcha.requireResponse('hcaptcha-box-perfil');
+  if (!captchaResponse) return;
 
   const nombreCompleto = apellido ? `${nombre} ${apellido}` : nombre;
 
@@ -1209,8 +1213,8 @@ async function crearPerfil(btn) {
 // CREAR NEGOCIO
 // ═══════════════════════════════════════
 async function crearNegocio(btn) {
-  const captchaResponse = getCaptchaResponse('hcaptcha-box');
-  if (!captchaResponse) { alert('Por favor completá el captcha para continuar.'); return; }
+  const captchaResponse = window.RegistroCaptcha.requireResponse('hcaptcha-box');
+  if (!captchaResponse) return;
 
   const email = document.getElementById('reg-email')?.value?.trim();
   const password = document.getElementById('reg-password')?.value;
@@ -1305,8 +1309,8 @@ async function crearNegocio(btn) {
 // CREAR VISITANTE (mínimo)
 // ═══════════════════════════════════════
 async function crearVisitante(btn) {
-  const captchaResponse = getCaptchaResponse('hcaptcha-box-visitante');
-  if (!captchaResponse) { alert('Por favor completá el captcha para continuar.'); return; }
+  const captchaResponse = window.RegistroCaptcha.requireResponse('hcaptcha-box-visitante');
+  if (!captchaResponse) return;
 
   const email = document.getElementById('reg-email')?.value?.trim();
   const password = document.getElementById('reg-password')?.value;

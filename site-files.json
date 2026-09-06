@@ -5,6 +5,7 @@
   "assets/js/buscarte-auth.js",
   "assets/js/buscarte-config.js",
   "assets/js/meta-pixel.js",
+  "assets/js/registro-captcha.js",
   "assets/vendor/supabase-2.112.3.min.js",
   "buscARTE_anuncio_detalle.html",
   "buscARTE_anuncios.html",

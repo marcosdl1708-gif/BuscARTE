@@ -19,13 +19,16 @@ Los cambios de organización posteriores son locales. No implican un push ni una
 npm ci
 npm run build
 npm test
+npm run test:registro
 ```
 
 El build también funciona directamente con `node scripts/build-site.mjs`, sin instalar dependencias: copia y verifica archivos, sin consultar servicios remotos. `npm ci` sí es necesario para instalar dependencias de las funciones en un entorno limpio.
 
 `npm test` verifica el empaquetado con archivos ficticios aislados (lista permitida, integridad, reconstrucción y rechazo de rutas peligrosas/enlaces). No es una suite funcional de registro, perfiles, chat ni Android.
 
-`site-files.json` contiene la lista explícita de publicación. El resultado es `dist/` (33 archivos incluyendo `_redirects`), sin documentos, campañas, respaldos, `files.zip` ni herramientas internas. No modificar HTML al empaquetar. Un archivo nuevo requiere incorporarlo deliberadamente a esa lista. Si encuentra archivos inesperados en `dist/`, el build se detiene y no los elimina.
+`npm run test:registro` prueba el flujo de captcha con Playwright y servicios simulados; no permite tráfico real de registro, emails, tracking ni hCaptcha. En Windows usa Edge instalado; en otros sistemas, instalar Chromium con `npx playwright install chromium` antes. Opcionalmente `BUSCARTE_PLAYWRIGHT_MODULE` permite usar una instalación existente de Playwright, y `BUSCARTE_QA_OUTPUT` indica dónde guardar capturas sintéticas (fuera de `dist/`).
+
+`site-files.json` contiene la lista explícita de publicación. El resultado actual es `dist/` (34 archivos incluyendo `_redirects` y el controlador de captcha), sin documentos, campañas, respaldos, `files.zip` ni herramientas internas. No modificar HTML al empaquetar. Un archivo nuevo requiere incorporarlo deliberadamente a esa lista. Si encuentra archivos inesperados en `dist/`, el build se detiene y no los elimina.
 
 Netlify usa `dist/` y `netlify/functions/`. Las funciones programadas y Node 20 conservan su configuración anterior. Nunca publicar la raíz del repositorio. No se han validado todavía estas nuevas opciones en un deploy remoto.
 
@@ -33,6 +36,6 @@ Netlify usa `dist/` y `netlify/functions/`. Las funciones programadas y Node 20 
 
 Un bloque por vez, con cambios pequeños y verificables. Primero reproducir el problema; luego corregir y revisar web móvil/escritorio y su efecto en la app. Una preview no aísla automáticamente los datos: no hacer altas, envíos, publicaciones ni escrituras de prueba contra usuarios reales.
 
-Esta preparación no corrige todavía los bugs reportados. Primer bloque sugerido: captcha invisible que bloquea la creación de perfil. Mantener separados los cambios visuales, la migración Auth y los cambios de disciplinas/modelo de datos.
+El bloque de captcha está implementado localmente en `codex/captcha-mobile-20260905`, pendiente de integración/publicación. Ver `docs/qa-captcha-20260905.md` para pruebas y límites. Los demás bugs siguen pendientes. Mantener separados los cambios visuales, la migración Auth y los cambios de disciplinas/modelo de datos.
 
 El mapa local y la ubicación del respaldo están en `../BuscARTE-ORGANIZACION.md`.
