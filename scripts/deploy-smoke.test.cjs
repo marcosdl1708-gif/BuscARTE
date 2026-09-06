@@ -20,6 +20,18 @@ for (const file of listedFiles) {
 allowedPaths.set('/', 'index.html');
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 const allResults = [];
+const fixtureUser = 'smoke-fixture-user';
+const fixtureOther = 'smoke-fixture-other';
+const fixtureConversation = 'smoke-fixture-conversation';
+const fixtureTimestamp = '2026-09-05T20:00:00.000Z';
+const fixtureProfiles = [
+  { id: fixtureUser, nombre: 'Persona de prueba aislada' },
+  { id: fixtureOther, nombre: 'Marina de prueba aislada' }
+].map(person => ({
+  ...person, tipo_cuenta: 'artista', rubro: 'musica', instrumento: 'Guitarra',
+  generos: 'Rock', referentes: 'Referencia sintética', bio: 'Perfil sintético de smoke test.',
+  ciudad: 'Buenos Aires', barrio: 'Almagro', experiencia: 4, disponibilidad: 'Proyectos'
+}));
 let browser;
 function qaOutput() {
   if (!process.env.BUSCARTE_QA_OUTPUT) return null;
@@ -74,8 +86,8 @@ function fakeCaptchaSdk() {
   })();`;
 }
 
-async function setup(t, { logged = false, width = 390, firstPostError = false } = {}) {
-  const result = { test: t.name, fetched: [], redirects: [], mocked: [], forbidden: [], pageErrors: [], consoleErrors: [], networkErrors: [], posts: [], sdk: 0 };
+async function setup(t, { logged = false, width = 390, firstPostError = false, chatFixture = false } = {}) {
+  const result = { test: t.name, fetched: [], redirects: [], mocked: [], forbidden: [], pageErrors: [], consoleErrors: [], networkErrors: [], posts: [], writes: [], sdk: 0 };
   allResults.push(result);
   const context = await browser.newContext({
     viewport: { width, height: 844 }, isMobile: width < 768, hasTouch: width < 768,
@@ -84,6 +96,11 @@ async function setup(t, { logged = false, width = 390, firstPostError = false } 
   t.after(() => context.close());
   await context.addInitScript(logged => {
     localStorage.setItem('buscarte_meta_consent_v1', 'denied');
+    // Never open a native sharing surface or touch the system clipboard.
+    window.__smokeSharedProfiles = [];
+    Object.defineProperty(navigator, 'share', { configurable: true, value: async data => {
+      window.__smokeSharedProfiles.push(data);
+    } });
     if (logged) {
       localStorage.setItem('ba_logged', '1');
       localStorage.setItem('ba_user_id', 'smoke-fixture-user');
@@ -112,30 +129,35 @@ async function setup(t, { logged = false, width = 390, firstPostError = false } 
 
   // Fail-closed: this is the ONLY branch that can contact the network. It is
   // GET-only, same-origin, explicitly mapped to site-files.json, with automatic
-  // redirects disabled. Every redirect Location is checked before the browser
-  // receives it, and each redirected request passes through this guard again.
+  // redirects disabled. Follow each checked Location manually: Playwright routes
+  // only the first request in a browser redirect chain. The browser receives the
+  // final verified body, never a 3xx that could escape this interception policy.
   await context.route('**/*', async route => {
     const request = route.request();
     const url = new URL(request.url());
     const tag = request.method() + ' ' + url.origin + url.pathname;
+    if (request.method() !== 'GET') result.writes.push(tag);
     if (request.method() === 'GET' && allowedStatic(url)) {
       try {
-        let redirects = 0;
-        for (let previous = request.redirectedFrom(); previous; previous = previous.redirectedFrom()) redirects++;
-        assert.ok(redirects <= 5, 'Static redirect chain exceeded five hops');
-        const response = await route.fetch({ method: 'GET', maxRedirects: 0, timeout: 30000 });
-        const status = response.status();
-        if ([301, 302, 303, 307, 308].includes(status)) {
+        let currentUrl = url;
+        let response;
+        for (let redirects = 0; ; redirects++) {
+          assert.ok(redirects <= 5, 'Static redirect chain exceeded five hops');
+          assert.ok(allowedStatic(currentUrl), 'Static request left the explicit candidate allowlist');
+          response = await route.fetch({ url: currentUrl.href, method: 'GET', maxRedirects: 0, timeout: 30000 });
+          const status = response.status();
+          if (![301, 302, 303, 307, 308].includes(status)) break;
           const location = response.headers().location;
           assert.ok(location, 'Static redirect has no Location');
-          const destination = new URL(location, url);
+          const destination = new URL(location, currentUrl);
           assert.ok(allowedStatic(destination), 'Redirect left the explicit candidate static allowlist: ' + destination.origin + destination.pathname);
-          result.redirects.push({ from: url.pathname, to: destination.pathname, status });
-          return route.fulfill({ response });
+          result.redirects.push({ from: currentUrl.pathname, to: destination.pathname, status });
+          currentUrl = destination;
         }
+        const status = response.status();
         assert.equal(status, 200, `${url.pathname} must return 200`);
         const body = await response.body();
-        const file = allowedPaths.get(url.pathname.toLowerCase());
+        const file = allowedPaths.get(currentUrl.pathname.toLowerCase());
         const contentType = response.headers()['content-type'] || '';
         if (file.endsWith('.html')) assert.match(contentType, /text\/html/i, 'HTML MIME type');
         if (file.endsWith('.js')) {
@@ -161,10 +183,23 @@ async function setup(t, { logged = false, width = 390, firstPostError = false } 
       return route.fulfill({ contentType: 'application/javascript', body: result.sdk === 1 ? '// Synthetic unavailable provider callback.' : fakeCaptchaSdk() });
     }
     if (url.hostname === 'xiaanchoanxmampegoay.supabase.co') {
-      if (request.method() === 'GET' && ['/rest/v1/perfiles', '/rest/v1/anuncios', '/rest/v1/mensajes', '/rest/v1/reacciones'].includes(url.pathname)) {
+      if (request.method() === 'GET' && ['/rest/v1/perfiles', '/rest/v1/anuncios', '/rest/v1/mensajes', '/rest/v1/reacciones', '/rest/v1/perfiles_guardados', '/rest/v1/conversaciones'].includes(url.pathname)) {
         result.mocked.push(tag);
-        const rows = url.pathname === '/rest/v1/perfiles' && url.searchParams.get('id')
-          ? [{ id: 'smoke-fixture-user', nombre: 'Persona de prueba aislada', tipo_cuenta: 'artista', rubro: 'musica' }] : [];
+        let rows = [];
+        if (url.pathname === '/rest/v1/perfiles') {
+          const filter = url.searchParams.get('id') || '';
+          if (filter.startsWith('eq.')) rows = fixtureProfiles.filter(p => p.id === filter.slice(3));
+          else if (filter.startsWith('in.(') && filter.endsWith(')')) {
+            const ids = filter.slice(4, -1).split(',');
+            rows = fixtureProfiles.filter(p => ids.includes(p.id));
+          }
+        } else if (chatFixture && url.pathname === '/rest/v1/conversaciones') {
+          rows = [{ id: fixtureConversation, user1_id: fixtureUser, user2_id: fixtureOther,
+            ultimo_mensaje: 'Mensaje sintético sin envío real', updated_at: fixtureTimestamp, anuncio_id: null }];
+        } else if (chatFixture && url.pathname === '/rest/v1/mensajes') {
+          rows = [{ id: 'smoke-fixture-message', de_user_id: fixtureOther, para_user_id: fixtureUser,
+            contenido: 'Mensaje sintético sin envío real', created_at: fixtureTimestamp }];
+        }
         return route.fulfill({ contentType: 'application/json', headers: { 'content-range': '*/0' }, body: JSON.stringify(rows) });
       }
       if (request.method() === 'POST' && url.pathname === '/rest/v1/rpc/vencer_anuncios_viejos') {
@@ -322,4 +357,70 @@ test('deployed publication UI handles synthetic failure and success without a re
   await f.page.evaluate(() => submitAnuncio());
   assert.equal(f.result.posts.length, 2, 'Confirmed synthetic success must remain locked');
   await capture(f.page, 'deploy-anuncios-success-simulado.png');
+});
+
+test('deployed own mobile profile replaces self-contact with editing and shares an explicit owner URL', async t => {
+  const f = await setup(t, { logged: true, width: 320 });
+  // No id tests the existing signed-in fallback and the canonical shared link.
+  await f.go('/buscARTE_perfil_publico.html');
+  await f.page.waitForFunction(() => document.body.dataset.profileState === 'own');
+  assert.equal(await f.page.locator('#perfil-nombre').textContent(), 'Persona de prueba aislada');
+  assert.equal(await f.page.locator('#profile-owner-note').isVisible(), true);
+  assert.equal(await f.page.locator('#edit-profile-link').isVisible(), true);
+  const editDestination = new URL(await f.page.locator('#edit-profile-link').getAttribute('href'), f.page.url());
+  assert.equal(editDestination.origin, candidate.origin);
+  assert.match(editDestination.pathname, /^\/buscARTE_perfil(?:\.html)?$/i);
+  for (const selector of ['#contact-profile-btn', '#contact-card', '#save-btn', '#report-link']) {
+    assert.equal(await f.page.locator(selector).isVisible(), false, `${selector} cannot invite an action against the owner`);
+  }
+  for (const selector of ['#edit-profile-link', '#share-btn']) {
+    const box = await f.page.locator(selector).boundingBox();
+    assert.ok(box && box.height >= 44 && box.width >= 44, `${selector} has a usable mobile touch target`);
+    assert.ok(box.x >= 0 && box.x + box.width <= 321, `${selector} fits a 320px phone`);
+  }
+  await f.page.locator('#share-btn').click();
+  const shared = await f.page.evaluate(() => window.__smokeSharedProfiles);
+  assert.equal(shared.length, 1);
+  const destination = new URL(shared[0].url);
+  assert.equal(destination.origin, candidate.origin);
+  assert.match(destination.pathname, /^\/buscARTE_perfil_publico(?:\.html)?$/i);
+  assert.equal(destination.searchParams.get('id'), fixtureUser);
+  assert.deepEqual(f.result.writes, [], 'Reading/sharing an own profile must not write to a backend');
+  await capture(f.page, 'deploy-perfil-propio-320.png');
+});
+
+test('deployed mobile chat opens the other profile and Back restores the same conversation without any send', async t => {
+  const f = await setup(t, { logged: true, width: 320, chatFixture: true });
+  await f.go('/buscARTE_mensajes.html?conv=' + fixtureConversation);
+  await f.page.waitForFunction(() => document.getElementById('chat-persona')?.hasAttribute('href'));
+  for (const selector of ['#chat-persona', '#chat-ver-perfil']) {
+    const link = f.page.locator(selector);
+    assert.equal(await link.isVisible(), true, `${selector} stays visible on mobile`);
+    const destination = new URL(await link.getAttribute('href'), f.page.url());
+    assert.equal(destination.origin, candidate.origin);
+    assert.equal(destination.searchParams.get('id'), fixtureOther);
+    assert.equal(await link.getAttribute('aria-label'), 'Ver perfil de Marina de prueba aislada');
+    const box = await link.boundingBox();
+    assert.ok(box && box.height >= 44 && box.width >= 44 && box.x >= 0 && box.x + box.width <= 321, `${selector} fits a 320px touch viewport`);
+  }
+  for (const selector of ['#chat-header-avatar', '#chat-header-name']) {
+    assert.equal(await f.page.locator(selector).evaluate(el => el.closest('a')?.id), 'chat-persona');
+  }
+  await f.page.waitForFunction(() => document.getElementById('chat-messages').textContent.includes('Mensaje sintético sin envío real'));
+  await capture(f.page, 'deploy-chat-perfil-320.png');
+  await f.page.locator('#chat-ver-perfil').click();
+  await f.page.waitForFunction(() => document.body?.dataset.profileState === 'other');
+  assert.equal(new URL(f.page.url()).searchParams.get('id'), fixtureOther);
+  assert.equal(await f.page.locator('#perfil-nombre').textContent(), 'Marina de prueba aislada');
+  assert.equal(await f.page.locator('#contact-profile-btn').isVisible(), true);
+  assert.equal(await f.page.locator('#edit-profile-link').isVisible(), false);
+  await f.page.goBack({ waitUntil: 'load' });
+  await f.page.waitForFunction(() => document.getElementById('chat-persona')?.hasAttribute('href'));
+  assert.equal(new URL(f.page.url()).searchParams.get('conv'), fixtureConversation);
+  assert.equal(await f.page.locator('#chat-header-name').textContent(), 'Marina de prueba aislada');
+  assert.equal(new URL(await f.page.locator('#chat-persona').getAttribute('href'), f.page.url()).searchParams.get('id'), fixtureOther);
+  await f.page.waitForFunction(() => document.getElementById('chat-messages').textContent.includes('Mensaje sintético sin envío real'));
+  assert.deepEqual(f.result.writes, [], 'Chat/profile navigation cannot send messages, emails or other backend writes');
+  assert.ok(f.result.fetched.some(item => item.file === 'buscARTE_mensajes.html'));
+  assert.ok(f.result.fetched.some(item => item.file === 'buscARTE_perfil_publico.html'));
 });

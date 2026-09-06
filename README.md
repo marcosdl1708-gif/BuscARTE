@@ -3,6 +3,12 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
+## Estado operativo — publicación del 5/9, 23:44 ART
+
+Inicio + perfil propio/chat están **publicados**: deploy `6a9cd36de8ea461b8c4b7063`, fuente pública `a441167`, caché v11. Ver `docs/release-inicio-perfil-chat-20260905.md`. Se comprobaron 35 recursos, 35 rutas, cuatro exclusiones y ocho smoke tests sobre producción, además de las 152 pruebas locales. Funciones y horarios permanecen idénticos. No se creó otra preview ni se hizo push; GitHub `main` sigue pendiente de incorporar estos commits. Las secciones que describen los bloques como locales/preview registran el estado previo a esta publicación.
+
+Siguiente bloque autorizado: Marketplace, en local y separado del deploy anterior.
+
 ## Procedencia verificada — 5 de septiembre de 2026
 
 - GitHub: `https://github.com/marcosdl1708-gif/BuscARTE`, main `c40e88045a32f8311db82b923c0a598b4ae2fbff`.
