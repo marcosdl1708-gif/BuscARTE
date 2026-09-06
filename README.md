@@ -3,7 +3,11 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
-## Estado operativo — onboarding local del 6/9
+## Estado operativo — Inicio visual + onboarding locales del 6/9
+
+**Inicio más claro implementado sólo en local**, rama `codex/inicio-visual-20260906` desde `91608ad`, implementación `5b26d0a`. Incluye el onboarding anterior: primer pantallazo más breve, búsqueda prioritaria, menos repeticiones, estadísticas más abajo y perfiles ilustrativos identificados como ejemplos. Ambas Home conservan sus URLs, sesión, destinos de anclas y contratos. **334 casos cubiertos**: regresión 334/334 previa a los últimos ajustes de CSS, más repetición definitiva 80/80 de Inicio y 16/16 escenarios con fuentes reales. Build de 36 archivos. Ver `docs/qa-inicio-visual-20260906.md`; evidencia/resguardo privado `../BuscARTE-resguardos/inicio-visual-20260906`. Caché local v15; **sin deploy, preview ni push**, ni cambios de backend/Auth, datos, funciones o Android. Validación física de la app pendiente. No publicar ni sincronizar automáticamente; acordar un corte conjunto de onboarding + Inicio.
+
+### Estado previo — onboarding
 
 **Alta breve + perfil progresivo listos sólo en local**, rama `codex/onboarding-progresivo-20260906` desde `ed295b3`, implementación `28a2dd3`. El alta artística pasa de cinco/seis pantallas a cuatro por defecto, conserva detalles opcionales y ofrece empezar a explorar. El editor muestra cinco básicos con accesos a pendientes y progreso de datos guardados. **286/286 pruebas** en una corrida, build de 36 archivos y revisión móvil/escritorio. Ver `docs/qa-onboarding-progresivo-20260906.md`; evidencia/resguardo privado `../BuscARTE-resguardos/onboarding-progresivo-20260906`. Caché local v14: **sin deploy, preview ni push**, ni cambios de Auth, esquema, funciones o Android. Sólo consultas SELECT de metadatos de Supabase, sin usuarios ni escrituras. App física e integración con una cuenta de prueba autorizada pendientes. Puede agruparse antes de acordar la próxima publicación.
 
@@ -11,7 +15,7 @@ No depende del repositorio original ni del worktree de Android para funcionar.
 
 El usuario confirmó **postergar disciplinas múltiples/multirrubro y elección de principal entre rubros**. No retomarlo como siguiente mejora automática: requiere una decisión explícita y diseño separado de identidad del perfil, aparición en búsquedas y disciplina de cada anuncio. Conservar los contratos de rubro único y no mezclarlo con la migración Auth. Varios estilos dentro del mismo rubro no son lo mismo que varios rubros por cuenta.
 
-Siguiente bloque **propuesto, todavía no iniciado**: jerarquía visual y claridad del Inicio mobile. Mejorar el primer pantallazo, priorizar acciones útiles, reducir repeticiones y dar menor protagonismo a estadísticas; conservar la lógica de sesión ya corregida, destinos, filtros, permisos y datos. Revisar ambas Home (`index.html` y `buscARTE_index.html`), preservando sus URLs y destinos de anclas: hoy no tienen idéntico contenido ni significado de `#explorar`, y este bloque no autoriza fusionarlas. No implica un rediseño completo, material de personas inventado ni cambios de taxonomía/roles técnicos. Empezar localmente sólo cuando el usuario indique avanzar. Onboarding sigue local y pendiente de validación física; cualquier publicación conjunta requiere acordar el corte y verificarlo. Esta decisión prevalece sobre los órdenes históricos inferiores.
+El usuario autorizó con «Go» el bloque siguiente: jerarquía visual y claridad del Inicio mobile. **Ya implementado localmente**, como indica el estado operativo. Se preservan sesión, destinos, filtros, permisos y datos, y ambas Home (`index.html` y `buscARTE_index.html`) mantienen sus URLs y el distinto significado de `#explorar`; no se fusionaron. No implica un rediseño completo, material de personas inventado ni cambios de taxonomía/roles técnicos. Onboarding e Inicio siguen locales y pendientes de validación física; cualquier publicación conjunta requiere acordar el corte y verificarlo. Esta decisión prevalece sobre los órdenes históricos inferiores.
 
 ## Última publicación verificada — 6/9, 12:54 ART
 
@@ -50,6 +54,7 @@ npm test
 npm run test:registro
 npm run test:anuncios
 npm run test:inicio
+npm run test:inicio-visual
 npm run test:perfil
 npm run test:chat
 npm run test:marketplace
@@ -67,6 +72,8 @@ El build también funciona directamente con `node scripts/build-site.mjs`, sin i
 `npm run test:anuncios` usa el mismo entorno para verificar publicación mobile, contratos de los cinco tipos de anuncios, fotos, errores y envíos repetidos. Todas las solicitudes se simulan, incluida la RPC de vencimiento que la página ejecuta al cargar: no abrir la página real como una prueba supuestamente de sólo lectura.
 
 `npm run test:inicio` verifica ambas Home con visitantes y cuentas conocidas, datos de sesión incompletos, retorno por historial, cambio entre pestañas, enlaces al perfil, menú accesible y mensajes tardíos. Usa fixtures aisladas, sin tráfico real de backend ni escrituras de identidad. También comprueba que el modo Auth local no tome la caché legacy como una sesión validada.
+
+`npm run test:inicio-visual` verifica contratos frente a `91608ad`, jerarquía, ejemplos identificados, tres estados de sesión a seis anchos, navegación sin superposición, estadísticas más abajo, anclas, foco, movimiento reducido y teclado. Todo el backend es simulado/bloqueado. Ver el informe del bloque para la comprobación adicional con fuentes reales y los límites de la app física.
 
 `npm run test:perfil` verifica la presentación propia/ajena, edición, compartir con ID explícito, contacto y cambios de cuenta. `npm run test:chat` verifica los accesos al perfil, mobile, historial y respuestas tardías. Ambas suites usan servicios simulados y rechazan toda solicitud no prevista; los casos de envío nunca contactan usuarios reales.
 
