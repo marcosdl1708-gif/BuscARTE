@@ -23,13 +23,15 @@ Estas decisiones prevalecen sobre el orden propuesto anteriormente. Multirrubro/
 
 Pruebas web con datos sintéticos y verificación de archivos publicados no prueban toda la app instalada, teclado nativo ni la integración real de captcha/RPC/RLS/Storage/email. Eso sigue pendiente de dispositivo y cuenta/entorno expresamente autorizados. Tampoco hay medición que demuestre aún mayor completitud de perfiles o contratación.
 
-## Bloque actual — bienvenida
+## Bloque actual — bienvenida y recordatorio, sólo local
 
 Preparado después del deploy v16 en `2d0f65d`: sólo texto/diseño/enlaces de bienvenida en local, sin envío real ni otra publicación. Exploración general de rubros primero; foto/presentación y retorno mediante login después. Registro, Auth, destinatarios, cadencia, configuración, handler y los otros siete correos intactos. 105/105 pruebas; límites de clientes reales y entrega en `qa-bienvenida-20260906.md`.
 
+Tras la auditoría y nuevo «go», recordatorio preparado en `bdf652f` desde `9b75b23`: foto/presentación opcionales, sin «3 veces más visitas» y retorno al perfil por login. No cambia selección/frecuencia ni los demás correos. Ver `qa-recordatorio-perfil-20260906.md`: 191/191 pruebas combinadas, sin envíos ni deploy. Proponer muestra controlada autorizada en clientes reales y un corte conjunto con bienvenida; no ampliar a toda la base automáticamente.
+
 ## Feedback que queda, además de multirrubro
 
-1. **Engagement completo**: avisos/emails por pendientes reales del perfil, foto, disciplinas, regreso y mensajes/contactos. El checklist web ya existe y hay correos de mensajes, pero los recordatorios actuales sólo consideran foto/bio. Antes de ampliar: revisar roles elegibles, bajas, frecuencia, deduplicación, seguridad y métricas; no activar campañas con la base registrada por defecto. Retirar o respaldar afirmaciones como «hasta 3 veces más visitas» en un bloque de revisión de esa plantilla.
+1. **Engagement completo**: avisos/emails por pendientes reales del perfil, foto, disciplinas, regreso y mensajes/contactos. El checklist web ya existe y hay correos de mensajes, pero la selección de recordatorios sólo considera foto/bio. El texto/enlace ya mejoró en local; falta publicación y validación real. Antes de ampliar: revisar roles elegibles, bajas, frecuencia, deduplicación, seguridad y métricas; no activar campañas con la base registrada por defecto. La eliminación de «3 veces más visitas» está preparada, no publicada.
 2. **Roles técnicos dentro de rubros existentes**: evaluar FOH, monitores, iluminación, stage y stage manager como especialidades/subrubros, no crear un rubro nuevo por defecto. Experiencia, tipo/tamaño de venue y responsabilidades requieren diseño propio. A1/B1 sigue siendo una referencia a investigar, no una clasificación aprobada. Revisar impacto en campos/filtros antes de implementar.
 3. **Identidad visual/editorial más humana — postergada**: el Inicio mejoró, pero no es un rediseño integral ni una renovación de Instagram. Material real, historias y casos de uso quedan para más adelante, con permisos disponibles.
 4. **Validación en uso — guía al cierre**: entregar un recorrido único de usuario nuevo para que el usuario pruebe en teléfono/app. Después se podrá medir abandono, completitud y llegada a buscar/publicar/contactar. No declarar impacto a partir de tests sintéticos.

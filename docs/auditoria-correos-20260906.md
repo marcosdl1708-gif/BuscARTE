@@ -26,3 +26,7 @@ Las guías de Functions/Supabase se aplicaron al límite de sólo lectura: no ej
 - Al cerrar los bloques acordados, entregar al usuario una guía integral de una pasada desde una cuenta nueva para validar físicamente la app. No sustituirla por tests sintéticos ni hacer contactos reales automáticamente.
 
 La auditoría está terminada; las correcciones propuestas necesitan su siguiente autorización. No hubo deploy/push, altas, envíos, campañas, cambios de horarios/supresiones/planes ni escrituras remotas.
+
+### Actualización posterior — recordatorio local autorizado
+
+El usuario autorizó continuar con «go». Implementado únicamente contenido/enlace del recordatorio en `bdf652f`; ver `qa-recordatorio-perfil-20260906.md`. Bienvenida y recordatorio nuevos siguen sin publicar ni enviar pruebas reales. Esta actualización no altera las observaciones históricas del panel, límites ni prioridades previas a ampliar envíos.

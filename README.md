@@ -3,7 +3,13 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
-## Estado operativo — bienvenida preparada sólo en local
+## Estado operativo — bienvenida y recordatorio preparados sólo en local
+
+Continuar en `codex/recordatorio-perfil-20260906`, desde la auditoría `9b75b23`; implementación `bdf652f`. Tras el «go» del usuario se mejoró **sólo el contenido/enlace de perfil_incompleto**: foto/presentación opcionales, sin promesa de visitas, un botón para ingresar y volver a `perfil#completar`. Bienvenida preparada previamente sigue intacta. Handler, otras plantillas, selección, destinatarios, frecuencia, configuración, 36 archivos públicos, datos/Auth y Android no cambian. **191/191 pruebas locales**, build36; informe `docs/qa-recordatorio-perfil-20260906.md`, evidencia/resguardo privado `../BuscARTE-resguardos/recordatorio-perfil-20260906`.
+
+**Sin deploy, preview, push ni emails reales.** Producción no se volvió a consultar en este bloque; última publicación verificada: v16 inferior. Bienvenida y recordatorio nuevos siguen pendientes juntos, aunque el dist estático coincide con la fuente publicada. Próximo corte propuesto: muestra controlada en clientes reales con autorización y luego un único deploy conjunto, conservando las otras tres funciones/horarios. No ampliar campañas ni sincronizar main automáticamente. Roles técnicos como subrubros por evaluar; identidad visual y multirrubro siguen postergados. Guía física de usuario nuevo al cierre del trabajo acordado.
+
+### Histórico previo — bienvenida y auditoría Resend
 
 **Decisión posterior del usuario:** auditar Resend antes de avanzar con bienvenida/recordatorios, sólo lectura y sin envíos ni deploy. Roles técnicos se evalúan como especialidades/subrubros dentro de los rubros existentes; identidad visual queda postergada. Al cerrar el trabajo acordado, entregar una guía integral para que el usuario pruebe la app desde una cuenta nueva. Ver `docs/feedback-mobile-seguimiento-20260906.md`. No se autoriza una campaña ni la implementación de roles con esta decisión.
 
@@ -92,6 +98,8 @@ npm run test:perfil-progreso
 npm run test:coherencia-rubros
 npm run test:bienvenida
 npm run test:bienvenida-visual
+npm run test:recordatorio
+npm run test:recordatorio-visual
 ```
 
 El build también funciona directamente con `node scripts/build-site.mjs`, sin instalar dependencias: copia y verifica archivos, sin consultar servicios remotos. `npm ci` sí es necesario para instalar dependencias de las funciones en un entorno limpio.
@@ -115,6 +123,8 @@ El build también funciona directamente con `node scripts/build-site.mjs`, sin i
 `npm run test:onboarding` verifica alta breve/extendida, roles, rubros, datos opcionales, captcha, contrato RPC, duplicados, errores, recuperación de sesión y layout. `npm run test:perfil-progreso` verifica los cinco básicos sobre datos confirmados, acciones directas, enlaces, estados vacíos/históricos, cambios de cuenta, foto y guardado concurrente. Ambas suites simulan o rechazan toda su red; no generan cuentas, fotos ni emails reales.
 
 `npm run test:coherencia-rubros` verifica los diez rubros en el editor y ambas Home: campos correctos, textos, progreso, foco, selector, destinos y estados de sesión sin escrituras. Onboarding también cubre las altas mínimas de los diez rubros a 320/390/1280 y los detalles opcionales propios. `BUSCARTE_COHERENCIA_BASELINE=1` ejecuta por separado dos reproducciones históricas de copy/navegación en `f070ba3`. Capturas mediante `BUSCARTE_QA_OUTPUT`, fuera del repositorio; toda la aplicación se simula o bloquea.
+
+Las suites `test:bienvenida` y `test:recordatorio` evalúan templates/handler/login con VMs y entorno ficticio, sin red real. La suite nueva fija `9b75b23` para preservar todo fuera del recordatorio, incluida bienvenida; la histórica de bienvenida excluye explícitamente ese bloque ahora aprobado, no los demás. Las dos suites `*-visual` renderizan HTML sintético sin red a cinco anchos; cada una necesita un `BUSCARTE_QA_OUTPUT` nuevo y distinto, fuera del repo, o su directorio privado automático. No equivalen a clientes de correo ni entrega real.
 
 `site-files.json` contiene la lista explícita de publicación. El resultado actual es `dist/` (36 archivos incluyendo `_redirects`, el controlador de captcha y los dos assets compartidos del Inicio), sin documentos, campañas, respaldos, `files.zip` ni herramientas internas. No modificar HTML al empaquetar. Un archivo nuevo requiere incorporarlo deliberadamente a esa lista. Si encuentra archivos inesperados en `dist/`, el build se detiene y no los elimina.
 
