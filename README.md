@@ -22,6 +22,8 @@ npm test
 npm run test:registro
 npm run test:anuncios
 npm run test:inicio
+npm run test:perfil
+npm run test:chat
 ```
 
 El build también funciona directamente con `node scripts/build-site.mjs`, sin instalar dependencias: copia y verifica archivos, sin consultar servicios remotos. `npm ci` sí es necesario para instalar dependencias de las funciones en un entorno limpio.
@@ -33,6 +35,8 @@ El build también funciona directamente con `node scripts/build-site.mjs`, sin i
 `npm run test:anuncios` usa el mismo entorno para verificar publicación mobile, contratos de los cinco tipos de anuncios, fotos, errores y envíos repetidos. Todas las solicitudes se simulan, incluida la RPC de vencimiento que la página ejecuta al cargar: no abrir la página real como una prueba supuestamente de sólo lectura.
 
 `npm run test:inicio` verifica ambas Home con visitantes y cuentas conocidas, datos de sesión incompletos, retorno por historial, cambio entre pestañas, enlaces al perfil, menú accesible y mensajes tardíos. Usa fixtures aisladas, sin tráfico real de backend ni escrituras de identidad. También comprueba que el modo Auth local no tome la caché legacy como una sesión validada.
+
+`npm run test:perfil` verifica la presentación propia/ajena, edición, compartir con ID explícito, contacto y cambios de cuenta. `npm run test:chat` verifica los accesos al perfil, mobile, historial y respuestas tardías. Ambas suites usan servicios simulados y rechazan toda solicitud no prevista; los casos de envío nunca contactan usuarios reales.
 
 `site-files.json` contiene la lista explícita de publicación. El resultado actual es `dist/` (36 archivos incluyendo `_redirects`, el controlador de captcha y los dos assets compartidos del Inicio), sin documentos, campañas, respaldos, `files.zip` ni herramientas internas. No modificar HTML al empaquetar. Un archivo nuevo requiere incorporarlo deliberadamente a esa lista. Si encuentra archivos inesperados en `dist/`, el build se detiene y no los elimina.
 
@@ -50,10 +54,18 @@ Netlify está conectado a `main`: un push normal puede publicar automáticamente
 
 Los demás bugs siguen pendientes, incluido el enlace general de Marketplace: mejorar el formulario de venta no corrige por sí solo ese recorrido. Mantener separados los cambios visuales, la migración Auth y los cambios de disciplinas/modelo de datos.
 
-## Siguiente bloque preparado — Inicio con sesión
+## Bloque pendiente de publicación — Inicio con sesión
 
 La rama `codex/inicio-sesion-20260905`, desde `ce51224`, mejora sólo el Inicio de las cuentas conocidas. Ambas URLs conservan sus contratos y comparten presentación: saludo, cuatro accesos útiles, exploración por rubro y cierre sin volver a pedir registro. Una caché marcada como registrada pero sin ID ofrece reingresar, no otra alta. El menú y los enlaces personalizados esperan a estar listos antes de poder usarse.
 
 Este bloque ya está **validado en preview, no publicado en producción**. El código público es `e63d92f`; la draft Netlify `6a9cc9c456bb08b603d9b3cf` pasó comparación de 35 recursos, 35 rutas y seis smoke tests remotos aislados. No se hizo push a `main` ni se cambió el deploy activo de producción: la publicación descrita arriba sigue correspondiendo a captcha + anuncios. Ver `docs/preview-inicio-20260905.md` para el resultado remoto y `docs/qa-inicio-20260905.md` para pruebas locales, capturas y límites. La publicación en producción requiere su aprobación y repetir allí las verificaciones; no promover la draft directamente como sustituto de validar su contexto y funciones.
 
 El mapa local y la ubicación del respaldo están en `../BuscARTE-ORGANIZACION.md`.
+
+## Bloque local siguiente — Perfil propio y chat → perfil
+
+Continuación desde `8cd3947` en `codex/perfil-chat-20260905`, que incluye el Inicio todavía pendiente de publicación. Cambios separados: `9deecd4` (perfil propio/acciones) y `c764b34` (chat → perfil). El perfil propio muestra **Editar mi perfil** y compartir, sin invitar a contactarse, guardarse o reportarse. En el chat, **Ver perfil** sigue visible en mobile; nombre/avatar también enlazan y volver conserva la conversación.
+
+Validado **sólo localmente**: 152 pruebas aprobadas, build de 36 archivos y revisión visual móvil/escritorio con datos sintéticos. No se creó otra preview, no hubo deploy ni push; Supabase, funciones y Android no se modificaron. La preview anterior contiene sólo Inicio, no este bloque. El service worker queda preparado en v11 para la futura publicación conjunta.
+
+Por decisión del usuario se agrupan las mejoras para evitar deploys por cada bloque. No publicar ni actualizar `main` automáticamente: primero acordar el corte, revisar el paquete conjunto y validar el contexto de producción. Ver `docs/qa-perfil-chat-20260905.md` para resultados y límites. Próximos recorridos a revisar por separado: entrada general de Marketplace y guardado de estilo de danza; después onboarding/completitud y disciplinas/modelo de datos.
