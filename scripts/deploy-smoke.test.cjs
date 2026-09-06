@@ -75,19 +75,24 @@ function fakeCaptchaSdk() {
         frame.width = '164'; frame.height = '144'; frame.style.border = '0';
         frame.srcdoc = '<body style="background:#222;color:#eee;font:14px sans-serif">Verificación simulada<br>QA SIN ALTAS REALES</body>';
         document.getElementById(boxId).appendChild(frame);
-        widgets.set(id, { boxId, options });
+        widgets.set(id, { boxId, options, response: '' });
         return id;
       },
-      getResponse() { return ''; },
-      reset() {},
+      getResponse(id) { return widgets.get(id)?.response || ''; },
+      reset(id) { const w = widgets.get(id); if (w) w.response = ''; },
       remove(id) { const w = widgets.get(id); if (w) document.getElementById(w.boxId).replaceChildren(); widgets.delete(id); }
+    };
+    window.__smokeSolveCaptcha = boxId => {
+      const w = [...widgets.values()].find(widget => widget.boxId === boxId);
+      if (!w) throw new Error('Synthetic captcha was not rendered');
+      w.response = 'smoke-captcha-token-not-real'; w.options.callback(w.response);
     };
     window.buscarteCaptchaLoaded();
   })();`;
 }
 
-async function setup(t, { logged = false, width = 390, firstPostError = false, chatFixture = false, marketplaceFixture = false, danceFixture = false } = {}) {
-  const result = { test: t.name, fetched: [], redirects: [], mocked: [], forbidden: [], pageErrors: [], consoleErrors: [], networkErrors: [], posts: [], patches: [], reads: [], writes: [], sdk: 0 };
+async function setup(t, { logged = false, width = 390, firstPostError = false, chatFixture = false, marketplaceFixture = false, danceFixture = false, onboardingFixture = false, progressFixture = false } = {}) {
+  const result = { test: t.name, fetched: [], redirects: [], mocked: [], forbidden: [], pageErrors: [], consoleErrors: [], networkErrors: [], posts: [], patches: [], registrations: [], emails: [], reads: [], writes: [], sdk: 0 };
   // Each smoke owns its mutable synthetic row; nothing is persisted remotely or
   // shared with another case. Return only the PATCH representation the UI asks for.
   const profiles = structuredClone(fixtureProfiles);
@@ -95,6 +100,10 @@ async function setup(t, { logged = false, width = 390, firstPostError = false, c
     rubro: 'danza', instrumento: '', generos: 'Contemporáneo',
     provincia: 'CABA', ciudad: 'Buenos Aires (CABA)',
     campos_especificos: JSON.stringify({ rol: ['Bailarín/a'], disciplina: ['Tango'], nivel: ['Profesional'] })
+  });
+  if (progressFixture) Object.assign(profiles[0], {
+    bio: '', instrumento: '', generos: '', referentes: '', provincia: null, ciudad: null,
+    barrio: '', foto_url: null, campos_especificos: '{}'
   });
   const products = [
     { id: 9101, titulo: 'Guitarra sintética usada', categoria_producto: 'Guitarra eléctrica', condicion: 'Usado', rubro: 'danza' },
@@ -176,10 +185,13 @@ async function setup(t, { logged = false, width = 390, firstPostError = false, c
         const file = allowedPaths.get(currentUrl.pathname.toLowerCase());
         const contentType = response.headers()['content-type'] || '';
         if (file.endsWith('.html')) assert.match(contentType, /text\/html/i, 'HTML MIME type');
+        if (file.endsWith('.css')) assert.match(contentType, /text\/css/i, 'CSS MIME type');
         if (file.endsWith('.js')) {
           assert.match(contentType, /(?:java|ecma)script/i, 'JavaScript MIME type');
-          assert.equal(sha256(body), sha256(fs.readFileSync(path.join(root, file))), `${file}: served JS must match the candidate source`);
         }
+        // Pretty URLs can rewrite HTML anchors/serialization. The separate
+        // verify-deploy-files.mjs performs its bounded inert-DOM comparison.
+        if (/\.(?:css|js)$/.test(file)) assert.equal(sha256(body), sha256(fs.readFileSync(path.join(root, file))), `${file}: served CSS/JS must match the candidate source`);
         result.fetched.push({ file, status, contentType, bytes: body.length, sha256: sha256(body) });
         return route.fulfill({ response, body });
       } catch (error) {
@@ -196,7 +208,7 @@ async function setup(t, { logged = false, width = 390, firstPostError = false, c
     if (url.hostname === 'js.hcaptcha.com' && url.pathname === '/1/api.js' && request.method() === 'GET') {
       result.mocked.push(tag);
       result.sdk++;
-      return route.fulfill({ contentType: 'application/javascript', body: result.sdk === 1 ? '// Synthetic unavailable provider callback.' : fakeCaptchaSdk() });
+      return route.fulfill({ contentType: 'application/javascript', body: result.sdk === 1 && !onboardingFixture ? '// Synthetic unavailable provider callback.' : fakeCaptchaSdk() });
     }
     if (url.hostname === 'xiaanchoanxmampegoay.supabase.co') {
       if (request.method() === 'GET' && ['/rest/v1/perfiles', '/rest/v1/anuncios', '/rest/v1/mensajes', '/rest/v1/reacciones', '/rest/v1/perfiles_guardados', '/rest/v1/conversaciones'].includes(url.pathname)) {
@@ -221,7 +233,19 @@ async function setup(t, { logged = false, width = 390, firstPostError = false, c
         }
         return route.fulfill({ contentType: 'application/json', headers: { 'content-range': '*/0' }, body: JSON.stringify(rows) });
       }
-      if (danceFixture && request.method() === 'PATCH' && url.pathname === '/rest/v1/perfiles') {
+      if (onboardingFixture && request.method() === 'POST' && url.pathname === '/rest/v1/rpc/registrar_usuario') {
+        result.mocked.push(tag);
+        const body = request.postDataJSON();
+        result.registrations.push(body);
+        // Only this test accepts a simulated signup; no provider is contacted.
+        Object.assign(profiles[0], { nombre: body.p_nombre, tipo_cuenta: body.p_tipo_cuenta,
+          rubro: body.p_rubro, bio: body.p_bio, provincia: body.p_provincia, ciudad: body.p_ciudad,
+          barrio: body.p_barrio, instrumento: body.p_instrumento, generos: body.p_generos,
+          referentes: body.p_referentes, disponibilidad: body.p_disponibilidad,
+          campos_especificos: body.p_campos_especificos, foto_url: null });
+        return route.fulfill({ contentType: 'application/json', body: JSON.stringify({ id: fixtureUser }) });
+      }
+      if ((danceFixture || progressFixture) && request.method() === 'PATCH' && url.pathname === '/rest/v1/perfiles') {
         result.mocked.push(tag);
         const requestHeaders = request.headers();
         const patch = { query: url.search, headers: {
@@ -244,11 +268,16 @@ async function setup(t, { logged = false, width = 390, firstPostError = false, c
         return route.fulfill({ status: failed ? 400 : 201, contentType: 'application/json', body: JSON.stringify(failed ? { message: 'Synthetic QA rejection' } : [{ id: 9001 }]) });
       }
     }
+    if (onboardingFixture && request.method() === 'POST' && url.origin === candidate.origin && url.pathname === '/.netlify/functions/send-email') {
+      result.mocked.push(tag);
+      result.emails.push(request.postDataJSON());
+      return route.fulfill({ contentType: 'application/json', body: '{}' });
+    }
     if (url.origin === candidate.origin && url.pathname === '/favicon.ico' && request.method() === 'GET') {
       result.mocked.push(tag);
       return route.fulfill({ status: 204, body: '' });
     }
-    // Includes registration, Storage, email functions, tracking, unknown assets,
+    // Includes registration/email outside their explicit fixture, Storage, tracking, unknown assets,
     // external navigations and any new API calls. They are blocked AND fail QA.
     result.forbidden.push(tag);
     return route.abort('blockedbyclient');
@@ -539,4 +568,131 @@ test('deployed dance editor confirms a synthetic Tango to Ballet PATCH, reload a
   assert.deepEqual(f.result.writes, ['PATCH https://xiaanchoanxmampegoay.supabase.co/rest/v1/perfiles'], 'Only the explicit synthetic profile update was requested');
   assert.equal(f.result.posts.length, 0);
   await capture(f.page, 'deploy-danza-perfil-publico-320.png');
+});
+
+test('deployed clearer Home keeps guest exploration, honest examples and lower statistics on both URLs', async t => {
+  const f = await setup(t, { width: 320 });
+  for (const home of ['index.html', 'buscARTE_index.html']) {
+    await f.go('/' + home);
+    await f.page.waitForFunction(() => document.documentElement.dataset.homeSession === 'guest' && document.documentElement.dataset.homeReady === 'true');
+    assert.equal(await f.page.locator('body.home-clarity').count(), 1);
+    assert.equal(await f.page.locator('nav a[data-home-recover]').isVisible(), false, 'Guest must not receive the recovery-only login link');
+    assert.equal(await f.page.locator('#hero-invitado a').count(), 3);
+    assert.match(await f.page.locator('.home-examples').innerText(), /ilustrativ[oa]s?/i);
+    assert.doesNotMatch(await f.page.locator('.home-examples').innerText(), /\d+%\s*afinidad|Miles de músicos/i);
+    const anchor = f.page.locator('#explorar');
+    assert.equal(await anchor.evaluate((el, expected) => el.classList.contains(expected), home === 'index.html' ? 'rubros-section' : 'profiles-section'), true);
+    const primary = await f.page.locator('#hero-invitado .btn-neon').getAttribute('href');
+    if (home === 'index.html') assert.equal(primary, '#explorar');
+    else {
+      const destination = new URL(primary, f.page.url());
+      assert.equal(destination.origin, candidate.origin);
+      assert.match(destination.pathname, /^\/buscARTE_busqueda(?:\.html)?$/i);
+      assert.equal(destination.search, ''); assert.equal(destination.hash, '');
+    }
+    for (const width of [320, 820]) {
+      await f.page.setViewportSize({ width, height: 844 });
+      const layout = await f.page.evaluate(() => {
+        const box = el => { const r = el.getBoundingClientRect(); return { x:r.x, right:r.right, y:r.y, bottom:r.bottom, height:r.height }; };
+        const visible = el => el.getClientRects().length && getComputedStyle(el).visibility !== 'hidden';
+        const stats = document.querySelector('.home-community-stats');
+        return {
+          width:innerWidth, overflow:document.documentElement.scrollWidth,
+          controls:[...document.querySelectorAll('nav > a, .nav-links a, #nav-guest a, #hero-invitado a')].filter(visible).map(box),
+          navItems:[...document.querySelectorAll('nav > a, .nav-links a, #nav-guest a')].filter(visible).map(box),
+          statsAfterExplore:!!(document.getElementById('explorar').compareDocumentPosition(stats) & Node.DOCUMENT_POSITION_FOLLOWING),
+          statsAfterActions:!!(document.getElementById('como-funciona').compareDocumentPosition(stats) & Node.DOCUMENT_POSITION_FOLLOWING)
+        };
+      });
+      assert.equal(layout.width, width, 'No mobile viewport auto-shrink');
+      assert.ok(layout.overflow <= width + 1);
+      assert.ok(layout.statsAfterExplore && layout.statsAfterActions);
+      for (const rect of layout.controls) assert.ok(rect.x >= -1 && rect.right <= width + 1 && rect.height >= 44, JSON.stringify(rect));
+      for (let i=0; i<layout.navItems.length; i++) for (let j=i+1; j<layout.navItems.length; j++) {
+        const a=layout.navItems[i], b=layout.navItems[j];
+        assert.ok(a.right <= b.x + 1 || b.right <= a.x + 1 || a.bottom <= b.y + 1 || b.bottom <= a.y + 1, 'Navigation controls cannot overlap');
+      }
+      await capture(f.page, `deploy-${home.replace('.html','')}-clarity-guest-${width}.png`);
+    }
+  }
+  assert.deepEqual(f.result.writes, [], 'Home presentation cannot write accounts, messages, profiles or campaigns');
+});
+
+test('deployed four-screen artist signup uses the unchanged synthetic RPC and opens progressive profile completion', async t => {
+  const f = await setup(t, { width:320, onboardingFixture:true });
+  await f.go('/buscARTE_registro.html');
+  const active = step => f.page.waitForSelector('#step-' + step + '.active');
+  const next = step => f.page.locator('#step-' + step + ' .btn-next:not(#registro-detalles-artisticos)').first().click();
+  await active('tipo');
+  await f.page.locator('#tipo-artista').click(); await next('tipo'); await active('cuenta');
+  await f.page.locator('#reg-nombre').fill('Persona sintética de release');
+  await f.page.locator('#reg-email').fill('release-smoke@example.invalid');
+  await f.page.locator('#reg-password').fill('Synthetic-only-123!');
+  await f.page.locator('#sel-provincia').selectOption('Buenos Aires');
+  assert.equal(await f.page.locator('#registro-cuenta-opcional').getAttribute('open'), null);
+  await next('cuenta'); await active('rubro');
+  await f.page.locator('#rubro-grid button[onclick*="seleccionarRubro(\'musica\'"]').click();
+  await next('rubro'); await active('perfil');
+  assert.equal(await f.page.locator('#registro-perfil-opcional').getAttribute('open'), null);
+  await f.page.waitForFunction(() => document.querySelector('#step-perfil .captcha-panel')?.dataset.state === 'ready');
+  await next('perfil');
+  assert.equal(f.result.registrations.length, 0, 'The shortened flow cannot skip captcha');
+  await f.page.evaluate(() => __smokeSolveCaptcha('hcaptcha-box-perfil'));
+  await next('perfil'); await active('exito');
+  assert.equal(f.result.registrations.length, 1);
+  const payload = f.result.registrations[0];
+  assert.deepEqual(Object.keys(payload).sort(), ['p_email','p_password','p_nombre','p_provincia','p_ciudad','p_barrio','p_instrumento','p_generos','p_disponibilidad','p_referentes','p_bio','p_tipo_cuenta','p_rubro','p_campos_especificos'].sort());
+  assert.equal(payload.p_email, 'release-smoke@example.invalid');
+  assert.equal(payload.p_nombre, 'Persona sintética de release');
+  assert.equal(payload.p_provincia, 'Buenos Aires');
+  assert.equal(payload.p_tipo_cuenta, 'artista'); assert.equal(payload.p_rubro, 'musica');
+  for (const key of ['p_ciudad','p_barrio','p_instrumento','p_generos','p_disponibilidad','p_referentes','p_bio']) assert.equal(payload[key], '', key + ' remains optional');
+  assert.deepEqual(payload.p_campos_especificos, {});
+  assert.equal(await f.page.locator('#exito-btn').getAttribute('href'), 'buscARTE_busqueda.html?rubro=musica');
+  const completion = new URL(await f.page.locator('#exito-completar').getAttribute('href'), f.page.url());
+  assert.equal(completion.origin, candidate.origin);
+  assert.match(completion.pathname, /^\/buscARTE_perfil(?:\.html)?$/i);
+  assert.equal(completion.search, ''); assert.equal(completion.hash, '#completar');
+  await f.page.evaluate(() => crearPerfil(document.querySelector('#step-perfil .btn-next')));
+  assert.equal(f.result.registrations.length, 1, 'Confirmed signup is not submitted twice');
+  await capture(f.page, 'deploy-onboarding-success-simulado-320.png');
+  await f.page.locator('#exito-completar').click();
+  await f.page.waitForFunction(() => !isLoadingProfile && document.activeElement?.id === 'profile-progress');
+  assert.equal(new URL(f.page.url()).hash, '#completar');
+  assert.equal(await f.page.locator('#profile-progress-meter').getAttribute('aria-valuenow'), '1');
+  assert.equal(await f.page.locator('#profile-progress-list li').count(), 5);
+  assert.equal(f.result.emails.length, 1);
+  assert.deepEqual(f.result.emails[0], { tipo:'bienvenida', destinatario:'release-smoke@example.invalid', datos:{ nombre:'Persona' } });
+  assert.deepEqual(f.result.writes, ['POST https://xiaanchoanxmampegoay.supabase.co/rest/v1/rpc/registrar_usuario', 'POST ' + candidate.origin + '/.netlify/functions/send-email'], 'Only the explicit synthetic RPC and welcome mail are requested; neither reaches a service');
+  assert.equal(f.result.patches.length, 0);
+  await capture(f.page, 'deploy-onboarding-perfil-progresivo-320.png');
+});
+
+test('deployed mobile profile completion counts saved basics, not drafts, and survives confirmed synthetic save', async t => {
+  const f = await setup(t, { logged:true, width:320, progressFixture:true });
+  await f.go('/buscARTE_perfil.html#completar');
+  const ready = () => f.page.waitForFunction(() => !isLoadingProfile && document.getElementById('reg-nombre-perfil')?.value === 'Persona de prueba aislada');
+  await ready();
+  await f.page.waitForFunction(() => document.activeElement?.id === 'profile-progress');
+  const meter = f.page.locator('#profile-progress-meter');
+  assert.equal(await meter.getAttribute('aria-valuenow'), '1');
+  assert.equal(await f.page.locator('#profile-progress-list li').count(), 5);
+  assert.equal(await f.page.locator('#profile-progress-list a').count(), 4);
+  await f.page.locator('[data-basic="bio"] a').click();
+  assert.equal(await f.page.locator('#bio-text').evaluate(el => el === document.activeElement), true);
+  await f.page.locator('#bio-text').fill('Presentación sintética confirmada en el smoke.');
+  assert.equal(await meter.getAttribute('aria-valuenow'), '1', 'A draft cannot claim saved completion');
+  await f.page.locator('#save-bar .btn-neon').click();
+  await f.page.waitForFunction(() => document.getElementById('profile-status')?.textContent.includes('Perfil guardado correctamente'));
+  assert.equal(await meter.getAttribute('aria-valuenow'), '2');
+  assert.equal(f.result.patches.length, 1);
+  assert.equal(new URLSearchParams(f.result.patches[0].query).get('id'), 'eq.' + fixtureUser);
+  assert.equal(new URLSearchParams(f.result.patches[0].query).get('select'), 'id,campos_especificos');
+  assert.match(f.result.patches[0].headers.prefer, /return=representation/);
+  await f.page.reload({ waitUntil:'load' }); await ready();
+  assert.equal(await meter.getAttribute('aria-valuenow'), '2');
+  assert.equal(await f.page.locator('#bio-text').inputValue(), 'Presentación sintética confirmada en el smoke.');
+  assert.ok(await f.page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+  assert.deepEqual(f.result.writes, ['PATCH https://xiaanchoanxmampegoay.supabase.co/rest/v1/perfiles'], 'Only the explicit synthetic owner PATCH occurs');
+  await capture(f.page, 'deploy-perfil-progreso-guardado-simulado-320.png');
 });
