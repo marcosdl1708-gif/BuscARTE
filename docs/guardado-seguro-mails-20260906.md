@@ -23,6 +23,10 @@ Comando vigente para el nuevo transporte: `node --test scripts/guardar-perfil-se
 
 ## Publicación
 
-Preparado para un único deploy de producción autorizado, sin preview ni push. Estado final se registra después de Netlify. Evidencia privada y bundle previo: `../../BuscARTE-resguardos/guardado-seguro-20260906/`.
+**Publicado el 6/9/2026 a las 17:38:25 ART**, deploy `6a9dcf37d0aeb9991f8eb446`, fuente `b1d35dd`, v17. Confirmado activo/ready/production en `https://buscarte.com.ar`. Un único deploy autorizado, sin preview ni push. [Deploy y logs](https://app.netlify.com/projects/rococo-gaufre-c6b9b1/deploys/6a9dcf37d0aeb9991f8eb446).
+
+Verificación mínima en producción: GET de editor y SW 200; scripts inline idénticos a la fuente revisada; v17 presente. Una operación `verify` con identidad ficticia de dominio `.invalid` y contraseña aleatoria fue rechazada con 401/no-store, comprobando configuración privilegiada aceptada y conexión a la RPC de login sin actualizar perfiles. No se ejecutó ningún guardado real desde herramientas ni se enviaron más correos. La prueba positiva con la cuenta/contraseña del usuario queda a su cargo.
+
+Cinco funciones en nodejs24.x: `guardar-perfil` nueva y `send-email` actualizada; hashes binarios de `recordatorio-perfil`, `resumen-mensual` y `reset-password` idénticos al deploy anterior. Ambos horarios idénticos. Las dos plantillas nuevas están publicadas; no se cambió selección/cadencia ni se activó otra campaña. Evidencia privada y bundle previo: `../../BuscARTE-resguardos/guardado-seguro-20260906/`.
 
 Reversión de código si fuera necesaria: primero comprobar el deploy activo, luego restaurar el anterior `6a9db430d7eed8dbdc9489d2`; esa versión conserva el bloqueo original de edición. No hay migraciones ni datos que revertir. Una prueba positiva con la contraseña/cuenta real queda a cargo del usuario; no se solicitaron credenciales ni se escribieron sus datos desde herramientas.

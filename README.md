@@ -3,7 +3,11 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
-## Estado operativo — bienvenida y recordatorio preparados sólo en local
+## Estado operativo — guardado seguro y mails publicados
+
+**Publicado 6/9, 17:38 ART:** deploy activo `6a9dcf37d0aeb9991f8eb446`, fuente `b1d35dd`, caché v17. Guardado con contraseña verificada por servidor + bienvenida/recordatorio; sin RLS/migración, cambios de cuentas, horarios, Android ni variables remotas. Verificación esencial local y chequeo de rechazo de credenciales en producción aprobados, sin escrituras de perfiles desde herramientas. Falta confirmación positiva del usuario con su cuenta. Informe `docs/guardado-seguro-mails-20260906.md`; rama `codex/guardado-seguro-20260906`. No repetir deploy ni enviar mails de muestra. GitHub main continúa pendiente de sincronización.
+
+### Histórico anterior a esta publicación
 
 **Corte autorizado posterior:** guardado seguro + ambos mails listos para publicar en `codex/guardado-seguro-20260906`. Reingreso de contraseña sólo para guardar; servidor verifica identidad antes del PATCH, sin modificar RLS ni activar la migración. Validación acotada por pedido del usuario: 13 comprobaciones de guardado, contratos de correo y build36/v17. Ver `docs/guardado-seguro-mails-20260906.md`; no confundir con la regresión histórica de PATCH directo. El estado de publicación se confirma en ese informe.
 

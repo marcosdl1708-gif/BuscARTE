@@ -2,7 +2,11 @@
 
 Este seguimiento separa implementación web, validación física y resultados de uso. No reabre automáticamente bloques postergados.
 
-## Prioridad posterior — guardado bloqueado, deploy pausado
+## Actualización posterior — arreglo y mails publicados
+
+El 6/9 a las17:38 ART se publicó `6a9dcf37d0aeb9991f8eb446`/v17: guardado verificado por contraseña en servidor y ambas plantillas de correo. No se modificaron RLS, cuentas, migración Auth, cadencia ni Android. Comprobaciones esenciales y configuración real/rechazo de credenciales aprobados; falta que el usuario confirme guardar y recargar con su cuenta. Ver `guardado-seguro-mails-20260906.md`. No repetir publicación ni muestras. Los apartados siguientes sobre bloqueo/local registran estados anteriores, superados por este corte.
+
+## Histórico — guardado bloqueado, deploy pausado
 
 El usuario recibió ambas muestras de correo, pero reportó fallo al editar géneros en PC y otro reporte similar. La respuesta del editor es `[]`; la política UPDATE real exige una identidad JWT que el guardado legacy no envía. Diagnóstico de sólo lectura en `diagnostico-guardado-perfil-20260906.md`. No está reparado: requiere acordar cómo validar al dueño del perfil sin abrir permisos ni activar toda la migración Auth. No dar por completa la integración real del bloque danza/guardado a partir de sus pruebas simuladas. Pausar publicación de mails y nuevos bloques hasta resolverlo; no reenviar muestras.
 
@@ -37,7 +41,7 @@ Tras la auditoría y nuevo «go», recordatorio preparado en `bdf652f` desde `9b
 
 ## Feedback que queda, además de multirrubro
 
-1. **Engagement completo**: avisos/emails por pendientes reales del perfil, foto, disciplinas, regreso y mensajes/contactos. El checklist web ya existe y hay correos de mensajes, pero la selección de recordatorios sólo considera foto/bio. El texto/enlace ya mejoró en local; falta publicación y validación real. Antes de ampliar: revisar roles elegibles, bajas, frecuencia, deduplicación, seguridad y métricas; no activar campañas con la base registrada por defecto. La eliminación de «3 veces más visitas» está preparada, no publicada.
+1. **Engagement completo**: avisos/emails por pendientes reales del perfil, foto, disciplinas, regreso y mensajes/contactos. El checklist web ya existe y hay correos de mensajes, pero la selección de recordatorios sólo considera foto/bio. Bienvenida/recordatorio mejorados y eliminación de «3 veces más visitas» ya publicados en v17; muestras recibidas. Antes de ampliar: revisar roles elegibles, bajas, frecuencia, deduplicación, seguridad y métricas; no activar campañas con la base registrada por defecto. Validación física y medición de uso siguen pendientes.
 2. **Roles técnicos dentro de rubros existentes**: evaluar FOH, monitores, iluminación, stage y stage manager como especialidades/subrubros, no crear un rubro nuevo por defecto. Experiencia, tipo/tamaño de venue y responsabilidades requieren diseño propio. A1/B1 sigue siendo una referencia a investigar, no una clasificación aprobada. Revisar impacto en campos/filtros antes de implementar.
 3. **Identidad visual/editorial más humana — postergada**: el Inicio mejoró, pero no es un rediseño integral ni una renovación de Instagram. Material real, historias y casos de uso quedan para más adelante, con permisos disponibles.
 4. **Validación en uso — guía al cierre**: entregar un recorrido único de usuario nuevo para que el usuario pruebe en teléfono/app. Después se podrá medir abandono, completitud y llegada a buscar/publicar/contactar. No declarar impacto a partir de tests sintéticos.
