@@ -3,7 +3,13 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
-## Estado operativo — coherencia entre rubros, sólo local
+## Estado operativo — coherencia entre rubros publicada
+
+**Publicado el 6/9/2026 a las 15:42 ART**: deploy activo verificado `6a9db430d7eed8dbdc9489d2`, fuente pública `e4783b7`, HEAD de publicación `d5352f4`, caché v16. Un único deploy de producción autorizado, sin preview ni push. Regresión final **412/412**, smokes **16/16 locales y 16/16 en producción** con backend simulado; 35 recursos, 35 rutas y cuatro exclusiones comprobados. Las cuatro funciones, hashes/runtimes y dos horarios permanecen idénticos. Ver `docs/release-coherencia-rubros-20260906.md`; evidencia privada `../BuscARTE-resguardos/release-coherencia-rubros-20260906`. Sin cambios Auth, datos o Android; app física e integración real pendientes. GitHub main sigue sin sincronizar: no disparar otro deploy mediante push accidental.
+
+El usuario autorizó continuar con **bienvenida en local**, únicamente plantilla y enlaces, sin correos reales ni cambios de destinatarios/cadencia. No forma parte del deploy superior. Multirrubro/principal sigue postergado. Las notas inferiores describen estados históricos.
+
+### Histórico previo — coherencia local
 
 Preparación local en `codex/coherencia-rubros-20260906`, desde `f070ba3`, implementación `4668dd5` y ajuste tipográfico `e4783b7`: registro/perfil/Inicio coherentes con los diez rubros existentes, textos compartidos neutrales, acciones de completitud específicas, selector legible y diez accesos generales también en legacy. No cambia taxonomía, filtros, datos, Auth ni Android; multirrubro/principal sigue postergado. Caché local v16; **sin deploy, preview ni push**. Regresión 412/412 antes del último ajuste de título mobile, seguida de 99/99 pruebas afectadas y 14/14 smokes locales definitivos; build36. Alcance, revisión tipográfica y límites en `docs/qa-coherencia-rubros-20260906.md`. Evidencia/resguardo privado `../BuscARTE-resguardos/coherencia-rubros-20260906`. No confundir este dist con la publicación v15 inferior ni verificarlo contra producción como si ya estuviera publicado. App física e integración real con cuenta autorizada pendientes.
 
