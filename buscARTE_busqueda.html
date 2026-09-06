@@ -892,22 +892,31 @@
     'chips-rol-cir':'especialidad','chips-mod-cir':'modalidad',
     'chips-rol-esc':'rol',        'chips-formato-esc':'formato'
   };
+  const CAMPO_LEGACY_IDS = {
+    'chips-rol-act':['chips-rol-actuacion'], 'chips-escena':['chips-tipo-escena'],
+    'chips-rol-dis':['chips-rol-diseno'], 'chips-estilo-dis':['chips-estilo-diseno'],
+    'chips-rol-dan':['chips-rol-danza'], 'chips-disc-dan':['chips-disciplina-danza'],
+    'chips-rol-cir':['chips-rol-circo'], 'chips-mod-cir':['chips-modalidad-circo'],
+    'chips-rol-esc':['chips-rol-escritura'], 'chips-formato-esc':['chips-formato-escritura']
+  };
 
   // Helpers para campos_especificos
   function getCampoEspecifico(p, secId) {
-    if (!p.campos_especificos) return '';
-    try {
-      const c = typeof p.campos_especificos === 'string' ? JSON.parse(p.campos_especificos) : p.campos_especificos;
-      const key = CAMPO_KEY_ALIAS[secId] || secId;
-      return (c[key] && c[key][0]) || '';
-    } catch(e) { return ''; }
+    return getCamposEspecificosArray(p, secId)[0] || '';
   }
   function getCamposEspecificosArray(p, secId) {
-    if (!p.campos_especificos) return [];
+    if (!p.campos_especificos || !secId) return [];
     try {
       const c = typeof p.campos_especificos === 'string' ? JSON.parse(p.campos_especificos) : p.campos_especificos;
-      const key = CAMPO_KEY_ALIAS[secId] || secId;
-      return c[key] || [];
+      if (!c || typeof c !== 'object' || Array.isArray(c)) return [];
+      const canonical = CAMPO_KEY_ALIAS[secId] || secId;
+      const aliases = [secId, ...(CAMPO_LEGACY_IDS[secId] || [])];
+      const key = Object.prototype.hasOwnProperty.call(c, canonical)
+        ? canonical
+        : aliases.find(alias => Object.prototype.hasOwnProperty.call(c, alias));
+      const values = key ? c[key] : null;
+      return (Array.isArray(values) ? values : [values])
+        .filter(value => typeof value === 'string').map(value => value.trim()).filter(Boolean);
     } catch(e) { return []; }
   }
 

@@ -485,6 +485,11 @@
   .save-bar-text { font-size: 0.82rem; color: var(--gris); }
   .save-bar-text strong { color: var(--neon); font-weight: 400; }
   .save-actions { display: flex; gap: 1rem; }
+  #profile-save-feedback { display:none; margin-top:.35rem; max-width:52rem; font-size:.8rem; line-height:1.4; color:var(--neon); }
+  #profile-save-feedback:not(:empty) { display:block; }
+  #profile-save-feedback.error { color:#ffaaa0; }
+  .save-actions button { min-height:44px; }
+  #mi-rubro-contenido .chip { min-height:44px; white-space:normal; text-align:left; }
 
   /* HINT */
   .hint {
@@ -801,6 +806,15 @@
       gap:.75rem !important;
     }
     .save-actions { display:grid !important; grid-template-columns:1fr 1fr !important; gap:.6rem !important; }
+    .layout { grid-template-columns:minmax(0,1fr) !important; }
+    .main, .config-section, .field, .field-row > * { min-width:0; max-width:100%; }
+    .main { width:100%; padding-bottom:14rem !important; }
+    .save-actions { grid-template-columns:minmax(0,1fr) !important; }
+    .save-actions .btn-neon { width:100%; white-space:normal; }
+    .save-bar-text { min-width:0; overflow-wrap:anywhere; }
+    .videos-highlight-header { flex-direction:column; }
+    .videos-highlight-header > div { min-width:0; max-width:100%; }
+    .videos-highlight-desc .examples { overflow-wrap:anywhere; }
   }
 
 </style>
@@ -1301,7 +1315,7 @@
 
 <!-- SAVE BAR -->
 <div class="save-bar" id="save-bar">
-  <div class="save-bar-text">Tenés <strong>cambios sin guardar</strong></div>
+  <div class="save-bar-text"><span id="profile-save-label">Tenés <strong>cambios sin guardar</strong></span><div id="profile-save-feedback" role="status" aria-live="polite"></div></div>
   <div class="save-actions">
     <button class="btn-ghost" onclick="hideSaveBar()">Descartar</button>
     <button class="btn-neon" onclick="saveProfile()">Guardar cambios</button>
@@ -1328,6 +1342,35 @@
   const tipoCuentaActivo = localStorage.getItem('ba_tipo_cuenta') || 'artista';
 
   let isLoadingProfile = true;
+  let isSavingProfile = false;
+  let perfilCargado = null;
+  let camposPerfilCargados = {};
+  let profileEditRevision = 0;
+  let profileSaveTimer = null;
+  let profileLoadVersion = 0;
+
+  // Estos guardas evitan mezclar formularios/cuentas, no sustituyen permisos del servidor.
+  function mismaCuentaPerfil(id) {
+    try {
+      return localStorage.getItem('ba_logged') === '1' &&
+        String(localStorage.getItem('ba_user_id') || '') === String(id || '') &&
+        (localStorage.getItem('ba_rubro') || 'musica') === rubroActivo &&
+        (localStorage.getItem('ba_tipo_cuenta') || 'artista') === tipoCuentaActivo;
+    } catch(e) { return false; }
+  }
+
+  function parseCamposPerfil(value) {
+    if (value == null || value === '') return {};
+    const campos = typeof value === 'string' ? JSON.parse(value) : value;
+    if (!campos || typeof campos !== 'object' || Array.isArray(campos)) throw new Error('Formato de campos del perfil inválido.');
+    return campos;
+  }
+
+  function comparableCampos(value) {
+    if (Array.isArray(value)) return value.map(comparableCampos);
+    if (value && typeof value === 'object') return Object.fromEntries(Object.keys(value).sort().map(key => [key, comparableCampos(value[key])]));
+    return value;
+  }
 
   // ═══════════════════════════════════════
   // INIT PERFIL — adapta la página al rubro
@@ -1445,7 +1488,7 @@
       ],
       secciones: [
         { label:'¿Cuál es tu rol?', id:'chips-rol-dan', chips:['Bailarín/a','Coreógrafo','Profesor de danza','Bailarín de sesión'] },
-        { label:'Disciplina', id:'chips-disc-dan', chips:['Contemporáneo','Urbano / Hip-hop','Tango','Folclore','Ballet','Danza clásica','Salsa / Ritmos latinos','Flamenco','Danza árabe','Danza aérea','Swing','Pole dance','Expresión corporal'] },
+        { label:'Estilos de danza', hint:'Podés elegir varios. Para reemplazar un estilo, desmarcá el anterior.', id:'chips-disc-dan', chips:['Contemporáneo','Urbano / Hip-hop','Tango','Folclore','Ballet','Danza clásica','Salsa / Ritmos latinos','Flamenco','Danza árabe','Danza aérea','Swing','Pole dance','Expresión corporal'] },
         { label:'Nivel', id:'chips-nivel-dan', chips:['Amateur','Semiprofesional','Profesional'] },
       ]
     },
@@ -1517,6 +1560,13 @@
     'chips-rol-maq':'rol',         'chips-esp-maq':'especialidad',
     'chips-rol-cir':'especialidad','chips-mod-cir':'modalidad',
     'chips-rol-esc':'rol',         'chips-formato-esc':'formato'
+  };
+  const SECTION_LEGACY_IDS = {
+    'chips-rol-act':['chips-rol-actuacion'], 'chips-escena':['chips-tipo-escena'],
+    'chips-rol-dis':['chips-rol-diseno'], 'chips-estilo-dis':['chips-estilo-diseno'],
+    'chips-rol-dan':['chips-rol-danza'], 'chips-disc-dan':['chips-disciplina-danza'], 'chips-nivel-dan':['chips-nivel-danza'],
+    'chips-rol-cir':['chips-rol-circo'], 'chips-mod-cir':['chips-modalidad-circo'],
+    'chips-rol-esc':['chips-rol-escritura'], 'chips-formato-esc':['chips-formato-escritura']
   };
 
   function initPerfil(rubro) {
@@ -1611,9 +1661,10 @@
         </div>`;
       } else {
         html += `<div class="field" style="margin-bottom:.5rem"><label>${sec.label}</label></div>`;
+        if (sec.hint) html += `<p class="hint" id="${sec.id}-hint" style="margin-bottom:.7rem;color:var(--gris)">${escapeHtml(sec.hint)}</p>`;
         html += `<div class="chips" id="${sec.id}">`;
         (sec.chips || []).forEach(chip => {
-          html += `<button class="chip" onclick="toggleChip(this)">${chip}</button>`;
+          html += `<button class="chip" aria-pressed="false" onclick="toggleChip(this)">${chip}</button>`;
         });
         html += `</div>`;
       }
@@ -1648,9 +1699,12 @@
 
   function showStatus(message, type = 'ok') {
     const el = document.getElementById('profile-status');
-    if (!el) return;
-    el.textContent = message;
-    el.className = 'form-status show' + (type === 'error' ? ' error' : '');
+    if (el) {
+      el.textContent = message;
+      el.className = 'form-status show' + (type === 'error' ? ' error' : '');
+    }
+    const feedback = document.getElementById('profile-save-feedback');
+    if (feedback) { feedback.textContent = message; feedback.className = type === 'error' ? 'error' : ''; }
   }
 
   function clearStatus() {
@@ -1658,6 +1712,8 @@
     if (!el) return;
     el.textContent = '';
     el.className = 'form-status';
+    const feedback = document.getElementById('profile-save-feedback');
+    if (feedback) feedback.textContent = '';
   }
 
   function normalizeUrl(value) {
@@ -1668,7 +1724,10 @@
   }
 
   function resetFormSelections() {
-    document.querySelectorAll('.chip.selected, .disp-card.selected').forEach(el => el.classList.remove('selected'));
+    document.querySelectorAll('.chip.selected, .disp-card.selected').forEach(el => {
+      el.classList.remove('selected');
+      if (el.hasAttribute('aria-pressed')) el.setAttribute('aria-pressed', 'false');
+    });
   }
 
   async function optimizeProfileImage(file) {
@@ -1733,7 +1792,7 @@
   }
 
   // CHIPS
-  function toggleChip(el) { el.classList.toggle('selected'); showSaveBar(); }
+  function toggleChip(el) { el.classList.toggle('selected'); el.setAttribute('aria-pressed', String(el.classList.contains('selected'))); showSaveBar(); }
 
   // DISPONIBILIDAD
   function toggleDisp(el) { el.classList.toggle('selected'); showSaveBar(); }
@@ -1847,11 +1906,16 @@
   let saveBarVisible = false;
   function showSaveBar() {
     if (isLoadingProfile) return;
+    profileEditRevision++;
+    clearTimeout(profileSaveTimer);
     document.getElementById('save-bar')?.classList.add('visible');
+    const label = document.getElementById('profile-save-label');
+    if (label) label.textContent = 'Tenés cambios sin guardar';
     saveBarVisible = true;
-    clearStatus();
+    if (!isSavingProfile) clearStatus();
   }
   function hideSaveBar() {
+    if (isSavingProfile) return;
     document.getElementById('save-bar')?.classList.remove('visible');
     saveBarVisible = false;
   }
@@ -1868,7 +1932,10 @@
 
   // CARGAR PERFIL AL ENTRAR
   async function cargarPerfil() {
+    if (isSavingProfile) return;
     if (!miId) { isLoadingProfile = false; return; }
+    const loadVersion = ++profileLoadVersion;
+    perfilCargado = null;
     isLoadingProfile = true;
     resetFormSelections();
 
@@ -1876,18 +1943,21 @@
     initPerfil(rubroActivo);
 
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${encodeURIComponent(miId)}&select=*`, { headers: hdrs });
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${encodeURIComponent(miId)}&select=*`, { headers: hdrs, cache:'no-store' });
       if (!res.ok) {
         const errText = await res.text().catch(() => '');
         throw new Error(`Supabase respondió ${res.status}. ${errText}`);
       }
 
       const data = await res.json();
+      if (loadVersion !== profileLoadVersion) return;
+      if (!mismaCuentaPerfil(miId)) throw new Error('La cuenta cambió durante la carga.');
       const p = Array.isArray(data) ? data[0] : null;
-      if (!p) {
+      if (!p || data.length !== 1 || String(p.id) !== String(miId)) {
         showStatus('No encontramos tu perfil. Probá volver a ingresar.', 'error');
         return;
       }
+      camposPerfilCargados = rubroActivo === 'musica' ? {} : parseCamposPerfil(p.campos_especificos);
 
       // Llenar campos de texto
       const nombreInput = document.getElementById('reg-nombre-perfil') || document.querySelector('#foto input[type=text]');
@@ -1933,28 +2003,38 @@
         }
       } else {
         // Cargar campos_especificos (claves canónicas) en las secciones del rubro activo
-        if (p.campos_especificos) {
-          try {
-            const campos = typeof p.campos_especificos === 'string'
-              ? JSON.parse(p.campos_especificos)
-              : p.campos_especificos;
+        {
+            const campos = camposPerfilCargados;
             const secciones = (RUBROS_PERFIL_CONFIG[rubroActivo] || {}).secciones || [];
             secciones.forEach(sec => {
               const key = SECTION_KEYS[sec.id] || sec.id;
               // canónica primero; fallback al id de sección por si quedó algún dato viejo
-              const values = (campos[key] != null) ? campos[key] : campos[sec.id];
+              const legacyKey = [sec.id, ...(SECTION_LEGACY_IDS[sec.id] || [])].find(alias => Object.hasOwn(campos, alias));
+              const values = Object.hasOwn(campos, key) ? campos[key] : campos[legacyKey];
               if (values == null) return;
               if (sec.type === 'textarea') {
+                if (typeof values !== 'string' && !(Array.isArray(values) && values.every(value => typeof value === 'string'))) throw new Error('No se pudo interpretar el texto guardado.');
                 const ta = document.getElementById(sec.id);
                 if (ta) ta.value = Array.isArray(values) ? values.join(', ') : String(values);
               } else {
                 const arr = Array.isArray(values) ? values : [values];
-                document.querySelectorAll(`#${sec.id} .chip`).forEach(chip => {
-                  if (arr.includes(chip.textContent.trim())) chip.classList.add('selected');
+                if (arr.some(value => typeof value !== 'string')) throw new Error('No se pudieron interpretar las opciones guardadas.');
+                const container = document.getElementById(sec.id);
+                if (!container) return;
+                // Una opción histórica no ofrecida hoy sigue visible y se puede quitar deliberadamente.
+                arr.map(value => value.trim()).filter(Boolean).forEach(value => {
+                  let chip = [...container.querySelectorAll('.chip')].find(chip => chip.textContent.trim() === value);
+                  if (!chip) {
+                    chip = document.createElement('button');
+                    chip.type = 'button'; chip.className = 'chip'; chip.textContent = value;
+                    chip.addEventListener('click', () => toggleChip(chip));
+                    container.appendChild(chip);
+                  }
+                  chip.classList.add('selected');
+                  chip.setAttribute('aria-pressed', 'true');
                 });
               }
             });
-          } catch(e) { console.error('Error cargando campos_especificos:', e); }
         }
       }
 
@@ -2041,12 +2121,15 @@
       if (sideMeta) sideMeta.textContent = `${rubroActivo === 'musica' ? (p.instrumento || 'Músico').split(',')[0] : rubroLabel} · ${p.ciudad || '—'}`;
 
       actualizarCompletitud(p);
+      perfilCargado = p;
+      profileEditRevision = 0;
       hideSaveBar();
     } catch(e) {
+      if (loadVersion !== profileLoadVersion) return;
       showStatus('Error cargando tu perfil. Revisá la conexión e intentá de nuevo.', 'error');
       console.error('Error cargando perfil:', e);
     } finally {
-      isLoadingProfile = false;
+      if (loadVersion === profileLoadVersion) isLoadingProfile = false;
     }
   }
 
@@ -2072,16 +2155,23 @@
 
   // GUARDAR PERFIL
   async function saveProfile() {
-    const miIdActual = localStorage.getItem('ba_user_id');
-    if (!miIdActual) { showStatus('Necesitás estar logueado para guardar.', 'error'); return; }
+    if (isSavingProfile) return;
+    if (!Object.hasOwn(RUBROS_PERFIL_CONFIG, rubroActivo)) {
+      showStatus('No pudimos identificar el rubro del perfil. Elegí un rubro válido antes de guardar.', 'error');
+      return;
+    }
+    if (isLoadingProfile || !perfilCargado) {
+      showStatus('Esperá a que cargue tu perfil. Si hubo un error, recargá la página antes de guardar.', 'error');
+      return;
+    }
+    const miIdActual = perfilCargado.id;
+    if (!mismaCuentaPerfil(miIdActual)) {
+      showStatus('La cuenta o el rubro cambió. Recargá tu perfil antes de guardar.', 'error');
+      return;
+    }
 
     const btn = document.querySelector('.save-bar .btn-neon');
     const saveBar = document.getElementById('save-bar');
-    if (btn) {
-      btn.textContent = 'Guardando...';
-      btn.disabled = true;
-    }
-    saveBar?.classList.add('saving');
 
     // Recolectar datos
     const nombre = (document.getElementById('reg-nombre-perfil') || document.querySelector('#foto input[type=text]'))?.value?.trim() || '';
@@ -2097,7 +2187,12 @@
       referentes_str = perfReferentes.join(', ');
     } else {
       // Recolectar campos de mi-rubro como JSON, con claves canónicas (rol, estilo, etc.)
-      const camposObj = {};
+      // Reemplazar sólo lo que permite editar este formulario y preservar campos desconocidos.
+      const camposObj = { ...camposPerfilCargados };
+      (RUBROS_PERFIL_CONFIG[rubroActivo]?.secciones || []).forEach(sec => {
+        delete camposObj[SECTION_KEYS[sec.id] || sec.id];
+        [sec.id, ...(SECTION_LEGACY_IDS[sec.id] || [])].forEach(alias => { delete camposObj[alias]; });
+      });
       document.querySelectorAll('#mi-rubro-contenido .chips').forEach(chipsDiv => {
         const key = SECTION_KEYS[chipsDiv.id] || chipsDiv.id;
         const selected = [...chipsDiv.querySelectorAll('.chip.selected')].map(c => c.textContent.trim());
@@ -2108,7 +2203,8 @@
         const key = SECTION_KEYS[ta.id] || ta.id;
         if (key && ta.value.trim()) camposObj[key] = ta.value.trim();
       });
-      if (Object.keys(camposObj).length) campos_especificos = JSON.stringify(camposObj);
+      // {} también se envía: omitir el campo resucitaría la selección anterior al recargar.
+      campos_especificos = JSON.stringify(camposObj);
     }
 
     const disponibilidad = [...document.querySelectorAll('#disponibilidad .disp-card.selected')].map(c => c.querySelector('.disp-title')?.textContent?.trim()).filter(Boolean).join(', ');
@@ -2140,6 +2236,17 @@
       if (plat && val) redesObj[plat] = val;
     });
 
+    const revisionEnviada = profileEditRevision;
+    isSavingProfile = true;
+    clearTimeout(profileSaveTimer);
+    if (btn) { btn.textContent = 'Guardando...'; btn.disabled = true; }
+    const discard = saveBar?.querySelector('.btn-ghost');
+    if (discard) discard.disabled = true;
+    saveBar?.classList.add('visible', 'saving');
+    showStatus('Guardando tus cambios…');
+    const controller = new AbortController();
+    const requestTimeout = setTimeout(() => controller.abort(), 20000);
+    let failureMessage = 'No pudimos confirmar el guardado. Conservamos tus cambios; revisá tu perfil antes de volver a guardar.';
     try {
       const payload = {
         nombre,
@@ -2161,45 +2268,63 @@
         // Nuevos campos — se activan con la actualización de Supabase el 14/6
         tipo_cuenta: tipoCuentaActivo,
         rubro: rubroActivo,
-        ...(campos_especificos ? { campos_especificos } : {})
+        ...(rubroActivo !== 'musica' ? { campos_especificos } : {})
       };
 
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${encodeURIComponent(miIdActual)}`, {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${encodeURIComponent(miIdActual)}&select=id,campos_especificos`, {
         method: 'PATCH',
-        headers: { ...hdrs, 'Prefer': 'return=minimal' },
-        body: JSON.stringify(payload)
+        headers: { ...hdrs, 'Prefer': 'return=representation' },
+        body: JSON.stringify(payload),
+        signal: controller.signal
       });
 
-      if (res.ok || res.status === 204) {
+      if (!res.ok) {
+        failureMessage = res.status >= 500
+          ? 'No pudimos confirmar el guardado. Conservamos tus cambios; revisá tu perfil antes de volver a guardar.'
+          : 'No se pudieron guardar los cambios. Conservamos tu selección; revisá tu sesión e intentá de nuevo.';
+        throw new Error('HTTP ' + res.status);
+      }
+      const rows = await res.json();
+      if (!Array.isArray(rows) || rows.length !== 1 || String(rows[0]?.id) !== String(miIdActual)) {
+        throw new Error('La respuesta no confirma una actualización del perfil esperado.');
+      }
+      if (rubroActivo !== 'musica') {
+        const confirmed = parseCamposPerfil(rows[0].campos_especificos);
+        if (!Object.hasOwn(rows[0], 'campos_especificos') ||
+            JSON.stringify(comparableCampos(confirmed)) !== JSON.stringify(comparableCampos(JSON.parse(campos_especificos)))) {
+          throw new Error('La respuesta no confirma las opciones enviadas.');
+        }
+      }
+      if (!mismaCuentaPerfil(miIdActual)) {
+        showStatus('La cuenta cambió durante el guardado. Recargá tu perfil para revisar el resultado.', 'error');
+        return;
+      }
+      perfilCargado = { ...perfilCargado, ...payload };
+      if (rubroActivo !== 'musica') camposPerfilCargados = parseCamposPerfil(rows[0].campos_especificos);
+      // Un fallo de caché local no puede convertir una actualización confirmada en un error remoto.
+      try {
         localStorage.setItem('ba_name', nombre);
         localStorage.setItem('ba_referentes', payload.referentes || '');
         localStorage.setItem('ba_generos', generos || '');
+      } catch(e) {}
+      actualizarCompletitud(perfilCargado);
+      if (profileEditRevision === revisionEnviada) {
         showStatus('Perfil guardado correctamente.');
-        actualizarCompletitud({ ...payload, redes: payload.redes });
-        if (btn) {
-          btn.textContent = '✓ Guardado';
-          btn.style.background = '#a8c832';
-        }
-        setTimeout(() => {
-          if (btn) {
-            btn.textContent = 'Guardar cambios';
-            btn.style.background = '';
-            btn.disabled = false;
-          }
-          saveBar?.classList.remove('saving');
-          hideSaveBar();
+        const label = document.getElementById('profile-save-label');
+        if (label) label.textContent = '✓ Cambios guardados';
+        profileSaveTimer = setTimeout(() => {
+          if (!isSavingProfile && profileEditRevision === revisionEnviada && mismaCuentaPerfil(miIdActual)) hideSaveBar();
         }, 1400);
       } else {
-        const errText = await res.text().catch(() => '');
-        console.error('Save error:', res.status, errText);
-        showStatus('Error al guardar. Intentá de nuevo.', 'error');
-        if (btn) { btn.textContent = 'Guardar cambios'; btn.disabled = false; }
-        saveBar?.classList.remove('saving');
+        showStatus('Se guardó lo enviado. Tenés cambios nuevos sin guardar.');
       }
     } catch(e) {
-      showStatus('No se pudo conectar. Verificá tu conexión.', 'error');
-      console.error(e);
+      showStatus(mismaCuentaPerfil(miIdActual) ? failureMessage : 'La cuenta cambió durante el guardado. Recargá tu perfil para revisar el resultado.', 'error');
+    } finally {
+      clearTimeout(requestTimeout);
+      isSavingProfile = false;
       if (btn) { btn.textContent = 'Guardar cambios'; btn.disabled = false; }
+      if (discard) discard.disabled = false;
       saveBar?.classList.remove('saving');
     }
   }

@@ -1,6 +1,6 @@
 // ⚠️ IMPORTANTE: subí este número en CADA deploy (v3 → v4 → v5...).
 // Si no lo cambiás, el navegador puede seguir sirviendo los archivos viejos cacheados.
-const CACHE_VERSION = 'buscarte-v12-2026-09-05-marketplace';
+const CACHE_VERSION = 'buscarte-v13-2026-09-06-perfil-danza';
 const OFFLINE_URL = '/index.html';
 
 const SHELL = [

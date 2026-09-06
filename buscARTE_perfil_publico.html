@@ -1176,18 +1176,34 @@
                   secPortfolio:{icon:'📄',title:'Portfolio / Publicaciones'} },
   }
 
+  // Alias históricos del editor/registro, separados por rubro para no mezclar roles.
+  const CAMPO_LEGACY_IDS = {
+    actuacion: { rol:['chips-rol-act','chips-rol-actuacion'], tipo_escena:['chips-escena','chips-tipo-escena'] },
+    audiovisual: { rol:['chips-rol-av'], especialidad:['chips-esp-av'] },
+    modelaje: { tipo_trabajo:['chips-tipo-modelo'], genero:['chips-genero-modelo'] },
+    diseno: { rol:['chips-rol-dis','chips-rol-diseno'], estilo:['chips-estilo-dis','chips-estilo-diseno'] },
+    tatuaje: { rol:['chips-rol-tatu'], estilo:['chips-estilo-tatu'] },
+    danza: { rol:['chips-rol-dan','chips-rol-danza'], disciplina:['chips-disc-dan','chips-disciplina-danza'] },
+    maquillaje: { rol:['chips-rol-maq'], especialidad:['chips-esp-maq'] },
+    circo: { especialidad:['chips-rol-cir','chips-rol-circo'], modalidad:['chips-mod-cir','chips-modalidad-circo'] },
+    escritura: { rol:['chips-rol-esc','chips-rol-escritura'], formato:['chips-formato-esc','chips-formato-escritura'] },
+  }
   function getCampoEspecifico(p, secId) {
-    if (!p.campos_especificos) return ''
-    try {
-      const c = typeof p.campos_especificos === 'string' ? JSON.parse(p.campos_especificos) : p.campos_especificos
-      return (c[secId] && c[secId][0]) || ''
-    } catch(e) { return '' }
+    return getCamposEspecificosArray(p, secId)[0] || ''
   }
   function getCamposEspecificosArray(p, secId) {
     if (!p.campos_especificos || !secId) return []
     try {
       const c = typeof p.campos_especificos === 'string' ? JSON.parse(p.campos_especificos) : p.campos_especificos
-      return Array.isArray(c[secId]) ? c[secId] : (c[secId] ? [c[secId]] : [])
+      if (!c || typeof c !== 'object' || Array.isArray(c)) return []
+      const aliases = (CAMPO_LEGACY_IDS[p.rubro] || {})[secId] || []
+      const key = Object.prototype.hasOwnProperty.call(c, secId)
+        ? secId
+        : aliases.find(alias => Object.prototype.hasOwnProperty.call(c, alias))
+      // Una canónica vacía es un borrado explícito, no una invitación a usar el alias viejo.
+      const values = key ? c[key] : null
+      return (Array.isArray(values) ? values : [values])
+        .filter(value => typeof value === 'string').map(value => value.trim()).filter(Boolean)
     } catch(e) { return [] }
   }
   // Claves canónicas de campos_especificos que escribe el REGISTRO, por rubro.
@@ -1454,7 +1470,11 @@
       // Tags (hero) — primeros 3 géneros/disciplinas del perfil
       const tags = document.getElementById('perfil-tags')
       if (tags) {
-        tags.innerHTML = generos.slice(0,3).map(g=>`<span class="ptag">${escapeHtml(g)}</span>`).join('')
+        // El hero usa la misma fuente que la sección de disciplina; generos es de música.
+        const disciplinas = rubro === 'musica'
+          ? generos
+          : getCamposEspecificosArray(p, (CAMPO_KEYS[rubro]||{}).gen)
+        tags.innerHTML = disciplinas.slice(0,3).map(g=>`<span class="ptag">${escapeHtml(g)}</span>`).join('')
       }
 
       // Disponibilidad
