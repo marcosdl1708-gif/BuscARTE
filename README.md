@@ -3,7 +3,13 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
-## Estado operativo — roles técnicos publicados, 6/9/2026
+## Estado operativo — perfil de Modelaje corregido, 11/9/2026
+
+Publicado a las **19:36 ART**, deploy `6aa48252875c3a2023f75eaf`, fuente `646640f`, caché v19. En Modelaje, la sección Tipo de trabajo lee `tipo_trabajo`; el género conserva su stat y tags. Portfolio vacío muestra «Sin material de portfolio cargado». Sin cambios de datos, filtros, funciones, cuentas, migración o Android. Cuatro pruebas específicas y build36 aprobados; perfil/SW verificados en producción; cinco funciones y ambos horarios idénticos. Informe `docs/release-perfil-modelaje-20260911.md`.
+
+El cierre se sincroniza a GitHub con `[skip netlify]` para no duplicar el deploy. **Hay una modificación previa ajena en `docs/guia-prueba-app-usuario-nuevo.md`, preservada sin incluir en commits ni publicación.** No limpiarla automáticamente. Validación física de este arreglo a cargo del usuario/testers, sin repetir toda la guía.
+
+### Histórico — roles técnicos publicados, 6/9/2026
 
 **Publicado a las 18:13 ART:** deploy `6a9dd772a759ecdf9c3c56e5`, fuente `04b584d`, caché v18. Los cinco roles técnicos ya están en Música: registro, perfil, búsqueda y Busco/Ofrezco/filtros. Conservan datos/campos existentes; no son rubros nuevos ni categorías del Marketplace. Sin migración Auth, cambios de cuentas, horarios o Android. El guardado con contraseña y los mails anteriores se conservan.
 

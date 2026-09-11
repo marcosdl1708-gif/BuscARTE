@@ -2,6 +2,10 @@
 
 Este seguimiento separa implementación web, validación física y resultados de uso. No reabre automáticamente bloques postergados.
 
+## Feedback del 11/9 — Modelaje
+
+Captura de perfil con «Tipo de trabajo → Mujer», aunque el resumen muestra correctamente «Publicidad» y «Género → Mujer». Confirmado en fuente publicada: título y campo de sección cruzados. Corrección y deploy autorizados con «go»: sección lee los tipos de trabajo sin modificar género/stats/tags; texto vacío del portfolio neutro sólo para Modelaje. **Publicado** `6aa48252875c3a2023f75eaf`, fuente `646640f`, v19, 11/9 a las 19:36 ART. Cuatro comprobaciones específicas y build36, scripts/SW online y funciones/horarios sin cambios. Detalle en `release-perfil-modelaje-20260911.md`. Sin datos reales de prueba ni validación física nueva.
+
 ## Actualización vigente — roles publicados y guía única
 
 El usuario aclaró que la guía debía usarse después de publicar todos los cambios y autorizó el deploy de roles. **Publicado el 6/9 a las 18:13 ART**, `6a9dd772a759ecdf9c3c56e5`/v18, fuente `04b584d`. Las cinco especialidades de Música están verificadas en las cuatro páginas públicas; sin cambiar rubros, datos, Marketplace, Auth o Android. Cuatro pruebas locales específicas y build36; no se hicieron envíos, cuentas o publicaciones de prueba reales.
