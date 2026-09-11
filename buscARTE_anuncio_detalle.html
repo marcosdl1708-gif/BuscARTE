@@ -399,6 +399,12 @@
   .btn-reaction.active { border-color:var(--neon);color:var(--neon);background:rgba(212,245,60,.06); }
   .btn-reaction.asistire.active { border-color:#5b9fff;color:#5b9fff;background:rgba(91,159,255,.06); }
   .btn-reaction .r-count { font-size:.72rem;opacity:.8; }
+  .btn-reaction[hidden] { display:none; }
+  .attendance-status { font-size:.85rem;line-height:1.5;color:var(--neon);margin-top:.75rem; }
+  .attendance-status:empty { display:none; }
+  .attendance-status.is-error { color:#ffab91; }
+  .contact-form label { display:block;font-size:.85rem;margin-bottom:.6rem; }
+  .btn-reaction:disabled, .btn-send:disabled { opacity:.65;cursor:default; }
   .detail-desc { background:rgba(255,255,255,.015);border:1px solid #171717;padding:1.15rem 1.25rem; }
   .foto-main { min-height:220px; }
   .ficha { border-color:#242424; }
@@ -1084,15 +1090,16 @@
     }
 
     const loginBlock = logged
-      ? `<textarea placeholder="Escribí tu mensaje..."></textarea>
-         <button class="btn-send" onclick="sendMsg(this)" data-anuncio-id="${escapeAttr(id)}" data-para-id="${escapeAttr(a.user_id || '')}">${btnText}</button>`
+      ? `${tipo === 'jam' ? '<label for="attendance-message">Mensaje al organizador (opcional)</label>' : ''}<textarea ${tipo === 'jam' ? 'id="attendance-message" oninput="actualizarAsistenciaUI()"' : ''} placeholder="${tipo === 'jam' ? 'Si querés, contá cómo vas a participar…' : 'Escribí tu mensaje...'}"></textarea>
+         <button class="btn-send" ${tipo === 'jam' ? 'id="btn-confirmar-asistencia" onclick="confirmarAsistencia(this)"' : 'onclick="sendMsg(this)"'} data-anuncio-id="${escapeAttr(id)}" data-para-id="${escapeAttr(a.user_id || '')}">${btnText}</button>
+         ${tipo === 'jam' ? '<div class="attendance-status" data-asistencia-status role="status" aria-live="polite"></div>' : ''}`
       : `<div class="detail-note"><strong>El anuncio es público.</strong><br>Para responder, consultar o apuntarte necesitás una cuenta gratis.</div>
          <a class="btn-send" href="buscARTE_login.html?next=${encodeURIComponent(location.pathname + location.search)}" style="display:block;text-align:center;text-decoration:none">Ingresar para responder →</a>
          <a class="btn-secondary-action" href="buscARTE_registro.html">Crear cuenta gratis</a>`
 
     return `<div class="sidebar-card is-contact contact-anchor-offset" id="contact-card">
       <div class="sidebar-card-title">${escapeHtml(title)}</div>
-      <div class="sidebar-card-sub">${tipo === 'jam' ? 'Confirmá asistencia y contale al organizador cómo participás.' : tipo === 'vende' ? 'Consultá antes de coordinar una compra, prueba o retiro.' : tipo === 'clases' ? 'Preguntá horarios, modalidad y disponibilidad.' : 'Contale quién sos y por qué te interesa.'}</div>
+      <div class="sidebar-card-sub">${tipo === 'jam' ? 'Confirmá tu asistencia. No hace falta escribir un mensaje.' : tipo === 'vende' ? 'Consultá antes de coordinar una compra, prueba o retiro.' : tipo === 'clases' ? 'Preguntá horarios, modalidad y disponibilidad.' : 'Contale quién sos y por qué te interesa.'}</div>
       <div class="contact-form">${loginBlock}</div>
     </div>`
   }
@@ -1101,7 +1108,7 @@
     const card = document.getElementById('contact-card')
     if (card) {
       card.scrollIntoView({ behavior:'smooth', block:'start' })
-      setTimeout(() => card.querySelector('textarea')?.focus(), 450)
+      setTimeout(() => (card.querySelector('#btn-confirmar-asistencia') || card.querySelector('textarea'))?.focus(), 450)
     }
   }
 
@@ -1122,10 +1129,113 @@
 
   // ── REACCIONES (me gusta / asistiré) ──────────────────────────────────────
   let reaccionesState = { like: false, asistire: false }
+  let eventoActual = null
+  let asistenciaOcupada = false
+  let asistenciaRevision = 0
+
+  function estadoAsistencia(texto, error = false) {
+    document.querySelectorAll('[data-asistencia-status]').forEach(el => {
+      el.textContent = texto
+      el.classList.toggle('is-error', error)
+    })
+  }
+
+  function actualizarAsistenciaUI() {
+    const activa = reaccionesState.asistire
+    const top = document.getElementById('btn-asistire')
+    if (top) {
+      top.disabled = asistenciaOcupada || activa
+      top.classList.toggle('active', activa)
+      top.setAttribute('aria-pressed', String(activa))
+      top.querySelector('.r-label').textContent = activa ? '✓ Asistencia confirmada' : '🎟 Asistiré'
+    }
+    const cancelar = document.getElementById('btn-cancelar-asistencia')
+    if (cancelar) { cancelar.hidden = !activa; cancelar.disabled = asistenciaOcupada }
+    const ta = document.getElementById('attendance-message')
+    if (ta) ta.readOnly = asistenciaOcupada
+    const btn = document.getElementById('btn-confirmar-asistencia')
+    if (btn) {
+      btn.disabled = asistenciaOcupada || (activa && !ta?.value.trim())
+      btn.textContent = asistenciaOcupada ? 'Procesando…' : activa ? (ta?.value.trim() ? 'Enviar mensaje →' : '✓ Asistencia confirmada') : 'Confirmar asistencia →'
+    }
+  }
+
+  async function confirmarAsistencia(btn) { return guardarAsistencia(true, btn?.id === 'btn-confirmar-asistencia' ? btn : null) }
+
+  async function cancelarAsistencia() {
+    if (asistenciaOcupada || !reaccionesState.asistire) return
+    if (confirm('¿Querés cancelar tu asistencia a este evento?')) await guardarAsistencia(false)
+  }
+
+  async function guardarAsistencia(asistir, mensajeBtn = null) {
+    if (asistenciaOcupada || !eventoActual) return
+    const miId = localStorage.getItem('ba_user_id')
+    if (localStorage.getItem('ba_logged') !== '1' || !miId) {
+      if (confirm('Para confirmar asistencia necesitás ingresar. ¿Querés hacerlo ahora?')) {
+        window.location.href = 'buscARTE_login.html?next=' + encodeURIComponent(location.pathname + location.search)
+      }
+      return
+    }
+    const anuncioId = eventoActual.id
+    if (![miId, anuncioId].every(v => /^\d+$/.test(String(v)) && Number.isSafeInteger(Number(v)) && Number(v) > 0)) {
+      estadoAsistencia('No se pudo identificar la cuenta o el evento. Recargá la página.', true)
+      return
+    }
+    const mismaCuenta = () => localStorage.getItem('ba_logged') === '1' && localStorage.getItem('ba_user_id') === miId
+    const filtro = `anuncio_id=eq.${encodeURIComponent(anuncioId)}&user_id=eq.${encodeURIComponent(miId)}&tipo=eq.asistire`
+    asistenciaOcupada = true
+    asistenciaRevision++ // Ignorar lecturas iniciadas antes de esta operación.
+    actualizarAsistenciaUI()
+    estadoAsistencia(asistir ? 'Confirmando asistencia…' : 'Cancelando asistencia…')
+    let guardada = false
+    try {
+      if (!asistir || !reaccionesState.asistire) {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/reacciones${asistir ? '?on_conflict=user_id,anuncio_id,tipo' : '?' + filtro}`, {
+          method: asistir ? 'POST' : 'DELETE', signal: AbortSignal.timeout(15000),
+          headers: { ...hdrs, Prefer: asistir ? 'resolution=ignore-duplicates,return=minimal' : 'return=minimal' },
+          ...(asistir ? { body: JSON.stringify({ anuncio_id: dbId(anuncioId), user_id: dbId(miId), tipo: 'asistire' }) } : {})
+        })
+        if (!res.ok) throw new Error('No se pudo guardar la asistencia')
+      }
+      const verificacion = await fetch(`${SUPABASE_URL}/rest/v1/reacciones?${filtro}&select=tipo`, { headers: hdrs, cache: 'no-store', signal: AbortSignal.timeout(15000) })
+      if (!verificacion.ok) throw new Error('No se pudo verificar la asistencia')
+      const filas = await verificacion.json()
+      if (!mismaCuenta() || !Array.isArray(filas) || filas.length > 1 || filas.some(f => f.tipo !== 'asistire')) throw new Error('Asistencia sin verificar')
+      reaccionesState.asistire = filas.length === 1
+      if (reaccionesState.asistire !== asistir) throw new Error('La asistencia cambió; volver a intentar')
+      guardada = true
+      actualizarAsistenciaUI()
+      if (!mismaCuenta()) throw new Error('Cambió la cuenta')
+      if (asistir && mensajeBtn && document.getElementById('attendance-message')?.value.trim()) {
+        const enviado = await sendMsg(mensajeBtn, true)
+        estadoAsistencia(enviado ? '✓ Asistencia confirmada y mensaje enviado.' : 'Tu asistencia está confirmada. No pudimos confirmar el envío del mensaje; conservamos tu texto. Revisá Mensajes antes de reintentar.', !enviado)
+      } else {
+        estadoAsistencia(asistir ? '✓ Tu asistencia está confirmada. No hace falta enviar un mensaje.' : 'Tu asistencia fue cancelada.')
+      }
+    } catch(e) {
+      estadoAsistencia(!mismaCuenta() ? 'La cuenta cambió. Recargá la página para consultar tu asistencia.' : guardada ? 'La asistencia se guardó, pero no pudimos completar el paso siguiente. Recargá para verificar.' : 'No pudimos confirmar el cambio de asistencia. Intentá nuevamente; no se duplicará.', true)
+    } finally {
+      asistenciaOcupada = false
+      asistenciaRevision++
+      actualizarAsistenciaUI()
+    }
+    // El contador no bloquea el resultado ni el envío del mensaje opcional.
+    if (guardada && mismaCuenta()) {
+      const revision = asistenciaRevision
+      fetch(`${SUPABASE_URL}/rest/v1/reacciones?anuncio_id=eq.${encodeURIComponent(anuncioId)}&tipo=eq.asistire&select=tipo`, { headers: hdrs, cache: 'no-store', signal: AbortSignal.timeout(15000) })
+        .then(res => res.ok ? res.json() : null)
+        .then(filas => {
+          const count = document.getElementById('count-asistire')
+          if (count && mismaCuenta() && revision === asistenciaRevision && Array.isArray(filas)) count.textContent = filas.length
+        }).catch(() => {})
+    }
+  }
 
   async function cargarReacciones(anuncioId) {
     if (!anuncioId) return
     const miId = localStorage.getItem('ba_user_id')
+    const revision = asistenciaRevision
+    const vigente = () => revision === asistenciaRevision && !asistenciaOcupada && miId === localStorage.getItem('ba_user_id')
     try {
       // Contadores totales
       const rTotales = await fetch(
@@ -1139,7 +1249,7 @@
         const elLike = document.getElementById('count-like')
         const elAsistire = document.getElementById('count-asistire')
         if (elLike) elLike.textContent = likes || 0
-        if (elAsistire) elAsistire.textContent = asistencias || 0
+        if (elAsistire && vigente()) elAsistire.textContent = asistencias || 0
       }
 
       // Estado del usuario actual
@@ -1150,7 +1260,12 @@
         )
         if (rMias.ok) {
           const mias = await rMias.json()
+          if (vigente()) {
+            reaccionesState.asistire = mias.some(r => r.tipo === 'asistire')
+            actualizarAsistenciaUI()
+          }
           mias.forEach(r => {
+            if (r.tipo === 'asistire') return
             reaccionesState[r.tipo] = true
             const btn = document.getElementById(`btn-${r.tipo}`)
             if (btn) {
@@ -1167,6 +1282,7 @@
   }
 
   async function toggleReaccion(tipo) {
+    if (tipo === 'asistire') return confirmarAsistencia()
     const miId = localStorage.getItem('ba_user_id')
     const logged = localStorage.getItem('ba_logged') === '1'
     if (!logged || !miId) {
@@ -1295,6 +1411,7 @@
   }
 
   function renderAnuncio(a, autor, id) {
+    eventoActual = normalizarTipo(a.tipo) === 'jam' ? { id: String(id) } : null
     const tipo = normalizarTipo(a.tipo)
     const label = tipo === 'ofrezco' ? getLabelOfrezco(a) : (LABELS[tipo] || escapeHtml(tipo))
     const badge = BADGES[tipo] || 'badge-busco'
@@ -1360,10 +1477,12 @@
       </div>
       <div class="reaction-bar" id="reaction-bar">
         ${tipo === 'jam'
-          ? `<button class="btn-reaction asistire" id="btn-asistire" onclick="toggleReaccion('asistire')">🎟 Asistiré <span class="r-count" id="count-asistire">0</span></button>`
+          ? `<button class="btn-reaction asistire" id="btn-asistire" onclick="confirmarAsistencia()" aria-pressed="false"><span class="r-label">🎟 Asistiré</span> <span class="r-count" id="count-asistire">0</span></button>
+             <button class="btn-reaction" id="btn-cancelar-asistencia" onclick="cancelarAsistencia()" hidden>Cancelar asistencia</button>`
           : ''}
         <button class="btn-reaction like" id="btn-like" onclick="toggleReaccion('like')"><span class="r-label">♡ Me gusta</span> <span class="r-count" id="count-like">0</span></button>
       </div>
+      ${tipo === 'jam' ? '<div class="attendance-status" data-asistencia-status role="status" aria-live="polite"></div>' : ''}
     </section>
 
     ${quickHTML ? `<div class="quick-info-grid">${quickHTML}</div>` : ''}
@@ -1477,7 +1596,7 @@
     </div>`
   }
 
-  async function sendMsg(btn) {
+  async function sendMsg(btn, desdeAsistencia = false) {
     const ta = btn.previousElementSibling
     const texto = ta?.value?.trim()
     if (!texto) { ta?.focus(); return }
@@ -1526,6 +1645,7 @@
         convId = Array.isArray(nuevaJson) && nuevaJson[0] ? nuevaJson[0].id : null
       }
 
+      if (desdeAsistencia && (localStorage.getItem('ba_user_id') !== miId || localStorage.getItem('ba_logged') !== '1')) throw new Error('Cambió la cuenta')
       const msgRes = await fetch(`${SUPABASE_URL}/rest/v1/mensajes`, {
         method: 'POST',
         headers: { ...hdrs, 'Prefer': 'return=minimal' },
@@ -1533,9 +1653,9 @@
       })
       if (!msgRes.ok) throw new Error(await msgRes.text())
 
-      window.MetaAds?.trackOnce('Contact', {
+      try { window.MetaAds?.trackOnce('Contact', {
         content_type: 'artistic_ad'
-      }, `contact-ad:${anuncioId}`)
+      }, `contact-ad:${anuncioId}`) } catch(e) {}
 
       if (convId) {
         fetch(`${SUPABASE_URL}/rest/v1/conversaciones?id=eq.${encodeURIComponent(convId)}`, {
@@ -1566,6 +1686,7 @@
         }
       } catch(e) {}
 
+      if (desdeAsistencia) { ta.value = ''; return true }
       btn.textContent = '✓ Enviado'
       btn.style.background = '#a8c832'
       ta.value = ''
@@ -1577,6 +1698,7 @@
       }, 1300)
     } catch(e) {
       console.error('Error enviando mensaje:', e)
+      if (desdeAsistencia) return false
       alert('No se pudo enviar el mensaje. Intentá de nuevo.')
       btn.textContent = ACTION_BTNS[normalizarTipo(document.querySelector('.anuncio-tipo-badge')?.textContent)] || 'Enviar mensaje →'
       btn.disabled = false
