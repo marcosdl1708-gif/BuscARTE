@@ -1154,8 +1154,8 @@
                   secGeneros:{icon:'🎬',title:'Especialidades'}, secRef:{show:false},
                   secPortfolio:{icon:'🎬',title:'Portfolio / Reel'} },
     modelaje:   { rolLabel:'Tipo de trabajo', generoLabel:'Género', fallbackRol:'Modelo',
-                  secGeneros:{icon:'👗',title:'Tipo de trabajo'}, secRef:{show:false},
-                  secPortfolio:{icon:'📸',title:'Portfolio / Fotos'} },
+                  secGeneros:{icon:'👗',title:'Tipo de trabajo',field:'tipo_trabajo'}, secRef:{show:false},
+                  secPortfolio:{icon:'📸',title:'Portfolio / Fotos',emptyText:'Sin material de portfolio cargado'} },
     diseno:     { rolLabel:'Rol', generoLabel:'Estilo', fallbackRol:'Diseñador/a',
                   secGeneros:{icon:'✏️',title:'Estilo / Técnica'}, secRef:{show:false},
                   secPortfolio:{icon:'🖼️',title:'Portfolio'} },
@@ -1222,6 +1222,11 @@
   }
 
   // ─── UI del rubro: no depende del perfil, se aplica inmediatamente ───
+  function getPortfolioEmptyText(rubro) {
+    const config = RUBROS_PERFIL_CONFIG[rubro] || RUBROS_PERFIL_CONFIG.musica
+    return config.secPortfolio.emptyText || 'Sin videos cargados'
+  }
+
   function inicializarRubroUI(rubro) {
     const config = RUBROS_PERFIL_CONFIG[rubro] || RUBROS_PERFIL_CONFIG.musica
     document.documentElement.style.setProperty('--neon', RUBRO_COLORS[rubro] || '#d4f53c')
@@ -1233,6 +1238,8 @@
     if (sgEl) sgEl.innerHTML = `<span class="icon">${config.secGeneros.icon}</span> ${config.secGeneros.title}`
     const spEl = document.getElementById('section-title-portfolio')
     if (spEl) spEl.innerHTML = `<span class="icon">${config.secPortfolio.icon}</span> ${config.secPortfolio.title}`
+    const emptyPortfolio = document.querySelector('#perfil-videos > .video-item-empty:only-child')
+    if (emptyPortfolio) emptyPortfolio.textContent = getPortfolioEmptyText(rubro)
     const srSec = document.getElementById('section-referentes')
     if (srSec) srSec.style.display = config.secRef.show ? '' : 'none'
     // Actualizar el stat-instrumento label también
@@ -1290,7 +1297,8 @@
           ? generos.map(g=>`<span class="genero-chip primary">${escapeHtml(g)}</span>`).join('')
           : '—'
       } else {
-        const secVals = getCamposEspecificosArray(p, (CAMPO_KEYS[rubro]||{}).gen)
+        // El bloque puede mostrar otro campo sin cambiar el stat de género ni los tags.
+        const secVals = getCamposEspecificosArray(p, config.secGeneros.field || (CAMPO_KEYS[rubro]||{}).gen)
         genEl.innerHTML = secVals.length
           ? secVals.map(v=>`<span class="genero-chip primary">${escapeHtml(v)}</span>`).join('')
           : '—'
@@ -1487,7 +1495,7 @@
 
       // Videos
       const videosEl = document.getElementById('perfil-videos')
-      if (videosEl) videosEl.innerHTML = '<div class="video-item-empty">Sin videos cargados</div>'
+      if (videosEl) videosEl.innerHTML = `<div class="video-item-empty">${escapeHtml(getPortfolioEmptyText(rubro))}</div>`
       if (videosEl && p.videos) {
         const links = p.videos.split(',').map(v=>v.trim()).filter(Boolean)
           .map(v=>({ url: safeUrl(v), raw: v })).filter(x=>x.url)
