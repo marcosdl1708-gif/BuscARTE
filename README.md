@@ -3,7 +3,13 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
-## Estado operativo — perfil de Modelaje corregido, 11/9/2026
+## Estado operativo — asistencia a eventos corregida, 11/9/2026
+
+Publicado a las **19:56 ART**, deploy `6aa4872b940d5068912622e8`, fuente `da86a9c`, caché v20. Confirmar asistencia guarda la reacción existente sin exigir mensaje; mensaje al organizador opcional, confirmación verificada, bloqueo compartido y cancelación explícita. Sin migración, cambios de permisos, funciones, horarios, otros anuncios o Android. Siete pruebas específicas y comprobación móvil aislada aprobadas; build36, HTML/SW online idénticos y cinco funciones/horarios preservados. Informe `docs/release-asistencia-eventos-20260911.md`.
+
+El cierre se sincroniza con `[skip netlify]` para evitar otro deploy. La edición previa de `docs/guia-prueba-app-usuario-nuevo.md` sigue intacta y excluida. Prueba real con teléfono/cuenta a cargo de testers: abrir un evento ajeno, confirmar sin escribir y volver a abrirlo para comprobar persistencia. No se enviaron mensajes ni asistencias reales desde herramientas.
+
+### Histórico — perfil de Modelaje corregido, 11/9/2026
 
 Publicado a las **19:36 ART**, deploy `6aa48252875c3a2023f75eaf`, fuente `646640f`, caché v19. En Modelaje, la sección Tipo de trabajo lee `tipo_trabajo`; el género conserva su stat y tags. Portfolio vacío muestra «Sin material de portfolio cargado». Sin cambios de datos, filtros, funciones, cuentas, migración o Android. Cuatro pruebas específicas y build36 aprobados; perfil/SW verificados en producción; cinco funciones y ambos horarios idénticos. Informe `docs/release-perfil-modelaje-20260911.md`.
 
