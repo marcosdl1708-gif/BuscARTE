@@ -3,7 +3,13 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
-## Estado operativo — asistencia a eventos corregida, 11/9/2026
+## Estado operativo — login y email normalizados, 12/9/2026
+
+Publicado a las **14:50 ART**, deploy `6aa590c8dcefc07a7832050d`, fuente `7c8a559`, caché v21. Se normalizaron los cuatro emails con mayúsculas y la entrada de los RPC legacy de registro/login; registro web normaliza sus tres altas. Contraseñas, IDs, otros datos, permisos, correos y Android preservados. No se activó Supabase Auth ni la migración de cuentas. Parche SQL aplicado y verificado (historial remoto `20260912174834`); pruebas con tablas temporales/rollback y rol anon, tres comprobaciones locales y build36 aprobados. Informe `docs/release-login-email-20260912.md`.
+
+No se conoce el correo del usuario del foro: se corrigió un defecto reproducido, no se certifica que explique su caso particular. Cierre GitHub con `[skip netlify]`, sin segundo deploy. Guía ajena modificada sigue intacta/excluida. La carpeta supabase sólo archiva este parche puntual, **no es una línea base completa de la base: no ejecutar db push/pull automáticamente**.
+
+### Histórico — asistencia a eventos corregida, 11/9/2026
 
 Publicado a las **19:56 ART**, deploy `6aa4872b940d5068912622e8`, fuente `da86a9c`, caché v20. Confirmar asistencia guarda la reacción existente sin exigir mensaje; mensaje al organizador opcional, confirmación verificada, bloqueo compartido y cancelación explícita. Sin migración, cambios de permisos, funciones, horarios, otros anuncios o Android. Siete pruebas específicas y comprobación móvil aislada aprobadas; build36, HTML/SW online idénticos y cinco funciones/horarios preservados. Informe `docs/release-asistencia-eventos-20260911.md`.
 
