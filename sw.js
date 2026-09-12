@@ -1,6 +1,6 @@
 // ⚠️ IMPORTANTE: subí este número en CADA deploy (v3 → v4 → v5...).
 // Si no lo cambiás, el navegador puede seguir sirviendo los archivos viejos cacheados.
-const CACHE_VERSION = 'buscarte-v20-2026-09-11-asistencia-eventos';
+const CACHE_VERSION = 'buscarte-v21-2026-09-12-login-email';
 const OFFLINE_URL = '/index.html';
 
 const SHELL = [

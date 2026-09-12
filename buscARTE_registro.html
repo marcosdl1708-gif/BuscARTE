@@ -850,7 +850,7 @@ function avanzarDesdeCuenta() {
 
 function validarDatosCuenta() {
   const nombre = document.getElementById('reg-nombre').value.trim();
-  const email = document.getElementById('reg-email').value.trim();
+  const email = document.getElementById('reg-email').value.trim().toLowerCase();
   const pass = document.getElementById('reg-password').value;
   const prov = document.getElementById('sel-provincia').value;
   if (!nombre) { alert('Por favor ingresá tu nombre.'); goStep('cuenta'); return false; }
@@ -1145,7 +1145,7 @@ async function crearPerfil(btn) {
   if (registroEnCurso || registroCreado) return;
   if (!validarDatosCuenta()) return;
   if (tipoCuenta !== 'artista' || !Object.hasOwn(RUBRO_COLORS, rubroSeleccionado)) { alert('Por favor elegí tu tipo de cuenta y rubro.'); goStep('rubro'); return; }
-  const email = document.getElementById('reg-email')?.value?.trim();
+  const email = document.getElementById('reg-email')?.value?.trim().toLowerCase();
   const nombre = document.getElementById('reg-nombre')?.value?.trim();
   const apellido = document.getElementById('reg-apellido')?.value?.trim();
   const password = document.getElementById('reg-password')?.value;
@@ -1297,7 +1297,7 @@ async function crearNegocio(btn) {
   const captchaResponse = window.RegistroCaptcha.requireResponse('hcaptcha-box');
   if (!captchaResponse) return;
 
-  const email = document.getElementById('reg-email')?.value?.trim();
+  const email = document.getElementById('reg-email')?.value?.trim().toLowerCase();
   const password = document.getElementById('reg-password')?.value;
   const nombre = document.getElementById('neg-nombre')?.value?.trim() || document.getElementById('reg-nombre')?.value?.trim();
   const provincia = document.getElementById('sel-provincia')?.value || '';
@@ -1402,7 +1402,7 @@ async function crearVisitante(btn) {
   const captchaResponse = window.RegistroCaptcha.requireResponse('hcaptcha-box-visitante');
   if (!captchaResponse) return;
 
-  const email = document.getElementById('reg-email')?.value?.trim();
+  const email = document.getElementById('reg-email')?.value?.trim().toLowerCase();
   const password = document.getElementById('reg-password')?.value;
   const nombre = document.getElementById('reg-nombre')?.value?.trim();
   const provincia = document.getElementById('sel-provincia')?.value || '';
