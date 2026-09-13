@@ -3,7 +3,13 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
-## Estado operativo — login y email normalizados, 12/9/2026
+## Estado operativo — menú táctil y generador para Música, 13/9/2026
+
+Fuente `a9602e2`, deploy `6aa6bd88018fd650aaa404a2`, caché v22. Ambos Inicio evitan cerrar el menú por un blur transitorio antes del click. Generador disponible en los ocho paneles móviles de cuenta y visible sólo para artistas de Música; página de la herramienta usa la misma regla, sin inferir Música por ausencia de rubro. Cuatro pruebas aisladas aprobadas, build37. Sin cambios de datos, Auth, funciones, cron o Android. Informe `docs/release-menu-musica-20260913.md`; comprobación remota en el resguardo privado `menu-musica-20260913`.
+
+Cierre GitHub con `[skip netlify]`, sin segundo deploy. Guía ajena intacta/excluida. Falta comprobación física en el teléfono que reportó el menú: se reparó una condición reproducible, no se certifica su causa individual. Al retomar, verificar el estado actual; las secciones siguientes son históricas.
+
+### Histórico — login y email normalizados, 12/9/2026
 
 Publicado a las **14:50 ART**, deploy `6aa590c8dcefc07a7832050d`, fuente `7c8a559`, caché v21. Se normalizaron los cuatro emails con mayúsculas y la entrada de los RPC legacy de registro/login; registro web normaliza sus tres altas. Contraseñas, IDs, otros datos, permisos, correos y Android preservados. No se activó Supabase Auth ni la migración de cuentas. Parche SQL aplicado y verificado (historial remoto `20260912174834`); pruebas con tablas temporales/rollback y rol anon, tres comprobaciones locales y build36 aprobados. Informe `docs/release-login-email-20260912.md`.
 
