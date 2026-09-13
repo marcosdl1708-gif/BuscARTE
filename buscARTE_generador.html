@@ -184,6 +184,8 @@
     }
   </style>
 <script src="/assets/js/meta-pixel.js?v=1" defer></script>
+<style>html:not([data-music-tools="true"]) a[href*="buscarte_generador" i] { display: none !important; }</style>
+<script src="/assets/js/menu-cuenta.js"></script>
 </head>
 <body>
 <div class="cursor" id="cursor"></div>
@@ -335,17 +337,22 @@
 <div class="toast" id="toast">Listo</div>
 
 <script>
-  // ── CONTROL DE ACCESO: solo músicos registrados ──
-  // No logueado           → lock con CTA de registro (intriga)
-  // Logueado, rubro música → acceso completo
-  // Logueado, otro rubro   → lock (la herramienta es de música)
-  (function checkAcceso() {
-    const logueado = localStorage.getItem('ba_logged') === '1';
-    const rubro = localStorage.getItem('ba_rubro') || 'musica';
+  // Herramienta local de Música: misma regla de presentación que los menús.
+  function checkAcceso() {
+    const permitido = window.BuscARTEMenu?.isMusician() === true;
+    let logueado = false;
+    try { logueado = localStorage.getItem('ba_logged') === '1'; } catch (_) {}
     const lock = document.getElementById('gen-lock');
     const lockTitle = document.getElementById('gen-lock-title');
     const lockSub = document.getElementById('gen-lock-sub');
     const lockActions = document.getElementById('gen-lock-actions');
+
+    document.querySelector('main')?.toggleAttribute('inert', !permitido);
+    if (permitido) {
+      if (lock) lock.style.display = 'none';
+      document.body.style.overflow = '';
+      return true;
+    }
 
     if (!logueado) {
       if (lock) lock.style.display = 'flex';
@@ -355,16 +362,19 @@
       if (lockActions) lockActions.innerHTML = `
         <a href="buscARTE_registro.html" class="gen-lock-btn-primary">Crear perfil gratis →</a>
         <a href="buscARTE_login.html" class="gen-lock-btn-ghost">Ya tengo cuenta</a>`;
-    } else if (rubro !== 'musica') {
+    } else {
       if (lock) lock.style.display = 'flex';
       document.body.style.overflow = 'hidden';
       if (lockTitle) lockTitle.textContent = 'Solo para músicos';
-      if (lockSub) lockSub.innerHTML = 'El generador de nombres está pensado para <strong>bandas, solistas y proyectos musicales</strong>, y tu cuenta es de otro rubro.';
+      if (lockSub) lockSub.innerHTML = 'El generador de nombres está pensado para <strong>bandas, solistas y proyectos musicales</strong>. Está disponible para perfiles de Música.';
       if (lockActions) lockActions.innerHTML = `
         <a href="buscARTE_busqueda.html" class="gen-lock-btn-primary">← Volver a Artistas</a>
         <a href="buscARTE_anuncios.html" class="gen-lock-btn-ghost">Ver anuncios</a>`;
     }
-  })();
+    return false;
+  }
+  checkAcceso();
+  window.addEventListener('buscarte:musictoolschange', checkAcceso);
 
   const BANDA = {
     prefijos: ['Los','Las','La','El','Proyecto','Colectivo','Banda','Trío','Cuarteto','La Orquesta','El Conjunto','Gran'],
@@ -459,6 +469,7 @@
   }
 
   function generar() {
+    if (!checkAcceso()) return;
     const generador = modo === 'banda' ? generarNombreBanda : generarNombreSolista;
     const nuevos = [];
     let intentos = 0;

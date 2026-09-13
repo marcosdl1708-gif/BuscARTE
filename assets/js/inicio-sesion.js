@@ -103,8 +103,10 @@
         document.getElementById('nav-avatar-btn')?.focus();
       }
     });
-    document.getElementById('nav-user')?.addEventListener('focusout', event => {
-      if (!event.currentTarget.contains(event.relatedTarget)) closeMenu();
+    // Un blur transitorio (relatedTarget=null) durante un toque no debe ocultar
+    // el enlace antes del click. Cerrar cuando el foco realmente pase afuera.
+    document.addEventListener('focusin', event => {
+      if (!event.target.closest('#nav-user')) closeMenu();
     });
   }
 
