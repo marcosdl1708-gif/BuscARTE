@@ -1138,6 +1138,31 @@
     } catch (e) { return ''; }
   }
 
+  // Instagram se guarda como usuario o URL. Interpretar la plataforma sin
+  // reescribir datos existentes ni cambiar las otras redes, fotos o videos.
+  function socialUrl(platform, raw) {
+    const isInstagram = /^(?:📸\s*)?(?:instagram|(?:www\.)?instagram\.com\/?)$/i.test(String(platform || '').trim());
+    if (!isInstagram) return safeUrl(raw);
+    const value = String(raw || '').trim();
+    if (!value) return '';
+
+    if (/^(?:https?:\/\/|\/\/|(?:www\.)?instagram\.com(?:[/?#]|$))/i.test(value)) {
+      try {
+        const input = value.startsWith('//') ? 'https:' + value : /^https?:\/\//i.test(value) ? value : 'https://' + value;
+        const url = new URL(input);
+        if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password || url.port ||
+            !['instagram.com', 'www.instagram.com'].includes(url.hostname)) return '';
+        url.protocol = 'https:';
+        url.hostname = 'www.instagram.com';
+        return url.href;
+      } catch (_) { return ''; }
+    }
+
+    const username = value.replace(/^@/, '');
+    if (!/^[a-z0-9_](?:[a-z0-9_.]{0,28}[a-z0-9_])?$/i.test(username) || username.includes('..')) return '';
+    return 'https://www.instagram.com/' + username + '/';
+  }
+
   // ─── RUBRO CONFIG PARA PERFIL PÚBLICO ───
   const RUBRO_COLORS = {
     musica:'#d4f53c', actuacion:'#ff6b5b', audiovisual:'#5b9fff',
@@ -1524,7 +1549,7 @@
           try {
             const redes = JSON.parse(p.redes)
             const links = Object.entries(redes).filter(([,v])=>v).map(([k,v])=>{
-              const url = safeUrl(v)
+              const url = socialUrl(k, v)
               if (!url) return ''
               return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="red-link">${escapeHtml(k)} ${escapeHtml(v)}</a>`
             })
