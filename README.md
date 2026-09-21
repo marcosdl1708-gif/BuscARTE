@@ -3,7 +3,13 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
-## Estado operativo — menú táctil y generador para Música, 13/9/2026
+## Estado operativo — enlaces de Instagram corregidos, 21/9/2026
+
+Fuente `17b844f`, deploy `6ab1abe3118fa89e00fdf1e8`, caché v23. El perfil público interpreta Instagram como usuario, @usuario o URL, sin reescribir datos guardados; enlaces completos y demás redes conservados. Casos 304/309 comprobados con lecturas públicas; tres pruebas focalizadas y build37 aprobados. Sin cambios de cuentas, Auth, funciones, cron o Android. Informe `docs/release-instagram-20260921.md`; evidencia privada en `instagram-links-20260921`.
+
+Cierre GitHub con `[skip netlify]`, sin segundo deploy. Guía ajena intacta/excluida. Resta confirmación física de los testers al reabrir la app conectada; no confundir validar el destino del enlace con validar la cuenta dentro de Instagram. Las entradas siguientes son históricas.
+
+### Histórico — menú táctil y generador para Música, 13/9/2026
 
 Fuente `a9602e2`, deploy `6aa6bd88018fd650aaa404a2`, caché v22. Ambos Inicio evitan cerrar el menú por un blur transitorio antes del click. Generador disponible en los ocho paneles móviles de cuenta y visible sólo para artistas de Música; página de la herramienta usa la misma regla, sin inferir Música por ausencia de rubro. Cuatro pruebas aisladas aprobadas, build37. Sin cambios de datos, Auth, funciones, cron o Android. Informe `docs/release-menu-musica-20260913.md`; comprobación remota en el resguardo privado `menu-musica-20260913`.
 
