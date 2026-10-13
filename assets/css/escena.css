@@ -849,6 +849,11 @@ html[data-ba-design="a2"] :is(.card-cta,.anuncio-respond,.mini-link,.intro-cta) 
 html[data-ba-design="a2"] .filter-header:has(#filter-category-label) {
   gap:.5rem .6rem; padding:1rem 1.25rem .85rem;
 }
+/* This board chooser is outside .filter-panel and does not inherit its top
+   padding. Keep the caption clear of the sticky header's separator. */
+html[data-ba-design="a2"] #anuncios-filters-panel > #fp-rubro-global {
+  padding-top:1rem;
+}
 html[data-ba-design="a2"] #filter-category-label {
   justify-self:start; width:fit-content; max-width:100%; margin-top:0;
   line-height:1.5; letter-spacing:.065em; padding:4px 8px;

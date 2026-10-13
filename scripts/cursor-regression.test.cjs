@@ -89,78 +89,93 @@ async function setup(t,{file='buscARTE_busqueda.html',width=1440,mode='member',b
   }
   return {page,result,context};
 }
-async function snapshot(page){return page.evaluate(()=>{
-  const cursor=document.getElementById('ba-cursor'),hit=document.querySelector('[data-ba-cursor-hit="true"]');
-  const style=cursor&&getComputedStyle(cursor),r=cursor?.getBoundingClientRect();
-  return {active:document.documentElement.dataset.baCursorActive==='true',visible:!!cursor?.isConnected&&!cursor.hidden&&style.display!=='none'&&style.visibility==='visible'&&+style.opacity>.5&&r.width>=4&&r.height>=4,hit:hit?.tagName||null,hitCursor:hit?getComputedStyle(hit).cursor:null,pointerEvents:style?.pointerEvents||null,legacy:[...document.querySelectorAll('#cursor,#cursor-ring')].map(el=>getComputedStyle(el).display),allMarked:document.querySelectorAll('[data-ba-cursor-hit="true"]').length};
-});}
-async function hover(page,selector){const locator=(typeof selector==='string'?page.locator(selector):selector).filter({visible:true}).first();await locator.scrollIntoViewIfNeeded();const box=await locator.boundingBox();assert.ok(box,String(selector));await page.mouse.move(box.x+box.width/2,box.y+box.height/2);await page.waitForTimeout(60);return {state:await snapshot(page),cursor:await locator.evaluate(el=>getComputedStyle(el).cursor)};}
-async function safeAtMouse(page){const state=await snapshot(page);assert.ok(!state.active||state.visible,JSON.stringify(state));assert.ok(state.hitCursor!=='none'||state.visible,JSON.stringify(state));assert.ok(state.allMarked<=1);if(state.visible)assert.equal(state.pointerEvents,'none');return state;}
-async function native(page,selector,expected){const value=await hover(page,selector);assert.equal(value.state.active,false);assert.equal(value.state.visible,false);assert.notEqual(value.cursor,'none');if(expected)assert.equal(value.cursor,expected);return value;}
+async function hover(page,selector){
+  const el=(typeof selector==='string'?page.locator(selector):selector).filter({visible:true}).first();
+  await el.scrollIntoViewIfNeeded();const box=await el.boundingBox();assert.ok(box,String(selector));
+  await page.mouse.move(box.x+box.width/2,box.y+box.height/2);
+  return el.evaluate(el=>getComputedStyle(el).cursor);
+}
+function isCircle(value){return /^url\("data:image\/svg\+xml,/.test(value)&&/ 16 16, (auto|pointer|not-allowed|grab|progress)$/.test(value);}
+async function validateSvg(page,value){
+  assert.ok(isCircle(value),value);const uri=value.match(/^url\("([^"]+)"\)/)[1];
+  await page.evaluate(uri=>{window.__qaCursorImage=new Image();window.__qaCursorImage.src=uri;},uri);
+  // Disabled page JS also disables onload handlers. Read the browser's native
+  // decoder state through explicit evaluations instead of an event callback.
+  for(let i=0;i<30;i++){if(await page.evaluate(()=>window.__qaCursorImage.complete))break;await page.waitForTimeout(20);}
+  return page.evaluate(uri=>{
+    const source=decodeURIComponent(uri.slice('data:image/svg+xml,'.length)),xml=new DOMParser().parseFromString(source,'image/svg+xml');
+    const image=window.__qaCursorImage,loaded=image.complete&&image.naturalWidth>0;
+    return {loaded,width:image.naturalWidth,height:image.naturalHeight,parserErrors:xml.querySelectorAll('parsererror').length,circles:xml.querySelectorAll('circle').length,unsafe:!!xml.querySelector('script,foreignObject,image,animate'),stroke:[...xml.querySelectorAll('circle')].map(el=>el.getAttribute('stroke'))};
+  },uri);
+}
+async function circle(page,selector){
+  const value=await hover(page,selector);assert.ok(isCircle(value),value);assert.notEqual(value,'none');
+  assert.equal(await page.locator('#ba-cursor,[data-ba-cursor-hit],[data-ba-cursor-active]').count(),0);
+  return value;
+}
+async function native(page,selector,expected){const value=await hover(page,selector);assert.equal(value,expected);return value;}
 async function capture(page,name){await page.screenshot({path:path.join(output,name+'.png'),animations:'disabled'});}
-
-test('all nineteen release pages import cursor last, once, with independent IDs',()=>{
-  assert.equal(pages.length,19);assert.ok(published.includes('assets/css/cursor.css'));assert.ok(published.includes('assets/js/cursor.js'));
-  for(const file of pages){const html=sources.get(file).toString('utf8');assert.equal((html.match(/href="\/assets\/css\/cursor\.css"/g)||[]).length,1,file);assert.equal((html.match(/src="\/assets\/js\/cursor\.js"/g)||[]).length,1,file);assert.ok(html.indexOf('/assets/css/cursor.css')>html.indexOf('/assets/css/escena.css'),file);}
-  const js=sources.get('assets/js/cursor.js').toString('utf8');assert.doesNotMatch(js,/fetch\(|localStorage|sessionStorage|\.netlify|supabase/i);assert.match(js,/clearHit\(\);[\s\S]*requestAnimationFrame/);assert.match(js,/ba-cursor-native-fallback/);
+async function noHiddenPointer(page){
+  const bad=await page.evaluate(()=>[...document.querySelectorAll('body *')].filter(el=>{const r=el.getBoundingClientRect(),s=getComputedStyle(el);return r.width>0&&r.height>0&&s.display!=='none'&&s.visibility!=='hidden'&&s.cursor==='none';}).map(el=>el.tagName+'#'+el.id+'.'+el.className));
+  assert.deepEqual(bad,[]);
+}
+test('all nineteen pages share the browser cursor with fallback keywords; no custom rendering engine',()=>{
+  assert.equal(pages.length,19);
+  for(const file of pages){const html=sources.get(file).toString();assert.equal((html.match(/href="\/assets\/css\/cursor\.css"/g)||[]).length,1,file);assert.equal((html.match(/src="\/assets\/js\/cursor\.js"/g)||[]).length,1,file);assert.ok(html.indexOf('/assets/css/cursor.css')>html.indexOf('/assets/css/escena.css'),file);}
+  const js=sources.get('assets/js/cursor.js').toString(),css=sources.get('assets/css/cursor.css').toString();
+  assert.doesNotMatch(js,/fetch\(|localStorage|sessionStorage|requestAnimationFrame|setInterval|data-ba-cursor-active|\.netlify|supabase/i);
+  assert.doesNotMatch(css,/cursor\s*:\s*none/i);assert.match(css,/16 16,auto/);assert.match(css,/16 16,pointer/);assert.match(js,/ba-cursor-native-fallback/);
 });
-for(const file of ['buscARTE_busqueda.html','buscARTE_anuncios.html','buscARTE_mensajes.html'])test('reproduces and repairs vanished account-name pointer: '+file,async t=>{
-  const before=await setup(t,{file,baseline:true});const bug=await hover(before.page,'#nav-avatar-btn');assert.equal(bug.cursor,'none');assert.ok(bug.state.legacy.every(display=>display==='none'));before.result.checks.push({confirmedBug:bug});await capture(before.page,'before-'+file);
-  const after=await setup(t,{file});const fixed=await hover(after.page,'#nav-avatar-btn');assert.equal(fixed.state.visible,true);assert.equal(fixed.state.active,true);assert.equal(fixed.state.hitCursor,'none');after.result.checks.push({fixed});await capture(after.page,'after-'+file);
-  await after.page.locator('#nav-avatar-btn').click();assert.equal((await snapshot(after.page)).active,false);
-  for(const item of await after.page.locator('#nav-dropdown a').filter({visible:true}).all()){await item.hover();await after.page.waitForTimeout(50);assert.equal((await safeAtMouse(after.page)).visible,true);}
-  await after.page.locator('#nav-avatar-btn').evaluate(el=>{const name=el.querySelector('.nav-avatar-name')||el.querySelector('span');if(name)name.textContent='Nombre dinámico';});
-  assert.equal((await hover(after.page,'#nav-avatar-btn')).state.visible,true);
-  await after.page.locator('#nav-dropdown a[href="buscARTE_perfil.html"]').click();await after.page.waitForURL(/buscARTE_perfil\.html/);assert.equal((await snapshot(after.page)).active,false);assert.equal((await hover(after.page,'#nav-avatar-btn')).state.visible,true);
+for(const file of ['buscARTE_busqueda.html','buscARTE_anuncios.html','buscARTE_mensajes.html'])test('continuous account/menu movement, clicks and scrolling never changes to a native arrow: '+file,async t=>{
+  const f=await setup(t,{file});const first=await circle(f.page,'#nav-avatar-btn');const svg=await validateSvg(f.page,first);f.result.checks.push({svg});assert.deepEqual({...svg,stroke:undefined},{loaded:true,width:32,height:32,parserErrors:0,circles:3,unsafe:false,stroke:undefined});
+  await f.page.evaluate(()=>{window.__cursorSequence=[];const sample=event=>{const el=document.elementFromPoint(event.clientX||window.__mouseX||0,event.clientY||window.__mouseY||0);if(event.type==='pointermove'){window.__mouseX=event.clientX;window.__mouseY=event.clientY;}window.__cursorSequence.push({phase:event.type,cursor:el&&getComputedStyle(el).cursor});};for(const name of ['pointermove','pointerdown','pointerup','click'])document.addEventListener(name,sample,{passive:true});});
+  let box=await f.page.locator('#nav-avatar-btn').boundingBox();await f.page.mouse.move(box.x+8,box.y+box.height/2);await f.page.mouse.move(box.x+box.width-10,box.y+box.height/2,{steps:25});
+  await f.page.locator('#nav-avatar-btn').click();await circle(f.page,'#nav-dropdown a');
+  await f.page.locator('#nav-avatar-btn').evaluate(el=>{const span=el.querySelector('span');if(span)span.textContent='Nombre dinámico';});
+  await circle(f.page,'#nav-avatar-btn');
+  const samples=await f.page.evaluate(()=>window.__cursorSequence);f.result.checks.push({samples});assert.ok(samples.length>=25);assert.ok(samples.every(item=>isCircle(item.cursor)),JSON.stringify(samples.filter(item=>!isCircle(item.cursor))));
+  await f.page.locator('#nav-avatar-btn').click();await f.page.mouse.move(1200,650);await f.page.mouse.wheel(0,230);await f.page.waitForTimeout(80);
+  const afterScroll=await f.page.evaluate(()=>getComputedStyle(document.elementFromPoint(1200,650)).cursor);assert.ok(isCircle(afterScroll),afterScroll);
+  await noHiddenPointer(f.page);await capture(f.page,'continuous-'+file);
 });
-for(const mode of ['guest','member'])for(const file of pages)test('desktop safe cursor on '+mode+' '+file,async t=>{
-  const f=await setup(t,{file,mode});assert.equal((await snapshot(f.page)).active,false);
+for(const mode of ['guest','member'])for(const file of pages)test('desktop browser cursor is safe on '+mode+' '+file,async t=>{
+  const f=await setup(t,{file,mode});
   const controls=f.page.locator('nav a[href],nav button,summary,#gen-lock-actions a[href],#ba-session-notice a[href]').filter({visible:true});
   const reachable=[];for(const item of await controls.all())if(await item.evaluate(el=>{const r=el.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return !el.closest('[inert]')&&!!hit&&(hit===el||el.contains(hit));}))reachable.push(item);
-  assert.ok(reachable.length>0,'Page has reachable navigation, including an access gate when appropriate');
-  for(const item of reachable.slice(0,3)){await item.hover();await f.page.waitForTimeout(40);f.result.checks.push(await safeAtMouse(f.page));}
-  // The pointer remains native during scroll/re-layout and resumes on movement.
-  await f.page.evaluate(()=>document.dispatchEvent(new Event('scroll')));assert.equal((await snapshot(f.page)).active,false);
-  const text=f.page.locator('input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),textarea').filter({visible:true});const editable=[];for(const item of await text.all())if(await item.evaluate(el=>!el.closest('[inert]')))editable.push(item);if(editable.length){const expected=(await editable[0].getAttribute('disabled'))!==null?'not-allowed':/^(file|range|color|button|submit|reset|image)$/.test(await editable[0].getAttribute('type'))?'pointer':'text';f.result.checks.push(await native(f.page,editable[0],expected));}
-  if(['index.html','buscARTE_perfil_publico.html','buscARTE_mensajes.html'].includes(file))await capture(f.page,'desktop-'+mode+'-'+file);
+  assert.ok(reachable.length);for(const item of reachable.slice(0,3))f.result.checks.push({cursor:await circle(f.page,item)});
+  await noHiddenPointer(f.page);
+  if(['index.html','buscARTE_perfil_publico.html'].includes(file))await capture(f.page,'desktop-'+mode+'-'+file);
 });
-for(const width of [320,390])for(const file of pages)test('touch '+width+' never paints fake pointer on '+file,async t=>{
+for(const width of [320,390])for(const file of pages)test('touch '+width+' remains native on '+file,async t=>{
   const f=await setup(t,{file,width,mode:/login|registro|reset|recuperar/.test(file)?'guest':'member'});
-  await f.page.mouse.move(width/2,45);await f.page.waitForTimeout(40);assert.equal((await snapshot(f.page)).visible,false);assert.equal((await snapshot(f.page)).active,false);
-  const control=f.page.locator('nav a[href],nav button,summary').filter({visible:true}).first();assert.notEqual(await control.evaluate(el=>getComputedStyle(el).cursor),'none');
-  assert.ok(await f.page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
-  if(['index.html','buscARTE_perfil.html'].includes(file))await capture(f.page,'touch-'+width+'-'+file);
+  await f.page.mouse.move(width/2,45);const control=f.page.locator('nav a[href],nav button,summary').filter({visible:true}).first();
+  const value=await control.evaluate(el=>getComputedStyle(el).cursor);assert.ok(!value.startsWith('url('));assert.notEqual(value,'none');assert.equal(await f.page.locator('#ba-cursor').count(),0);
+  assert.ok(await f.page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));await noHiddenPointer(f.page);
+  if(file==='index.html')await capture(f.page,'touch-'+width+'-'+file);
 });
-for(const file of pages)test('no JavaScript leaves native pointer on '+file,async t=>{
-  const f=await setup(t,{file,noJS:true,mode:'guest'});assert.equal(await f.page.locator('#ba-cursor').count(),0);
-  const bad=await f.page.evaluate(()=>[...document.querySelectorAll('body *')].filter(el=>{const r=el.getBoundingClientRect(),s=getComputedStyle(el);return r.width>0&&r.height>0&&s.display!=='none'&&s.visibility!=='hidden'&&s.cursor==='none';}).map(el=>el.tagName+'#'+el.id+'.'+el.className));assert.deepEqual(bad,[]);
+for(const file of pages)test('no JavaScript still has a valid browser-rendered circle and native fields: '+file,async t=>{
+  const f=await setup(t,{file,noJS:true,mode:'guest'});await noHiddenPointer(f.page);
+  const value=await f.page.locator('nav a[href],nav button').filter({visible:true}).first().evaluate(el=>getComputedStyle(el).cursor);
+  const image=await validateSvg(f.page,value);assert.equal(image.loaded,true);assert.equal(image.width,32);assert.equal(image.height,32);
+  assert.equal(await f.page.locator('#ba-cursor').count(),0);
 });
-test('render failure, hidden node, detached node and stalled frame always restore native cursor',async t=>{
-  for(const options of [{noCSS:true},{brokenFrame:true},{oldEngine:true}]){const f=await setup(t,options);const value=await hover(f.page,'#nav-avatar-btn');assert.equal(value.state.active,false);assert.equal(value.state.visible,false);assert.equal(value.cursor,'pointer');f.result.checks.push(value);}
-  for(const mutation of ['hide','remove','opacity']){const f=await setup(t);assert.equal((await hover(f.page,'#nav-avatar-btn')).state.visible,true);await f.page.evaluate(mutation=>{const c=document.getElementById('ba-cursor');if(mutation==='hide')c.style.setProperty('display','none','important');if(mutation==='remove')c.remove();if(mutation==='opacity')c.style.opacity='0';},mutation);await f.page.waitForTimeout(30);assert.equal((await snapshot(f.page)).active,false);assert.equal(await f.page.locator('#nav-avatar-btn').evaluate(el=>getComputedStyle(el).cursor),'pointer');}
+for(const settings of [{reducedMotion:'reduce'},{forcedColors:'active'},{width:900}])test('accessibility/viewport has native fallback '+JSON.stringify(settings),async t=>{const f=await setup(t,settings);await native(f.page,'#nav-avatar-btn','pointer');await noHiddenPointer(f.page);});
+test('failed CSS, stalled RAF and unsupported old DOM engine never create an invisible cursor',async t=>{
+  const css=await setup(t,{noCSS:true});await native(css.page,'#nav-avatar-btn','pointer');await noHiddenPointer(css.page);
+  for(const options of [{brokenFrame:true},{oldEngine:true}]){const f=await setup(t,options);await circle(f.page,'#nav-avatar-btn');await noHiddenPointer(f.page);}
+  const f=await setup(t);await f.page.evaluate(()=>document.documentElement.style.setProperty('--ba-circle-cursor','url("data:image/svg+xml,broken")'));
+  const value=await hover(f.page,'#nav-avatar-btn');assert.match(value,/16 16, pointer$/);assert.notEqual(value,'none');
+  const failed=await validateSvg(f.page,value);assert.equal(failed.loaded,false);f.result.checks.push({failedImageWithVisibleNativeFallbackKeyword:value});
 });
-for(const settings of [{reducedMotion:'reduce'},{forcedColors:'active'},{width:900}])test('accessibility/viewport native fallback '+JSON.stringify(settings),async t=>{const f=await setup(t,settings);await native(f.page,'#nav-avatar-btn','pointer');});
-test('focus, window exit, iframe, modal, disabled control and text caret fall back safely',async t=>{
-  const f=await setup(t,{file:'buscARTE_perfil.html'});
-  for(const event of ['blur','pagehide','pageshow']){await hover(f.page,'#nav-avatar-btn');await f.page.evaluate(event=>window.dispatchEvent(new Event(event)),event);assert.equal((await snapshot(f.page)).active,false);}
-  await hover(f.page,'#nav-avatar-btn');await f.page.evaluate(()=>document.dispatchEvent(new PointerEvent('pointerout',{relatedTarget:null})));assert.equal((await snapshot(f.page)).active,false);
-  await native(f.page,'#bio-text','text');
-  await f.page.evaluate(()=>abrirEliminarCuenta());await native(f.page,'.btn-delete-cancel','pointer');await native(f.page,'#delete-password-input','text');await native(f.page,'#btn-delete-confirm','not-allowed');await f.page.locator('.btn-delete-cancel').click();
-  await f.page.evaluate(()=>{const frame=document.createElement('iframe');frame.id='cursor-qa-frame';frame.src='about:blank';frame.style.cssText='position:fixed;left:100px;top:200px;width:300px;height:200px;z-index:200000;background:white';document.body.append(frame);});
-  await hover(f.page,'#nav-avatar-btn');await f.page.mouse.move(180,270);await f.page.waitForTimeout(130);assert.equal((await snapshot(f.page)).active,false);await f.page.locator('#cursor-qa-frame').evaluate(el=>el.remove());
+test('all ten discipline colors and a runtime context change retain a valid circle',async t=>{
+  const f=await setup(t);for(const color of ['#d4f53c','#ff6b5b','#5b9fff','#4de8c4','#ffaa5b','#c45bff','#5bd4ff','#e8a84a','#ffdd5b','#a0d47b']){
+    await f.page.evaluate(color=>document.documentElement.style.setProperty('--neon',color),color);await f.page.waitForFunction(color=>decodeURIComponent(document.documentElement.style.getPropertyValue('--ba-circle-cursor')).includes(color),color);
+    const value=await circle(f.page,'#nav-avatar-btn'),svg=await validateSvg(f.page,value);assert.equal(svg.loaded,true);assert.ok(svg.stroke.includes(color));f.result.checks.push({color,svg});
+  }
 });
-test('actual ads creation dialog and chat input preserve native caret and working controls',async t=>{
-  const ads=await setup(t,{file:'buscARTE_anuncios.html'});await ads.page.evaluate(()=>openModal());assert.ok(await ads.page.locator('#modal').isVisible());await native(ads.page,'#modal button','pointer');
-  const field=ads.page.locator('#modal input,#modal textarea').filter({visible:true}).first();if(await field.count())await native(ads.page,field,'text');
-  const chat=await setup(t,{file:'buscARTE_mensajes.html'});await chat.page.locator('.conv-item').first().click();await chat.page.waitForSelector('#chat-input',{state:'visible'});await native(chat.page,'#chat-input','text');await chat.page.locator('#chat-input').fill('Borrador aislado, sin enviar.');await chat.page.locator('.quick-reply').first().hover();await chat.page.waitForTimeout(50);assert.equal((await safeAtMouse(chat.page)).visible,true);await capture(chat.page,'desktop-chat-custom-button');
-});
-test('artist cards, ad response and public profile actions are not intercepted; report modal stays native',async t=>{
-  const search=await setup(t);assert.equal((await hover(search.page,'.musician-card')).state.visible,true);
-  const ads=await setup(t,{file:'buscARTE_anuncios.html'});const action=ads.page.locator('.anuncio a[href],.anuncio button').filter({visible:true}).first();const adHover=await hover(ads.page,action);ads.result.checks.push(adHover);assert.equal((await safeAtMouse(ads.page)).visible,true,JSON.stringify(adHover));assert.equal(await action.evaluate(el=>getComputedStyle(el).pointerEvents),'auto');
-  const profile=await setup(t,{file:'buscARTE_perfil_publico.html'});for(const control of (await profile.page.locator('.btn-contact,.btn-save,.btn-share,#report-link').filter({visible:true}).all())){await control.hover();await profile.page.waitForTimeout(50);assert.equal((await safeAtMouse(profile.page)).visible,true);}
-  await profile.page.evaluate(()=>abrirReporte());await native(profile.page,'.btn-report-cancel','pointer');await profile.page.locator('.report-option').last().click();await native(profile.page,'#report-detail','text');await profile.page.locator('.btn-report-cancel').click();await capture(profile.page,'desktop-profile-custom');
-});
-test('changing preferences and detaching the exact hovered target restore native state',async t=>{
-  const f=await setup(t);assert.equal((await hover(f.page,'#nav-avatar-btn')).state.visible,true);await f.page.emulateMedia({reducedMotion:'reduce'});await f.page.waitForTimeout(30);assert.equal((await snapshot(f.page)).active,false);assert.equal(await f.page.locator('#nav-avatar-btn').evaluate(el=>getComputedStyle(el).cursor),'pointer');
-  await f.page.emulateMedia({reducedMotion:'no-preference'});assert.equal((await hover(f.page,'#nav-avatar-btn')).state.visible,true);await f.page.evaluate(()=>document.querySelector('[data-ba-cursor-hit="true"]')?.remove());await f.page.waitForTimeout(30);assert.equal((await snapshot(f.page)).active,false);
+test('dialogs, chat controls, disabled buttons and fields maintain the intended cursor without toggling',async t=>{
+  const profile=await setup(t,{file:'buscARTE_perfil.html'});await native(profile.page,'#bio-text','text');await profile.page.evaluate(()=>abrirEliminarCuenta());
+  await circle(profile.page,'.btn-delete-cancel');await circle(profile.page,'#btn-delete-confirm');await native(profile.page,'#delete-password-input','text');await profile.page.locator('.btn-delete-cancel').click();await circle(profile.page,'#nav-avatar-btn');
+  const ads=await setup(t,{file:'buscARTE_anuncios.html'});await ads.page.evaluate(()=>openModal());await circle(ads.page,'#modal button');const field=ads.page.locator('#modal input,#modal textarea').filter({visible:true}).first();await native(ads.page,field,'text');
+  const chat=await setup(t,{file:'buscARTE_mensajes.html'});await chat.page.locator('.conv-item').first().click();await chat.page.waitForSelector('#chat-input',{state:'visible'});await native(chat.page,'#chat-input','text');await circle(chat.page,'.quick-reply');await chat.page.locator('.quick-reply').first().click();await circle(chat.page,'.quick-reply');await noHiddenPointer(chat.page);
 });
