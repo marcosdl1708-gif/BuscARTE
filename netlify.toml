@@ -15,9 +15,10 @@
   directory = "netlify/functions"
 
 [build.environment]
-  # @netlify/functions ^5 requiere Node >= 18. Fijamos una versión LTS para que
-  # las funciones tengan fetch global y crypto disponibles.
-  NODE_VERSION = "20"
+  # Git CD toma también esta versión como runtime por defecto de Functions.
+  # Node 24 LTS conserva el runtime de los deploys manuales anteriores y el
+  # usado en las pruebas aisladas, sin volver a la configuración histórica 20.
+  NODE_VERSION = "24"
 
 [functions."resumen-mensual"]
   # Día 1 de cada mes, 10:00 ART
