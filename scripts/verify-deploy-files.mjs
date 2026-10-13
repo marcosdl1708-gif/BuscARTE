@@ -94,7 +94,13 @@ for (let i = 0; i < publicFiles.length; i += 4) {
     const expected = sha1(local);
     const actual = sha1(response.body);
     let comparison = 'exact-bytes';
-    if (actual !== expected && file.endsWith('.html')) {
+    // Git checkout on Netlify uses LF; the reviewed Windows workspace may use
+    // CRLF. Accept only that exact byte transformation, not arbitrary trimming.
+    const textFile = /\.(?:html|css|js|json|txt|xml)$/.test(file);
+    const gitLf = textFile ? Buffer.from(local.toString('utf8').replace(/\r\n/g, '\n')) : null;
+    if (actual !== expected && gitLf && actual === sha1(gitLf)) {
+      comparison = 'git-checkout-lf';
+    } else if (actual !== expected && file.endsWith('.html')) {
       assert.equal(sha1(await canonicalHtml(response.body)), sha1(await canonicalHtml(local)),
         file + ' must match after only known Pretty URLs and inert HTML serialization');
       comparison = 'html-pretty-urls-normalized';

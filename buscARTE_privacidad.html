@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-ba-design="a2">
 <head>
+<script src="/assets/js/sesion-segura.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Cómo manejamos tu información en buscARTE: perfiles, anuncios, mensajes, archivos, notificaciones y eliminación de cuenta.">
@@ -256,6 +257,7 @@
 
   </style>
 <script src="/assets/js/meta-pixel.js?v=1" defer></script>
+<link rel="stylesheet" href="/assets/css/escena.css">
 </head>
 <body>
   <div class="cursor" id="cursor"></div>
@@ -303,7 +305,7 @@
         <h1>Política de <span>privacidad</span></h1>
         <p class="hero-desc">Cómo manejamos la información que cargás en buscARTE, qué partes son públicas, qué derechos tenés sobre tus datos y cómo podés editar o eliminar tu cuenta.</p>
         <div class="meta-row">
-          <span class="meta-chip neon">Última actualización: agosto 2026</span>
+          <span class="meta-chip neon">Última actualización: octubre 2026</span>
           <span class="meta-chip">buscARTE.com.ar</span>
           <span class="meta-chip">Argentina</span>
         </div>
@@ -404,7 +406,9 @@
 
       <section id="localstorage">
         <h2>Cookies y almacenamiento local</h2>
-        <p>buscARTE puede usar almacenamiento local del navegador para recordar tu sesión, tu nombre, tu ID de usuario, preferencias simples, mensajes vistos y nombres guardados del generador.</p>
+        <p>Para mantener tu ingreso usamos una cookie esencial de sesión, con una duración máxima de 30 días. Es <strong>HttpOnly</strong> (los scripts de la página no pueden leerla) y <strong>Secure</strong> (se envía por HTTPS). La identidad se comprueba en el servidor antes de acceder a datos privados o realizar cambios.</p>
+        <p>Al cerrar sesión se invalida esa sesión; al restablecer tu contraseña se invalidan las sesiones de tu cuenta. No necesitás volver a escribir tu contraseña para cada edición del perfil, mientras tu sesión siga vigente.</p>
+        <p>El almacenamiento local conserva copias de presentación como tu nombre e ID, además de preferencias simples, mensajes vistos y nombres guardados del generador. La caché <strong>ba_*</strong> no autoriza el acceso a mensajes ni cambios de datos: esa autorización depende de la sesión verificada en el servidor.</p>
         <p>También guardamos tu elección sobre medición. Si la permitís, Meta Pixel puede crear cookies como <strong>_fbp</strong> y <strong>_fbc</strong> para atribuir visitas y conversiones. El píxel no se carga en pantallas privadas o enlaces con datos sensibles.</p>
         <p>Podés cambiar esta decisión cuando quieras. Estado actual: <strong data-meta-consent-status>Todavía no elegiste.</strong></p>
         <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1rem">
@@ -511,13 +515,7 @@
     }
   });
 
-  function logout() {
-    localStorage.removeItem('ba_logged');
-    localStorage.removeItem('ba_name');
-    localStorage.removeItem('ba_email');
-    localStorage.removeItem('ba_user_id');
-    window.location.href = 'index.html';
-  }
+  function logout() { return window.BuscARTESesion.logout(); }
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -526,5 +524,7 @@
   }
 
   </script>
+<script src="/assets/js/escena.js"></script>
+<script src="/assets/js/escena-fondos.js"></script>
 </body>
 </html>

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-ba-design="a2">
 <head>
+<script src="/assets/js/sesion-segura.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- SEO -->
@@ -263,6 +264,7 @@
   <meta name="apple-mobile-web-app-title" content="buscARTE">
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <script src="/assets/js/meta-pixel.js?v=1" defer></script>
+<link rel="stylesheet" href="/assets/css/escena.css">
 </head>
 <body>
 
@@ -363,7 +365,7 @@
       </div>
       <div class="field">
         <label for="reg-password">Contraseña</label>
-        <input type="password" id="reg-password" autocomplete="new-password" placeholder="Mínimo 8 caracteres" oninput="validarPassword(this)">
+        <input type="password" id="reg-password" autocomplete="new-password" maxlength="72" placeholder="Mínimo 8 caracteres" oninput="validarPassword(this)">
         <div id="pass-feedback" style="font-size:.75rem;margin-top:.4rem;height:1rem"></div>
       </div>
       <div class="field">
@@ -638,8 +640,8 @@
         <input type="text" id="neg-nombre" placeholder="Ej: Estudio La Perla, Teatro El Convento...">
       </div>
       <div class="field">
-        <label>Descripción y servicios que ofrecés</label>
-        <textarea id="neg-descripcion" placeholder="Contá brevemente qué ofrecés, precios referenciales, condiciones..."></textarea>
+        <label>Descripción y servicios que ofrecés · hasta 300 caracteres</label>
+        <textarea id="neg-descripcion" maxlength="300" placeholder="Contá brevemente qué ofrecés, precios referenciales, condiciones..."></textarea>
       </div>
       <div class="field">
         <label>Precio referencial <span style="color:var(--gris2); font-size:0.7rem; text-transform:none; letter-spacing:0">(opcional)</span></label>
@@ -719,8 +721,8 @@
         <summary>Agregar foto, bio y qué buscás · opcional</summary>
 
       <div class="field">
-        <label>Bio corta (aparece en tu perfil)</label>
-        <textarea id="bio-text" placeholder="Contá algo sobre vos, tu estilo, tu experiencia, qué buscás..."></textarea>
+        <label>Bio corta (aparece en tu perfil) · hasta 300 caracteres</label>
+        <textarea id="bio-text" maxlength="300" placeholder="Contá algo sobre vos, tu estilo, tu experiencia, qué buscás..."></textarea>
       </div>
 
       <div class="field">
@@ -761,6 +763,8 @@
         <div class="success-icon" id="exito-icon">🎉</div>
         <div class="success-title">¡Ya sos parte<br>de <span>buscARTE</span>!</div>
         <p class="success-sub" id="exito-sub">Tu perfil está listo. Ya podés explorar artistas, publicar anuncios y conectar con la escena argentina.</p>
+        <p id="exito-opcionales" role="status" hidden style="color:var(--blanco);font-size:.9rem;line-height:1.6;margin:0 0 1rem"></p>
+        <a id="exito-opcionales-link" href="buscARTE_perfil.html#completar" hidden style="color:var(--neon);margin-bottom:1rem">Revisar los datos pendientes en mi perfil →</a>
         <a href="buscARTE_busqueda.html" class="btn-next" id="exito-btn" style="display:inline-flex;text-decoration:none;font-size:1rem;padding:1rem 2.5rem;margin-bottom:1rem;">Explorar →</a>
         <br>
         <div class="onboarding-next" id="exito-completar-panel">
@@ -787,6 +791,7 @@ let fotoNegocioUrl = null;
 let dropdownIdx = -1;
 let registroEnCurso = false;
 let registroCreado = false;
+let registroSinConfirmar = false;
 
 // ═══════════════════════════════════════
 // hCAPTCHA — Render explícito por widget (soporta múltiples captchas)
@@ -855,7 +860,8 @@ function validarDatosCuenta() {
   const prov = document.getElementById('sel-provincia').value;
   if (!nombre) { alert('Por favor ingresá tu nombre.'); goStep('cuenta'); return false; }
   if (!email || !document.getElementById('reg-email').checkValidity()) { alert('Por favor ingresá un email válido.'); goStep('cuenta'); return false; }
-  if (pass.length < 8) { alert('La contraseña debe tener al menos 8 caracteres.'); goStep('cuenta'); return false; }
+  const passwordError = errorNuevaPassword(pass);
+  if (passwordError) { alert(passwordError); goStep('cuenta'); return false; }
   if (!prov) { alert('Por favor seleccioná tu provincia.'); goStep('cuenta'); return false; }
   return true;
 }
@@ -1142,7 +1148,7 @@ const SUPABASE_URL = 'https://xiaanchoanxmampegoay.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68';
 
 async function crearPerfil(btn) {
-  if (registroEnCurso || registroCreado) return;
+  if (registroEnCurso || registroCreado || registroSinConfirmar) return;
   if (!validarDatosCuenta()) return;
   if (tipoCuenta !== 'artista' || !Object.hasOwn(RUBRO_COLORS, rubroSeleccionado)) { alert('Por favor elegí tu tipo de cuenta y rubro.'); goStep('rubro'); return; }
   const email = document.getElementById('reg-email')?.value?.trim().toLowerCase();
@@ -1156,6 +1162,8 @@ async function crearPerfil(btn) {
   if (!nombre) { alert('Por favor ingresá tu nombre.'); goStep('cuenta'); return; }
   if (!email || !email.includes('@')) { alert('Por favor ingresá un email válido.'); goStep('cuenta'); return; }
   if (!password || password.length < 8) { alert('La contraseña debe tener al menos 8 caracteres.'); goStep('cuenta'); return; }
+  const bio = document.getElementById('bio-text')?.value || '';
+  if (bio.length > 300) { alert('La bio admite hasta 300 caracteres. Acortala antes de crear tu perfil; no recortamos tu texto automáticamente.'); goStep('perfil'); return; }
 
   // Validar captcha (widget específico de este paso)
   const captchaResponse = window.RegistroCaptcha.requireResponse('hcaptcha-box-perfil');
@@ -1173,8 +1181,8 @@ async function crearPerfil(btn) {
   const referentes = rubroSeleccionado === 'musica' ? artists.join(', ') : '';
 
   const disponibilidad = [...document.querySelectorAll('.objetivo-card.selected')].map(c => c.querySelector('.objetivo-title')?.textContent).join(', ');
-  const bio = document.getElementById('bio-text')?.value || '';
-  const edadRegistro = parseInt(document.getElementById('edad-registro')?.value || '', 10) || null;
+  const edadTexto = document.getElementById('edad-registro')?.value?.trim() || '';
+  const edadRegistro = edadTexto ? Number(edadTexto) : null;
   const camposEspecificos = collectCamposEspecificos();
 
   registroEnCurso = true;
@@ -1191,6 +1199,7 @@ async function crearPerfil(btn) {
         'Authorization': `Bearer ${SUPABASE_KEY}`
       },
       body: JSON.stringify({
+        captcha_token: captchaResponse,
         p_email: email,
         p_password: password,
         p_nombre: nombreCompleto,
@@ -1211,6 +1220,7 @@ async function crearPerfil(btn) {
 
     let data = null;
     try { data = await response.json(); } catch(_) { data = null; }
+    if (response.status >= 502 || data?.code === 'REGISTRATION_UNCONFIRMED') { mostrarRegistroNoConfirmado(); return; }
 
     if (!response.ok || data?.error) {
       const errText = data?.error || data?.message || JSON.stringify(data || {});
@@ -1235,55 +1245,30 @@ async function crearPerfil(btn) {
       return;
     }
     registroCreado = true;
-    // La RPC registrar_usuario no toma edad: la guardamos por PATCH (opcional)
-    if (usuario?.id && edadRegistro) {
-      fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${usuario.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal' },
-        body: JSON.stringify({ edad: edadRegistro })
-      }).catch(e => console.error('Error guardando edad:', e));
-    }
-    if (fotoRegistroUrl && usuario?.id) {
-      subirFotoRegistro(usuario.id).then(fotoUrl => {
-        if (fotoUrl) {
-          fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${usuario.id}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal' },
-            body: JSON.stringify({ foto_url: fotoUrl })
-          }).catch(e => console.error('Error guardando foto_url:', e));
-        }
-      }).catch(e => console.error('Error subiendo foto:', e));
-    }
-
+    if (usuario.session_pending) { mostrarRegistroSinSesion(); return; }
     guardarSesionRegistro(usuario.id, nombreCompleto, 'artista', rubroSeleccionado,
       rubroSeleccionado === 'musica' ? artists.join(',') : '', generos);
     if (rubroSeleccionado === 'musica' && artists.length) guardarArtistasEnSupabase(artists);
 
-    // Email bienvenida
-    fetch('/.netlify/functions/send-email', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        tipo: 'bienvenida',
-        destinatario: email,
-        datos: { nombre: nombreCompleto.split(' ')[0] }
-      })
-    }).catch(e => console.error('Error enviando bienvenida:', e));
+    // La bienvenida la envía el servidor tras confirmar la creación, no el navegador.
 
     // Personalizar pantalla de éxito
     personalizarExito();
     goStep('exito');
+    document.getElementById('reg-password').value = '';
+    await guardarComplementosRegistro(usuario.id, { edad:edadRegistro, foto:fotoRegistroUrl });
 
   } catch (e) {
     if (registroCreado) { mostrarRegistroSinSesion(); return; }
-    alert('No se pudo conectar. Verificá tu conexión e intentá de nuevo.');
+    mostrarRegistroNoConfirmado();
     console.error(e);
     resetCaptcha('hcaptcha-box-perfil');
   } finally {
     registroEnCurso = false;
+    if (registroCreado || registroSinConfirmar) document.getElementById('reg-password').value = '';
     btn.textContent = '🎉 Crear mi perfil';
     btn.style.opacity = '1';
-    btn.disabled = registroCreado;
+    btn.disabled = registroCreado || registroSinConfirmar;
   }
 }
 
@@ -1291,9 +1276,11 @@ async function crearPerfil(btn) {
 // CREAR NEGOCIO
 // ═══════════════════════════════════════
 async function crearNegocio(btn) {
-  if (registroEnCurso || registroCreado) return;
+  if (registroEnCurso || registroCreado || registroSinConfirmar) return;
   if (!validarDatosCuenta()) return;
   if (tipoCuenta !== 'negocio' || !document.getElementById('neg-tipo').value) { alert('Por favor elegí el tipo de negocio.'); goStep('negocio'); return; }
+  const descripcion = document.getElementById('neg-descripcion')?.value || '';
+  if (descripcion.length > 300) { alert('La descripción admite hasta 300 caracteres. Acortala antes de crear tu perfil; no recortamos tu texto automáticamente.'); goStep('negocio-contacto'); return; }
   const captchaResponse = window.RegistroCaptcha.requireResponse('hcaptcha-box');
   if (!captchaResponse) return;
 
@@ -1321,6 +1308,7 @@ async function crearNegocio(btn) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
       body: JSON.stringify({
+        captcha_token: captchaResponse,
         p_email: email,
         p_password: password,
         p_nombre: nombre,
@@ -1331,7 +1319,7 @@ async function crearNegocio(btn) {
         p_generos: '',
         p_disponibilidad: '',
         p_referentes: '',
-        p_bio: document.getElementById('neg-descripcion')?.value || '',
+        p_bio: descripcion,
         p_tipo_cuenta: 'negocio',
         p_rubro: document.getElementById('neg-tipo')?.value || '',
         p_campos_especificos: camposNegocio
@@ -1340,6 +1328,7 @@ async function crearNegocio(btn) {
 
     let data = null;
     try { data = await response.json(); } catch(_) {}
+    if (response.status >= 502 || data?.code === 'REGISTRATION_UNCONFIRMED') { mostrarRegistroNoConfirmado(); return; }
 
     if (!response.ok || data?.error) {
       const errText = data?.error || data?.message || '';
@@ -1363,32 +1352,24 @@ async function crearNegocio(btn) {
       return;
     }
     registroCreado = true;
+    if (usuario.session_pending) { mostrarRegistroSinSesion(); return; }
     guardarSesionRegistro(usuario.id, nombre, 'negocio');
-
-    if (fotoNegocioUrl && usuario?.id) {
-      subirFotoRegistro(usuario.id, fotoNegocioUrl).then(fotoUrl => {
-        if (fotoUrl) {
-          fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${usuario.id}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal' },
-            body: JSON.stringify({ foto_url: fotoUrl })
-          }).catch(e => console.error('Error guardando foto_url:', e));
-        }
-      }).catch(e => console.error('Error subiendo foto:', e));
-    }
 
     personalizarExito();
     goStep('exito');
+    document.getElementById('reg-password').value = '';
+    await guardarComplementosRegistro(usuario.id, { foto:fotoNegocioUrl });
   } catch(e) {
     if (registroCreado) { mostrarRegistroSinSesion(); return; }
-    alert('No se pudo conectar. Verificá tu conexión.');
+    mostrarRegistroNoConfirmado();
     console.error(e);
     resetCaptcha('hcaptcha-box');
   } finally {
     registroEnCurso = false;
+    if (registroCreado || registroSinConfirmar) document.getElementById('reg-password').value = '';
     btn.textContent = '🏢 Crear mi perfil';
     btn.style.opacity = '1';
-    btn.disabled = registroCreado;
+    btn.disabled = registroCreado || registroSinConfirmar;
   }
 }
 
@@ -1396,7 +1377,7 @@ async function crearNegocio(btn) {
 // CREAR VISITANTE (mínimo)
 // ═══════════════════════════════════════
 async function crearVisitante(btn) {
-  if (registroEnCurso || registroCreado) return;
+  if (registroEnCurso || registroCreado || registroSinConfirmar) return;
   if (!validarDatosCuenta()) return;
   if (tipoCuenta !== 'visitante') return;
   const captchaResponse = window.RegistroCaptcha.requireResponse('hcaptcha-box-visitante');
@@ -1409,13 +1390,14 @@ async function crearVisitante(btn) {
 
   registroEnCurso = true;
   if (btn) { btn.textContent = 'Creando...'; btn.style.opacity = '0.7'; btn.disabled = true; }
-  const restoreBtn = () => { if (btn) { btn.textContent = '🛒 Crear mi cuenta'; btn.style.opacity = '1'; btn.disabled = false; } };
+  const restoreBtn = () => { if (btn) { btn.textContent = '🛒 Crear mi cuenta'; btn.style.opacity = '1'; btn.disabled = registroSinConfirmar; } };
 
   try {
     const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/registrar_usuario`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
       body: JSON.stringify({
+        captcha_token: captchaResponse,
         p_email: email, p_password: password, p_nombre: nombre,
         p_provincia: provincia, p_ciudad: '', p_barrio: '',
         p_instrumento: '', p_generos: '', p_disponibilidad: '', p_referentes: '', p_bio: '',
@@ -1425,6 +1407,7 @@ async function crearVisitante(btn) {
 
     let data = null;
     try { data = await response.json(); } catch(_) {}
+    if (response.status >= 502 || data?.code === 'REGISTRATION_UNCONFIRMED') { mostrarRegistroNoConfirmado(); return; }
 
     if (!response.ok || data?.error) {
       const errText = data?.error || data?.message || '';
@@ -1449,20 +1432,75 @@ async function crearVisitante(btn) {
     }
 
     registroCreado = true;
+    if (usuario.session_pending) { mostrarRegistroSinSesion(); return; }
     guardarSesionRegistro(usuario.id, nombre || '', 'visitante');
 
     personalizarExito();
     goStep('exito');
   } catch(e) {
     if (registroCreado) { mostrarRegistroSinSesion(); return; }
-    alert('No se pudo conectar. Verificá tu conexión e intentá de nuevo.');
+    mostrarRegistroNoConfirmado();
     console.error(e);
     resetCaptcha('hcaptcha-box-visitante');
     restoreBtn();
   } finally {
     registroEnCurso = false;
+    if (registroCreado || registroSinConfirmar) document.getElementById('reg-password').value = '';
     if (!registroCreado) restoreBtn();
   }
+}
+
+// Los complementos no vuelven a crear la cuenta si fallan. Se verifican con
+// la sesión del servidor, sin volver a enviar ni guardar la contraseña.
+async function guardarDatoRegistroSeguro(credentials, changes, operation = 'save') {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 20000);
+  try {
+    const response = await fetch('/.netlify/functions/guardar-perfil', {
+      method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, cache:'no-store', redirect:'error', signal:controller.signal,
+      body:JSON.stringify({ ...credentials, changes, operation })
+    });
+    if (!response.ok) throw new Error('No se confirmó el complemento.');
+    const rows = await response.json();
+    if (!Array.isArray(rows) || rows.length !== 1 || String(rows[0]?.id) !== String(credentials.profileId) ||
+        (Object.hasOwn(changes, 'edad') && rows[0].edad !== changes.edad) ||
+        (Object.hasOwn(changes, 'foto_url') && rows[0].foto_url !== changes.foto_url)) throw new Error('Respuesta sin confirmación.');
+    return rows[0];
+  } finally { clearTimeout(timeout); }
+}
+
+async function guardarComplementosRegistro(id, { edad = null, foto = null } = {}) {
+  const labels = [edad !== null ? 'edad' : '', foto ? 'foto' : ''].filter(Boolean);
+  if (!labels.length) return;
+  const status = document.getElementById('exito-opcionales');
+  const link = document.getElementById('exito-opcionales-link');
+  status.hidden = false;
+  status.textContent = 'Tu cuenta ya está creada. Estamos terminando de guardar los datos opcionales; podés empezar a explorar.';
+  link.hidden = true;
+  const pendientes = [];
+  const credentials = { profileId:id };
+  try {
+    if (edad !== null) {
+      try {
+        if (!Number.isInteger(edad) || edad < 15 || edad > 80) throw new Error('Edad fuera del rango del registro.');
+        await guardarDatoRegistroSeguro(credentials, { edad });
+      }
+      catch (_) { pendientes.push('edad'); }
+    }
+    if (foto) {
+      try {
+        // Verificar dueño antes de subir los bytes, igual que en el editor.
+        await guardarDatoRegistroSeguro(credentials, {}, 'verify');
+        const foto_url = await subirFotoRegistro(id, foto);
+        if (!foto_url) throw new Error('Foto sin confirmación.');
+        await guardarDatoRegistroSeguro(credentials, { foto_url });
+      } catch (_) { pendientes.push('foto'); }
+    }
+  } finally { /* No credenciales ni contraseñas en los complementos. */ }
+  if (pendientes.length) {
+    status.textContent = 'Tu cuenta fue creada correctamente. No pudimos confirmar el guardado de tu ' + pendientes.join(' y ') + '. Revisá esos datos desde tu perfil; no hace falta registrarte otra vez.';
+    link.hidden = false;
+  } else status.textContent = 'Tu ' + labels.join(' y ') + ' ' + (labels.length > 1 ? 'quedaron guardadas.' : 'quedó guardada.');
 }
 
 // The existing RPC returns a row/object ID. Never invent a successful session
@@ -1473,16 +1511,18 @@ function registroTieneId(usuario) {
 }
 
 function guardarSesionRegistro(id, nombre, tipo, rubro = '', referentes = '', generos = '') {
-  // Keep the existing legacy cache contract. The marker is written last so a
-  // partial storage failure cannot present a newly created, incomplete session.
+  // El transporte ya comprobó la cookie y proyectó la identidad del servidor.
+  // Los valores del formulario no crean ni reemplazan una sesión verificada.
+  if (String(window.BuscARTESesion.user?.id || '') !== String(id)) throw new Error('Sesión sin confirmar');
   const keys = ['ba_logged', 'ba_user_id', 'ba_name', 'ba_tipo_cuenta', 'ba_rubro', 'ba_referentes', 'ba_generos'];
   try {
     localStorage.removeItem('ba_logged');
     localStorage.setItem('ba_user_id', String(id));
-    localStorage.setItem('ba_name', nombre);
-    localStorage.setItem('ba_tipo_cuenta', tipo);
+    localStorage.setItem('ba_name', window.BuscARTESesion.user.nombre || nombre);
+    localStorage.setItem('ba_tipo_cuenta', window.BuscARTESesion.user.tipo_cuenta);
     for (const [key, value] of [['ba_rubro', rubro], ['ba_referentes', referentes], ['ba_generos', generos]]) {
-      if (tipo === 'artista' || value) localStorage.setItem(key, value); else localStorage.removeItem(key);
+      const field = {ba_rubro:'rubro', ba_referentes:'referentes', ba_generos:'generos'}[key];
+      localStorage.setItem(key, window.BuscARTESesion.user[field] || '');
     }
     localStorage.setItem('ba_logged', '1');
   } catch (error) {
@@ -1498,6 +1538,15 @@ function mostrarRegistroSinSesion() {
   const button = document.getElementById('exito-btn');
   button.textContent = 'Ingresar a mi cuenta →';
   button.href = 'buscARTE_login.html';
+  document.getElementById('exito-completar-panel').hidden = true;
+  goStep('exito');
+}
+function mostrarRegistroNoConfirmado() {
+  registroSinConfirmar = true;
+  document.getElementById('exito-icon').textContent = '…';
+  document.getElementById('exito-sub').textContent = 'No pudimos confirmar si se creó tu cuenta. Intentá ingresar con tu email antes de crearla otra vez, para evitar repetir el registro.';
+  const button = document.getElementById('exito-btn');
+  button.textContent = 'Intentar ingresar →'; button.href = 'buscARTE_login.html';
   document.getElementById('exito-completar-panel').hidden = true;
   goStep('exito');
 }
@@ -1556,13 +1605,19 @@ function selectObjetivo(el) {
 // ═══════════════════════════════════════
 // PASSWORD VALIDATION
 // ═══════════════════════════════════════
+function errorNuevaPassword(value) {
+  if (value.length < 8) return 'La contraseña debe tener al menos 8 caracteres.';
+  if (new TextEncoder().encode(value).length > 72) return 'La contraseña es demasiado larga (máximo 72 bytes). Usá menos caracteres, especialmente si incluís emojis o acentos.';
+  return '';
+}
 function validarPassword(input) {
   const fb = document.getElementById('pass-feedback');
   const val = input.value;
   if (!val) { fb.textContent = ''; return; }
-  if (val.length < 8) { fb.style.color = '#e8311a'; fb.textContent = 'Mínimo 8 caracteres'; }
+  const error = errorNuevaPassword(val);
+  if (error) { fb.style.color = '#e8311a'; fb.textContent = error; }
   else if (val.length < 12) { fb.style.color = '#f5a623'; fb.textContent = '✓ Válida (podría ser más larga)'; }
-  else { fb.style.color = 'var(--neon)'; fb.textContent = '✓ Contraseña segura'; }
+  else { fb.style.color = 'var(--neon)'; fb.textContent = '✓ Longitud válida'; }
 }
 
 // ═══════════════════════════════════════
@@ -1576,7 +1631,7 @@ function previewFotoNegocio(input) {
   reader.onload = e => {
     fotoNegocioUrl = e.target.result;
     document.getElementById('neg-foto-icon').style.display = 'none';
-    document.getElementById('neg-foto-text').innerHTML = '<strong>Logo cargado ✓</strong><br><span style="font-size:.8rem;color:var(--neon)">Clickeá para cambiarlo</span>';
+    document.getElementById('neg-foto-text').innerHTML = '<strong>Imagen seleccionada ✓</strong><br><span style="font-size:.8rem;color:var(--neon)">Clickeá para cambiarla</span>';
     const prev = document.getElementById('neg-foto-preview');
     prev.src = e.target.result;
     prev.style.display = 'block';
@@ -1592,7 +1647,7 @@ function previewFotoRegistro(input) {
   reader.onload = e => {
     fotoRegistroUrl = e.target.result;
     document.getElementById('reg-foto-icon').style.display = 'none';
-    document.getElementById('reg-foto-text').innerHTML = '<strong>Foto cargada ✓</strong><br><span style="font-size:.8rem;color:var(--neon)">Clickeá para cambiarla</span>';
+    document.getElementById('reg-foto-text').innerHTML = '<strong>Imagen seleccionada ✓</strong><br><span style="font-size:.8rem;color:var(--neon)">Clickeá para cambiarla</span>';
     const prev = document.getElementById('reg-foto-preview');
     prev.src = e.target.result;
     prev.style.display = 'block';
@@ -1602,18 +1657,22 @@ function previewFotoRegistro(input) {
 
 async function subirFotoRegistro(userId, fotoUrl = fotoRegistroUrl) {
   if (!fotoUrl || !userId) return null;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 20000);
   try {
     const blob = await (await fetch(fotoUrl)).blob();
+    if (!['image/jpeg','image/png','image/webp'].includes(blob.type) || blob.size > 2 * 1024 * 1024) return null;
     const ext = blob.type === 'image/png' ? 'png' : (blob.type === 'image/webp' ? 'webp' : 'jpg');
-    const fileName = `${userId}_registro.${ext}`;
+    const fileName = `${userId}-${Date.now()}.${ext}`;
     const res = await fetch(`${SUPABASE_URL}/storage/v1/object/fotos-perfil/${fileName}`, {
       method: 'POST',
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': blob.type, 'x-upsert': 'true' },
-      body: blob
+      body: blob, signal:controller.signal
     });
     if (!res.ok) { console.error('Error subiendo foto'); return null; }
     return `${SUPABASE_URL}/storage/v1/object/public/fotos-perfil/${fileName}`;
-  } catch(e) { console.error('subirFoto:', e); return null; }
+  } catch(e) { return null; }
+  finally { clearTimeout(timeout); }
 }
 
 // ═══════════════════════════════════════
@@ -1840,5 +1899,7 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(() => {}); });
 }
 </script>
+<script src="/assets/js/escena.js"></script>
+<script src="/assets/js/escena-fondos.js"></script>
 </body>
 </html>

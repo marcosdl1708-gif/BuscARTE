@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-ba-design="a2">
 <head>
+<script src="/assets/js/sesion-segura.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- SEO: canónica única por id. Mismo caso que perfil_publico: contenido cargado
@@ -436,6 +437,7 @@
 <script src="/assets/js/meta-pixel.js?v=1" defer></script>
 <style>html:not([data-music-tools="true"]) a[href*="buscarte_generador" i] { display: none !important; }</style>
 <script src="/assets/js/menu-cuenta.js"></script>
+<link rel="stylesheet" href="/assets/css/escena.css">
 </head>
 <body>
 
@@ -1013,6 +1015,13 @@
       return u.href
     } catch(e) { return '' }
   }
+  function precioTexto(value, porHora = false) {
+    const texto = String(value ?? '').trim()
+    if (!texto) return ''
+    const numerico = /^\$?\s*\d/.test(texto)
+    const importe = numerico && !texto.startsWith('$') ? '$' + texto : texto
+    return importe + (porHora && numerico ? ' / hora' : '')
+  }
   function abrirReporteAnuncio(event, link) {
     if (event) event.preventDefault()
     const container = link?.closest('.anuncio-view') || document
@@ -1059,7 +1068,8 @@
     if (diff < 1) return 'Hace un momento'
     if (diff < 60) return `Hace ${diff} min`
     if (diff < 1440) return `Hace ${Math.floor(diff/60)} hs`
-    return `Hace ${Math.floor(diff/1440)} días`
+    const dias = Math.floor(diff/1440)
+    return `Hace ${dias} ${dias === 1 ? 'día' : 'días'}`
   }
   function initials(nombre) {
     return String(nombre || 'Usuario').split(' ').filter(Boolean).map(w=>w[0]).join('').toUpperCase().slice(0,2) || '?'
@@ -1086,7 +1096,7 @@
     if (esPropio) {
       return `<div class="sidebar-card is-contact contact-anchor-offset" id="contact-card">
         <div class="sidebar-card-title">Este anuncio es tuyo</div>
-        <div class="sidebar-card-sub">Este detalle ya se puede ver públicamente. Para pausar, editar o eliminar, andá a Mis anuncios.</div>
+        <div class="sidebar-card-sub">Para pausar, reactivar o eliminar tu publicación, andá a Mis anuncios.</div>
         <a href="buscARTE_mis_anuncios.html" class="btn-ver-perfil">Gestionar anuncio →</a>
       </div>`
     }
@@ -1110,7 +1120,7 @@
     const card = document.getElementById('contact-card')
     if (card) {
       card.scrollIntoView({ behavior:'smooth', block:'start' })
-      setTimeout(() => (card.querySelector('#btn-confirmar-asistencia') || card.querySelector('textarea'))?.focus(), 450)
+      setTimeout(() => (card.querySelector('#btn-confirmar-asistencia') || card.querySelector('textarea') || card.querySelector('a[href]'))?.focus(), 450)
     }
   }
 
@@ -1362,14 +1372,14 @@
   function renderEspecial(a) {
     const tipo = normalizarTipo(a.tipo)
     if (tipo === 'vende') {
-      const fotos = [a.foto_url, a.foto_url_2, a.foto_url_3].filter(Boolean)
+      const fotos = [a.foto_url, a.foto_url_2, a.foto_url_3].map(safeExternalUrl).filter(Boolean)
       const foto = fotos.length > 0
         ? `<div class="foto-gallery fotos-${fotos.length}">${fotos.map(url =>
-            `<div class="foto-main" onclick="openLightbox('${escapeAttr(url)}')"><img src="${escapeAttr(url)}" alt="Foto del anuncio" loading="lazy"></div>`
+            `<button type="button" class="foto-main" data-photo-src="${escapeAttr(url)}" onclick="openLightbox(this.dataset.photoSrc)" aria-label="Ampliar foto del anuncio" style="padding:0;border:0;width:100%;background:transparent;color:inherit"><img src="${escapeAttr(url)}" alt="Foto del anuncio" loading="lazy"></button>`
           ).join('')}</div>`
         : ''
       const rows = [
-        a.precio ? ['Precio', String(a.precio).startsWith('$') ? a.precio : '$'+a.precio, 'price'] : null,
+        precioTexto(a.precio) ? ['Precio', precioTexto(a.precio), 'price'] : null,
         a.categoria_producto ? ['Categoría', a.categoria_producto, ''] : null,
         a.marca ? ['Marca', a.marca, ''] : null,
         a.condicion ? ['Condición', a.condicion, ''] : null,
@@ -1380,7 +1390,7 @@
     }
 
     if (tipo === 'clases') {
-      const precioHora = a.precio ? `${String(a.precio).startsWith('$') ? a.precio : '$'+a.precio} / hora` : ''
+      const precioHora = precioTexto(a.precio, true)
       return `<div class="evento-hero" style="border-color:rgba(0,210,200,.2)">
         <div class="evento-fecha-row">${(a.instrumentos || a.instrumento) ? `<span class="evento-fecha-grande" style="color:#00d4c8">🎓 Clases de ${escapeHtml(String(a.instrumentos || a.instrumento).split(',')[0])}</span>` : `<span class="evento-fecha-grande" style="color:#00d4c8">🎓 Doy clases</span>`}</div>
         ${a.nivel ? `<div class="evento-lugar">📊 Nivel: <strong>${escapeHtml(a.nivel)}</strong></div>` : ''}
@@ -1392,7 +1402,8 @@
 
     if (tipo === 'jam') {
       const f = formatFechaEvento(a.fecha_evento)
-      const flyer = a.foto_url ? `<div class="foto-section" style="margin-bottom:1.5rem"><div class="foto-main" style="max-height:420px" onclick="openLightbox('${escapeAttr(a.foto_url)}')"><img src="${escapeAttr(a.foto_url)}" alt="Flyer del evento"></div></div>` : ''
+      const flyerUrl = safeExternalUrl(a.foto_url)
+      const flyer = flyerUrl ? `<div class="foto-section" style="margin-bottom:1.5rem"><button type="button" class="foto-main" data-photo-src="${escapeAttr(flyerUrl)}" style="max-height:420px;padding:0;border:0;width:100%;background:transparent;color:inherit" onclick="openLightbox(this.dataset.photoSrc)" aria-label="Ampliar flyer del evento"><img src="${escapeAttr(flyerUrl)}" alt="Flyer del evento"></button></div>` : ''
       const fecha = f ? `<div class="evento-hero">
         <div class="evento-fecha-row">
           <span class="evento-fecha-grande${f.pasado ? ' anuncio-pasado' : ''}">${escapeHtml(f.fecha)}</span>
@@ -1434,9 +1445,12 @@
     const tags = [a.instrumentos, a.instrumento, a.generos, a.tags, a.categoria_producto, a.nivel, a.modalidad].filter(Boolean).join(',').split(',').map(t=>t.trim()).filter(Boolean)
     const tagsHTML = [...new Set(tags)].map(t=>`<span class="dtag dtag-neon">${escapeHtml(t)}</span>`).join('')
     const tipoParam = tipo === 'vende' ? 'vende' : tipo
-    const actionTitle = ACTION_TITLES[tipo] || 'Contactar'
+    const rubroTablon = tipo === 'busco' ? a.rubro_buscado : a.rubro
+    const masAnunciosUrl = 'buscARTE_anuncios.html?' + new URLSearchParams({ tipo: tipoParam, ...(tipo !== 'vende' && RUBRO_COLORS[rubroTablon] ? { rubro: rubroTablon } : {}) }).toString()
+    const esPropio = localStorage.getItem('ba_logged') === '1' && String(a.user_id || '') === localStorage.getItem('ba_user_id')
+    const actionTitle = esPropio ? 'Gestionar anuncio' : (ACTION_TITLES[tipo] || 'Contactar')
     const statusLabel = tipo === 'jam' ? 'Evento publicado' : tipo === 'vende' ? 'Marketplace' : tipo === 'clases' ? 'Clases disponibles' : 'Anuncio activo'
-    const precio = a.precio ? (String(a.precio).startsWith('$') ? a.precio : '$'+a.precio) : ''
+    const precio = precioTexto(a.precio)
     const f = tipo === 'jam' ? formatFechaEvento(a.fecha_evento) : null
     const quickItems = []
     if (tipo === 'vende' && precio) quickItems.push(['Precio', precio, 'strong'])
@@ -1451,7 +1465,7 @@
     document.getElementById('page-wrap').innerHTML = `<div class="breadcrumb">
       <a href="buscARTE_anuncios.html">Tablón</a>
       <span>›</span>
-      <a href="buscARTE_anuncios.html?tipo=${encodeURIComponent(tipoParam)}">${label}</a>
+      <a href="${escapeAttr(masAnunciosUrl)}">${label}</a>
       <span>›</span>
       ${escapeHtml(a.titulo || 'Anuncio')}
     </div>
@@ -1475,7 +1489,7 @@
       </div>
       <div class="hero-action-row">
         <button class="btn-primary-hero" onclick="focusContact()">${escapeHtml(actionTitle)} →</button>
-        <a class="btn-share" href="buscARTE_anuncios.html?tipo=${encodeURIComponent(tipoParam)}">Ver más de esta categoría</a>
+        <a class="btn-share" href="${escapeAttr(masAnunciosUrl)}">Ver más de esta categoría</a>
       </div>
       <div class="reaction-bar" id="reaction-bar">
         ${tipo === 'jam'
@@ -1497,7 +1511,7 @@
         <div class="similar-section">
           <div class="similar-title">Seguir explorando</div>
           <div class="similar-grid">
-            <a href="buscARTE_anuncios.html?tipo=${encodeURIComponent(tipoParam)}" class="similar-item">
+            <a href="${escapeAttr(masAnunciosUrl)}" class="similar-item">
               <span class="similar-badge ${badge}">${label}</span>
               <div class="similar-titulo">Ver más anuncios de esta categoría</div>
               <div class="similar-meta">Tablón de anuncios</div>
@@ -1667,26 +1681,7 @@
         }).catch(()=>{})
       }
 
-      // Notificación email al destinatario — no bloquea el envío
-      try {
-        const emailRes = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${encodeURIComponent(paraId)}&select=email,nombre`, { headers: hdrs })
-        const destArr = await emailRes.json()
-        const dest = Array.isArray(destArr) ? destArr[0] : null
-        if (dest?.email) {
-          fetch('/.netlify/functions/send-email', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              tipo: 'mensaje',
-              destinatario: dest.email,
-              datos: {
-                remitente: localStorage.getItem('ba_name') || 'Un usuario de buscARTE',
-                preview: texto.length > 100 ? texto.slice(0, 100) + '...' : texto
-              }
-            })
-          }).catch(() => {})
-        }
-      } catch(e) {}
+      // El servidor notifica después de persistir el mensaje y sin exponer emails.
 
       if (desdeAsistencia) { ta.value = ''; return true }
       btn.textContent = '✓ Enviado'
@@ -1763,7 +1758,7 @@
       if(d)d.classList.remove('open');if(w)w.classList.remove('open');
     }
   });
-  function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');window.location.href='index.html';}
+  function logout() { return window.BuscARTESesion.logout(); }
 </script>
 <div class="mbn-overlay" id="mbn-overlay" onclick="closeMbnPanel()"></div>
 <div class="mbn-panel" id="mbn-panel">
@@ -1810,12 +1805,7 @@ function closeMbnPanel(){
   document.getElementById('mbn-panel').classList.remove('open');
   document.getElementById('mbn-overlay').classList.remove('open');
 }
-function mbnLogout(){
-  localStorage.removeItem('ba_logged');
-  localStorage.removeItem('ba_name');
-  localStorage.removeItem('ba_user_id');
-  window.location.href='index.html';
-}
+function mbnLogout() { return window.BuscARTESesion.logout(); }
 
 </script>
 <script>
@@ -1825,16 +1815,29 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+  let lightboxFocusAnterior = null;
+  let lightboxOverflowAnterior = '';
   function openLightbox(src) {
-    document.getElementById('lightbox-img').src = src;
+    const safe = safeExternalUrl(src);
+    if (!safe) return;
+    lightboxFocusAnterior = document.activeElement;
+    lightboxOverflowAnterior = document.body.style.overflow;
+    document.getElementById('lightbox-img').src = safe;
     document.getElementById('lightbox').classList.add('open');
     document.body.style.overflow = 'hidden';
+    document.querySelector('#lightbox .lightbox-close').focus({ preventScroll:true });
   }
   function closeLightbox() {
+    if (!document.getElementById('lightbox').classList.contains('open')) return;
     document.getElementById('lightbox').classList.remove('open');
-    document.body.style.overflow = '';
+    document.body.style.overflow = lightboxOverflowAnterior;
+    lightboxFocusAnterior?.focus({ preventScroll:true });
   }
-  document.addEventListener('keydown', e => { if(e.key === 'Escape') closeLightbox(); });
+  document.addEventListener('keydown', e => {
+    if (!document.getElementById('lightbox').classList.contains('open')) return;
+    if (e.key === 'Escape') { e.preventDefault(); closeLightbox(); }
+    if (e.key === 'Tab') { e.preventDefault(); document.querySelector('#lightbox .lightbox-close').focus(); }
+  });
 
 
   // En mobile, el avatar del nav abre el panel del bottom nav
@@ -1856,9 +1859,11 @@ if ('serviceWorker' in navigator) {
   })();
 
 </script>
-<div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
-  <button class="lightbox-close" onclick="closeLightbox()">×</button>
+<div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()" role="dialog" aria-modal="true" aria-label="Imagen ampliada">
+  <button class="lightbox-close" onclick="closeLightbox()" aria-label="Cerrar imagen ampliada" style="min-width:44px;min-height:44px">×</button>
   <img id="lightbox-img" src="" alt="Foto ampliada">
 </div>
+<script src="/assets/js/escena.js"></script>
+<script src="/assets/js/escena-fondos.js"></script>
 </body>
 </html>

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-ba-design="a2">
 <head>
+<script src="/assets/js/sesion-segura.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>buscARTE — Mis anuncios</title>
@@ -331,6 +332,7 @@
 <script src="/assets/js/meta-pixel.js?v=1" defer></script>
 <style>html:not([data-music-tools="true"]) a[href*="buscarte_generador" i] { display: none !important; }</style>
 <script src="/assets/js/menu-cuenta.js"></script>
+<link rel="stylesheet" href="/assets/css/escena.css">
 </head>
 <body>
 
@@ -465,14 +467,7 @@
   }
   const AUTH_RUNTIME = authRuntimeEnabled();
 
-  // PROTECCIÓN: esta página es privada porque gestiona anuncios propios.
-  (function() {
-    try {
-      if (!AUTH_RUNTIME && localStorage.getItem('ba_logged') !== '1') {
-        window.location.replace('buscARTE_login.html');
-      }
-    } catch(e) {}
-  })();
+  // La gestión propia espera la identidad verificada en inicializarMisAnuncios.
 
   // CURSOR
   window.addEventListener('DOMContentLoaded', function() {
@@ -505,6 +500,7 @@
 
   let currentFilter = { tipo: 'todos' };
   let cardToDelete = null;
+  let misAnunciosCargaVersion = 0;
 
   function escapeHtml(value) {
     return String(value ?? '')
@@ -526,10 +522,12 @@
   function timeAgo(iso) {
     if (!iso) return '';
     const diff = Math.floor((new Date() - new Date(iso)) / 60000);
+    if (!Number.isFinite(diff)) return '';
     if (diff < 1) return 'Hace un momento';
     if (diff < 60) return `Hace ${diff} min`;
     if (diff < 1440) return `Hace ${Math.floor(diff/60)} hs`;
-    return `Hace ${Math.floor(diff/1440)} días`;
+    const dias = Math.floor(diff/1440);
+    return `Hace ${dias} ${dias === 1 ? 'día' : 'días'}`;
   }
 
   function showToast(msg, type) {
@@ -708,7 +706,7 @@
     const vistasTotal = visibles.reduce((sum, a) => sum + Number(a.vistas || 0), 0);
 
     const sub = document.querySelector('.page-sub');
-    if (sub) sub.textContent = `${total} anuncios publicados · ${activos} activos`;
+    if (sub) sub.textContent = `${total} ${total === 1 ? 'anuncio publicado' : 'anuncios publicados'} · ${activos} ${activos === 1 ? 'activo' : 'activos'}`;
     const set = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
     set('count-todos', total);
     set('count-activos', activos);
@@ -724,17 +722,24 @@
   }
 
   async function cargarMisAnuncios() {
+    const version = ++misAnunciosCargaVersion;
+    const cuenta = miId;
+    const vigente = () => version === misAnunciosCargaVersion && cuenta === miId;
     const lista = document.getElementById('anuncios-lista');
+    lista.setAttribute('aria-busy', 'true');
     lista.innerHTML = '<div style="padding:3rem;text-align:center;color:var(--gris);font-size:.88rem">Cargando tus anuncios...</div>';
 
     if (!miId) {
       lista.innerHTML = '<div style="padding:3rem;text-align:center;color:var(--gris)">Necesitás estar logueado para ver tus anuncios.<br><a href="buscARTE_login.html" style="color:var(--neon)">Ingresar</a></div>';
+      lista.setAttribute('aria-busy', 'false');
       return;
     }
 
     try {
       const anuncios = await fetchAllMisAnuncios();
+      if (!vigente()) return;
       if (!AUTH_RUNTIME) await syncHiddenDeletes(anuncios);
+      if (!vigente()) return;
       updateStats(anuncios);
       const visibles = applyVisibleFilter(anuncios);
 
@@ -746,15 +751,20 @@
           <span class="empty-icon">📋</span>
           <div class="empty-title">Sin anuncios</div>
           <div class="empty-sub">${escapeHtml(msg)}</div>
-          <button class="btn-publish" onclick="window.location.href='buscARTE_anuncios.html'">+ Publicar ahora</button>
+          ${currentFilter.tipo === 'todos'
+            ? '<a class="btn-publish" href="buscARTE_anuncios.html">+ Publicar ahora</a>'
+            : '<button class="btn-publish" onclick="filterTab(event,\'todos\',document.querySelector(\'#quick-filter-tabs .filter-tab\'))">Ver todos mis anuncios</button>'}
         </div>`;
         return;
       }
 
       lista.innerHTML = visibles.map(buildCard).join('');
     } catch(e) {
-      lista.innerHTML = '<div style="padding:3rem;text-align:center;color:var(--gris)">Error al cargar tus anuncios. Intentá de nuevo.</div>';
+      if (!vigente()) return;
+      lista.innerHTML = '<div role="status" style="padding:3rem;text-align:center;color:var(--gris)">No pudimos cargar tus anuncios.<br><button class="btn-action" style="margin-top:1rem" onclick="cargarMisAnuncios()">Reintentar</button></div>';
       console.error(e);
+    } finally {
+      if (vigente()) lista.setAttribute('aria-busy', 'false');
     }
   }
 
@@ -921,18 +931,7 @@
       if(w) w.classList.remove('open');
     }
   });
-  function logout(){
-    if (AUTH_RUNTIME) {
-      window.BuscARTEAuth.signOut({ scope: 'local' })
-        .catch(error => console.error('No se pudo cerrar la sesión Auth:', error))
-        .finally(() => { window.location.href='index.html'; });
-      return;
-    }
-    localStorage.removeItem('ba_logged');
-    localStorage.removeItem('ba_name');
-    localStorage.removeItem('ba_user_id');
-    window.location.href='index.html';
-  }
+  function logout() { return window.BuscARTESesion.logout(); }
 
   function renderAuthSession(state) {
     miId = String(state.profileId);
@@ -960,6 +959,10 @@
 
   async function inicializarMisAnuncios() {
     if (!AUTH_RUNTIME) {
+      const session = await window.BuscARTESesion.require();
+      if (!session) return;
+      miId = String(session.id);
+      renderAuthSession({profileId:session.id, profile:session});
       await cargarMisAnuncios();
       return;
     }
@@ -1036,19 +1039,7 @@ function closeMbnPanel(){
   document.getElementById('mbn-panel').classList.remove('open');
   document.getElementById('mbn-overlay').classList.remove('open');
 }
-function mbnLogout(){
-  var authMode = window.BuscARTEConfig?.isLocalRuntime === true && window.BuscARTEConfig?.mode === 'auth' && window.BuscARTEConfig?.networkEnabled === true;
-  if (authMode) {
-    window.BuscARTEAuth.signOut({ scope: 'local' })
-      .catch(function(error) { console.error('No se pudo cerrar la sesión Auth:', error); })
-      .finally(function() { window.location.href='index.html'; });
-    return;
-  }
-  localStorage.removeItem('ba_logged');
-  localStorage.removeItem('ba_name');
-  localStorage.removeItem('ba_user_id');
-  window.location.href='index.html';
-}
+function mbnLogout() { return window.BuscARTESesion.logout(); }
 
 </script>
 <script>
@@ -1077,5 +1068,7 @@ if ('serviceWorker' in navigator) {
   })();
 
 </script>
+<script src="/assets/js/escena.js"></script>
+<script src="/assets/js/escena-fondos.js"></script>
 </body>
 </html>

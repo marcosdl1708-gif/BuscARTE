@@ -5,6 +5,8 @@
   "scripts": {
     "build": "node scripts/build-site.mjs",
     "test": "node --test scripts/build-site.test.mjs",
+    "test:backend-seguro": "node --test scripts/datos-seguridad.test.mjs scripts/mail-security.test.cjs",
+    "test:sesion-segura": "node --test scripts/sesion-segura.test.cjs scripts/sesion-segura-browser.test.cjs",
     "test:registro": "node --test scripts/registro-captcha.test.cjs",
     "test:anuncios": "node --test scripts/anuncios-publicacion.test.cjs",
     "test:inicio": "node --test scripts/inicio-sesion.test.cjs",

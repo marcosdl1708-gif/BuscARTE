@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-ba-design="a2">
 <head>
+<script src="/assets/js/sesion-segura.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- SEO -->
@@ -568,6 +569,7 @@
 <script src="/assets/js/meta-pixel.js?v=1" defer></script>
 <style>html:not([data-music-tools="true"]) a[href*="buscarte_generador" i] { display: none !important; }</style>
 <script src="/assets/js/menu-cuenta.js"></script>
+<link rel="stylesheet" href="/assets/css/escena.css">
 </head>
 <body>
 
@@ -1597,12 +1599,7 @@
     }
   });
 
-  function logout() {
-    localStorage.removeItem('ba_logged');
-    localStorage.removeItem('ba_name');
-    localStorage.removeItem('ba_user_id');
-    window.location.href = 'index.html';
-  }
+  function logout() { return window.BuscARTESesion.logout(); }
 
   function closeMobileFilters() {
     const panel = document.querySelector('.filters-panel');
@@ -1665,12 +1662,7 @@ function closeMbnPanel(){
   document.getElementById('mbn-panel').classList.remove('open');
   document.getElementById('mbn-overlay').classList.remove('open');
 }
-function mbnLogout(){
-  localStorage.removeItem('ba_logged');
-  localStorage.removeItem('ba_name');
-  localStorage.removeItem('ba_user_id');
-  window.location.href='index.html';
-}
+function mbnLogout() { return window.BuscARTESesion.logout(); }
 
 </script>
 <script>
@@ -1699,5 +1691,7 @@ if ('serviceWorker' in navigator) {
   })();
 
 </script>
+<script src="/assets/js/escena.js"></script>
+<script src="/assets/js/escena-fondos.js"></script>
 </body>
 </html>

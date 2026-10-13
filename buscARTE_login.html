@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-ba-design="a2">
 <head>
+<script src="/assets/js/sesion-segura.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- SEO -->
@@ -204,6 +205,7 @@
 
 </style>
 <script src="/assets/js/meta-pixel.js?v=1" defer></script>
+<link rel="stylesheet" href="/assets/css/escena.css">
 </head>
 <body>
 
@@ -248,25 +250,25 @@
       <div class="success-bar" id="success-bar">
         ✓ Ingreso exitoso — redirigiendo...
       </div>
-      <div class="global-msg" id="global-msg"></div>
+      <div class="global-msg" id="global-msg" role="alert"></div>
       <div class="global-msg info" id="return-note" style="display:none"></div>
 
       <div class="field" id="field-email">
-        <label>Email</label>
-        <input type="email" id="email" placeholder="tu@email.com" oninput="clearError('field-email')">
-        <div class="field-error">Ingresá un email válido</div>
+        <label for="email">Email</label>
+        <input type="email" id="email" autocomplete="username" inputmode="email" placeholder="tu@email.com" oninput="clearError('field-email')" aria-describedby="email-error">
+        <div class="field-error" id="email-error">Ingresá un email válido</div>
       </div>
 
       <div class="field" id="field-pass">
-        <label>
+        <label for="password">
           Contraseña
           <a href="buscARTE_recuperar.html">¿Olvidaste tu contraseña?</a>
         </label>
         <div class="pass-wrap">
-          <input type="password" id="password" placeholder="Tu contraseña" oninput="clearError('field-pass')" onkeydown="if(event.key==='Enter') login()">
+          <input type="password" id="password" autocomplete="current-password" placeholder="Tu contraseña" aria-describedby="password-error" oninput="clearError('field-pass')" onkeydown="if(event.key==='Enter') login()">
           <button type="button" class="pass-toggle" onclick="togglePass()" id="pass-toggle-btn" aria-label="Mostrar u ocultar contraseña">👁</button>
         </div>
-        <div class="field-error">Contraseña incorrecta</div>
+        <div class="field-error" id="password-error">Contraseña incorrecta</div>
       </div>
 
       <button type="button" class="btn-submit" id="btn-submit" onclick="login()">
@@ -311,7 +313,13 @@
 
     const redirect = getRedirectUrl();
     const returnNote = document.getElementById('return-note');
-    if (returnNote && redirect && redirect !== 'buscARTE_busqueda.html') {
+    const sessionReason = params.get('session');
+    if (returnNote && sessionReason) {
+      returnNote.textContent = sessionReason === 'upgrade'
+        ? 'Actualizamos la seguridad: ingresá una vez con tu cuenta de siempre. No necesitás registrarte otra vez.'
+        : 'Volvé a ingresar para renovar tu sesión. Tus datos y tu cuenta siguen intactos.';
+      returnNote.style.display = 'block';
+    } else if (returnNote && redirect && redirect !== 'buscARTE_busqueda.html') {
       returnNote.textContent = 'Después de ingresar volvés a la página que estabas intentando abrir.';
       returnNote.style.display = 'block';
     }
@@ -392,12 +400,14 @@
     const field = document.getElementById(fieldId);
     if (!field) return;
     field.classList.add('error');
+    field.querySelector('input')?.setAttribute('aria-invalid', 'true');
     const msg = field.querySelector('.field-error');
     if (msg && message) msg.textContent = message;
   }
 
   function clearError(fieldId) {
     document.getElementById(fieldId)?.classList.remove('error');
+    document.getElementById(fieldId)?.querySelector('input')?.removeAttribute('aria-invalid');
     hideGlobal();
   }
 
@@ -475,6 +485,7 @@
   }
 
   async function login() {
+    if (document.getElementById('btn-submit')?.disabled) return;
     const emailInput = document.getElementById('email');
     const passInput = document.getElementById('password');
     const email = emailInput.value.trim().toLowerCase();
@@ -520,8 +531,8 @@
 
       if (!res.ok) {
         console.error('Error login_usuario:', res.status, payload);
-        setFieldError('field-pass', 'Email o contraseña incorrectos.');
-        showGlobal('No pudimos iniciar sesión. Revisá tus datos e intentá de nuevo.');
+        if (res.status >= 500) showGlobal(payload?.error || 'No pudimos confirmar la sesión. Revisá tu conexión y volvé a ingresar.');
+        else { setFieldError('field-pass', 'Email o contraseña incorrectos.'); showGlobal('No pudimos iniciar sesión. Revisá tus datos e intentá de nuevo.'); }
         resetButton();
         return;
       }
@@ -543,12 +554,13 @@
         localStorage.setItem('ba_referentes', user.referentes || '');
         localStorage.setItem('ba_generos', user.generos || '');
         localStorage.setItem('ba_tipo_cuenta', user.tipo_cuenta || 'artista');
-        localStorage.setItem('ba_rubro', user.rubro || 'musica');
+        localStorage.setItem('ba_rubro', user.rubro || '');
 
         document.getElementById('success-bar')?.classList.add('show');
+        const redirect = getRedirectUrl();
         localStorage.removeItem('ba_after_login');
 
-        setTimeout(() => { window.location.href = getRedirectUrl(); }, 850);
+        setTimeout(() => { window.location.href = redirect; }, 850);
       } else {
         setFieldError('field-pass', user?.error || 'Email o contraseña incorrectos.');
         resetButton();
@@ -560,5 +572,7 @@
     }
   }
 </script>
+<script src="/assets/js/escena.js"></script>
+<script src="/assets/js/escena-fondos.js"></script>
 </body>
 </html>

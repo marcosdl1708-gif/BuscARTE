@@ -8,6 +8,7 @@ const root = path.resolve(__dirname, '..');
 const origin = 'https://buscarte.test';
 const source = fs.readFileSync(path.join(root, 'buscARTE_registro.html'), 'utf8');
 const controller = fs.readFileSync(path.join(root, 'assets/js/registro-captcha.js'), 'utf8');
+const staticFiles = new Set(JSON.parse(fs.readFileSync(path.join(root,'site-files.json'),'utf8')));
 const roles = {
   artista: { step: 'perfil', box: 'hcaptcha-box-perfil', create: 'crearPerfil' },
   negocio: { step: 'negocio-contacto', box: 'hcaptcha-box', create: 'crearNegocio' },
@@ -61,7 +62,7 @@ function fakeCaptcha() {
 async function setup(t, options = {}) {
   const width = options.width || 390;
   const context = await browser.newContext({ viewport: { width, height: 844 }, isMobile: width < 768, hasTouch: width < 768, serviceWorkers: 'block' });
-  const calls = { rpc: [], emails: [], optional: [], unexpected: [], errors: [], alerts: [] };
+  const calls = { rpc: [], emails: [], optional: [], secure:[], events:[], unexpected: [], errors: [], alerts: [] };
   let releaseRpc;
   const rpcGate = new Promise(resolve => { releaseRpc = resolve; });
   if (!options.pending) releaseRpc();
@@ -85,6 +86,8 @@ async function setup(t, options = {}) {
         return route.fulfill({ contentType: 'text/html', body: '<!doctype html><title>Destino sintético</title><p>Sin servicios reales</p>' });
       }
       if (['/manifest.json', '/favicon.ico'].includes(url.pathname)) return route.fulfill({ body: '{}' });
+      const relative=url.pathname.slice(1);
+      if (staticFiles.has(relative) && relative.startsWith('assets/')) return route.fulfill({ contentType:({'.js':'application/javascript','.css':'text/css','.webp':'image/webp','.png':'image/png'})[path.extname(relative)]||'application/octet-stream',body:fs.readFileSync(path.join(root,relative)) });
     }
     if (url.hostname === 'js.hcaptcha.com' && url.pathname === '/1/api.js' && method === 'GET') {
       return route.fulfill({ contentType: 'application/javascript', body: fakeCaptcha() });
@@ -102,10 +105,17 @@ async function setup(t, options = {}) {
         calls.optional.push({ path: url.pathname, method, body: method === 'GET' ? null : request.postDataJSON() });
         return route.fulfill({ contentType: 'application/json', body: method === 'GET' ? '[]' : '{}' });
       }
-      if ((url.pathname === '/rest/v1/perfiles' && method === 'PATCH') || (url.pathname.startsWith('/storage/v1/object/fotos-perfil/') && method === 'POST')) {
+      if (url.pathname.startsWith('/storage/v1/object/fotos-perfil/') && method === 'POST') {
+        calls.events.push('upload');
         calls.optional.push({ path: url.pathname, method });
-        return route.fulfill({ contentType: 'application/json', body: '{}' });
+        return route.fulfill({ status:options.uploadStatus||200, contentType: 'application/json', body: '{}' });
       }
+    }
+    if (url.origin===origin && url.pathname==='/.netlify/functions/guardar-perfil' && method==='POST') {
+      const body=request.postDataJSON(); calls.secure.push(body); calls.events.push(body.operation==='verify'?'verify':Object.hasOwn(body.changes,'foto_url')?'photo':'age');
+      const status=body.operation==='verify'?(options.verifyStatus||200):options.secureStatus||200;
+      const rows=Object.hasOwn(options,'secureRows')?options.secureRows:[{id:body.profileId,...body.changes}];
+      return route.fulfill({status,contentType:'application/json',body:JSON.stringify(rows)});
     }
     if (url.origin === origin && url.pathname === '/.netlify/functions/send-email' && method === 'POST') {
       calls.emails.push(request.postDataJSON());
@@ -527,5 +537,94 @@ for (const width of [320, 390, 1280]) {
       await f.solve(); await f.submit(); await f.active('exito');
       await f.page.screenshot({ path: path.join(output, 'onboarding-success-' + width + '.png'), animations: 'disabled' });
     }
+  });
+}
+
+const portrait=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jit0AAAAASUVORK5CYII=', 'base64');
+async function optionalPhoto(f, role='artista', age=false) {
+  await f.final(role);
+  if (role==='artista') {
+    await f.page.locator('#registro-perfil-opcional > summary').click();
+    if (age) await f.page.locator('#edad-registro').fill('26');
+  }
+  await f.page.locator(role==='artista'?'#reg-foto-input':'#neg-foto-input').setInputFiles({name:'synthetic-only.png',mimeType:'image/png',buffer:portrait});
+  await f.page.locator(role==='artista'?'#reg-foto-preview':'#neg-foto-preview').waitFor({state:'visible'});
+  await f.solve(role); await f.submit(role); await f.active('exito');
+  await f.page.waitForFunction(()=>registroCreado && !registroEnCurso);
+}
+for (const role of ['artista','negocio']) {
+  test(`${role}: optional photo uses verified owner, timestamp path and secure endpoint without direct profile PATCH`,async t=>{
+    const f=await setup(t); await optionalPhoto(f,role,role==='artista');
+    assert.deepEqual(f.calls.events,role==='artista'?['age','verify','upload','photo']:['verify','upload','photo']);
+    const upload=f.calls.optional.find(c=>c.method==='POST' && c.path.startsWith('/storage/'));
+    assert.match(upload.path,/\/fotos-perfil\/onboarding-fixture-only-\d{10,16}\.png$/);
+    for (const body of f.calls.secure) {
+      assert.equal(body.profileId,'onboarding-fixture-only');
+      assert.equal(body.email,'persona@example.invalid');
+      assert.equal(body.password,'Fixture-only-123!');
+    }
+    const photo=f.calls.secure.find(c=>Object.hasOwn(c.changes,'foto_url'));
+    assert.deepEqual(Object.keys(photo.changes),['foto_url']);
+    assert.match(photo.changes.foto_url,/\/onboarding-fixture-only-\d{10,16}\.png$/);
+    assert.equal(await f.page.locator('#reg-password').inputValue(),'');
+    assert.match(await f.page.locator('#exito-opcionales').textContent(),/qued.*guardad/);
+    assert.equal(await f.page.locator('#exito-opcionales-link').isVisible(),false);
+    assert.equal(await f.page.evaluate(()=>[...Object.values(localStorage),...Object.values(sessionStorage)].some(v=>v.includes('Fixture-only-123!'))),false);
+  });
+}
+for (const [label,options,events] of [
+  ['rejected verify',{verifyStatus:401},['verify']],
+  ['empty verification result',{secureRows:[]},['verify']],
+  ['wrong represented owner',{secureRows:[{id:'different-owner'}]},['verify']],
+  ['upload failure',{uploadStatus:500},['verify','upload']],
+  ['photo link save failure',{secureStatus:502},['verify','upload','photo']]
+]) {
+  test(`optional ${label} keeps created account and clearly explains pending photo without repeating signup`,async t=>{
+    const f=await setup(t,options); await optionalPhoto(f);
+    assert.deepEqual(f.calls.events,events);
+    assert.equal(f.calls.rpc.length,1);
+    assert.equal(await f.page.evaluate(()=>localStorage.getItem('ba_logged')),'1');
+    assert.match(await f.page.locator('#exito-opcionales').textContent(),/No pudimos confirmar.*foto/);
+    assert.equal(await f.page.locator('#exito-opcionales-link').isVisible(),true);
+    assert.equal(await f.page.locator('#exito-opcionales-link').getAttribute('href'),'buscARTE_perfil.html#completar');
+    assert.equal(await f.page.locator('#reg-password').inputValue(),'');
+    await f.page.evaluate(()=>crearPerfil(document.querySelector('#step-perfil .btn-next')));
+    assert.equal(f.calls.rpc.length,1);
+  });
+}
+test('optional age failure is explicit and never retries signup or claims that age was saved',async t=>{
+  const f=await setup(t,{secureStatus:502}); await f.final();
+  await f.page.locator('#registro-perfil-opcional > summary').click();
+  await f.page.locator('#edad-registro').fill('26');
+  await f.solve();await f.submit();await f.active('exito');
+  await f.page.waitForFunction(()=>registroCreado && !registroEnCurso);
+  assert.deepEqual(f.calls.events,['age']);
+  assert.match(await f.page.locator('#exito-opcionales').textContent(),/No pudimos confirmar.*edad/);
+  assert.equal(f.calls.rpc.length,1);
+});
+for (const rows of [[{id:'onboarding-fixture-only'}],[{id:'onboarding-fixture-only',edad:25}]]) {
+  test('optional age requires its represented value, not just the expected profile ID',async t=>{
+    const f=await setup(t,{secureRows:rows});await f.final();
+    await f.page.locator('#registro-perfil-opcional > summary').click();
+    await f.page.locator('#edad-registro').fill('26');
+    await f.solve();await f.submit();await f.active('exito');
+    await f.page.waitForFunction(()=>registroCreado && !registroEnCurso);
+    assert.match(await f.page.locator('#exito-opcionales').textContent(),/No pudimos confirmar.*edad/);
+    assert.equal(f.calls.rpc.length,1);
+  });
+}
+for (const role of Object.keys(roles)) for (const width of [320,390]) {
+  test(`integrated A2 ${role} final step and success fit ${width}px`,async t=>{
+    const f=await setup(t,{width});await f.final(role);
+    assert.equal(await f.page.evaluate(()=>document.documentElement.dataset.baDesign),'a2');
+    const prefix='#step-'+roles[role].step;
+    await assertFits(f.page,width,[prefix+' .captcha-panel',prefix+' .h-captcha iframe',prefix+' .btn-next']);
+    await f.page.locator(prefix+' .btn-next').scrollIntoViewIfNeeded();
+    const button=await f.page.locator(prefix+' .btn-next').boundingBox();
+    assert.ok(button.height>=44 && button.y>=-1 && button.y+button.height<=845);
+    await f.solve(role);await f.submit(role);await f.active('exito');
+    await assertFits(f.page,width,['#exito-btn']);
+    assert.equal(await f.page.locator('#reg-password').inputValue(),'');
+    assert.equal(await f.page.locator('#exito-opcionales').isVisible(),false);
   });
 }

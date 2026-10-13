@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-ba-design="a2">
 <head>
+<script src="/assets/js/sesion-segura.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Contactanos para reportes de seguridad, bugs, feedback o propuestas de colaboración para buscARTE.">
@@ -88,6 +89,7 @@
     @media (max-width:420px) { .motivos{grid-template-columns:1fr} }
   </style>
 <script src="/assets/js/meta-pixel.js?v=1" defer></script>
+<link rel="stylesheet" href="/assets/css/escena.css">
 </head>
 <body>
 <div class="cursor" id="cursor"></div><div class="cursor-ring" id="cursor-ring"></div>
@@ -129,8 +131,8 @@
     <div class="field" id="field-asunto"><label for="c-asunto">Asunto</label><select id="c-asunto" onchange="clearField('field-asunto')"><option value="">Elegí un motivo</option><option>Seguridad infantil</option><option>Reportar un anuncio</option><option>Reportar una conversación</option><option>Reportar un bug</option><option>Sugerir una feature</option><option>Propuesta de negocio</option><option>Feedback general</option><option>Otro</option></select><div class="error-text">Elegí un motivo.</div></div>
     <div class="field" id="field-mensaje"><label for="c-mensaje">Mensaje</label><textarea id="c-mensaje" placeholder="Contanos qué pasó, en qué página, desde qué celular/navegador o qué idea tenés..." oninput="clearField('field-mensaje')"></textarea><div class="error-text">Escribí un mensaje.</div></div>
     <button class="btn-send" id="btn-send" onclick="enviarContacto(this)"><span class="btn-text">Enviar mensaje →</span><span class="spinner"></span></button>
-    <div class="msg success" id="success-msg">✓ Mensaje enviado. Te respondemos a la brevedad.</div>
-    <div class="msg error" id="error-msg">No se pudo enviar el mensaje. Probá de nuevo o escribinos por mail.</div>
+    <div class="msg success" id="success-msg" role="status">✓ Mensaje enviado. Te respondemos a la brevedad.</div>
+    <div class="msg error" id="error-msg" role="alert">No se pudo enviar el mensaje. Probá de nuevo o escribinos por mail.</div>
     <div class="mail-directo">También podés escribir directo a <a href="mailto:BuscARTE.webmail@gmail.com">BuscARTE.webmail@gmail.com</a></div>
   </section>
 </div>
@@ -188,6 +190,7 @@
   }
 
   async function enviarContacto(btn) {
+    if (btn.disabled) return;
     const nombre = document.getElementById('c-nombre').value.trim();
     const email = document.getElementById('c-email').value.trim();
     const asunto = document.getElementById('c-asunto').value;
@@ -245,5 +248,7 @@
     }
   }
 </script>
+<script src="/assets/js/escena.js"></script>
+<script src="/assets/js/escena-fondos.js"></script>
 </body>
 </html>

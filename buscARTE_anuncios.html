@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 
-<html lang="es">
+<html lang="es" data-ba-design="a2">
 <head>
+<script src="/assets/js/sesion-segura.js"></script>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <!-- SEO -->
@@ -65,11 +66,11 @@
   .filters-panel::-webkit-scrollbar { width:3px; }
   .filters-panel::-webkit-scrollbar-thumb { background:var(--gris3); }
 
-  .filter-header { padding:1.2rem 1.5rem 1rem;border-bottom:1px solid #1c1c1c;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--negro2);z-index:5; }
-  .filter-title-wrap { }
+  .filter-header { padding:1.2rem 1.5rem 1rem;border-bottom:1px solid #1c1c1c;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.35rem .6rem;align-items:center;position:sticky;top:0;background:var(--negro2);z-index:5; }
+  .filter-title-wrap { display:contents; }
   .filter-title { font-family:var(--font-display);font-size:.95rem; }
-  .filter-category-label { font-size:.62rem;color:var(--neon);letter-spacing:.1em;text-transform:uppercase;margin-top:.1rem; }
-  .filter-clear { font-size:.65rem;color:var(--gris2);cursor:none;background:none;border:none;font-family:var(--font-body);letter-spacing:.08em;text-transform:uppercase;padding:0;transition:color .2s; }
+  .filter-category-label { grid-column:1/-1;grid-row:2;font-size:.62rem;color:var(--neon);letter-spacing:.1em;text-transform:uppercase;margin-top:.1rem;line-height:1.4;overflow-wrap:anywhere; }
+  .filter-clear { grid-column:2;grid-row:1;min-height:44px;font-size:.65rem;color:var(--gris);cursor:none;background:none;border:none;font-family:var(--font-body);letter-spacing:.08em;text-transform:uppercase;padding:.25rem 0;transition:color .2s;white-space:nowrap; }
   .filter-clear:hover { color:var(--neon); }
 
   /* Paneles de filtros por categoría */
@@ -131,7 +132,7 @@
   .anuncio-time { font-size:.63rem;color:var(--gris2);margin-left:auto; }
   .anuncio-respond { background:transparent;border:1px solid var(--gris3);color:var(--gris);padding:.28rem .7rem;font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;cursor:none;transition:all .2s;font-family:var(--font-body); }
   .anuncio-respond:hover { border-color:var(--neon);color:var(--neon); }
-  .anuncio-likes { font-size:.65rem;color:var(--gris2);display:inline-flex;align-items:center;gap:.25rem; }
+  .anuncio-likes { font-size:.7rem;color:var(--gris);display:inline-flex;align-items:center;gap:.25rem;line-height:1.4;flex-wrap:wrap; }
   .anuncio-likes.has-likes { color:var(--gris); }
 
   .reply-form { display:none;margin-top:1rem;padding-top:1rem;border-top:1px solid #181818;animation:fadeUp .2s ease; }
@@ -950,6 +951,7 @@
 <script src="/assets/js/meta-pixel.js?v=1" defer></script>
 <style>html:not([data-music-tools="true"]) a[href*="buscarte_generador" i] { display: none !important; }</style>
 <script src="/assets/js/menu-cuenta.js"></script>
+<link rel="stylesheet" href="/assets/css/escena.css">
 </head>
 <body data-marketplace="false">
 <div class="cursor" id="cursor"></div>
@@ -971,6 +973,18 @@
 <button class="modal-tipo-btn" onclick="selectTipo('clases',this)"><span class="modal-tipo-icon">🎓</span><span class="modal-tipo-label">Doy clases</span></button>
 </div>
 <!-- BUSCO ARTISTA -->
+<div class="mfield" id="anuncio-comunidad-field" hidden>
+<label for="anuncio-comunidad">¿A qué comunidad se dirige?</label>
+<select id="anuncio-comunidad" onchange="showForm(currentTipo)">
+<option value="">Elegí una comunidad para tu anuncio</option>
+<option value="musica">Música</option><option value="actuacion">Actuación & escena</option>
+<option value="audiovisual">Audiovisual & fotografía</option><option value="modelaje">Modelaje</option>
+<option value="diseno">Diseño & artes visuales</option><option value="tatuaje">Tatuaje & arte corporal</option>
+<option value="danza">Danza</option><option value="maquillaje">Maquillaje, vestuario & FX</option>
+<option value="circo">Circo & artes escénicas</option><option value="escritura">Escritura & guión</option>
+</select>
+<p style="color:var(--gris);font-size:.8rem;margin-top:.5rem">Esto elige dónde aparece el anuncio, sin cambiar el tipo de tu cuenta.</p>
+</div>
 <div class="modal-form active" id="form-busco">
 <div class="mfield" id="busco-rubro-field">
 <label>¿Qué tipo de artista buscás?</label>
@@ -1206,7 +1220,7 @@
 <div class="filter-title">Filtros</div>
 <div class="filter-category-label" id="filter-category-label">Todos los anuncios</div>
 </div>
-<button class="filter-clear" onclick="clearFilters()">Limpiar</button>
+<button class="filter-clear" onclick="clearFilters()" aria-label="Limpiar filtros del tablón">Limpiar</button>
 </div>
 <!-- ═══ SELECTOR DE RUBRO GLOBAL (siempre visible, fuera de los paneles por categoría) ═══ -->
 <div class="filter-group" id="fp-rubro-global">
@@ -1394,7 +1408,7 @@
 <a class="mini-link" id="anuncios-intro-account" href="buscARTE_registro.html">+ Crear perfil</a>
 </div>
 </div>
-<button class="mobile-filter-btn" id="mobile-filter-btn-an" onclick="toggleMobileFiltersAn()">⚙ Filtros</button>
+<button class="mobile-filter-btn" id="mobile-filter-btn-an" onclick="toggleMobileFiltersAn()" aria-controls="anuncios-filters-panel" aria-expanded="false">⚙ Filtros</button>
 
 <div class="tipo-tabs">
 <button class="tipo-tab active" onclick="setTab(this,'todos')">Todos</button>
@@ -1465,7 +1479,7 @@
   }
 
   // Rubro seleccionado en el modal "busco artista" — por defecto, tu propia disciplina
-  let buscoRubroSeleccionado = rubroArtisticoInicial || 'musica'
+  let buscoRubroSeleccionado = localStorage.getItem('ba_tipo_cuenta') === 'artista' ? rubroArtisticoInicial || 'musica' : rubroFiltro
 
   let fotoVentaUrl = null
   let fotoVentaUrl2 = null
@@ -1615,7 +1629,7 @@
     link.href = marketplace ? 'buscARTE_anuncios.html' : 'buscARTE_busqueda.html'
     link.textContent = marketplace ? 'Anuncios artísticos' : '🎨 Artistas'
     const account = document.getElementById('anuncios-intro-account')
-    account.hidden = marketplace && isLogged()
+    account.hidden = isLogged()
     account.textContent = marketplace ? '+ Crear cuenta' : '+ Crear perfil'
     const subtitle = document.getElementById('main-sub-text')
     if (marketplace) subtitle.textContent = 'Venta y alquiler · todos los rubros'
@@ -1803,6 +1817,8 @@
     ;['jam-1','venta-1','venta-2','venta-3'].forEach(key => { fotoGeneraciones[key] = (fotoGeneraciones[key] || 0) + 1 })
     resetFotoUI('jam')
     resetFotoUI('venta')
+    const comunidad = document.getElementById('anuncio-comunidad')
+    if (comunidad) { comunidad.value = ''; delete comunidad.dataset.seeded }
     setPublishState('idle')
   }
   function closeModalOutside(e) { if(e.target === document.getElementById('modal')) closeModal() }
@@ -1874,14 +1890,34 @@
     const form = document.getElementById('form-' + tipo)
     if (form) form.classList.add('active')
 
-    const miRubro = localStorage.getItem('ba_rubro') || 'musica'
+    const artist = (window.__baTipoCuenta || localStorage.getItem('ba_tipo_cuenta')) === 'artista'
+    const comunidadField = document.getElementById('anuncio-comunidad-field')
+    const comunidad = document.getElementById('anuncio-comunidad')
+    const elegirComunidad = !artist && tipo !== 'busco' && tipo !== 'vende'
+    comunidadField.hidden = !elegirComunidad
+    comunidad.required = elegirComunidad
+    if (elegirComunidad && !comunidad.dataset.seeded) {
+      comunidad.value = RUBROS_VALIDOS_ANUN.includes(rubroFiltroActivo) ? rubroFiltroActivo : ''
+      comunidad.dataset.seeded = '1'
+    }
+    const miRubro = artist ? localStorage.getItem('ba_rubro') : comunidad.value
+    if (elegirComunidad && !RUBROS_VALIDOS_ANUN.includes(miRubro)) {
+      if (form) form.classList.remove('active')
+      actualizarTituloModal(tipo)
+      return
+    }
 
     if (tipo === 'busco' && formRubrosRenderizados.get(tipo) !== (buscoRubroSeleccionado || 'musica')) {
       // "Busco" deja elegir a quién buscás (cualquier rubro). Siempre mostramos el selector
       // y dejamos marcado el chip del rubro activo para que se vea el estado actual.
-      const rb = buscoRubroSeleccionado || 'musica'
-      const chipBtn = document.querySelector('#busco-rubro-chips .mchip[onclick*="\'' + rb + '\'"]')
-      seleccionarRubroBusco(rb, chipBtn)
+      const rb = buscoRubroSeleccionado || (artist ? miRubro : null)
+      if (RUBROS_VALIDOS_ANUN.includes(rb)) {
+        const chipBtn = document.querySelector('#busco-rubro-chips .mchip[onclick*="\'' + rb + '\'"]')
+        seleccionarRubroBusco(rb, chipBtn)
+      } else {
+        document.querySelectorAll('#busco-rubro-chips .mchip').forEach(chip => chip.classList.remove('on'))
+        document.getElementById('busco-chips-especificos').innerHTML = '<p style="color:var(--gris);font-size:.82rem">Elegí el rubro de la persona que buscás.</p>'
+      }
       const rubroField = document.getElementById('busco-rubro-field')
       if (rubroField) rubroField.style.display = ''
     }
@@ -1904,7 +1940,9 @@
     if (!titleEl) return
     const t = canonicalTipo(tipo)
     if (t === 'busco') { titleEl.textContent = 'Busco artista'; return }
-    const rubro = localStorage.getItem('ba_rubro') || 'musica'
+    const artist = (window.__baTipoCuenta || localStorage.getItem('ba_tipo_cuenta')) === 'artista'
+    const rubro = artist ? localStorage.getItem('ba_rubro') : document.getElementById('anuncio-comunidad')?.value
+    if (!RUBROS_VALIDOS_ANUN.includes(rubro)) { titleEl.textContent = {ofrezco:'Me ofrezco',jam:'Evento / encuentro',clases:'Clases / taller',vende:'Venta / alquiler'}[t] || 'Publicar anuncio'; return }
     const config = RUBROS_ANUNCIO_CONFIG[rubro] || RUBROS_ANUNCIO_CONFIG.musica
     const sidebarItem = config.sidebar.find(s => s.tipo === t)
     titleEl.textContent = sidebarItem ? sidebarItem.label : 'Publicar anuncio'
@@ -2019,11 +2057,13 @@
       if (!vigente() || signal.aborted) return
       const extMap = { 'image/png':'png', 'image/webp':'webp', 'image/jpeg':'jpg' }
       const ext = extMap[file.type] || 'jpg'
+      const session = await window.BuscARTESesion.require();
+      if (!session) throw new Error('Volvé a ingresar antes de subir la foto.');
       const random = (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now())
-      const fileName = `${tipo}-${random}.${ext}`
+      const fileName = `${session.id}-${Date.now()}-${tipo}-${random}.${ext}`
       const res = await fetch(`${SUPABASE_URL}/storage/v1/object/fotos-anuncios/${fileName}`, {
         method:'POST',
-        headers:{ ...SB_HEADERS, 'Content-Type':file.type, 'x-upsert':'true' },
+        headers:{ ...SB_HEADERS, 'Content-Type':file.type },
         body:file,
         signal
       })
@@ -2113,10 +2153,15 @@
     let envioIniciado = false
     try {
     let datos = { tipo, estado:'activo', user_id: miId }
-    // Rubro de quien publica (su disciplina). Define el tablón para ofrezco/clases/jam.
-    // El marketplace (vende) es transversal: vive en la sección Compra-venta y no necesita
-    // un rubro propio, así que un visitante (sin ba_rubro) queda con rubro null, no 'musica'.
-    datos.rubro = (tipo === 'vende') ? (localStorage.getItem('ba_rubro') || null) : (localStorage.getItem('ba_rubro') || 'musica')
+    // Artistas: conservar su disciplina. Negocios/visitantes: comunidad elegida
+    // para este anuncio, nunca reclasificar el perfil ni inferir Música.
+    // Marketplace es transversal; las cuentas sin disciplina artística usan null.
+    const artist = (window.__baTipoCuenta || localStorage.getItem('ba_tipo_cuenta')) === 'artista'
+    const comunidad = tipo === 'busco' ? buscoRubroSeleccionado : document.getElementById('anuncio-comunidad')?.value
+    datos.rubro = tipo === 'vende' ? (artist ? localStorage.getItem('ba_rubro') || null : null) : artist ? localStorage.getItem('ba_rubro') : comunidad
+    if (tipo !== 'vende' && (!RUBROS_VALIDOS_ANUN.includes(datos.rubro) || (tipo === 'busco' && !RUBROS_VALIDOS_ANUN.includes(buscoRubroSeleccionado)))) {
+      throw new Error(tipo === 'busco' ? 'Elegí el rubro de la persona que buscás.' : 'Elegí a qué comunidad se dirige el anuncio.')
+    }
 
     if (tipo === 'busco' || tipo === 'ofrezco') {
       const form = document.getElementById('form-' + tipo)
@@ -2135,7 +2180,7 @@
       if (!datos.titulo && tipo === 'ofrezco') datos.titulo = datos.instrumentos ? `Me ofrezco: ${datos.instrumentos}` : 'Me ofrezco como artista'
       // rubro_buscado — determina en qué tablón aparece el anuncio
       if (tipo === 'busco') {
-        datos.rubro_buscado = buscoRubroSeleccionado || rubroFiltro || 'musica'
+        datos.rubro_buscado = buscoRubroSeleccionado
         if (!datos.titulo) datos.titulo = `Busco ${RUBROS_LABELS[datos.rubro_buscado] || 'artista'}`
       }
     }
@@ -2240,10 +2285,12 @@
   function timeAgo(iso) {
     if (!iso) return ''
     const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 60000)
+    if (!Number.isFinite(diff)) return ''
     if (diff < 1) return 'Ahora mismo'
     if (diff < 60) return `Hace ${diff} min`
     if (diff < 1440) return `Hace ${Math.floor(diff/60)} hs`
-    return `Hace ${Math.floor(diff/1440)} días`
+    const dias = Math.floor(diff/1440)
+    return `Hace ${dias} ${dias === 1 ? 'día' : 'días'}`
   }
 
   function formatFecha(iso) {
@@ -2268,7 +2315,7 @@
     const zona = a.zona || a.lugar || ''
     let precio = a.precio || a.precio_entrada || ''
     if (precio && /^\d/.test(String(precio).trim())) precio = '$' + String(precio).trim()
-    if (tipo === 'clases' && precio) precio = precio + '/h'
+    if (tipo === 'clases' && /^\$\s*\d/.test(String(precio))) precio = precio + '/h'
     const tagsHTML = [...tags, precio].filter(Boolean).map(t=>`<span class="anuncio-tag">${escapeHtml(t)}</span>`).join('')
     const fechaInfo = (tipo === 'jam' && a.fecha_evento) ? formatFecha(a.fecha_evento) : null
     const fechaHTML = fechaInfo ? `<div class="anuncio-fecha${fechaInfo.pasado ? ' anuncio-pasado' : ''}"><span class="anuncio-fecha-icon">📅</span>${escapeHtml(fechaInfo.str)}</div>` : ''
@@ -2685,7 +2732,7 @@
     document.getElementById('publish-sidebar-title').textContent = esMarketplace() ? 'Publicá lo que ofrecés' : 'Publicar anuncio'
     document.getElementById('publish-sidebar-copy').textContent = esMarketplace()
       ? 'Mostrá el producto, agregá fotos y recibí consultas. Sin intermediarios: coordinás con la otra persona.'
-      : '¿Buscás alguien, te ofrecés, querés organizar una jam o vender algo?'
+      : '¿Buscás personas, te ofrecés, organizás un evento o querés vender algo?'
     const publishEl = document.querySelector('.publish-types')
     if (publishEl) {
       // El atajo de este catálogo ofrece venta. El modal conserva todos los tipos permitidos.
@@ -2722,10 +2769,11 @@
       const p = Array.isArray(rows) ? rows[0] : null
       if (!p) return
       const prev = window.__baTipoCuenta
+      const prevRubro = localStorage.getItem('ba_rubro')
       if (p.tipo_cuenta) { window.__baTipoCuenta = p.tipo_cuenta; localStorage.setItem('ba_tipo_cuenta', p.tipo_cuenta) }
       if (p.rubro) localStorage.setItem('ba_rubro', p.rubro)
       // Si el tipo cambió respecto a lo ya renderizado, re-aplicar SOLO la UI de publicar.
-      if (prev !== window.__baTipoCuenta) renderPublishUI()
+      if (prev !== window.__baTipoCuenta || prevRubro !== localStorage.getItem('ba_rubro')) renderPublishUI()
     } catch(e) { /* fail-safe: sin restricción */ }
   }
 
@@ -3189,6 +3237,8 @@
 
       const titleNum = document.getElementById('anuncios-count') || document.querySelector('.main-title span')
       if (titleNum) titleNum.textContent = String(rendered)
+      const headingLabel = document.getElementById('anuncios-heading-label')
+      if (headingLabel) headingLabel.textContent = esMarketplace() ? (rendered === 1 ? 'publicación' : 'publicaciones') : (rendered === 1 ? 'anuncio' : 'anuncios')
       const sub = document.getElementById('main-sub-text') || document.querySelector('.main-sub')
       const efRubro = getRubroFiltroEfectivo()
       const rubroLabel = efRubro ? (RUBROS_LABELS[efRubro] || efRubro) : null
@@ -3298,32 +3348,29 @@
       document.getElementById('nav-dropdown')?.classList.remove('open')
     }
   })
-  function logout(){ localStorage.removeItem('ba_logged'); localStorage.removeItem('ba_name'); localStorage.removeItem('ba_user_id'); localStorage.removeItem('ba_tipo_cuenta'); localStorage.removeItem('ba_rubro'); window.location.href='index.html' }
+  function logout() { return window.BuscARTESesion.logout(); }
 
   function toggleMobileFiltersAn() {
     const panel = document.getElementById('anuncios-filters-panel')
     const btn = document.getElementById('mobile-filter-btn-an')
     if (!panel) return
     panel.classList.toggle('mobile-open')
-    if (btn) btn.textContent = panel.classList.contains('mobile-open') ? '✕ Cerrar filtros' : '⚙ Filtros'
+    if (btn) {
+      const abierto = panel.classList.contains('mobile-open')
+      btn.textContent = abierto ? '✕ Cerrar filtros' : '⚙ Filtros'
+      btn.setAttribute('aria-expanded', String(abierto))
+    }
   }
   function closeMobileFiltersAn() {
     const panel = document.getElementById('anuncios-filters-panel')
     const btn = document.getElementById('mobile-filter-btn-an')
     if (panel) panel.classList.remove('mobile-open')
-    if (btn) btn.textContent = '⚙ Filtros'
+    if (btn) { btn.textContent = '⚙ Filtros'; btn.setAttribute('aria-expanded', 'false') }
   }
 
   async function vencerAnunciosViejos() {
-    try {
-      await fetch(`${SUPABASE_URL}/rest/v1/rpc/vencer_anuncios_viejos`, {
-        method: 'POST',
-        headers: { ...SB_HEADERS, 'Content-Type':'application/json' },
-        body: '{}'
-      });
-    } catch(e) {
-      console.warn('No se pudo ejecutar vencimiento automático de anuncios:', e);
-    }
+    // El servidor mantiene el vencimiento al leer anuncios. No exponer una RPC
+    // privilegiada ni pedir al navegador que modifique anuncios de otras cuentas.
   }
 
   async function cargarContadoresReacciones(ids) {
@@ -3352,10 +3399,10 @@
         const el = document.getElementById(`likes-${anuncioId}`)
         if (!el) return
         const partes = []
-        if (counts.like > 0) partes.push(`♥ ${counts.like}`)
-        if (counts.asistire > 0) partes.push(`🎟 ${counts.asistire}`)
+        if (counts.like > 0) partes.push(`♥ ${counts.like} me gusta`)
+        if (counts.asistire > 0) partes.push(`${counts.asistire} ${counts.asistire === 1 ? 'asistente' : 'asistentes'}`)
         if (partes.length) {
-          el.textContent = partes.join('  ')
+          el.textContent = partes.join(' · ')
           el.style.display = 'inline-flex'
           el.classList.add('has-likes')
         }
@@ -3437,14 +3484,7 @@ function closeMbnPanel(){
   document.getElementById('mbn-panel').classList.remove('open');
   document.getElementById('mbn-overlay').classList.remove('open');
 }
-function mbnLogout(){
-  localStorage.removeItem('ba_logged');
-  localStorage.removeItem('ba_name');
-  localStorage.removeItem('ba_user_id');
-  localStorage.removeItem('ba_tipo_cuenta');
-  localStorage.removeItem('ba_rubro');
-  window.location.href='index.html';
-}
+function mbnLogout() { return window.BuscARTESesion.logout(); }
 
 </script>
 <script>
@@ -3473,5 +3513,7 @@ if ('serviceWorker' in navigator) {
   })();
 
 </script>
+<script src="/assets/js/escena.js"></script>
+<script src="/assets/js/escena-fondos.js"></script>
 </body>
 </html>

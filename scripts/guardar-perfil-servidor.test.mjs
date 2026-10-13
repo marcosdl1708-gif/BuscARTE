@@ -24,7 +24,7 @@ async function run(body = base, options = {}) {
     assert.equal(url.pathname, '/rest/v1/perfiles'); assert.equal(init.method, 'PATCH');
     assert.equal(url.searchParams.get('id'), 'eq.701');
     assert.equal(url.searchParams.get('or'), '(baneado.is.null,baneado.eq.false)');
-    assert.equal(url.searchParams.get('select'), 'id,campos_especificos,generos,foto_url,rubro');
+    assert.equal(url.searchParams.get('select'), 'id,campos_especificos,generos,foto_url,rubro,edad');
     assert.equal(init.headers.Prefer, 'return=representation');
     return Response.json(options.rows ?? [{ id: 701, ...data }], { status: options.patchStatus ?? 200 });
   };
@@ -74,6 +74,34 @@ test('photo must be the verified owner file in the configured public bucket', as
   for (const bad of ['not-a-url', foto_url.replace('/701-', '/999-'), foto_url.replace(backend, 'https://evil.example.invalid'), foto_url + '?token=x', foto_url.replace('.jpg', '.svg'), foto_url.replace('/701-', '/../701-')]) {
     const out = await run({ ...base, changes: { foto_url: bad } }); assert.equal(out.status, 400); assert.equal(out.calls.length, 1);
   }
+});
+test('businesses and visitors retain their existing rubro while saving age/photo; role and rubro changes stay rejected', async () => {
+  const foto_url = backend + '/storage/v1/object/public/fotos-perfil/701-1788710000000.png';
+  for (const [tipo_cuenta, rubro] of [['negocio','Sala de ensayo'], ['visitante','']]) {
+    const login = { ...user, tipo_cuenta, rubro };
+    for (const changes of [{ edad:26 }, { foto_url }, { edad:26, rubro, tipo_cuenta }]) {
+      const out = await run({ ...base, changes }, { login });
+      assert.equal(out.status,200); assert.equal(out.calls.length,2);
+      assert.equal(Object.hasOwn(out.calls[1].data,'tipo_cuenta'),false);
+    }
+    for (const changes of [{ rubro:'musica' }, { tipo_cuenta:'artista' }, { foto_url, rubro:'musica' }]) {
+      const out=await run({ ...base, changes }, { login });
+      // Mixed photo changes are invalid before authentication; the other changes
+      // are denied after confirming the owner. Neither may PATCH.
+      assert.ok([400,403].includes(out.status));
+      assert.equal(out.calls.filter(c=>c.init.method==='PATCH').length,0);
+    }
+  }
+});
+test('age is validated without widening identity or privilege writes', async () => {
+  for (const edad of [14,121,26.5,'26',NaN]) {
+    const out=await run({ ...base, changes:{edad} });
+    // JSON encodes NaN as null, which is the legitimate clear-age operation.
+    assert.equal(out.status,Number.isNaN(edad)?200:400);
+  }
+  assert.equal((await run({ ...base, changes:{edad:null} })).status,200);
+  for (const rows of [[{id:701}], [{id:701,edad:25}]]) assert.equal((await run({ ...base,changes:{edad:26} },{rows})).status,502);
+  const out=await run({ ...base,changes:{edad:26} }); assert.equal(out.result[0].edad,26);
 });
 test('upstream failure or unconfirmed result never reports successful save; legacy JSON preserved', async () => {
   for (const options of [{ throwFetch: true }, { loginStatus: 500 }, { patchStatus: 500 }, { rows: [] }, { rows: [{ id: 999 }] }, { rows: [{ id: 701, generos: 'Anterior' }] }]) {

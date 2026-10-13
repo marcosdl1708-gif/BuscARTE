@@ -7,6 +7,7 @@ const { chromium } = require(process.env.BUSCARTE_PLAYWRIGHT_MODULE || 'playwrig
 const root = path.resolve(__dirname, '..');
 const html = fs.readFileSync(path.join(root, 'buscARTE_registro.html'), 'utf8');
 const controller = fs.readFileSync(path.join(root, 'assets/js/registro-captcha.js'), 'utf8');
+const staticFiles = new Set(JSON.parse(fs.readFileSync(path.join(root,'site-files.json'),'utf8')));
 const paths = {
   artista: { step: 'perfil', box: 'hcaptcha-box-perfil', create: 'crearPerfil' },
   negocio: { step: 'negocio-contacto', box: 'hcaptcha-box', create: 'crearNegocio' },
@@ -101,6 +102,8 @@ async function setup(t, { width = 390, mode = 'ready', rpcFailure = false } = {}
       return route.fulfill({ contentType: 'application/javascript', body: '// Tracking disabled in isolated tests.' });
     }
     if (url.origin === 'http://buscarte.test' && ['/manifest.json', '/favicon.ico'].includes(url.pathname)) return route.fulfill({ body: '{}' });
+    const relative=url.pathname.slice(1);
+    if (url.origin==='http://buscarte.test' && request.method()==='GET' && relative.startsWith('assets/') && staticFiles.has(relative)) return route.fulfill({contentType:({'.js':'application/javascript','.css':'text/css','.webp':'image/webp','.png':'image/png'})[path.extname(relative)]||'application/octet-stream',body:fs.readFileSync(path.join(root,relative))});
     calls.unexpected.push(request.method() + ' ' + url.origin + url.pathname);
     return route.abort();
   });

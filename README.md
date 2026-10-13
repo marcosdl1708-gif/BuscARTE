@@ -3,6 +3,16 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
+## Preparación local A2 — 13/10/2026, todavía sin publicar
+
+Rama `codex/propuesta-visual-20261013`, base `1785b2f`. El diseño A2 elegido se trasladó a assets publicables y a las 19 páginas; los arreglos de navegación, anuncios, chat, formularios y guardado opcional del registro están en preparación local. Construcción explícita: 66 archivos en `dist/`, sin controles/datos de la demo, PNG originales, prompts, pruebas ni documentos privados. Preview A/B/C y prototipo multidisciplina quedan fuera del paquete.
+
+Actualización de seguridad aprobada por el usuario el 13/10: se prepararon sesiones opacas del servidor, gateway verificado y cierre coordinado del acceso legacy. La migración aditiva remota `20261013202641` (`web_session_backend`) sólo crea tablas privadas de sesiones/límites y procedimientos de servidor; no convierte cuentas a Supabase Auth. Las pruebas de registro/login/reset/límites se ejecutaron con datos sintéticos dentro de una transacción deshecha, sin cuentas de prueba retenidas ni correos. El cierre de permisos se aplicará después de verificar las funciones publicadas; no ejecutar la migración de cierre antes de ese corte.
+
+El usuario aprobó reparar seguridad conservando las cuentas/IDs/contraseñas actuales. La preparación Auth histórica no se ejecuta en bloque: está incompleta y no cierra estos accesos. Multidisciplina continúa como propuesta separada, sin interfaz de demo ni datos prototipo en producción. Detalles privados en `../BuscARTE-resguardos/auditoria-a2-20261013/`; propuesta en su `auditoria-multidisciplina.md`. No subir diagnósticos privados a GitHub.
+
+Construcción actual: 66 archivos públicos, scripts de seguridad incluidos; funciones y helper de servidor fuera de dist. Bienvenida/notificaciones se originan en acciones persistidas verificadas; reset consume tokens de forma atómica; los programados mantienen horarios y elegibilidad. hCaptcha está configurado como secreto sólo en producción (scopes Builds/Functions/Runtime permitidos por el plan); nunca copiarlo al código ni al frontend. Validación aislada/capturas en `../BuscARTE-resguardos/escena-release-*`; no equivalen a app física. La modificación ajena de `docs/guia-prueba-app-usuario-nuevo.md` permanece intacta y fuera del corte. Revalidar estado/deploy antes de continuar; esta sección registra preparación, no publicación.
+
 ## Estado operativo — enlaces de Instagram corregidos, 21/9/2026
 
 Fuente `17b844f`, deploy `6ab1abe3118fa89e00fdf1e8`, caché v23. El perfil público interpreta Instagram como usuario, @usuario o URL, sin reescribir datos guardados; enlaces completos y demás redes conservados. Casos 304/309 comprobados con lecturas públicas; tres pruebas focalizadas y build37 aprobados. Sin cambios de cuentas, Auth, funciones, cron o Android. Informe `docs/release-instagram-20260921.md`; evidencia privada en `instagram-links-20260921`.
@@ -140,6 +150,8 @@ Implementación `8957ad0`, cierre validado el 6/9: 214 casos locales cubiertos (
 La organización inicial fue local; después se publicaron captcha + anuncios y se sincronizó esta base con GitHub. Ver `docs/release-20260905.md` y `docs/github-sync-20260905.md` para distinguir ambas operaciones.
 
 ## Construcción local
+
+Para el corte A2/seguridad del 13/10, `npm run test:backend-seguro` verifica gateway, sesiones, guardado, correos y reset; `npm run test:sesion-segura` verifica los flujos actuales en VM/navegador aislados. Las suites históricas que esperan PATCH anónimo, handlers `.js` de correo o contraseña en cada guardado no certifican el contrato nuevo. La matriz A2 final abarca 19 páginas y 10 rubros, con servicios simulados y tráfico externo bloqueado; informes privados fuera del paquete público.
 
 ```sh
 npm ci

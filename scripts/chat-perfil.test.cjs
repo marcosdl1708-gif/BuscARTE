@@ -49,7 +49,7 @@ async function setup(t, options = {}) {
     const method = request.method();
     if (url.origin === origin && method === 'GET') {
       if (url.pathname === '/' + file) return route.fulfill({ contentType: 'text/html', body: options.demo ? source.replace('const PREVIEW_MODE = false;', 'const PREVIEW_MODE = true;') : source });
-      if (url.pathname === '/assets/js/meta-pixel.js') return route.fulfill({ contentType: 'application/javascript', body: fs.readFileSync(path.join(root, 'assets/js/meta-pixel.js')) });
+      if (['/assets/js/meta-pixel.js', '/assets/js/menu-cuenta.js'].includes(url.pathname)) return route.fulfill({ contentType: 'application/javascript', body: fs.readFileSync(path.join(root, url.pathname.slice(1))) });
       if (url.pathname === '/buscARTE_perfil_publico.html') {
         calls.navigations.push(url.searchParams.get('id'));
         // The destination is a static fixture, not the real profile script.
@@ -78,7 +78,10 @@ async function setup(t, options = {}) {
         }
         if (rows) return route.fulfill({ contentType: 'application/json', body: JSON.stringify(rows) });
       }
-      if (options.allowWrites && ((method === 'POST' && url.pathname === '/rest/v1/mensajes') || (method === 'PATCH' && url.pathname === '/rest/v1/conversaciones'))) return route.fulfill({ status: 201, body: '' });
+      if (options.allowWrites && ((method === 'POST' && url.pathname === '/rest/v1/mensajes') || (method === 'PATCH' && url.pathname === '/rest/v1/conversaciones'))) {
+        if (method === 'POST' && options.postGate) await options.postGate.promise;
+        return route.fulfill({ status: 201, body: '' });
+      }
     }
     if (options.allowWrites && method === 'POST' && url.origin === origin && url.pathname === '/.netlify/functions/send-email') {
       calls.api.push({ method, path: url.pathname, body: request.postDataJSON() });
@@ -308,5 +311,40 @@ if (baseline) {
     const email = f.calls.api.find(c => c.path === '/.netlify/functions/send-email');
     assert.equal(email.body.destinatario, 'fixture@example.invalid');
     assert.equal(email.body.tipo, 'mensaje');
+  });
+
+  test('a pending send rejects repeated Enter/click calls and keeps a new draft', async t => {
+    const gate = deferred(); t.after(() => gate.resolve());
+    const f = await setup(t, { allowWrites:true, postGate:gate });
+    await open(f);
+    await f.page.locator('#chat-input').fill('Primer mensaje');
+    await f.page.evaluate(() => { window.__send = sendMessage(); sendMessage(); });
+    await f.page.waitForFunction(() => enviandoMensaje);
+    await f.page.locator('#chat-input').fill('Nuevo borrador');
+    await f.page.keyboard.press('Enter');
+    assert.equal(await f.page.locator('#chat-send-btn').isDisabled(), true);
+    gate.resolve(); await f.page.evaluate(() => window.__send);
+    assert.equal(f.calls.api.filter(c => c.method === 'POST' && c.path === '/rest/v1/mensajes').length, 1);
+    assert.equal(await f.page.locator('#chat-input').inputValue(), 'Nuevo borrador');
+    assert.equal(await f.page.locator('#chat-send-btn').isDisabled(), false);
+  });
+
+  test('switching conversations during a send keeps its original PATCH/email destination and the new draft', async t => {
+    const gate = deferred(); t.after(() => gate.resolve());
+    const f = await setup(t, { allowWrites:true, postGate:gate, profiles:[
+      profile(first, 'Marina', { email:'first@example.invalid' }), profile(second, 'Tomás', { email:'second@example.invalid' })
+    ] });
+    await open(f);
+    await f.page.locator('#chat-input').fill('Para Marina');
+    await f.page.evaluate(() => { window.__send = sendMessage(); });
+    await f.page.waitForFunction(() => enviandoMensaje);
+    await open(f, 'conv-two');
+    await f.page.locator('#chat-input').fill('Borrador para Tomás');
+    gate.resolve(); await f.page.evaluate(() => window.__send);
+    const patch = f.calls.api.find(c => c.method === 'PATCH');
+    assert.match(patch.query, /id=eq.conv-one/);
+    assert.equal(f.calls.api.find(c => c.path === '/.netlify/functions/send-email').body.destinatario, 'first@example.invalid');
+    assert.equal(await f.page.locator('#chat-input').inputValue(), 'Borrador para Tomás');
+    assert.match(f.page.url(), /conv=conv-two$/);
   });
 }

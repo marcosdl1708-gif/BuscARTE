@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-ba-design="a2">
 <head>
+<script src="/assets/js/sesion-segura.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>buscARTE — Mis guardados</title>
@@ -232,6 +233,7 @@
 <script src="/assets/js/meta-pixel.js?v=1" defer></script>
 <style>html:not([data-music-tools="true"]) a[href*="buscarte_generador" i] { display: none !important; }</style>
 <script src="/assets/js/menu-cuenta.js"></script>
+<link rel="stylesheet" href="/assets/css/escena.css">
 </head>
 <body>
 <div class="cursor" id="cursor"></div>
@@ -377,12 +379,8 @@
     danza:'💃 Danza', maquillaje:'💄 Maquillaje', circo:'🎪 Circo', escritura:'✍️ Escritura',
   };
 
-  function requireLogin() {
-    try {
-      if (localStorage.getItem('ba_logged') !== '1') {
-        window.location.replace('buscARTE_login.html?redirect=' + encodeURIComponent('buscARTE_guardados.html'));
-      }
-    } catch(e) {}
+  async function requireLogin() {
+    return !!(await window.BuscARTESesion.require());
   }
 
   function escapeHtml(value) {
@@ -437,6 +435,13 @@
     return String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   }
 
+  function textoEspecialidades(p) {
+    let campos = p?.campos_especificos;
+    if (typeof campos === 'string') { try { campos = JSON.parse(campos); } catch (_) { return ''; } }
+    if (!campos || typeof campos !== 'object' || Array.isArray(campos)) return '';
+    return Object.values(campos).flat().filter(value => typeof value === 'string').join(' ');
+  }
+
   function getFilteredPerfiles() {
     const q = normalizeText(document.getElementById('search-input')?.value || '');
     const sort = document.getElementById('sort-select')?.value || 'recientes';
@@ -449,7 +454,7 @@
 
     if (q) {
       arr = arr.filter(p => normalizeText([
-        p.nombre, p.instrumento, p.generos, p.ciudad, p.barrio, p.bio, p.referentes
+        p.nombre, p.instrumento, p.generos, p.ciudad, p.barrio, p.bio, p.referentes, textoEspecialidades(p)
       ].join(' ')).includes(q));
     }
 
@@ -503,7 +508,7 @@
     const location = [p.barrio, p.ciudad].filter(Boolean).join(', ');
     const tags = generos.map(g=>`<span class="ctag">${escapeHtml(g)}</span>`).join('');
     const refs = p.referentes ? `🎨 <em>${escapeHtml(String(p.referentes).split(',').slice(0,3).join(', '))}</em>` : '';
-    const bio = p.bio || (p.instrumento ? escapeHtml(p.instrumento) : 'Artista en buscARTE');
+    const bio = p.bio || p.instrumento || 'Artista en buscARTE';
     const subtitulo = p.instrumento || subtituloDesdeCampos(p) || (RUBRO_LABELS[p.rubro] || 'Artista');
     const avatarHTML = p.foto_url
       ? `<div class="card-avatar" style="background:#000"><img src="${escapeHtml(p.foto_url)}" alt="${escapeHtml(p.nombre || 'Perfil')}"></div>`
@@ -545,7 +550,7 @@
       grid.innerHTML = `<div class="empty-state">
         <div class="empty-icon">${hasAny ? '🔎' : '♡'}</div>
         <div class="empty-title">${hasAny ? 'No hay resultados con esa búsqueda' : 'Sin artistas guardados todavía'}</div>
-        <div class="empty-sub">${hasAny ? 'Probá con otro nombre, instrumento, barrio o género.' : 'Cuando guardes un perfil desde el tablón, va a aparecer acá.'}</div>
+        <div class="empty-sub">${hasAny ? 'Probá con otro nombre, especialidad, barrio o estilo.' : 'Cuando guardes un perfil desde Artistas, va a aparecer acá.'}</div>
         <div class="empty-actions">
           ${hasAny ? `<button class="btn-outline" onclick="limpiarBusqueda()">Limpiar búsqueda</button>` : `<a href="buscARTE_busqueda.html" class="btn-solid">Buscar artistas →</a>`}
         </div>
@@ -799,18 +804,12 @@
     document.getElementById('mbn-panel')?.classList.remove('open');
     document.getElementById('mbn-overlay')?.classList.remove('open');
   }
-  function logout(){
-    localStorage.removeItem('ba_logged');
-    localStorage.removeItem('ba_name');
-    localStorage.removeItem('ba_email');
-    localStorage.removeItem('ba_user_id');
-    window.location.href = 'index.html';
-  }
-  function mbnLogout(){ logout(); }
+  function logout() { return window.BuscARTESesion.logout(); }
+  function mbnLogout() { return window.BuscARTESesion.logout(); }
 
-  document.addEventListener('DOMContentLoaded', function(){
+  document.addEventListener('DOMContentLoaded', async function(){
     initCursor();
-    if (!previewMode) requireLogin();
+    if (!previewMode && !(await requireLogin())) return;
     initNav();
     renderNombres();
     cargarGuardados();
@@ -820,5 +819,7 @@
     window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(()=>{}); });
   }
 </script>
+<script src="/assets/js/escena.js"></script>
+<script src="/assets/js/escena-fondos.js"></script>
 </body>
 </html>

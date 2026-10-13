@@ -1,6 +1,6 @@
 // ⚠️ IMPORTANTE: subí este número en CADA deploy (v3 → v4 → v5...).
 // Si no lo cambiás, el navegador puede seguir sirviendo los archivos viejos cacheados.
-const CACHE_VERSION = 'buscarte-v23-2026-09-21-instagram';
+const CACHE_VERSION = 'buscarte-v24-2026-10-13-escena-segura';
 const OFFLINE_URL = '/index.html';
 
 const SHELL = [
@@ -23,6 +23,11 @@ const SHELL = [
   '/assets/js/registro-captcha.js',
   '/assets/js/inicio-sesion.js',
   '/assets/css/inicio-sesion.css',
+  '/assets/css/escena.css',
+  '/assets/js/escena.js',
+  '/assets/js/escena-fondos.js',
+  '/assets/js/menu-cuenta.js',
+  '/assets/js/sesion-segura.js',
   '/manifest.json',
   '/icons/icon-192.png',
   '/icons/icon-512.png'

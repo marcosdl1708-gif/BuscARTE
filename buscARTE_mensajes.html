@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-ba-design="a2">
 <head>
+<script src="/assets/js/sesion-segura.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>buscARTE — Mensajes</title>
@@ -205,6 +206,7 @@
 <script src="/assets/js/meta-pixel.js?v=1" defer></script>
 <style>html:not([data-music-tools="true"]) a[href*="buscarte_generador" i] { display: none !important; }</style>
 <script src="/assets/js/menu-cuenta.js"></script>
+<link rel="stylesheet" href="/assets/css/escena.css">
 </head>
 <body>
 <div class="cursor" id="cursor"></div>
@@ -351,12 +353,13 @@
     escritura:  { bg:'#0f1f08', text:'#a0d47b' },
   };
   let miUserId = localStorage.getItem('ba_user_id');
-  const miNombre = localStorage.getItem('ba_name') || 'Yo';
+  let miNombre = localStorage.getItem('ba_name') || 'Yo';
 
   let conversaciones = [];
   let perfilesPorId = {};
   let anunciosPorId = {};
   let convActiva = null;
+  let enviandoMensaje = false;
   let pollingInterval = null;
   let convFilter = 'todas';
   let unreadByUserId = {};
@@ -368,9 +371,7 @@
   // Firma del último render de mensajes — evita re-renderizar (y romper el scroll) en el polling.
   let ultimaFirmaMsgs = '';
 
-  if (!PREVIEW_MODE && localStorage.getItem('ba_logged') !== '1') {
-    window.location.replace('buscARTE_login.html?redirect=' + encodeURIComponent('buscARTE_mensajes.html'));
-  }
+  // No inferir una sesión desde el ID guardado en el navegador.
 
   function escapeHTML(value) {
     return String(value ?? '').replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
@@ -398,7 +399,7 @@
     if (diff < 1) return 'Ahora';
     if (diff < 60) return `Hace ${diff} min`;
     if (diff < 1440) return `Hace ${Math.floor(diff/60)} hs`;
-    if (diff < 10080) return `Hace ${Math.floor(diff/1440)} días`;
+    if (diff < 10080) { const dias = Math.floor(diff/1440); return `Hace ${dias} ${dias === 1 ? 'día' : 'días'}`; }
     return d.toLocaleDateString('es-AR', {day:'numeric', month:'short'});
   }
   function dateLabel(iso) {
@@ -416,7 +417,12 @@
   }
   function setStatus(msg) { document.getElementById('conv-subtitle').textContent = msg; }
 
-  window.addEventListener('DOMContentLoaded', function() {
+  window.addEventListener('DOMContentLoaded', async function() {
+    if (!PREVIEW_MODE) {
+      const session = await window.BuscARTESesion.require();
+      if (!session) return;
+      miUserId = String(session.id); miNombre = session.nombre || 'Yo';
+    }
     initCursor();
     initNav();
     initMobilePanelLinks();
@@ -496,7 +502,7 @@
   async function cargarPerfiles(ids) {
     perfilesPorId = {};
     if (!ids.length) return;
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=in.(${ids.map(filterValue).join(',')})&select=id,nombre,instrumento,ciudad,foto_url,email,rubro`, { headers });
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=in.(${ids.map(filterValue).join(',')})&select=id,nombre,instrumento,ciudad,foto_url,rubro`, { headers });
     if (!res.ok) throw new Error('perfiles ' + res.status + ': ' + await res.text());
     const perfiles = await res.json();
     perfiles.forEach(p => { perfilesPorId[String(p.id)] = p; });
@@ -721,6 +727,7 @@
   }
 
   async function sendMessage() {
+    if (enviandoMensaje) return;
     const input = document.getElementById('chat-input');
     const btn = document.getElementById('chat-send-btn');
     const error = document.getElementById('send-error');
@@ -735,6 +742,9 @@
       return;
     }
     const original = input.value;
+    const conversacionEnviada = convActiva;
+    const destinoEnviado = conversacionEnviada.otroId;
+    enviandoMensaje = true;
     error.textContent = '';
     btn.disabled = true;
     btn.textContent = '…';
@@ -742,52 +752,41 @@
       const res = await fetch(`${SUPABASE_URL}/rest/v1/mensajes`, {
         method:'POST',
         headers: { ...headers, 'Prefer':'return=minimal' },
-        body: JSON.stringify({ de_user_id: normalizeId(miUserId), para_user_id: normalizeId(convActiva.otroId), contenido: text })
+        body: JSON.stringify({ de_user_id: normalizeId(miUserId), para_user_id: normalizeId(destinoEnviado), contenido: text })
       });
       if (!res.ok) throw new Error('mensaje ' + res.status + ': ' + await res.text());
 
-      const patch = await fetch(`${SUPABASE_URL}/rest/v1/conversaciones?id=eq.${filterValue(convActiva.id)}`, {
+      const patch = await fetch(`${SUPABASE_URL}/rest/v1/conversaciones?id=eq.${filterValue(conversacionEnviada.id)}`, {
         method:'PATCH',
         headers: { ...headers, 'Prefer':'return=minimal' },
         body: JSON.stringify({ ultimo_mensaje:text, updated_at:new Date().toISOString() })
       });
       if (!patch.ok) console.warn('No se pudo actualizar conversación', patch.status, await patch.text());
 
-      input.value = '';
-      autoResize(input);
-      updateComposerState();
-      notificarPorEmail(convActiva.otroId, text);
-      await cargarMensajes(true);
+      // El servidor notifica al destinatario únicamente después de guardar el mensaje.
+      if (convActiva === conversacionEnviada) {
+        // Una persona puede seguir escribiendo mientras llega la respuesta.
+        // No borrar ese nuevo borrador ni el de otra conversación.
+        if (input.value === original) input.value = '';
+        autoResize(input);
+        updateComposerState();
+        await cargarMensajes(true);
+      }
       await cargarConversaciones();
-      if (convActiva) abrirConvPorId(convActiva.id);
     } catch(e) {
       console.error('Error enviando:', e);
-      input.value = original;
-      updateComposerState();
-      error.textContent = 'No se pudo enviar. Probá de nuevo.';
+      if (convActiva === conversacionEnviada) {
+        updateComposerState();
+        error.textContent = 'No se pudo enviar. Conservamos tu mensaje; probá de nuevo.';
+      }
     } finally {
+      enviandoMensaje = false;
       btn.disabled = false;
       btn.textContent = '↑';
       updateComposerState();
     }
   }
 
-  async function notificarPorEmail(destinoId, text) {
-    try {
-      const perfil = perfilesPorId[String(destinoId)];
-      let destinatario = perfil;
-      if (!destinatario?.email) {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${filterValue(destinoId)}&select=email,nombre`, { headers });
-        if (res.ok) [destinatario] = await res.json();
-      }
-      if (!destinatario?.email) return;
-      fetch('/.netlify/functions/send-email', {
-        method:'POST',
-        headers: { 'Content-Type':'application/json' },
-        body: JSON.stringify({ tipo:'mensaje', destinatario:destinatario.email, datos: { remitente:miNombre || 'Un artista', preview:text.length > 120 ? text.slice(0,120) + '...' : text } })
-      }).catch(()=>{});
-    } catch(e) {}
-  }
 
   function insertQuickReply(text) {
     const input = document.getElementById('chat-input');
@@ -807,7 +806,7 @@
       count.textContent = len + '/1000';
       count.classList.toggle('warning', len > 900);
     }
-    if (btn) btn.disabled = !convActiva || !input || !input.value.trim();
+    if (btn) btn.disabled = enviandoMensaje || !convActiva || !input || !input.value.trim();
   }
 
   function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
@@ -858,10 +857,10 @@
       document.getElementById('nav-dropdown')?.classList.remove('open');
     }
   });
-  function logout() { localStorage.removeItem('ba_logged'); localStorage.removeItem('ba_name'); localStorage.removeItem('ba_email'); localStorage.removeItem('ba_user_id'); window.location.href='index.html'; }
+  function logout() { return window.BuscARTESesion.logout(); }
   function toggleMbnPanel() { document.getElementById('mbn-panel').classList.toggle('open'); document.getElementById('mbn-overlay').classList.toggle('open'); }
   function closeMbnPanel() { document.getElementById('mbn-panel').classList.remove('open'); document.getElementById('mbn-overlay').classList.remove('open'); }
-  function mbnLogout() { logout(); }
+  function mbnLogout() { return window.BuscARTESesion.logout(); }
   function initMobilePanelLinks() {
     const uid = localStorage.getItem('ba_user_id');
     const el = document.getElementById('mbnp-perfil');
@@ -903,5 +902,7 @@
     };
   }
 </script>
+<script src="/assets/js/escena.js"></script>
+<script src="/assets/js/escena-fondos.js"></script>
 </body>
 </html>

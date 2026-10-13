@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-ba-design="a2">
 <head>
+<script src="/assets/js/sesion-segura.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- SEO: canónica única por id. Resuelve "Duplicada sin canónica" en GSC.
@@ -770,6 +771,7 @@
 <script src="/assets/js/meta-pixel.js?v=1" defer></script>
 <style>html:not([data-music-tools="true"]) a[href*="buscarte_generador" i] { display: none !important; }</style>
 <script src="/assets/js/menu-cuenta.js"></script>
+<link rel="stylesheet" href="/assets/css/escena.css">
 </head>
 <body data-profile-state="loading">
 
@@ -989,7 +991,8 @@
     show('share-btn', ready);
     show('report-link', ready && !own);
     document.querySelector('.profile-sidebar').hidden = !ready || own;
-    document.querySelector('.profile-match-hero').hidden = !ready || own;
+    const affinity = document.querySelector('.profile-match-hero');
+    affinity.hidden = !ready || own || affinity.querySelector('.match-big')?.style.display !== 'block';
     document.querySelector('.login-note').hidden = !!uid;
     if (!ready || own) {
       document.getElementById('report-overlay')?.classList.remove('open');
@@ -1412,6 +1415,8 @@
     const request = ++perfilCargaVersion
     perfilObjetivoId = id
     perfilCargado = null
+    document.querySelector('.match-big').style.display = 'none'
+    document.querySelector('.match-big-label').style.display = 'none'
     document.body.dataset.profileState = 'loading'
     document.getElementById('profile-status').hidden = false
     document.getElementById('profile-status-text').textContent = 'Cargando perfil…'
@@ -1423,7 +1428,9 @@
     }
 
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${encodeURIComponent(id)}&select=*`, { headers: hdrs })
+      // Solicitar sólo presentación; nunca descargar hashes o tokens de recuperación.
+      const fields = 'id,nombre,instrumento,generos,provincia,ciudad,barrio,bio,referentes,disponibilidad,donde_ensaya,redes,videos,es_premium,foto_url,celular,baneado,experiencia,edad,genero_principal,tipo_cuenta,rubro,campos_especificos'
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${encodeURIComponent(id)}&select=${fields}`, { headers: hdrs })
       if (!res.ok) throw new Error('No se pudo cargar el perfil: ' + res.status)
       const [p] = await res.json()
       if (request !== perfilCargaVersion) return
@@ -1451,14 +1458,14 @@
       const ubicacion = [p.barrio, p.ciudad].filter(Boolean).join(', ')
 
       // Detectar rubro con cadena de prioridad:
-      // 1. URL param ?rubro=X (pasado desde busqueda.html al clickear "Ver perfil →")
-      // 2. p.rubro de Supabase (el rubro real del perfil que se está viendo)
+      // 1. p.rubro de Supabase (el rubro real del perfil que se está viendo)
+      // 2. URL param sólo para perfiles históricos sin rubro guardado
       // 3. 'musica' como fallback final
       // OJO: NO usamos localStorage.ba_rubro — ese es el rubro de QUIEN MIRA, no del perfil
       // visto. Usarlo hacía que un perfil ajeno heredara la disciplina del espectador
       // (p.ej. un visitante sin rubro se mostraba como "Músico" si lo miraba un músico).
       const urlRubro = new URLSearchParams(window.location.search).get('rubro')
-      const rubro = urlRubro || p.rubro || 'musica'
+      const rubro = p.rubro || urlRubro || 'musica'
 
       // Un visitante no es artista: no tiene instrumento/rubro/stats. Render mínimo y honesto.
       if (p.tipo_cuenta === 'visitante') {
@@ -1581,6 +1588,9 @@
       }
 
       // % Afinidad basado en artistas favoritos compartidos
+      document.querySelector('.match-big').style.display = 'none'
+      document.querySelector('.match-big-label').style.display = 'none'
+      actualizarAccionesPerfil()
       let miReferentes = leerCachePerfil('ba_referentes') || ''
       let miGeneros = leerCachePerfil('ba_generos') || ''
       // Si no está en localStorage, intentar cargar desde Supabase
@@ -1607,6 +1617,7 @@
           afinidadEl.textContent = pct + '%'
           afinidadEl.style.display = 'block'
           document.querySelector('.match-big-label').style.display = 'block'
+          actualizarAccionesPerfil()
         }
       }
 
@@ -1668,6 +1679,7 @@
         `${SUPABASE_URL}/rest/v1/conversaciones?or=(and(user1_id.eq.${miId},user2_id.eq.${paraId}),and(user1_id.eq.${paraId},user2_id.eq.${miId}))`,
         { headers: hdrs }
       )
+      if (!convRes.ok) throw new Error('No se pudo abrir la conversación.');
       let convs = await convRes.json()
       if (!mismoContacto()) return
       let convId
@@ -1681,17 +1693,19 @@
           headers: { ...hdrs, 'Prefer': 'return=representation' },
           body: JSON.stringify({ user1_id: parseInt(miId), user2_id: parseInt(paraId), ultimo_mensaje: texto })
         })
+        if (!nueva.ok) throw new Error('No se pudo crear la conversación.');
         const [conv] = await nueva.json()
         if (!mismoContacto()) return
         convId = conv.id
       }
 
       // Guardar mensaje
-      await fetch(`${SUPABASE_URL}/rest/v1/mensajes`, {
+      const mensajeGuardado = await fetch(`${SUPABASE_URL}/rest/v1/mensajes`, {
         method: 'POST',
         headers: { ...hdrs, 'Prefer': 'return=minimal' },
         body: JSON.stringify({ de_user_id: parseInt(miId), para_user_id: parseInt(paraId), contenido: texto })
       })
+      if (!mensajeGuardado.ok) throw new Error('No se pudo confirmar el mensaje. Conservamos tu texto.');
       if (!mismoContacto()) return
 
       // Actualizar último mensaje
@@ -1771,7 +1785,7 @@
       if(d)d.classList.remove('open');if(w)w.classList.remove('open');
     }
   });
-  function logout(){localStorage.removeItem('ba_logged');localStorage.removeItem('ba_name');localStorage.removeItem('ba_user_id');window.location.href='index.html';}
+  function logout() { return window.BuscARTESesion.logout(); }
 
   // ─── REPORTAR PERFIL ───
   let reportMotivo = '';
@@ -1904,12 +1918,7 @@ function closeMbnPanel(){
   document.getElementById('mbn-panel').classList.remove('open');
   document.getElementById('mbn-overlay').classList.remove('open');
 }
-function mbnLogout(){
-  localStorage.removeItem('ba_logged');
-  localStorage.removeItem('ba_name');
-  localStorage.removeItem('ba_user_id');
-  window.location.href='index.html';
-}
+function mbnLogout() { return window.BuscARTESesion.logout(); }
 </script>
 
 <div class="report-modal-overlay" id="report-overlay" onclick="if(event.target===this)cerrarReporte()">
@@ -1968,5 +1977,7 @@ if ('serviceWorker' in navigator) {
   })();
 
 </script>
+<script src="/assets/js/escena.js"></script>
+<script src="/assets/js/escena-fondos.js"></script>
 </body>
 </html>

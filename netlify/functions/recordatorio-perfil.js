@@ -4,8 +4,6 @@
  * Schedule: "0 13 * * 1"
  */
 
-const SUPABASE_URL   = process.env.SUPABASE_URL || 'https://xiaanchoanxmampegoay.supabase.co';
-const SUPABASE_KEY   = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY;
 const SEND_EMAIL_URL = process.env.URL
   ? `${process.env.URL}/.netlify/functions/send-email`
   : 'https://buscarte.com.ar/.netlify/functions/send-email';
@@ -13,18 +11,19 @@ const SEND_EMAIL_URL = process.env.URL
 const DELAY_MS = 400;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-async function getUsuariosIncompletos() {
+async function getUsuariosIncompletos(backend) {
   const hace14dias = new Date(Date.now() - 14 * 24 * 3600 * 1000).toISOString();
   const hace7dias  = new Date(Date.now() -  7 * 24 * 3600 * 1000).toISOString();
   const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/perfiles?select=id,nombre,email,foto_url,bio` +
+    `${backend.origin}/rest/v1/perfiles?select=id,nombre,email,foto_url,bio` +
     `&created_at=gte.${encodeURIComponent(hace14dias)}` +
     `&created_at=lte.${encodeURIComponent(hace7dias)}` +
     `&email=not.is.null`,
-    { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
+    { headers:backend.headers, redirect:'error', signal:AbortSignal.timeout(15000) }
   );
-  if (!res.ok) throw new Error(`Supabase ${res.status}: ${await res.text()}`);
+  if (!res.ok) throw new Error('backend');
   const data = await res.json();
+  if (!Array.isArray(data)) throw new Error('backend');
   return data.filter(u =>
     u.email &&
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(u.email) &&
@@ -32,44 +31,48 @@ async function getUsuariosIncompletos() {
   );
 }
 
-async function sendRecordatorio(user) {
+async function sendRecordatorio(user, secret) {
+  if (!secret) throw new Error('configuration');
   const res = await fetch(SEND_EMAIL_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-buscarte-secret': process.env.INTERNAL_SECRET || '' },
+    headers: { 'Content-Type': 'application/json', 'x-buscarte-secret':secret },
     body: JSON.stringify({
       tipo: 'perfil_incompleto',
       destinatario: user.email,
       datos: { nombre: user.nombre || 'artista' }
-    })
+    }),
+    redirect:'error',
+    signal:AbortSignal.timeout(15000)
   });
-  if (!res.ok) {
-    const data = await res.json().catch(() => ({}));
-    throw new Error(data.error || `HTTP ${res.status}`);
-  }
+  if (!res.ok) throw new Error('mail');
 }
 
 exports.handler = async function(event) {
   console.log('[recordatorio-perfil] Iniciando...');
-  if (!SUPABASE_KEY) {
-    console.error('[recordatorio-perfil] Falta SUPABASE_SERVICE_KEY');
+  let backend, secret;
+  try {
+    const security = await import('../lib/session.mjs');
+    backend = security.serverConfig();
+    secret = security.internalMailSecret();
+  } catch (_) { /* Fallar cerrado si la configuración o el módulo no están disponibles. */ }
+  if (!backend || !secret) {
+    console.error('[recordatorio-perfil] Configuración de servidor no disponible');
     return { statusCode: 500 };
   }
   let usuarios;
   try {
-    usuarios = await getUsuariosIncompletos();
+    usuarios = await getUsuariosIncompletos(backend);
   } catch(e) {
-    console.error('[recordatorio-perfil] Error:', e.message);
+    console.error('[recordatorio-perfil] No se pudo consultar el lote');
     return { statusCode: 500 };
   }
   console.log(`[recordatorio-perfil] Usuarios a notificar: ${usuarios.length}`);
   let ok = 0, errores = 0;
   for (let i = 0; i < usuarios.length; i++) {
     try {
-      await sendRecordatorio(usuarios[i]);
-      console.log(`[recordatorio-perfil] ✅ ${usuarios[i].email}`);
+      await sendRecordatorio(usuarios[i], secret);
       ok++;
     } catch(e) {
-      console.error(`[recordatorio-perfil] ❌ ${usuarios[i].email}: ${e.message}`);
       errores++;
     }
     if (i < usuarios.length - 1) await sleep(DELAY_MS);

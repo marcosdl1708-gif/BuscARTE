@@ -1,9 +1,10 @@
 import type { Config } from '@netlify/functions';
+import { sessionUser, rate } from '../lib/session.mjs';
 
 declare const Netlify: { env: { get(name: string): string | undefined } };
 
-// Transitional, server-only bridge. Credentials are checked for every operation;
-// this does not mint a session or change the database's existing RLS/Auth model.
+// Owner verified from an HttpOnly server session. The credential fallback keeps
+// older open editor tabs safe during the coordinated release; never trusts IDs.
 const ORIGINS = new Set(['https://buscarte.com.ar', 'https://www.buscarte.com.ar']);
 const MAX_BODY = 32 * 1024;
 const RUBROS = new Set(['musica', 'actuacion', 'audiovisual', 'modelaje', 'diseno', 'tatuaje', 'danza', 'maquillaje', 'circo', 'escritura']);
@@ -109,35 +110,45 @@ export default async function guardarPerfil(request: Request): Promise<Response>
   let payload: Record<string, any>;
   try { payload = await readPayload(request); } catch { return fail(400); }
   if (!object(payload) || Object.keys(payload).some(key => !['email', 'password', 'profileId', 'changes', 'operation'].includes(key)) ||
-      !text(payload.email, 254) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email.trim()) ||
-      !text(payload.password, 4096) || !payload.password.length || !idText(payload.profileId) || !object(payload.changes) ||
+      !idText(payload.profileId) || !object(payload.changes) ||
       ![undefined, 'save', 'verify'].includes(payload.operation)) return fail(400);
   const verifyOnly = payload.operation === 'verify';
   if (verifyOnly ? Object.keys(payload.changes).length !== 0 : !validChanges(payload.changes)) return fail(400);
   const backend = serverConfig();
   if (!backend) return fail(503);
-  const email = payload.email.trim().toLowerCase();
+  const credentials = payload.email !== undefined || payload.password !== undefined;
+  if (credentials && (!text(payload.email, 254) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email.trim()) ||
+      !text(payload.password, 4096) || !payload.password.length)) return fail(400);
+  const email = credentials ? payload.email.trim().toLowerCase() : '';
   // One shared deadline bounds credential verification plus the PATCH below.
   const signal = AbortSignal.timeout(15000);
   try {
-    const login = await fetch(backend.origin + '/rest/v1/rpc/login_usuario', {
-      method: 'POST', headers: backend.headers, body: JSON.stringify({ p_email: email, p_password: payload.password }), signal, redirect: 'error'
-    });
-    if (!login.ok) return fail(502);
-    const result = await login.json();
-    const user = Array.isArray(result) && result.length === 1 ? result[0] : result;
+    let user;
+    if (credentials) {
+      if (!await rate(request, 'login_usuario', 60, 900)) return json(429, { error: 'Esperá unos minutos antes de reintentar.' });
+      if (!await rate(request, 'login_usuario-account', 15, 900, email)) return json(429, { error: 'Esperá unos minutos antes de reintentar.' });
+      const login = await fetch(backend.origin + '/rest/v1/rpc/login_usuario', {
+        method: 'POST', headers: backend.headers, body: JSON.stringify({ p_email: email, p_password: payload.password }), signal, redirect: 'error'
+      });
+      if (!login.ok) return fail(502);
+      const result = await login.json();
+      user = Array.isArray(result) && result.length === 1 ? result[0] : result;
+    } else user = await sessionUser(request);
     if (!object(user) || user.error || !idText(user.id)) return fail(401);
     const verifiedId = idText(user.id);
     if (user.baneado === true || verifiedId !== idText(payload.profileId)) return fail(403);
-    if (typeof user.email !== 'string' || user.email.trim().toLowerCase() !== email ||
+    if (typeof user.email !== 'string' || (credentials && user.email.trim().toLowerCase() !== email) ||
         ![undefined, null, false].includes(user.baneado)) return fail(502);
     if (verifyOnly) return json(200, [{ id: user.id }]);
     const changes = { ...payload.changes };
     const rubro = Object.hasOwn(changes, 'rubro') ? changes.rubro : (user.rubro || 'musica');
     const tipo = user.tipo_cuenta || 'artista';
-    if (!RUBROS.has(rubro) || !['artista', 'negocio', 'visitante'].includes(tipo) ||
+    if (!['artista', 'negocio', 'visitante'].includes(tipo) ||
+        (tipo === 'artista' && !RUBROS.has(rubro)) ||
+        (tipo !== 'artista' && Object.hasOwn(changes, 'rubro') && changes.rubro !== user.rubro) ||
         (Object.hasOwn(changes, 'tipo_cuenta') && changes.tipo_cuenta !== tipo)) return fail(403);
-    // Preserve the existing single-rubro selector; never change the account role.
+    // Only artists use the ten-rubro selector. Businesses retain their existing
+    // category and visitors retain their empty rubro; never change either role.
     // This does not introduce multiple rubros, additional profiles or new categories.
     delete changes.tipo_cuenta;
     if (!Object.keys(changes).length) return fail(400);
@@ -152,7 +163,7 @@ export default async function guardarPerfil(request: Request): Promise<Response>
     const target = new URL(backend.origin + '/rest/v1/perfiles');
     target.searchParams.set('id', 'eq.' + verifiedId);
     target.searchParams.set('or', '(baneado.is.null,baneado.eq.false)');
-    target.searchParams.set('select', 'id,campos_especificos,generos,foto_url,rubro');
+    target.searchParams.set('select', 'id,campos_especificos,generos,foto_url,rubro,edad');
     const update = await fetch(target, {
       method: 'PATCH', headers: { ...backend.headers, Prefer: 'return=representation' }, body: JSON.stringify(changes), signal, redirect: 'error'
     });
@@ -160,6 +171,7 @@ export default async function guardarPerfil(request: Request): Promise<Response>
     const rows = await update.json();
     if (!Array.isArray(rows) || rows.length !== 1 || !object(rows[0]) || idText(rows[0].id) !== verifiedId) return fail(502);
     if ((Object.hasOwn(changes, 'rubro') && rows[0].rubro !== changes.rubro) ||
+        (Object.hasOwn(changes, 'edad') && rows[0].edad !== changes.edad) ||
         (Object.hasOwn(changes, 'generos') && rows[0].generos !== changes.generos) ||
         (Object.hasOwn(changes, 'foto_url') && rows[0].foto_url !== changes.foto_url)) return fail(502);
     if (Object.hasOwn(changes, 'campos_especificos')) {
@@ -167,10 +179,11 @@ export default async function guardarPerfil(request: Request): Promise<Response>
       if (!confirmed || canonical(confirmed) !== canonical(jsonObject(changes.campos_especificos))) return fail(502);
     }
     // Only explicitly selected profile fields may leave the server.
-    return json(200, [Object.fromEntries(['id', 'campos_especificos', 'generos', 'foto_url', 'rubro'].filter(key => Object.hasOwn(rows[0], key)).map(key => [key, rows[0][key]]))]);
+    return json(200, [Object.fromEntries(['id', 'campos_especificos', 'generos', 'foto_url', 'rubro', 'edad'].filter(key => Object.hasOwn(rows[0], key)).map(key => [key, rows[0][key]]))]);
   } catch { return fail(502); }
 }
 
 export const config: Config = {
+  path: '/.netlify/functions/guardar-perfil',
   rateLimit: { windowLimit: 10, windowSize: 60, aggregateBy: ['ip'], action: 'rate_limit' }
 };

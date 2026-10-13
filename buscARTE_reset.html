@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-ba-design="a2">
 <head>
+<script src="/assets/js/sesion-segura.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
@@ -77,6 +78,7 @@
     }
   </style>
 <script src="/assets/js/meta-pixel.js?v=1" defer></script>
+<link rel="stylesheet" href="/assets/css/escena.css">
 </head>
 <body>
 <div class="cursor" id="cursor"></div><div class="cursor-ring" id="cursor-ring"></div>
@@ -110,16 +112,16 @@
         <div class="field">
           <label for="pass1">Nueva contraseña</label>
           <div class="pass-wrap">
-            <input type="password" id="pass1" placeholder="Mínimo 8 caracteres" autocomplete="new-password" oninput="validar()">
-            <button type="button" class="pass-toggle" onclick="togglePass('pass1', this)">👁</button>
+            <input type="password" id="pass1" maxlength="72" placeholder="Mínimo 8 caracteres" autocomplete="new-password" oninput="validar()">
+            <button type="button" class="pass-toggle" aria-label="Mostrar u ocultar nueva contraseña" onclick="togglePass('pass1', this)">👁</button>
           </div>
           <div class="feedback" id="feedback1"></div>
         </div>
         <div class="field">
           <label for="pass2">Repetir contraseña</label>
           <div class="pass-wrap">
-            <input type="password" id="pass2" placeholder="Repetí la contraseña" autocomplete="new-password" oninput="validar()" onkeydown="if(event.key==='Enter' && !document.getElementById('btn-cambiar').disabled) cambiarPassword()">
-            <button type="button" class="pass-toggle" onclick="togglePass('pass2', this)">👁</button>
+            <input type="password" id="pass2" maxlength="72" placeholder="Repetí la contraseña" autocomplete="new-password" oninput="validar()" onkeydown="if(event.key==='Enter' && !document.getElementById('btn-cambiar').disabled) cambiarPassword()">
+            <button type="button" class="pass-toggle" aria-label="Mostrar u ocultar repetición de contraseña" onclick="togglePass('pass2', this)">👁</button>
           </div>
           <div class="feedback" id="feedback2"></div>
         </div>
@@ -226,19 +228,23 @@
 
     if (!p1) fb1.textContent = '';
     else if (p1.length < 8) { fb1.textContent = `✗ Faltan ${8 - p1.length} caracteres`; fb1.classList.add('error'); }
+    else if (new TextEncoder().encode(p1).length > 72) { fb1.textContent = '✗ Demasiado larga (máximo 72 bytes). Usá menos caracteres, especialmente emojis o acentos.'; fb1.classList.add('error'); }
     else { fb1.textContent = '✓ Longitud suficiente'; fb1.classList.add('ok'); }
 
     if (!p2) fb2.textContent = '';
     else if (p1 !== p2) { fb2.textContent = '✗ Las contraseñas no coinciden'; fb2.classList.add('error'); }
     else { fb2.textContent = '✓ Coinciden'; fb2.classList.add('ok'); }
 
-    btn.disabled = !(p1.length >= 8 && p1 === p2);
+    btn.disabled = cambiandoPassword || !(p1.length >= 8 && new TextEncoder().encode(p1).length <= 72 && p1 === p2);
   }
 
+  let cambiandoPassword = false;
   async function cambiarPassword() {
     const btn = document.getElementById('btn-cambiar');
     const nueva = document.getElementById('pass1').value;
-    if (btn.disabled) return;
+    if (nueva.length < 8 || new TextEncoder().encode(nueva).length > 72 || nueva !== document.getElementById('pass2').value) { validar(); return; }
+    if (btn.disabled || cambiandoPassword) return;
+    cambiandoPassword = true;
     btn.disabled = true;
     btn.classList.add('loading');
 
@@ -255,10 +261,14 @@
       showInlineError(e.message || 'Error de conexión. Intentá de nuevo.');
       btn.disabled = false;
       btn.classList.remove('loading');
+    } finally {
+      cambiandoPassword = false;
     }
   }
 
   verificarToken();
 </script>
+<script src="/assets/js/escena.js"></script>
+<script src="/assets/js/escena-fondos.js"></script>
 </body>
 </html>

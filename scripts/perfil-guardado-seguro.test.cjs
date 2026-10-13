@@ -15,19 +15,19 @@ let browser;
 before(async () => { browser = await chromium.launch({ headless:true, channel:process.platform === 'win32' ? 'msedge' : undefined }); });
 after(async () => { await browser?.close(); });
 
-async function setup(t, { status = 200, width = 1280 } = {}) {
+async function setup(t, { status = 200, width = 1280, type = 'artista', rubro = 'musica', profileExtras = {} } = {}) {
   const context = await browser.newContext({ viewport:{ width, height:844 }, isMobile:width < 768, hasTouch:width < 768, serviceWorkers:'block' });
-  await context.addInitScript(() => {
+  await context.addInitScript(({ type, rubro }) => {
     if (!localStorage.getItem('synthetic-initialized')) {
       for (const [key, value] of Object.entries({ 'synthetic-initialized':'1', buscarte_meta_consent_v1:'denied',
-        ba_logged:'1', ba_user_id:'210', ba_rubro:'musica', ba_tipo_cuenta:'artista', ba_name:'Persona Prueba' })) localStorage.setItem(key, value);
+        ba_logged:'1', ba_user_id:'210', ba_rubro:rubro, ba_tipo_cuenta:type, ba_name:'Persona Prueba',ba_referentes:'Cache histórico',ba_generos:'Cache de estilos' })) localStorage.setItem(key, value);
     }
     window.alert = () => { throw new Error('No alert allowed in secure save flow'); };
     window.prompt = () => { throw new Error('No prompt allowed in secure save flow'); };
-  });
-  const state = { profile:{ id:210, email:'prueba@example.invalid', nombre:'Persona Prueba', rubro:'musica', tipo_cuenta:'artista',
+  }, { type, rubro });
+  const state = { profile:{ id:210, email:'prueba@example.invalid', nombre:'Persona Prueba', rubro, tipo_cuenta:type,
     instrumento:'Batería', generos:'Rock, Pop', bio:'Perfil sintético.', provincia:'CABA', ciudad:'Buenos Aires (CABA)',
-    barrio:'Almagro', campos_especificos:null, foto_url:null } };
+    barrio:'Almagro', campos_especificos:null, foto_url:null, ...profileExtras } };
   const calls = { events:[], writes:[], unexpected:[], errors:[] };
   if (typeof context.routeWebSocket === 'function') await context.routeWebSocket('**/*', socket => { calls.unexpected.push('WebSocket'); socket.close(); });
   await context.route('**/*', async route => {
@@ -35,7 +35,7 @@ async function setup(t, { status = 200, width = 1280 } = {}) {
     const relative = url.pathname.slice(1);
     if (url.origin === origin && method === 'GET' && files.has(relative)) {
       if (relative.endsWith('.html') && relative !== file) return route.fulfill({ contentType:'text/html', body:'<!doctype html><p>Destino simulado</p>' });
-      return route.fulfill({ contentType:({ '.html':'text/html', '.js':'application/javascript', '.css':'text/css', '.png':'image/png' })[path.extname(relative)] || 'text/plain',
+      return route.fulfill({ contentType:({ '.html':'text/html', '.js':'application/javascript', '.css':'text/css', '.png':'image/png', '.webp':'image/webp' })[path.extname(relative)] || 'text/plain',
         body:relative === file ? source : fs.readFileSync(path.join(root, relative)) });
     }
     if (url.origin === origin && url.pathname === '/.netlify/functions/guardar-perfil' && method === 'POST') {
@@ -136,6 +136,19 @@ test('Escape cancels reauthentication without any POST or lost selection', async
   assert.deepEqual(await f.page.locator('#chips-gen .selected').allTextContents(), ['Jazz', 'Pop']);
 });
 
+for (const width of [320, 390]) {
+  test(`mobile ${width}px exposes a usable Cancelar action without writes or lost changes`, async t => {
+    const f = await setup(t, { width }); await editGenres(f);
+    const cancel = f.page.locator('#profile-reauth-form button[type="button"]');
+    assert.equal(await cancel.isVisible(), true);
+    const box = await cancel.boundingBox();
+    assert.ok(box.height >= 44 && box.x >= 0 && box.x + box.width <= width + 1);
+    await cancel.click(); await finished(f); await cleared(f);
+    assert.deepEqual(f.calls.events, []);
+    assert.deepEqual(await f.page.locator('#chips-gen .selected').allTextContents(), ['Jazz', 'Pop']);
+  });
+}
+
 test('account changes cancel the modal, erase its password and block saving the previous draft', async t => {
   const f = await setup(t); await editGenres(f);
   await f.page.locator('#profile-reauth-password').fill(password);
@@ -162,3 +175,24 @@ test('photo verifies credentials before upload and confirms its profile URL thro
   assert.match(await f.page.locator('#profile-status').innerText(), /Foto de perfil actualizada/);
   assert.equal(await f.page.locator('#preview-img').getAttribute('src'), f.state.profile.foto_url);
 });
+
+for (const [type,rubro] of [['negocio','Sala de ensayo'],['visitante','']]) {
+  test(`${type}: saving common bio preserves role, rubro, historical specialties and artistic cache`,async t=>{
+    const fields={instrumento:'Instrumento histórico',generos:'Género histórico',referentes:'Referencia histórica',disponibilidad:'Disponibilidad histórica',donde_ensaya:'Lugar histórico',experiencia:12,campos_especificos:JSON.stringify({telefono:'Número histórico',historical:['Conservar']})};
+    const f=await setup(t,{width:390,type,rubro,profileExtras:fields});
+    await f.page.locator('#bio-text').fill('Presentación nueva de la cuenta.');
+    await f.page.locator('#save-bar .btn-neon').click();
+    await f.page.locator('#profile-reauth-dialog[open]').waitFor();
+    await confirm(f);await finished(f);await cleared(f);
+    assert.match(await f.page.locator('#profile-status').innerText(),/guardado correctamente/);
+    assert.equal(f.calls.writes.length,1);
+    const changes=f.calls.writes[0].body.changes;
+    assert.equal(changes.bio,'Presentación nueva de la cuenta.');
+    for (const field of ['rubro',...Object.keys(fields)]) assert.equal(Object.hasOwn(changes,field),false,field+' must remain unmodified');
+    assert.equal(f.state.profile.rubro,rubro);assert.equal(f.state.profile.tipo_cuenta,type);
+    for (const [field,value] of Object.entries(fields)) assert.equal(f.state.profile[field],value);
+    assert.equal(await f.page.evaluate(()=>localStorage.getItem('ba_referentes')),'Cache histórico');
+    assert.equal(await f.page.evaluate(()=>localStorage.getItem('ba_generos')),'Cache de estilos');
+    assert.equal(await f.page.evaluate(()=>perfilCargado.campos_especificos),fields.campos_especificos);
+  });
+}

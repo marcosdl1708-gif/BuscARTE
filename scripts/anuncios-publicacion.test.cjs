@@ -6,6 +6,7 @@ const { chromium } = require(process.env.BUSCARTE_PLAYWRIGHT_MODULE || 'playwrig
 
 const root = path.resolve(__dirname, '..');
 const html = fs.readFileSync(path.join(root, 'buscARTE_anuncios.html'), 'utf8');
+const publicFiles = new Set(JSON.parse(fs.readFileSync(path.join(root, 'site-files.json'), 'utf8')));
 const userId = 'fixture-user-only';
 const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jGZkAAAAASUVORK5CYII=', 'base64');
 let browser;
@@ -48,6 +49,13 @@ async function setup(t, { width = 390, height = 844, role = 'artista', rubro = '
     }
     if (url.origin === 'http://buscarte.test' && url.pathname === '/assets/js/meta-pixel.js') {
       return route.fulfill({ contentType: 'application/javascript', body: 'window.__trackingCalls=[];window.MetaAds={trackCustom(...args){window.__trackingCalls.push(args)}};' });
+    }
+    if (url.origin === 'http://buscarte.test' && request.method() === 'GET' && url.pathname.startsWith('/assets/')) {
+      const file = url.pathname.slice(1);
+      if (publicFiles.has(file)) {
+        const contentType = ({ '.js':'application/javascript', '.css':'text/css', '.webp':'image/webp' })[path.extname(file)] || 'application/octet-stream';
+        return route.fulfill({ contentType, body:fs.readFileSync(path.join(root, file)) });
+      }
     }
     if (url.hostname === 'xiaanchoanxmampegoay.supabase.co') {
       if (request.method() === 'POST' && url.pathname === '/rest/v1/anuncios') {
