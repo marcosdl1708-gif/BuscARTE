@@ -66,6 +66,7 @@ async function withBackend(options, action) {
   if(options.changedPassword)profiles.get(701).password='new-synthetic-password-hash';
   const calls=[], unexpected=[], notifications=[];
   const state={ registered:false, messageSaved:false, deleted:false, sessionCreated:false };
+  const sessions=new Map([[digest(token),{perfil_id:701,password_fingerprint:options.badFingerprint?'0'.repeat(64):digest(oldPasswordHash)}]]);
   const reply=(status,value,headers={})=>new Response(value===null?null:JSON.stringify(value),{
     status, headers:{ 'content-type':'application/json', ...headers }
   });
@@ -94,15 +95,16 @@ async function withBackend(options, action) {
           assert.match(body.password_fingerprint,/^[a-f0-9]{64}$/);
           assert(Date.parse(body.expires_at)>Date.now());
           state.sessionCreated=true;
-          return reply(201,[]);
+          sessions.set(body.token_hash,{perfil_id:body.perfil_id,password_fingerprint:body.password_fingerprint});
+          // Real PostgREST default for an INSERT without return=representation:
+          // status 201 and an EMPTY body, not the [] assumed by old fixtures.
+          return reply(201,null);
         }
-        if(method==='DELETE')return reply(204,null);
+        if(method==='DELETE') { sessions.delete(url.searchParams.get('token_hash')?.replace(/^eq\./,''));return reply(204,null); }
         assert.equal(url.searchParams.get('select'),'perfil_id,password_fingerprint');
         assert.match(url.searchParams.get('expires_at'),/^gt\./);
-        const known=url.searchParams.get('token_hash')==='eq.'+digest(token);
-        return reply(200,!known||options.expired||options.revoked?[]:[{
-          perfil_id:701,password_fingerprint:options.badFingerprint?'0'.repeat(64):digest(oldPasswordHash)
-        }]);
+        const row=sessions.get(url.searchParams.get('token_hash')?.replace(/^eq\./,''));
+        return reply(200,!row||options.expired||options.revoked?[]:[row]);
       }
       if(url.pathname==='/rest/v1/perfiles' && method==='GET') {
         const rawId=url.searchParams.get('id');
@@ -348,6 +350,22 @@ test('login validates credentials then creates random HttpOnly session without c
     assert(state.sessionCreated);
     assert.match(res.headers.get('set-cookie'),/^__Host-ba_session=[A-Za-z0-9_-]{43}; Path=\/; Max-Age=2592000; Secure; HttpOnly; SameSite=Lax$/);
     assert.equal(apiCalls('/rest/v1/rpc/login_usuario','POST')[0].body.p_email,'owner@example.invalid');
+  });
+});
+test('realistic 201 empty-body session INSERT still issues cookie; session GET and logout round trip succeed',async()=>{
+  await withBackend({},async({apiCalls})=>{
+    const login=await datos(request('/rest/v1/rpc/login_usuario',{method:'POST',signed:false,body:{p_email:'owner@example.invalid',p_password:'correct-fixture'}}));
+    assert.equal(login.status,200);
+    assert.equal((await login.json()).id,701);
+    const issuedCookie=login.headers.get('set-cookie')?.split(';')[0];
+    assert.match(issuedCookie,/^__Host-ba_session=[A-Za-z0-9_-]{43}$/);
+    assert.notEqual(issuedCookie,cookie);
+    assert.equal(apiCalls('/rest/v1/sesiones_web','POST').length,1);
+    const current=await sesion(sessionRequest({headers:{cookie:issuedCookie}}));
+    assert.equal(current.status,200);assert.equal((await current.json()).user.id,701);
+    const logout=await sesion(sessionRequest({method:'POST',body:{action:'logout'},headers:{cookie:issuedCookie}}));
+    assert.equal(logout.status,200);assert.match(logout.headers.get('set-cookie'),/Max-Age=0/);
+    assert.equal((await sesion(sessionRequest({headers:{cookie:issuedCookie}}))).status,401);
   });
 });
 test('login separates NAT-friendly IP limit from normalized-account brute-force limit',async()=>{

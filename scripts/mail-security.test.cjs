@@ -24,7 +24,8 @@ const fixtureEnv = {
 };
 const plain = value => JSON.parse(JSON.stringify(value));
 function previous(file) {
-  return execFileSync('git', ['show', `HEAD:${file}`], { cwd:root, encoding:'utf8', windowsHide:true });
+  // Pin the last pre-security release, not a moving HEAD with renamed handlers.
+  return execFileSync('git', ['show', `1785b2f40e214511d7c8790e016f82b707450eb6:${file}`], { cwd:root, encoding:'utf8', windowsHide:true });
 }
 function bounded(source, start, end) {
   const first = source.indexOf(start), last = source.indexOf(end, first + start.length);

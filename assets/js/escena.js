@@ -21,19 +21,7 @@
     const frame = document.createElement('div'); frame.className = 'a2-art-frame';
     frame.innerHTML = '<div class="a2-art-canvas" aria-hidden="true"><img src="/assets/art/paint-splash-a2-960.webp" srcset="/assets/art/paint-splash-a2-576.webp 576w, /assets/art/paint-splash-a2-960.webp 960w" sizes="(max-width:600px) 320px, (max-width:900px) 420px, 540px" width="960" height="960" alt="" decoding="async" fetchpriority="high"><span class="a2-color-echo a2-echo-cyan"></span><span class="a2-color-echo a2-echo-violet"></span></div>';
     grid.append(frame);
-    const motion = document.createElement('button'); motion.type = 'button'; motion.className = 'a2-motion-control';
-    const reduced = matchMedia('(prefers-reduced-motion:reduce)');
-    let playing = !reduced.matches && store('sessionStorage','ba_a2_motion') !== 'paused';
-    function reflect() {
-      html.dataset.a2Motion = playing ? 'playing' : 'paused';
-      motion.setAttribute('aria-pressed',String(playing));
-      motion.setAttribute('aria-label',playing ? 'Detener el movimiento del fondo' : 'Activar el movimiento del fondo');
-      motion.textContent = playing ? 'Ⅱ Fondo en movimiento' : '▷ Fondo quieto';
-    }
-    reflect();
-    motion.addEventListener('click',() => { playing=!playing;store('sessionStorage','ba_a2_motion',playing?'playing':'paused');reflect(); });
-    reduced.addEventListener('change',event => { if(event.matches){playing=false;reflect();} });
-    hero.append(motion);
+    html.dataset.a2Motion = 'paused';
     const explore = $('#explorar');
     if (explore && explore.classList.contains('rubros-section')) {
       explore.querySelector('.section-label').textContent = 'Distintas formas de crear';

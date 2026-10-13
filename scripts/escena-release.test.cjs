@@ -328,15 +328,24 @@ for(const route of ['index.html','buscARTE_busqueda.html?rubro=tatuaje','buscART
   await capture(f.page,'1440-'+route.replace(/[^a-z0-9]/gi,'-'));
 });
 
-test('Home motion respects user preferences; real completion reads remain optional and guest CTAs stay hidden',async t=>{
-  const f=await setup(t,'index.html',{width:390,reducedMotion:'no-preference'});
+for(const width of [320,1440])test(`Home motion ${width}px keeps artwork fixed without extra controls; completion remains optional`,async t=>{
+  const f=await setup(t,'index.html',{width,reducedMotion:'no-preference'});
   await f.page.waitForFunction(()=>document.documentElement.dataset.homeSession==='member');
   assert.equal(await f.page.locator('#nav-guest').isVisible(),false);
-  assert.equal(await f.page.locator('.a2-motion-control').getAttribute('aria-pressed'),'true');
-  await f.page.locator('.a2-motion-control').click();assert.equal(await f.page.locator('.a2-motion-control').getAttribute('aria-pressed'),'false');
-  await f.page.locator('.a2-motion-control').click();assert.equal(await f.page.locator('.a2-motion-control').getAttribute('aria-pressed'),'true');
+  assert.equal(await f.page.locator('.a2-motion-control').count(),0,'No background-motion button is added');
+  assert.equal(await f.page.evaluate(()=>document.documentElement.dataset.a2Motion),'paused');
+  assert.equal(await f.page.locator('.a2-art-canvas').evaluate(el=>getComputedStyle(el).animationName),'none');
+  assert.ok(await f.page.locator('.a2-art-frame img').evaluate(el=>el.complete && el.naturalWidth>0),'Hero artwork remains loaded');
+  f.result.metrics=await metrics(f.page);
+  assert.ok(f.result.metrics.scrollWidth<=width+1,JSON.stringify(f.result.metrics));
+  for(const item of f.result.metrics.nav)assert.ok(item.left>=-1 && item.right<=width+1,JSON.stringify(item));
+  await capture(f.page,width+'-home-without-motion-control');
   await f.page.emulateMedia({reducedMotion:'reduce'});await f.page.waitForFunction(()=>document.documentElement.dataset.a2Motion==='paused');
-  assert.equal(await f.page.locator('.a2-motion-control').isVisible(),false);
+  assert.equal(await f.page.locator('.a2-art-canvas').evaluate(el=>getComputedStyle(el).animationName),'none');
+  assert.equal(await f.page.locator('.a2-motion-control').count(),0);
+  await f.page.emulateMedia({reducedMotion:'no-preference'});
+  assert.equal(await f.page.evaluate(()=>document.documentElement.dataset.a2Motion),'paused');
+  assert.equal(await f.page.locator('.a2-art-canvas').evaluate(el=>getComputedStyle(el).animationName),'none');
   await f.page.locator('#nav-avatar-btn').click();assert.ok(await f.page.locator('#nav-dropdown').isVisible());
   const profiles=f.page.locator('#nav-dropdown a[href*="perfil_publico"]');assert.equal(await profiles.count(),1);assert.match(await profiles.getAttribute('href'),/id=9001/);
   await f.page.locator('#nav-avatar-btn').click();assert.equal(await f.page.locator('#nav-dropdown').isVisible(),false);

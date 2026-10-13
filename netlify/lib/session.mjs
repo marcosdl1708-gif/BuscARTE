@@ -45,7 +45,10 @@ export async function backendJson(path, options = {}) {
   const response = await backend(path, options);
   if (!response.ok) throw new Error('backend');
   if (response.status === 204) return null;
-  return response.json();
+  // PostgREST also returns an empty 201 for a successful INSERT with its
+  // default return=minimal. A persisted session is not a failed login.
+  const text = await response.text();
+  return text ? JSON.parse(text) : null;
 }
 function sessionToken(request) {
   const parts = (request.headers.get('cookie') || '').split(';').map(part => part.trim()).filter(part => part.startsWith(COOKIE + '='));
