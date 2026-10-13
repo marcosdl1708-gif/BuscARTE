@@ -1,10 +1,11 @@
 import { randomBytes, createHash, createHmac, timingSafeEqual } from 'node:crypto';
+import { normalizeDisciplines } from './disciplinas.mjs';
 
 const ORIGINS = new Set(['https://buscarte.com.ar', 'https://www.buscarte.com.ar']);
 const COOKIE = '__Host-ba_session';
 const AGE = 30 * 24 * 60 * 60;
 export const environment = name => globalThis.Netlify?.env?.get(name) || process.env[name] || '';
-export const userFields = 'id,nombre,email,tipo_cuenta,rubro,referentes,generos,baneado';
+export const userFields = 'id,nombre,email,tipo_cuenta,rubro,referentes,generos,baneado,disciplinas,perfil_revision';
 export const hash = value => createHash('sha256').update(String(value)).digest('hex');
 export const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 export const id = value => /^(?:[1-9]\d{0,14})$/.test(String(value)) ? String(value) : '';
@@ -66,6 +67,7 @@ export async function sessionUser(request) {
   const user = Array.isArray(profiles) && profiles.length === 1 ? profiles[0] : null;
   if (!user || user.baneado === true || !user.password || !equalSecret(hash(user.password), rows[0].password_fingerprint)) return null;
   delete user.password;
+  if(user.tipo_cuenta==='artista' && user.disciplinas!=null)user.disciplinas=normalizeDisciplines(user.disciplinas,user.rubro);
   return user;
 }
 export async function startSession(profileId) {
@@ -74,6 +76,7 @@ export async function startSession(profileId) {
   const token = randomBytes(32).toString('base64url');
   await backendJson('/rest/v1/sesiones_web', { method: 'POST', body: JSON.stringify({ token_hash: hash(token), perfil_id: rows[0].id, password_fingerprint: hash(rows[0].password), expires_at: new Date(Date.now() + AGE * 1000).toISOString() }) });
   delete rows[0].password;
+  if(rows[0].tipo_cuenta==='artista' && rows[0].disciplinas!=null)rows[0].disciplinas=normalizeDisciplines(rows[0].disciplinas,rows[0].rubro);
   return { user: rows[0], cookie: COOKIE + '=' + token + '; Path=/; Max-Age=' + AGE + '; Secure; HttpOnly; SameSite=Lax' };
 }
 export async function endSession(request) {

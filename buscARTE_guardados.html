@@ -2,6 +2,7 @@
 <html lang="es" data-ba-design="a2">
 <head>
 <script src="/assets/js/sesion-segura.js"></script>
+  <script src="/assets/js/disciplinas.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>buscARTE — Mis guardados</title>
@@ -234,6 +235,7 @@
 <style>html:not([data-music-tools="true"]) a[href*="buscarte_generador" i] { display: none !important; }</style>
 <script src="/assets/js/menu-cuenta.js"></script>
 <link rel="stylesheet" href="/assets/css/escena.css">
+<link rel="stylesheet" href="/assets/css/cursor.css">
 </head>
 <body>
 <div class="cursor" id="cursor"></div>
@@ -449,7 +451,7 @@
 
     // Filtro por rubro
     if (currentRubroFilter && currentRubroFilter !== 'todos') {
-      arr = arr.filter(p => (p.rubro || 'musica') === currentRubroFilter);
+      arr = arr.map(p => window.BuscARTEDisciplinas.project(p,currentRubroFilter)).filter(Boolean);
     }
 
     if (q) {
@@ -474,7 +476,7 @@
     }
 
     // Rubros únicos presentes en los perfiles guardados
-    const rubrosPresentes = [...new Set(perfilesGuardados.map(p => p.rubro || 'musica'))];
+    const rubrosPresentes = [...new Set(perfilesGuardados.flatMap(p => window.BuscARTEDisciplinas.list(p)))];
 
     row.classList.add('visible');
 
@@ -506,7 +508,8 @@
     const initials = getInitials(p.nombre);
     const generos = String(p.generos||'').split(',').map(g=>g.trim()).filter(Boolean).slice(0,3);
     const location = [p.barrio, p.ciudad].filter(Boolean).join(', ');
-    const tags = generos.map(g=>`<span class="ctag">${escapeHtml(g)}</span>`).join('');
+    const memberships=window.BuscARTEDisciplinas.list(p);
+    const tags = generos.map(g=>`<span class="ctag">${escapeHtml(g)}</span>`).join('')+(memberships.length>1?memberships.map(key=>`<span class="ctag">${escapeHtml(window.BuscARTEDisciplinas.labels[key])}${key===window.BuscARTEDisciplinas.primary(p)?' · Principal':''}</span>`).join(''):'');
     const refs = p.referentes ? `🎨 <em>${escapeHtml(String(p.referentes).split(',').slice(0,3).join(', '))}</em>` : '';
     const bio = p.bio || p.instrumento || 'Artista en buscARTE';
     const subtitulo = p.instrumento || subtituloDesdeCampos(p) || (RUBRO_LABELS[p.rubro] || 'Artista');
@@ -646,7 +649,7 @@
         if (!ids.length) {
           perfilesGuardados = [];
         } else {
-          const pRes = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=in.(${ids.join(',')})&select=id,nombre,instrumento,generos,ciudad,barrio,bio,referentes,foto_url,rubro,campos_especificos`, { headers: hdrs });
+          const pRes = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=in.(${ids.join(',')})&select=id,nombre,instrumento,generos,ciudad,barrio,bio,referentes,foto_url,rubro,campos_especificos,tipo_cuenta,disciplinas,perfil_revision`, { headers: hdrs });
           if (!pRes.ok) throw new Error(await pRes.text());
           const perfiles = await pRes.json();
           const order = new Map(ids.map((id, idx) => [String(id), idx]));
@@ -821,5 +824,6 @@
 </script>
 <script src="/assets/js/escena.js"></script>
 <script src="/assets/js/escena-fondos.js"></script>
+<script src="/assets/js/cursor.js"></script>
 </body>
 </html>

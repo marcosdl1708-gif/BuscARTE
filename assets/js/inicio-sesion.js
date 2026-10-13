@@ -56,6 +56,16 @@
       document.documentElement.dataset.homeSession = state.mode;
       document.documentElement.dataset.homeReady = 'true';
 
+      let disciplines=document.getElementById('home-disciplinas');
+      const owner=window.BuscARTEDisciplinas?.own();
+      const selected=state.mode==='member' && owner && String(owner.id)===state.uid ? window.BuscARTEDisciplinas.list(owner) : [];
+      if (selected.length>1) {
+        if(!disciplines) {disciplines=document.createElement('div');disciplines.id='home-disciplinas';disciplines.setAttribute('aria-label','Tus disciplinas guardadas');disciplines.style.cssText='display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;font-size:.78rem';document.getElementById('hero-logueado')?.append(disciplines);}
+        disciplines.replaceChildren();
+        for(const key of selected) {const link=document.createElement('a');link.href='buscARTE_busqueda.html?rubro='+key;link.textContent=window.BuscARTEDisciplinas.labels[key]+(key===owner.rubro?' · Principal':'');link.style.cssText='display:inline-flex;align-items:center;min-height:44px;padding:7px 11px;border:1px solid var(--gris2);color:var(--blanco);max-width:100%;text-decoration:none';disciplines.append(link);}
+        disciplines.hidden=false;disciplines.style.display='flex';
+      } else if(disciplines) {disciplines.hidden=true;disciplines.style.display='none';disciplines.replaceChildren();}
+
       let lastSeen = '';
       try { lastSeen = localStorage.getItem('ba_msg_last_seen') || ''; } catch (_) {}
       const nextBadgeKey = state.mode === 'member' ? JSON.stringify([state.uid, lastSeen]) : '';
@@ -89,7 +99,7 @@
       refresh = () => render(readLegacy());
       refresh();
       window.addEventListener('storage', event => {
-        if (!event.key || ['ba_logged', 'ba_user_id', 'ba_name', 'ba_msg_last_seen'].includes(event.key)) refresh();
+        if (!event.key || ['ba_logged', 'ba_user_id', 'ba_name', 'ba_msg_last_seen','ba_disciplinas'].includes(event.key)) refresh();
       });
     }
 

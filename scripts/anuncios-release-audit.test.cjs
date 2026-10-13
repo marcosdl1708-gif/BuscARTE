@@ -47,7 +47,7 @@ async function setup(t, { file = files[0], width = 390, logged = true, rubro = '
   const context = await browser.newContext({ viewport: { width, height: 844 }, hasTouch: width < 901, isMobile: width < 901, serviceWorkers: 'block' });
   await context.addInitScript(({ logged, rubro }) => {
     localStorage.setItem('buscarte_meta_consent_v1', 'denied');
-    if (!logged) return;
+    if (!logged || localStorage.getItem('ba_logged') === '1') return;
     Object.entries({ ba_logged: '1', ba_user_id: '11', ba_name: 'Persona QA', ba_tipo_cuenta: 'artista', ba_rubro: rubro }).forEach(([k, v]) => localStorage.setItem(k, v));
   }, { logged, rubro });
   const page = await context.newPage();
@@ -61,20 +61,32 @@ async function setup(t, { file = files[0], width = 390, logged = true, rubro = '
     const req = route.request();
     const url = new URL(req.url());
     const relative = url.pathname.slice(1);
+    const json = (body, status = 200) => route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(body) });
+    if(url.origin === origin && url.pathname === '/.netlify/functions/sesion') {
+      if(req.method() !== 'GET')return json({error:'Fixture method denied.'},405);
+      return logged ? json({user:{id:11,nombre:'Persona QA',email:'persona-qa@example.invalid',tipo_cuenta:'artista',rubro:profileRubro,
+        referentes:'',generos:'',baneado:false,disciplinas:null,perfil_revision:0}}) : json({error:'Fixture session required.',code:'SESSION_REQUIRED'},401);
+    }
+    let apiUrl = url;
+    if(url.origin === origin && url.pathname === '/.netlify/functions/datos') {
+      const target=url.searchParams.get('path');
+      if(!target || !target.startsWith('/rest/v1/') || target.startsWith('//'))return json({error:'Unknown fixture gateway path.'},403);
+      apiUrl=new URL(target,'https://xiaanchoanxmampegoay.supabase.co');
+      if(apiUrl.origin !== 'https://xiaanchoanxmampegoay.supabase.co')return json({error:'External fixture gateway path.'},403);
+    }
     if (url.origin === origin && req.method() === 'GET') {
       if (allowed.has(relative)) return route.fulfill({ contentType: ({ '.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css', '.json': 'application/json', '.webp': 'image/webp' })[path.extname(relative)] || 'application/octet-stream', body: fs.readFileSync(path.join(root, relative)) });
       if (relative === 'favicon.ico') return route.fulfill({ status: 204, body: '' });
       if (relative.startsWith('fixture-photo')) return route.fulfill({ contentType: 'image/svg+xml', body: '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="64" height="64" fill="green"/></svg>' });
     }
     if (url.hostname === 'fonts.googleapis.com') return route.fulfill({ contentType: 'text/css', body: '' });
-    if (url.hostname === 'xiaanchoanxmampegoay.supabase.co') {
-      const json = body => route.fulfill({ contentType: 'application/json', body: JSON.stringify(body) });
-      if (req.method() === 'POST' && url.pathname === '/rest/v1/rpc/vencer_anuncios_viejos') { calls.writes.push('expiry-fixture'); return json(null); }
-      if (req.method() === 'PATCH' && url.pathname === '/rest/v1/anuncios') { calls.writes.push('view-fixture'); return json(null); }
-      if (req.method() === 'GET' && url.pathname === '/rest/v1/perfiles') return json([{ id: url.searchParams.get('id') === 'eq.22' ? 22 : 11, nombre: 'Persona QA', rubro: profileRubro, tipo_cuenta: 'artista' }]);
-      if (req.method() === 'GET' && url.pathname === '/rest/v1/anuncios') {
-        if (url.searchParams.get('select') === 'id') return json([]);
-        if (url.searchParams.has('user_id')) {
+    if (apiUrl.hostname === 'xiaanchoanxmampegoay.supabase.co') {
+      if (req.method() === 'POST' && apiUrl.pathname === '/rest/v1/rpc/vencer_anuncios_viejos') { calls.writes.push('expiry-fixture'); return json(null); }
+      if (req.method() === 'PATCH' && apiUrl.pathname === '/rest/v1/anuncios') { calls.writes.push('view-fixture'); return json(null); }
+      if (req.method() === 'GET' && apiUrl.pathname === '/rest/v1/perfiles') return json([{ id: apiUrl.searchParams.get('id') === 'eq.22' ? 22 : 11, nombre: 'Persona QA', rubro: profileRubro, rubro_principal:profileRubro, tipo_cuenta: 'artista',disciplinas:null,perfil_revision:0 }]);
+      if (req.method() === 'GET' && apiUrl.pathname === '/rest/v1/anuncios') {
+        if (apiUrl.searchParams.get('select') === 'id') return json([]);
+        if (apiUrl.searchParams.has('user_id')) {
           const response = ownResponses[calls.ownReads] || {};
           calls.ownReads++;
           if (response.gate) await response.gate;
@@ -83,8 +95,8 @@ async function setup(t, { file = files[0], width = 390, logged = true, rubro = '
         }
         return json([ad]);
       }
-      if (req.method() === 'GET' && url.pathname === '/rest/v1/reacciones') return json(url.searchParams.get('anuncio_id')?.startsWith('in.') ? [{ anuncio_id: 99, tipo: 'asistire' }, { anuncio_id: 99, tipo: 'like' }] : []);
-      if (req.method() === 'GET' && url.pathname === '/rest/v1/mensajes') return json([]);
+      if (req.method() === 'GET' && apiUrl.pathname === '/rest/v1/reacciones') return json(apiUrl.searchParams.get('anuncio_id')?.startsWith('in.') ? [{ anuncio_id: 99, tipo: 'asistire' }, { anuncio_id: 99, tipo: 'like' }] : []);
+      if (req.method() === 'GET' && apiUrl.pathname === '/rest/v1/mensajes') return json([]);
     }
     calls.unexpected.push(req.method() + ' ' + url.origin + url.pathname);
     return route.abort('blockedbyclient');

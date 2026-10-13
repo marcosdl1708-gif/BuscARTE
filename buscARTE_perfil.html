@@ -2,6 +2,7 @@
 <html lang="es" data-ba-design="a2">
 <head>
 <script src="/assets/js/sesion-segura.js"></script>
+  <script src="/assets/js/disciplinas.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>buscARTE — Configurar perfil</title>
@@ -852,6 +853,20 @@
   }
 
 </style>
+<style>
+  .md-editor[hidden] { display:none!important; }
+  .md-editor .md-list { display:grid;gap:10px;margin:16px 0; }
+  .md-editor .md-row,.md-editor .md-actions { display:flex;flex-wrap:wrap;align-items:center;gap:8px;min-width:0; }
+  .md-editor .md-row { border:1px solid var(--gris2);padding:10px; }
+  .md-editor .md-row button,.md-editor .md-actions button,.md-editor select { min-height:44px;padding:9px 12px;max-width:100%;font:inherit;color:var(--blanco);background:var(--negro2);border:1px solid var(--gris2);white-space:normal; }
+  .md-editor .md-row button:first-child { flex:1 1 170px;text-align:left; }
+  .md-editor .md-row button[aria-pressed="true"] { color:var(--neon);border-color:var(--neon); }
+  html[data-profile-editor-rubro="tatuaje"] .md-editor .md-row button[aria-pressed="true"],html[data-profile-editor-rubro="tatuaje"] #exp-val {color:var(--blanco);}
+  .md-editor button:disabled { opacity:.65;cursor:default; }
+  .md-editor .md-actions label,.md-editor .md-actions select { width:100%; }
+  .md-editor select { font-size:16px; }
+  .md-editor .md-note { color:var(--gris);font-size:.82rem;line-height:1.6;margin-top:12px; }
+</style>
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0a0a0a">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -862,6 +877,7 @@
 <style>html:not([data-music-tools="true"]) a[href*="buscarte_generador" i] { display: none !important; }</style>
 <script src="/assets/js/menu-cuenta.js"></script>
 <link rel="stylesheet" href="/assets/css/escena.css">
+<link rel="stylesheet" href="/assets/css/cursor.css">
 </head>
 <body>
 
@@ -952,7 +968,7 @@
   </aside>
 
   <!-- MAIN -->
-  <main class="main" onscroll="showSaveBar()">
+  <main class="main">
 
     <div class="page-header">
       <div class="page-label">Tu espacio en buscARTE</div>
@@ -1057,6 +1073,20 @@
       </div>
     </div>
 
+    <section class="config-section md-editor" id="mis-disciplinas" hidden aria-labelledby="md-title">
+      <h2 class="section-title" id="md-title">Tus disciplinas</h2>
+      <p class="section-desc">Una cuenta, distintas formas de crear. La principal se destaca en tu perfil; los datos de cada disciplina se editan por separado.</p>
+      <div class="md-list" id="md-list"></div>
+      <div class="md-actions">
+        <label for="md-add">Sumar una disciplina</label>
+        <select class="md-select" id="md-add"><option value="">Elegí una disciplina…</option></select>
+        <button type="button" class="btn-ghost" onclick="agregarRubro()">Agregar disciplina</button>
+        <button type="button" class="btn-ghost" onclick="descartarDisciplinas()">Deshacer cambios de disciplinas</button>
+      </div>
+      <p class="md-note" id="md-context" role="status" aria-live="polite"></p>
+      <p class="md-note">No hace falta completar todo. Agregar, quitar o cambiar la principal se publica sólo al guardar. Para quitar la principal, elegí otra primero.</p>
+    </section>
+
     <!-- MI RUBRO (rubros no musicales — se muestra/oculta vía JS) -->
     <div class="config-section" id="mi-rubro" style="display:none">
       <div class="section-title"><span class="s-icon" id="mi-rubro-icon">🎨</span> <span id="mi-rubro-titulo">Mi rubro</span></div>
@@ -1148,21 +1178,21 @@
       </div>
 
 
-      <div style="margin-top: 1.8rem;">
-        <div class="field">
-          <label>Años de experiencia</label>
-        </div>
-        <div class="exp-slider-wrap">
-          <div class="exp-labels"><span>Estoy arrancando</span><span>Toda la vida</span></div>
-          <input type="range" id="exp-slider" min="0" max="30" value="0" oninput="updateExp(this); showSaveBar()">
-          <div class="exp-value" id="exp-val">Estoy arrancando</div>
-        </div>
-      </div>
     </div>
 
 
 
     <!-- REFERENTES MUSICALES -->
+    <div class="config-section" id="experiencia">
+      <div class="section-title">Experiencia en esta disciplina</div>
+      <p class="section-desc">Opcional. Este dato corresponde sólo a la disciplina que estás editando.</p>
+      <div class="exp-slider-wrap">
+        <label for="exp-slider">Años de experiencia</label>
+        <div class="exp-labels"><span>Estoy arrancando</span><span>Toda la vida</span></div>
+        <input type="range" id="exp-slider" min="0" max="30" value="0" oninput="updateExp(this)">
+        <div class="exp-value" id="exp-val">Estoy arrancando</div>
+      </div>
+    </div>
     <div class="config-section" id="referentes-section">
       <div class="section-title"><span class="s-icon">🎵</span> Mis referentes</div>
       <p class="section-desc">Elegí artistas o bandas que ayuden a otros músicos a entender tu universo musical. Mostramos estos referentes de forma compacta en tu perfil público.</p>
@@ -1357,7 +1387,7 @@
       <!-- Se rellena por JS -->
     </div>
     <div class="rubro-modal-note">
-      Este selector no crea perfiles adicionales. Los perfiles con varios rubros todavía no están disponibles.
+      Cada disciplina tiene sus propios datos. Tu cuenta, fotos, mensajes y redes siguen siendo los mismos.
     </div>
   </div>
 </div>
@@ -1380,8 +1410,11 @@
   const hdrs = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }
 
   // DETECCIÓN DE RUBRO
-  const rubroActivo = localStorage.getItem('ba_rubro') || 'musica';
+  let rubroActivo = localStorage.getItem('ba_rubro') || '';
   const tipoCuentaActivo = localStorage.getItem('ba_tipo_cuenta') || 'artista';
+  let disciplinasBorrador = null;
+  let principalBorrador = rubroActivo;
+  let disciplinasBloqueadas = false;
 
   let isLoadingProfile = true;
   let isSavingProfile = false;
@@ -1430,7 +1463,7 @@
     if (!credentials?.session || !mismaCuentaPerfil(profileId)) throw new Error('La cuenta cambió. Recargá tu perfil antes de guardar.');
     return fetch('/.netlify/functions/guardar-perfil', {
       method:'POST', credentials:'same-origin', headers:{ 'Content-Type':'application/json' }, cache:'no-store', redirect:'error',
-      body:JSON.stringify({ profileId, changes, ...(operation ? { operation } : {}) }),
+      body:JSON.stringify({ profileId, changes, ...(changes.disciplinas ? {expectedRevision:Number(perfilCargado?.perfil_revision ?? 0)} : {}), ...(operation ? { operation } : {}) }),
       signal
     });
   }
@@ -1439,6 +1472,7 @@
     if (status === 401) return 'Tu sesión venció. Tus cambios siguen acá; ingresá en otra pestaña y volvé a guardar.';
     if (status === 403) return 'No pudimos verificar que esta cuenta sea la del perfil. Volvé a ingresar antes de guardar.';
     if (status === 400) return 'No pudimos guardar estos datos. Revisá los campos y volvé a intentar.';
+    if (status === 409) return 'El perfil cambió en otra pestaña. Conservamos este borrador: copiá tus cambios y recargá para revisar la versión guardada antes de volver a guardar.';
     return 'No pudimos confirmar el guardado. Conservamos tus cambios; revisá tu perfil antes de volver a guardar.';
   }
 
@@ -1447,7 +1481,6 @@
     try {
       return localStorage.getItem('ba_logged') === '1' &&
         String(localStorage.getItem('ba_user_id') || '') === String(id || '') &&
-        (localStorage.getItem('ba_rubro') || 'musica') === rubroActivo &&
         (localStorage.getItem('ba_tipo_cuenta') || 'artista') === tipoCuentaActivo;
     } catch(e) { return false; }
   }
@@ -1662,12 +1695,110 @@
     'chips-rol-esc':['chips-rol-escritura'], 'chips-formato-esc':['chips-formato-escritura']
   };
 
+  function conservarTexto(original, current) {
+    const normal = value => String(value ?? '').split(',').map(x=>x.trim()).filter(Boolean).sort().join(', ');
+    return normal(original) === normal(current) ? original : current;
+  }
+  function capturarDisciplina() {
+    if (!disciplinasBorrador?.details[rubroActivo]) return;
+    const d = window.BuscARTEDisciplinas.clone(disciplinasBorrador.details[rubroActivo]);
+    if (rubroActivo === 'musica') {
+      d.instrumento = conservarTexto(d.instrumento,[...document.querySelectorAll('#chips-inst .chip.selected')].map(c=>c.textContent.trim()).join(', '));
+      d.generos = conservarTexto(d.generos,[...document.querySelectorAll('#chips-gen .chip.selected')].map(c=>c.textContent.trim()).join(', '));
+      d.referentes = conservarTexto(d.referentes,perfReferentes.join(', '));
+      d.donde_ensaya = conservarTexto(d.donde_ensaya,document.querySelector('#ensayo .disp-card.selected .disp-title')?.textContent?.trim() || '');
+    } else {
+      const campos = {...(d.campos_especificos || {})};
+      for (const sec of RUBROS_PERFIL_CONFIG[rubroActivo]?.secciones || []) {
+        const key = SECTION_KEYS[sec.id] || sec.id;
+        const aliases = [sec.id,...(SECTION_LEGACY_IDS[sec.id] || [])];
+        const oldKey = Object.hasOwn(campos,key) ? key : aliases.find(alias=>Object.hasOwn(campos,alias));
+        const old = campos[oldKey];
+        const node = document.getElementById(sec.id);
+        const next = sec.type === 'textarea' ? node?.value?.trim() || '' : [...node?.querySelectorAll('.chip.selected') || []].map(c=>c.textContent.trim());
+        const comparable = value => Array.isArray(value) ? value.map(String).map(x=>x.trim()).filter(Boolean) : value == null || value === '' ? [] : [String(value).trim()];
+        if (JSON.stringify(comparable(old).sort()) === JSON.stringify(comparable(next).sort())) continue;
+        delete campos[key];aliases.forEach(alias=>delete campos[alias]);
+        campos[key] = next;
+      }
+      d.campos_especificos = Object.keys(campos).length ? campos : d.campos_especificos == null ? null : {};
+    }
+    d.disponibilidad = conservarTexto(d.disponibilidad,[...document.querySelectorAll('#disponibilidad .disp-card.selected .disp-title')].map(c=>c.textContent.trim()).join(', '));
+    const slider = document.getElementById('exp-slider');
+    if (slider && (slider.dataset.mdEdited === 'true' || Number(d.experiencia ?? 0) !== Number(slider.value))) d.experiencia = Number(slider.value);
+    disciplinasBorrador.details[rubroActivo] = d;
+  }
+  function seleccionarOpciones(container, values) {
+    if (!container) return;
+    for (const value of values) {
+      let chip = [...container.querySelectorAll('.chip')].find(c=>c.textContent.trim() === value);
+      if (!chip) { chip=document.createElement('button');chip.type='button';chip.className='chip';chip.textContent=value;chip.addEventListener('click',()=>toggleChip(chip));container.append(chip); }
+      chip.classList.add('selected');chip.setAttribute('aria-pressed','true');
+    }
+  }
+  function mostrarDetalleDisciplina() {
+    const d = disciplinasBorrador?.details[rubroActivo];
+    initPerfil(rubroActivo);resetFormSelections();
+    if (!d) return;
+    camposPerfilCargados = d.campos_especificos || {};
+    const split = value => String(value ?? '').split(',').map(x=>x.trim()).filter(Boolean);
+    if (rubroActivo === 'musica') {
+      seleccionarOpciones(document.getElementById('chips-inst'),split(d.instrumento));
+      seleccionarOpciones(document.getElementById('chips-gen'),split(d.generos));
+      perfReferentes=split(d.referentes);perfRenderTags(false);
+      document.querySelectorAll('#perf-chips-suger .ref-suger-chip').forEach(btn=>btn.classList.toggle('on',perfReferentes.includes(btn.textContent.trim())));
+      if (d.donde_ensaya) {
+        const title=String(d.donde_ensaya);
+        let card=[...document.querySelectorAll('#ensayo .disp-card')].find(c=>c.querySelector('.disp-title')?.textContent?.trim()===title);
+        if (!card) {card=document.createElement('button');card.type='button';card.className='disp-card';const span=document.createElement('span');span.className='disp-title';span.textContent=title;card.append(span);card.addEventListener('click',()=>selectEnsayo(card));document.querySelector('#ensayo .disponibilidad-grid')?.append(card);}
+        card?.classList.add('selected');
+      }
+    } else for (const sec of RUBROS_PERFIL_CONFIG[rubroActivo]?.secciones || []) {
+      const key=SECTION_KEYS[sec.id] || sec.id;
+      const alias=[sec.id,...(SECTION_LEGACY_IDS[sec.id] || [])].find(k=>Object.hasOwn(camposPerfilCargados,k));
+      const value=Object.hasOwn(camposPerfilCargados,key) ? camposPerfilCargados[key] : camposPerfilCargados[alias];
+      if (value == null) continue;
+      const values=Array.isArray(value) ? value : [value];
+      if (values.some(v=>typeof v !== 'string')) throw new Error('No se pudieron interpretar las opciones guardadas.');
+      if (sec.type === 'textarea') document.getElementById(sec.id).value=values.join(', ');
+      else seleccionarOpciones(document.getElementById(sec.id),values.map(v=>v.trim()).filter(Boolean));
+    }
+    const selected=split(d.disponibilidad);
+    const grid=document.getElementById('disponibilidad-grid');
+    for (const value of selected) {
+      let card=[...grid?.querySelectorAll('.disp-card') || []].find(c=>c.querySelector('.disp-title')?.textContent?.trim()===value);
+      if (!card) {card=document.createElement('button');card.type='button';card.className='disp-card';const span=document.createElement('span');span.className='disp-title';span.textContent=value;card.append(span);card.addEventListener('click',()=>toggleDisp(card));grid?.append(card);}
+      card.classList.add('selected');
+    }
+    const slider=document.getElementById('exp-slider');
+    if (slider) {slider.max=String(Math.max(30,Number(d.experiencia || 0)));slider.value=String(d.experiencia ?? 0);slider.dataset.mdEdited='false';updateExp(slider,false);}
+    renderDisciplinasEditor();
+  }
+  function renderDisciplinasEditor() {
+    const section=document.getElementById('mis-disciplinas');
+    section.hidden=tipoCuentaActivo !== 'artista' || !disciplinasBorrador || disciplinasBloqueadas;
+    if (section.hidden) return;
+    const list=document.getElementById('md-list');list.replaceChildren();
+    for (const key of disciplinasBorrador.selected) {
+      const row=document.createElement('div');row.className='md-row';row.dataset.disciplina=key;
+      const edit=document.createElement('button');edit.type='button';edit.textContent=RUBROS_PERFIL_CONFIG[key].emoji+' '+RUBROS_PERFIL_CONFIG[key].label;edit.setAttribute('aria-pressed',String(key===rubroActivo));edit.addEventListener('click',()=>cambiarRubro(key));
+      const main=document.createElement('button');main.type='button';main.textContent=key===principalBorrador?'★ Principal':'Hacer principal';main.disabled=key===principalBorrador;main.addEventListener('click',()=>hacerPrincipal(key));
+      const remove=document.createElement('button');remove.type='button';remove.textContent='Quitar';remove.setAttribute('aria-label','Quitar '+RUBROS_PERFIL_CONFIG[key].label);remove.disabled=key===principalBorrador;remove.addEventListener('click',()=>quitarDisciplina(key));
+      row.append(edit,main,remove);list.append(row);
+    }
+    const select=document.getElementById('md-add');select.replaceChildren(new Option('Elegí una disciplina…',''));
+    for (const key of window.BuscARTEDisciplinas.keys.filter(k=>!disciplinasBorrador.selected.includes(k))) select.add(new Option(window.BuscARTEDisciplinas.labels[key],key));
+    document.getElementById('md-context').textContent='Editando '+RUBROS_PERFIL_CONFIG[rubroActivo].label+'. Principal del borrador: '+RUBROS_PERFIL_CONFIG[principalBorrador].label+'.';
+  }
+
   function initPerfil(rubro) {
+    document.documentElement.dataset.profileEditorRubro=rubro;
     const config = RUBROS_PERFIL_CONFIG[rubro] || RUBROS_PERFIL_CONFIG.musica;
 
     // Cambiar paleta de colores según rubro
     document.documentElement.style.setProperty('--neon', RUBRO_COLORS[rubro] || '#d4f53c');
     const esMusica = rubro === 'musica';
+    document.getElementById('experiencia').hidden=tipoCuentaActivo !== 'artista';
 
     // Sidebar links
     const linkMusica = document.getElementById('sidebar-link-musica');
@@ -1740,6 +1871,11 @@
     // Nav label
     const navLabel = document.getElementById('nav-link-tablón');
     if (navLabel && !esMusica) navLabel.textContent = 'Artistas';
+    if (tipoCuentaActivo !== 'artista') {
+      for(const id of ['musica','mi-rubro','mis-disciplinas','experiencia','referentes-section','ensayo','disponibilidad','sidebar-rubro-section','sidebar-link-musica','sidebar-link-mi-rubro','sidebar-link-ensayo','sidebar-link-referentes']) {const node=document.getElementById(id);if(node)node.style.display='none';}
+      if(videosTitle)videosTitle.textContent='Trabajos y enlaces';
+      if(videosDesc)videosDesc.textContent='Estos enlaces son parte de la presentación de tu cuenta.';
+    }
   }
 
   function renderMiRubroFields(secciones) {
@@ -1906,7 +2042,7 @@
   function updateExp(el, markDirty = true) {
     const v = parseInt(el.value || '0', 10);
     document.getElementById('exp-val').textContent = v === 0 ? 'Estoy arrancando' : v === 30 ? '30+ años' : v + (v === 1 ? ' año' : ' años');
-    if (markDirty) showSaveBar();
+    if (markDirty) {el.dataset.mdEdited='true';showSaveBar();}
   }
 
   // SUBIR FOTO DE PERFIL
@@ -1963,7 +2099,7 @@
         throw new Error('No pudimos confirmar la foto guardada. Revisá tu perfil antes de volver a subirla.');
       }
       if (!currentPhotoAccount()) throw new Error('La cuenta cambió. Recargá tu perfil para revisar el resultado.');
-      perfilCargado = { ...perfilCargado, foto_url: fotoUrl };
+      perfilCargado = { ...perfilCargado, foto_url: fotoUrl, perfil_revision:rows[0].perfil_revision ?? perfilCargado.perfil_revision };
       const img = document.getElementById('preview-img');
       if (img) { img.src = fotoUrl; img.style.display = 'block'; }
       const initials = document.getElementById('avatar-initials');
@@ -2042,7 +2178,7 @@
 
     try {
       // El editor necesita estos campos, no hashes ni tokens de recuperación.
-      const fields = 'id,email,nombre,instrumento,generos,provincia,ciudad,barrio,bio,referentes,disponibilidad,donde_ensaya,redes,videos,es_premium,foto_url,celular,baneado,experiencia,edad,genero_principal,tipo_cuenta,rubro,campos_especificos';
+      const fields = 'id,email,nombre,instrumento,generos,provincia,ciudad,barrio,bio,referentes,disponibilidad,donde_ensaya,redes,videos,es_premium,foto_url,celular,baneado,experiencia,edad,genero_principal,tipo_cuenta,rubro,campos_especificos,disciplinas,perfil_revision';
       const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${encodeURIComponent(miId)}&select=${fields}`, { headers: hdrs, cache:'no-store' });
       if (!res.ok) {
         const errText = await res.text().catch(() => '');
@@ -2057,7 +2193,11 @@
         showStatus('No encontramos tu perfil. Probá volver a ingresar.', 'error');
         return;
       }
-      camposPerfilCargados = rubroActivo === 'musica' ? {} : parseCamposPerfil(p.campos_especificos);
+      rubroActivo=p.rubro || '';
+      principalBorrador=rubroActivo;
+      disciplinasBorrador=window.BuscARTEDisciplinas.read(p,true);
+      disciplinasBloqueadas=tipoCuentaActivo === 'artista' && !disciplinasBorrador.selected.length;
+      if (disciplinasBloqueadas) throw new Error('No pudimos identificar tu disciplina. No modificamos datos históricos incompletos.');
 
       // Llenar campos de texto
       const nombreInput = document.getElementById('reg-nombre-perfil') || document.querySelector('#foto input[type=text]');
@@ -2072,78 +2212,7 @@
         countBio(false);
       }
 
-      // Cargar campos de música (solo si rubro es música)
-      if (rubroActivo === 'musica') {
-        if (p.instrumento) {
-          const insts = p.instrumento.split(',').map(s => s.trim()).filter(Boolean);
-          document.querySelectorAll('#chips-inst .chip').forEach(c => {
-            if (insts.includes(c.textContent.trim())) c.classList.add('selected');
-          });
-        }
-        if (p.generos) {
-          const gens = p.generos.split(',').map(s => s.trim()).filter(Boolean);
-          document.querySelectorAll('#chips-gen .chip').forEach(c => {
-            if (gens.includes(c.textContent.trim())) c.classList.add('selected');
-          });
-        }
-        const expSlider = document.getElementById('exp-slider');
-        if (expSlider) {
-          expSlider.value = p.experiencia != null ? p.experiencia : 0;
-          updateExp(expSlider, false);
-        }
-        perfReferentes = p.referentes ? p.referentes.split(',').map(s => s.trim()).filter(Boolean) : [];
-        perfRenderTags(false);
-        document.querySelectorAll('#perf-chips-suger .ref-suger-chip').forEach(btn => {
-          btn.classList.toggle('on', perfReferentes.includes(btn.textContent.trim()));
-        });
-        if (p.donde_ensaya) {
-          document.querySelectorAll('#ensayo .disp-card').forEach(c => {
-            if (c.querySelector('.disp-title')?.textContent?.trim() === p.donde_ensaya) c.classList.add('selected');
-          });
-        }
-      } else {
-        // Cargar campos_especificos (claves canónicas) en las secciones del rubro activo
-        {
-            const campos = camposPerfilCargados;
-            const secciones = (RUBROS_PERFIL_CONFIG[rubroActivo] || {}).secciones || [];
-            secciones.forEach(sec => {
-              const key = SECTION_KEYS[sec.id] || sec.id;
-              // canónica primero; fallback al id de sección por si quedó algún dato viejo
-              const legacyKey = [sec.id, ...(SECTION_LEGACY_IDS[sec.id] || [])].find(alias => Object.hasOwn(campos, alias));
-              const values = Object.hasOwn(campos, key) ? campos[key] : campos[legacyKey];
-              if (values == null) return;
-              if (sec.type === 'textarea') {
-                if (typeof values !== 'string' && !(Array.isArray(values) && values.every(value => typeof value === 'string'))) throw new Error('No se pudo interpretar el texto guardado.');
-                const ta = document.getElementById(sec.id);
-                if (ta) ta.value = Array.isArray(values) ? values.join(', ') : String(values);
-              } else {
-                const arr = Array.isArray(values) ? values : [values];
-                if (arr.some(value => typeof value !== 'string')) throw new Error('No se pudieron interpretar las opciones guardadas.');
-                const container = document.getElementById(sec.id);
-                if (!container) return;
-                // Una opción histórica no ofrecida hoy sigue visible y se puede quitar deliberadamente.
-                arr.map(value => value.trim()).filter(Boolean).forEach(value => {
-                  let chip = [...container.querySelectorAll('.chip')].find(chip => chip.textContent.trim() === value);
-                  if (!chip) {
-                    chip = document.createElement('button');
-                    chip.type = 'button'; chip.className = 'chip'; chip.textContent = value;
-                    chip.addEventListener('click', () => toggleChip(chip));
-                    container.appendChild(chip);
-                  }
-                  chip.classList.add('selected');
-                  chip.setAttribute('aria-pressed', 'true');
-                });
-              }
-            });
-        }
-      }
-
-      // Experiencia
-      const expSlider = document.getElementById('exp-slider');
-      if (expSlider && rubroActivo !== 'musica') {
-        expSlider.value = p.experiencia != null ? p.experiencia : 0;
-        updateExp(expSlider, false);
-      }
+      mostrarDetalleDisciplina();
 
       // Edad
       const edadInput = document.getElementById('edad-input');
@@ -2298,11 +2367,11 @@
     const sidebar = document.querySelector('.preview-complete');
     const valid = !!p && !!perfilCargado && String(p.id) === String(perfilCargado.id) && mismaCuentaPerfil(p.id) &&
       tipoCuentaActivo === 'artista' && (!p.tipo_cuenta || p.tipo_cuenta === 'artista') &&
-      Object.hasOwn(RUBROS_PERFIL_CONFIG, rubroActivo) && (!p.rubro || p.rubro === rubroActivo);
+      Object.hasOwn(RUBROS_PERFIL_CONFIG, p.rubro);
     if (card) card.hidden = !valid;
     if (sidebar) sidebar.hidden = !valid;
     if (!valid) return;
-    const checks = basicosPerfil(p);
+    const checks = basicosPerfil(p,p.rubro);
     const done = checks.filter(item => item.done).length;
     const pct = Math.round(done / checks.length * 100);
     document.getElementById('profile-progress-summary').textContent = done === 5
@@ -2331,6 +2400,7 @@
         action.addEventListener('click', event => {
           event.preventDefault();
           if (!mismaCuentaPerfil(p.id)) { actualizarCompletitud(null); return; }
+          if (rubroActivo !== p.rubro) cambiarRubro(p.rubro);
           const target = document.getElementById(item.target);
           if (!target) return;
           if (!target.matches('input, select, textarea, button')) {
@@ -2396,38 +2466,13 @@
     const bio = document.getElementById('bio-text')?.value?.trim() || '';
     const esArtista = tipoCuentaActivo === 'artista';
 
-    // Campos según rubro
-    let instrumento = '', generos = '', referentes_str = '';
-    let campos_especificos = null;
-
-    if (esArtista && rubroActivo === 'musica') {
-      instrumento = [...document.querySelectorAll('#chips-inst .chip.selected')].map(c => c.textContent.trim()).join(', ');
-      generos = [...document.querySelectorAll('#chips-gen .chip.selected')].map(c => c.textContent.trim()).join(', ');
-      referentes_str = perfReferentes.join(', ');
-    } else if (esArtista) {
-      // Recolectar campos de mi-rubro como JSON, con claves canónicas (rol, estilo, etc.)
-      // Reemplazar sólo lo que permite editar este formulario y preservar campos desconocidos.
-      const camposObj = { ...camposPerfilCargados };
-      (RUBROS_PERFIL_CONFIG[rubroActivo]?.secciones || []).forEach(sec => {
-        delete camposObj[SECTION_KEYS[sec.id] || sec.id];
-        [sec.id, ...(SECTION_LEGACY_IDS[sec.id] || [])].forEach(alias => { delete camposObj[alias]; });
-      });
-      document.querySelectorAll('#mi-rubro-contenido .chips').forEach(chipsDiv => {
-        const key = SECTION_KEYS[chipsDiv.id] || chipsDiv.id;
-        const selected = [...chipsDiv.querySelectorAll('.chip.selected')].map(c => c.textContent.trim());
-        if (key && selected.length) camposObj[key] = selected;
-      });
-      // Textareas dentro de mi-rubro (ej: promo)
-      document.querySelectorAll('#mi-rubro-contenido textarea').forEach(ta => {
-        const key = SECTION_KEYS[ta.id] || ta.id;
-        if (key && ta.value.trim()) camposObj[key] = ta.value.trim();
-      });
-      // {} también se envía: omitir el campo resucitaría la selección anterior al recargar.
-      campos_especificos = JSON.stringify(camposObj);
+    if (esArtista && (disciplinasBloqueadas || !disciplinasBorrador?.selected.includes(principalBorrador))) {
+      showStatus("No pudimos interpretar tus disciplinas. Recargá antes de guardar; conservamos los datos actuales.", "error");return;
     }
-
-    const disponibilidad = [...document.querySelectorAll('#disponibilidad .disp-card.selected')].map(c => c.querySelector('.disp-title')?.textContent?.trim()).filter(Boolean).join(', ');
-    const donde_ensaya = rubroActivo === 'musica' ? (document.querySelector('#ensayo .disp-card.selected .disp-title')?.textContent?.trim() || '') : '';
+    if (esArtista) capturarDisciplina();
+    const disciplinasEnviadas=esArtista ? window.BuscARTEDisciplinas.clone(disciplinasBorrador) : null;
+    const principalEnviado=principalBorrador;
+    const revisionDB=Number(perfilCargado.perfil_revision ?? 0);
     const videos = [...document.querySelectorAll('.video-link-input')].map(i => normalizeUrl(i.value)).filter(Boolean).join(', ');
 
     if (!nombre) {
@@ -2488,11 +2533,8 @@
         barrio: document.getElementById('perfil-barrio')?.value || null,
         tipo_cuenta: tipoCuentaActivo,
         ...(esArtista ? {
-          instrumento, generos, disponibilidad, donde_ensaya,
-          referentes:referentes_str,
-          experiencia:parseInt(document.getElementById('exp-slider')?.value || 0, 10),
-          rubro:rubroActivo,
-          ...(rubroActivo !== 'musica' ? { campos_especificos } : {})
+          rubro:principalEnviado,
+          disciplinas:disciplinasEnviadas
         } : {})
       };
 
@@ -2506,27 +2548,32 @@
       if (!Array.isArray(rows) || rows.length !== 1 || String(rows[0]?.id) !== String(miIdActual)) {
         throw new Error('La respuesta no confirma una actualización del perfil esperado.');
       }
-      if (esArtista && rubroActivo !== 'musica') {
-        const confirmed = parseCamposPerfil(rows[0].campos_especificos);
-        if (!Object.hasOwn(rows[0], 'campos_especificos') ||
-            JSON.stringify(comparableCampos(confirmed)) !== JSON.stringify(comparableCampos(JSON.parse(campos_especificos)))) {
-          throw new Error('La respuesta no confirma las opciones enviadas.');
-        }
+      if (esArtista) {
+        const confirmed=window.BuscARTEDisciplinas.read(rows[0],true);
+        if (!rows[0].disciplinas || rows[0].rubro !== principalEnviado || !Number.isSafeInteger(Number(rows[0].perfil_revision)) || Number(rows[0].perfil_revision) <= revisionDB || JSON.stringify(comparableCampos(confirmed)) !== JSON.stringify(comparableCampos(disciplinasEnviadas))) throw new Error('La respuesta no confirma las disciplinas enviadas.');
       }
       if (!mismaCuentaPerfil(miIdActual)) {
         showStatus('La cuenta cambió durante el guardado. Recargá tu perfil para revisar el resultado.', 'error');
         return;
       }
-      perfilCargado = { ...perfilCargado, ...payload };
-      if (esArtista && rubroActivo !== 'musica') camposPerfilCargados = parseCamposPerfil(rows[0].campos_especificos);
+      perfilCargado = { ...perfilCargado, ...rows[0], rubro_principal:rows[0].rubro ?? perfilCargado.rubro };
+      if (esArtista && profileEditRevision === revisionEnviada) {
+        disciplinasBorrador=window.BuscARTEDisciplinas.read(perfilCargado,true);principalBorrador=perfilCargado.rubro;
+        camposPerfilCargados=disciplinasBorrador.details[rubroActivo]?.campos_especificos || {};renderDisciplinasEditor();
+      }
       // Un fallo de caché local no puede convertir una actualización confirmada en un error remoto.
       try {
         localStorage.setItem('ba_name', nombre);
         if (esArtista) {
-          localStorage.setItem('ba_referentes', payload.referentes || '');
-          localStorage.setItem('ba_generos', generos || '');
+          localStorage.setItem('ba_rubro',perfilCargado.rubro);
+          localStorage.setItem('ba_disciplinas',JSON.stringify({id:String(miIdActual),disciplinas:perfilCargado.disciplinas,perfil_revision:perfilCargado.perfil_revision}));
+          localStorage.setItem('ba_referentes',perfilCargado.referentes || '');
+          localStorage.setItem('ba_generos',perfilCargado.generos || '');
         }
       } catch(e) {}
+      window.BuscARTEMenu?.refresh();
+      // Actualizar la identidad verificada sin recargar el editor ni descartar borradores.
+      window.BuscARTESesion.refresh({reload:false});
       actualizarCompletitud(perfilCargado);
       if (profileEditRevision === revisionEnviada) {
         showStatus('Perfil guardado correctamente.');
@@ -2654,46 +2701,38 @@
   }
 
   function abrirSelectorRubro() {
-    if (isSavingProfile || isUploadingPhoto || profileReauthPending) return;
-    const grid = document.getElementById('rubro-modal-grid');
-    if (grid) {
-      grid.innerHTML = RUBROS_LISTA.map(r => `
-        <button class="rubro-modal-btn${r.key === rubroActivo ? ' current' : ''}"
-                onclick="cambiarRubro('${r.key}')">
-          <span class="rmb-emoji">${r.emoji}</span>
-          <span>${r.label}</span>
-        </button>
-      `).join('');
-    }
-    document.getElementById('rubro-modal-overlay')?.classList.add('open');
+    document.getElementById('mis-disciplinas')?.scrollIntoView({block:'start'});
+    document.getElementById('md-add')?.focus({preventScroll:true});
   }
-
-  function cerrarSelectorRubro() {
-    document.getElementById('rubro-modal-overlay')?.classList.remove('open');
+  function cerrarSelectorRubro() { document.getElementById('rubro-modal-overlay')?.classList.remove('open'); }
+  function cambiarRubro(key) {
+    if (isSavingProfile || isUploadingPhoto || disciplinasBloqueadas || !disciplinasBorrador?.selected.includes(key)) return;
+    capturarDisciplina();rubroActivo=key;mostrarDetalleDisciplina();cerrarSelectorRubro();
   }
-
-  function cambiarRubro(nuevoRubro) {
-    if (isSavingProfile || isUploadingPhoto || profileReauthPending) return;
-    if (nuevoRubro === rubroActivo) {
-      cerrarSelectorRubro();
-      return;
-    }
-    // Guardar cambios pendientes antes de cambiar
-    if (document.getElementById('save-bar')?.classList.contains('visible')) {
-      if (!confirm('Tenés cambios sin guardar. ¿Cambiar de rubro sin guardar?')) return;
-    }
-    localStorage.setItem('ba_rubro', nuevoRubro);
-    cerrarSelectorRubro();
-    // Recargar la página con el nuevo rubro activo
-    location.reload();
-  }
-
   function agregarRubro() {
-    // Multi-perfil (varios rubros por cuenta) todavía no está disponible.
-    alert('Todavía no se pueden tener varios rubros en una misma cuenta. Cambiar de rubro no crea un perfil adicional.');
+    if (isSavingProfile || isUploadingPhoto || tipoCuentaActivo !== 'artista' || disciplinasBloqueadas || !disciplinasBorrador) return;
+    const key=document.getElementById('md-add')?.value;
+    if (!window.BuscARTEDisciplinas.keys.includes(key) || disciplinasBorrador.selected.includes(key)) {showStatus('Elegí una disciplina nueva para sumar.', 'error');return;}
+    capturarDisciplina();disciplinasBorrador.selected.push(key);disciplinasBorrador.details[key]=window.BuscARTEDisciplinas.empty();
+    rubroActivo=key;mostrarDetalleDisciplina();showSaveBar();
   }
-
-  // Cargar al entrar
+  function hacerPrincipal(key) {
+    if (isSavingProfile || isUploadingPhoto || !disciplinasBorrador?.selected.includes(key)) return;
+    principalBorrador=key;renderDisciplinasEditor();showSaveBar();
+  }
+  function quitarDisciplina(key) {
+    if (isSavingProfile || isUploadingPhoto || key === principalBorrador || !disciplinasBorrador?.selected.includes(key)) return;
+    if (!confirm('¿Quitar '+RUBROS_PERFIL_CONFIG[key].label+'? Al guardar se quitarán sus datos de tu perfil. Tu cuenta, mensajes y anuncios no cambian.')) return;
+    capturarDisciplina();disciplinasBorrador.selected=disciplinasBorrador.selected.filter(k=>k!==key);delete disciplinasBorrador.details[key];
+    if (rubroActivo === key) rubroActivo=principalBorrador;
+    mostrarDetalleDisciplina();showSaveBar();
+  }
+  function descartarDisciplinas() {
+    if (isSavingProfile || isUploadingPhoto || !perfilCargado || tipoCuentaActivo !== 'artista') return;
+    if (!confirm('¿Deshacer sólo los cambios de disciplinas que todavía no guardaste? Los cambios de foto, bio y contacto quedan en el formulario.')) return;
+    disciplinasBorrador=window.BuscARTEDisciplinas.read(perfilCargado,true);principalBorrador=perfilCargado.rubro;rubroActivo=principalBorrador;
+    mostrarDetalleDisciplina();showSaveBar();showStatus('Disciplinas restauradas a la versión guardada. El resto del formulario no cambió.');
+  }
   cargarPerfil();
   cargarEmailParaEliminar();
   (function setupPhotoDrop(){
@@ -3056,5 +3095,6 @@ if ('serviceWorker' in navigator) {
 </script>
 <script src="/assets/js/escena.js"></script>
 <script src="/assets/js/escena-fondos.js"></script>
+<script src="/assets/js/cursor.js"></script>
 </body>
 </html>

@@ -25,12 +25,25 @@ fs.mkdirSync(output, { recursive:true });
 
 // Reuse the isolated transport, not its proposed multidiscipline behavior.
 // Every row here retains one real legacy category. No MD UI is loaded.
-let transport = read('preview/fixture-runtime.js');
+let transport = read('scripts/fixtures/legacy-runtime.js');
 const demoStart = transport.indexOf('  function demoProfile(');
 const demoEnd = transport.indexOf('  function json(', demoStart);
 assert.ok(demoStart > 0 && demoEnd > demoStart, 'Known synthetic transport boundary');
 transport = transport.slice(0, demoStart) + '  function demoProfile(row) { return { ...clone(row), foto_url: localPhoto(row.foto_url) }; }\n' + transport.slice(demoEnd);
 transport = transport.replace("url.hostname === 'xiaanchoanxmamgoay.supabase.co' || ", ''); // Never hide a mistyped production project URL.
+// Mock the current additive save contract using its pure preparation helper.
+// This is a frontend fixture, not a running function/DB/security certification.
+const disciplineContractBytes = fs.readFileSync(path.join(root,'netlify/lib/disciplinas.mjs'));
+const disciplineContract = disciplineContractBytes.toString('utf8').replace(/\bexport\s+/g,'').replaceAll('Buffer.byteLength(', 'qaByteLength(');
+transport = transport.replace('  const currentId =', `
+  for (const row of state.perfiles) { row.disciplinas ??= null; row.perfil_revision ??= 0; }
+  const qaDisciplineContract = (function(){
+    const qaByteLength = value => new TextEncoder().encode(value).length;
+    ${disciplineContract}
+    return { prepareProfileChanges };
+  })();
+  const currentId =`);
+transport = transport.replace("      if (key in profileLimits)", "      if (key === 'disciplinas') return value && typeof value === 'object' && !Array.isArray(value);\n      if (value === null && ['instrumento','generos','referentes','disponibilidad','donde_ensaya','experiencia','campos_especificos'].includes(key)) return true;\n      if (key in profileLimits)");
 // Model the new cookie/proxy contracts inside the isolated fixture closure.
 // Synthetic server identity is bootstrapped once, before production verification;
 // subsequent cache writes are not a new session. No actual cookie or API is used.
@@ -48,13 +61,31 @@ transport = transport.replace('  async function api(request, url) {', `
     if (url.pathname === '/.netlify/functions/sesion') {
       if (!qaSessionReady) { qaSessionReady = true; qaSessionId = currentId() || null; }
       const user = state.perfiles.find(row => sameId(row.id, qaSessionId));
-      if (request.method === 'GET') return user ? json({ user: Object.fromEntries(['id','nombre','email','tipo_cuenta','rubro','referentes','generos','baneado'].map(key => [key,user[key]])) }) : json({ error:'Fixture session required.', code:'SESSION_REQUIRED' },401);
+      if (request.method === 'GET') return user ? json({ user: Object.fromEntries(['id','nombre','email','tipo_cuenta','rubro','referentes','generos','baneado','disciplinas','perfil_revision'].map(key => [key,user[key]])) }) : json({ error:'Fixture session required.', code:'SESSION_REQUIRED' },401);
       if (request.method === 'POST') { const payload = await request.clone().json(); if (payload.action !== 'logout') return fail('Fixture: invalid logout.',400); qaSessionId = null; global.BuscARTEPreview.logout(); return json({ok:true}); }
       return fail('Fixture: session method denied.',405);
     }
 `);
-transport = transport.replace("const user = state.perfiles.find(row => row.email.toLowerCase() === String(input.email || '').trim().toLowerCase());\n      if (!user || input.password !== 'Demo1234!') return fail('Demo: usá la contraseña Demo1234!.', 401);", "const user = state.perfiles.find(row => sameId(row.id, qaSessionId));\n      if (!user) return fail('Fixture session required.',401);\n      if (Object.hasOwn(input,'email') || Object.hasOwn(input,'password')) return fail('Fixture: session save must not send credentials.',400);");
-transport = transport.replace("foto_url: user.foto_url, rubro: user.rubro }]);", "foto_url: user.foto_url, rubro: user.rubro, edad:user.edad }]);");
+const saveStart=transport.indexOf("    if (route === '/.netlify/functions/guardar-perfil') {"),saveEnd=transport.indexOf("    if (route === '/.netlify/functions/send-email')",saveStart);
+assert.ok(saveStart>0&&saveEnd>saveStart,'Known synthetic save boundary');
+transport=transport.slice(0,saveStart)+`
+    if (route === '/.netlify/functions/guardar-perfil') {
+      if (method !== 'POST') return fail('Fixture: save method denied.',405);
+      const user=state.perfiles.find(row=>sameId(row.id,qaSessionId));
+      if(!user)return fail('Fixture session required.',401);
+      if(Object.hasOwn(input,'email')||Object.hasOwn(input,'password'))return fail('Fixture: session save must not send credentials.',400);
+      if(!sameId(user.id,input.profileId))return fail('Fixture: owner mismatch.',403);
+      if(input.operation==='verify'&&input.changes&&!Object.keys(input.changes).length)return json([{id:user.id}]);
+      if(!validProfileChanges(input.changes)||input.changes.tipo_cuenta&&input.changes.tipo_cuenta!==user.tipo_cuenta)return fail('Fixture: invalid profile changes.',400);
+      let prepared;
+      try{prepared=qaDisciplineContract.prepareProfileChanges(user,input.changes,input.expectedRevision);}
+      catch(error){return error.message==='conflict'?json({error:'El perfil cambió en otra pestaña.',code:'PROFILE_CONFLICT'},409):fail('Fixture: invalid discipline contract.',400);}
+      Object.assign(user,prepared);persist();
+      const fields=['id',...Object.keys(profileLimits),'edad','experiencia','campos_especificos','rubro','tipo_cuenta','foto_url','disciplinas','perfil_revision'];
+      return json([Object.fromEntries(fields.filter(key=>Object.hasOwn(user,key)).map(key=>[key,user[key]]))]);
+    }
+`+transport.slice(saveEnd);
+new vm.Script(transport,{filename:'isolated-release-transport.js'});
 transport = transport.replace("Object.keys(input).every(key => key === 'visitas')", "Object.keys(input).every(key => key === 'visitas' || key === 'vistas')");
 transport += `\n(function(){
   delete document.documentElement.dataset.baPreview;
@@ -75,9 +106,10 @@ before(async () => { browser = await chromium.launch({ headless:true, channel:pr
 after(async () => {
   await browser?.close();
   const sourceDrift=[...releaseBytes].filter(([file,bytes])=>!fs.readFileSync(path.join(root,file)).equals(bytes)).map(([file])=>file);
+  if(!fs.readFileSync(path.join(root,'netlify/lib/disciplinas.mjs')).equals(disciplineContractBytes))sourceDrift.push('fixture-contract:netlify/lib/disciplinas.mjs');
   const finalAllowed=JSON.parse(fs.readFileSync(path.join(root,'site-files.json'),'utf8'));
   if(JSON.stringify(finalAllowed)!==JSON.stringify([...allowed]))sourceDrift.push('site-files.json');
-  fs.writeFileSync(path.join(output,'escena-release.json'), JSON.stringify({ at:new Date().toISOString(), output, scope:'Production frontend with synthetic session/gateway transport. All requests fulfilled locally or aborted; fonts use system fallback. Not live DB/RLS/Auth/email/native-app certification.', sourceDrift, sourceHashes:Object.fromEntries([...releaseBytes].map(([file,bytes])=>[file,createHash('sha256').update(bytes).digest('hex')])), results }, null, 2));
+  fs.writeFileSync(path.join(output,'escena-release.json'), JSON.stringify({ at:new Date().toISOString(), output, scope:'Production frontend with synthetic session/gateway transport. All requests fulfilled locally or aborted; fonts use system fallback. Not live DB/RLS/Auth/email/native-app certification.', sourceDrift, fixtureContractHash:createHash('sha256').update(disciplineContractBytes).digest('hex'), sourceHashes:Object.fromEntries([...releaseBytes].map(([file,bytes])=>[file,createHash('sha256').update(bytes).digest('hex')])), results }, null, 2));
   console.log('QA evidence: ' + output);
   assert.deepEqual(sourceDrift,[],'No late source change is certified by an older QA snapshot');
 });
@@ -124,6 +156,11 @@ async function setup(t, route, { width=390, mode='member', user=9001, reducedMot
     }finally{await context.close();}
   });
   await page.goto(origin+'/'+route,{waitUntil:'load'});
+  // Anonymous private pages legitimately replace the document during bootstrap.
+  // Wait for that expected redirect before consulting its fonts/rendered state.
+  if(mode==='guest'&&['buscARTE_perfil.html','buscARTE_mensajes.html','buscARTE_guardados.html','buscARTE_mis_anuncios.html'].includes(route.split('?')[0])){
+    await page.waitForURL(/buscARTE_login\.html/);await page.waitForLoadState('load');
+  }
   await page.evaluate(()=>document.fonts.ready);
   await page.waitForFunction(()=>!!document.body.dataset.a2Page);
   return {page,result,context};

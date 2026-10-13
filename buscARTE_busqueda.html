@@ -2,6 +2,7 @@
 <html lang="es" data-ba-design="a2">
 <head>
 <script src="/assets/js/sesion-segura.js"></script>
+  <script src="/assets/js/disciplinas.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- SEO -->
@@ -570,6 +571,7 @@
 <style>html:not([data-music-tools="true"]) a[href*="buscarte_generador" i] { display: none !important; }</style>
 <script src="/assets/js/menu-cuenta.js"></script>
 <link rel="stylesheet" href="/assets/css/escena.css">
+<link rel="stylesheet" href="/assets/css/cursor.css">
 </head>
 <body>
 
@@ -1169,7 +1171,7 @@
   async function fetchProfiles(force = false) {
     if (perfilesCache && !force) return perfilesCache;
 
-    const fields = 'id,nombre,instrumento,generos,ciudad,barrio,bio,referentes,disponibilidad,foto_url,created_at,baneado,rubro,campos_especificos,edad';
+    const fields = 'id,nombre,instrumento,generos,ciudad,barrio,bio,referentes,disponibilidad,foto_url,created_at,baneado,rubro,campos_especificos,edad,tipo_cuenta,disciplinas,perfil_revision';
     // Solo artistas del rubro activo: evita que negocios, visitantes u otros rubros se mezclen en el tablón
     const rubroFilter = `&rubro=eq.${encodeURIComponent(rubroActivo)}&tipo_cuenta=eq.artista`;
     const base = `${SUPABASE_URL}/rest/v1/perfiles?select=${fields}&baneado=eq.false${rubroFilter}&order=created_at.desc&limit=${MAX_FETCH}`;
@@ -1187,7 +1189,13 @@
     }
 
     const data = await res.json();
-    perfilesCache = Array.isArray(data) ? data.filter(p => p.baneado !== true) : [];
+    const unique=new Map();
+    for (const row of Array.isArray(data) ? data : []) {
+      if (row.baneado === true || (row.tipo_cuenta && row.tipo_cuenta !== 'artista')) continue;
+      const p=window.BuscARTEDisciplinas.project(row,rubroActivo);
+      if (p && !unique.has(String(p.id))) unique.set(String(p.id),p);
+    }
+    perfilesCache=[...unique.values()];
     return perfilesCache;
   }
 
@@ -1246,8 +1254,11 @@
   }
 
   function getAffinityScore(p) {
-    const myGeneros = splitList(localStorage.getItem('ba_generos')).map(normalizeText);
-    const myRefs = splitList(localStorage.getItem('ba_referentes')).map(normalizeText);
+    if (rubroActivo !== 'musica') return 0;
+    const own=window.BuscARTEDisciplinas.own();
+    const context=own ? window.BuscARTEDisciplinas.project(own,'musica') : null;
+    const myGeneros = splitList(context?.generos).map(normalizeText);
+    const myRefs = splitList(context?.referentes).map(normalizeText);
     const pGeneros = normalizeText(p.generos);
     const pRefs = normalizeText(p.referentes);
     let score = 0;
@@ -1693,5 +1704,6 @@ if ('serviceWorker' in navigator) {
 </script>
 <script src="/assets/js/escena.js"></script>
 <script src="/assets/js/escena-fondos.js"></script>
+<script src="/assets/js/cursor.js"></script>
 </body>
 </html>

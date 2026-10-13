@@ -2,7 +2,7 @@
 (function () {
   'use strict';
 
-  const keys = ['ba_logged', 'ba_user_id', 'ba_tipo_cuenta', 'ba_rubro'];
+  const keys = ['ba_logged', 'ba_user_id', 'ba_tipo_cuenta', 'ba_rubro', 'ba_disciplinas'];
   let lastState = '';
 
   function readState() {
@@ -15,7 +15,15 @@
 
   function isMusician(state = readState()) {
     const [logged, uid = '', type, rubro] = state;
-    return logged === '1' && /^[1-9]\d*$/.test(uid.trim()) && type === 'artista' && rubro === 'musica';
+    if (logged !== '1' || !/^[1-9]\d*$/.test(uid.trim()) || type !== 'artista') return false;
+    const verified = window.BuscARTESesion?.status === 'verified' ? window.BuscARTESesion.user : null;
+    if (verified && String(verified.id) === uid) return window.BuscARTEDisciplinas?.has(verified,'musica') === true;
+    // La caché sólo decide presentación; vincular membresía al ID impide heredar otra cuenta.
+    try {
+      const cache = JSON.parse(state[4] || 'null');
+      if (cache && cache.id === uid && window.BuscARTEDisciplinas) return window.BuscARTEDisciplinas.has({id:uid,tipo_cuenta:type,rubro,disciplinas:cache.disciplinas},'musica');
+    } catch (_) {}
+    return rubro === 'musica';
   }
 
   function refresh() {
@@ -31,6 +39,7 @@
   refresh();
   document.addEventListener('DOMContentLoaded', refresh);
   window.addEventListener('pageshow', refresh);
+  window.addEventListener('buscarte:sessionchange', refresh);
   window.addEventListener('focus', refresh);
   window.addEventListener('storage', event => { if (!event.key || keys.includes(event.key)) refresh(); });
   document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });

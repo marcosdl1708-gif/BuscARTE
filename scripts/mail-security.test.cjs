@@ -107,8 +107,11 @@ function runtime(file, options = {}) {
     console:{ log:(...args) => logs.push(args), warn:(...args) => logs.push(args), error:(...args) => logs.push(args) },
     setTimeout:callback => { callback(); return 1; }, clearTimeout:() => {}
   });
+  const disciplines = read('netlify/lib/disciplinas.mjs').replace(/^export /gm, '');
+  vm.runInContext('(function(){\n' + disciplines + '\n;globalThis.__normalizeDisciplines = normalizeDisciplines;\n})();', context, { timeout:1000 });
   const helper = read('netlify/lib/session.mjs')
     .replace(/^import \{([^}]+)\} from 'node:crypto';\s*/m, 'const {$1} = __crypto;\n')
+    .replace(/^import \{ normalizeDisciplines \} from '\.\/disciplinas\.mjs';\s*/m, 'const normalizeDisciplines = __normalizeDisciplines;\n')
     .replace(/^export /gm, '');
   vm.runInContext('(function(){\n' + helper + '\n;globalThis.__security = { internalMailSecret, rate, readJson, serverConfig, sessionUser, trustedOrigin };\n})();', context, { timeout:1000 });
   let source = read('netlify/functions/' + file);

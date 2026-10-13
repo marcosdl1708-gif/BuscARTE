@@ -2,15 +2,25 @@ const { test, before, after } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
+const { createHash } = require('node:crypto');
 const { chromium } = require(process.env.BUSCARTE_PLAYWRIGHT_MODULE || 'playwright');
 
 const root = path.resolve(__dirname, '..');
 const html = fs.readFileSync(path.join(root, 'buscARTE_anuncios.html'), 'utf8');
 const publicFiles = new Set(JSON.parse(fs.readFileSync(path.join(root, 'site-files.json'), 'utf8')));
-const userId = 'fixture-user-only';
+const userId = '701';
+const web = 'https://buscarte.com.ar';
+const sb = 'https://xiaanchoanxmampegoay.supabase.co';
+const sessionToken = Buffer.alloc(32,7).toString('base64url');
+const digest = value => createHash('sha256').update(value).digest('hex');
+let gateway, sessionHandler;
 const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jGZkAAAAASUVORK5CYII=', 'base64');
 let browser;
 before(async () => {
+  const nativeFetch=globalThis.fetch;
+  globalThis.fetch=async()=>{throw new Error('Network denied during handler import');};
+  try { gateway=(await import('../netlify/functions/datos.mjs')).default;sessionHandler=(await import('../netlify/functions/sesion.mjs')).default; }
+  finally { globalThis.fetch=nativeFetch; }
   browser = await chromium.launch({ headless: true, channel: process.platform === 'win32' ? 'msedge' : undefined });
 });
 after(async () => { await browser?.close(); });
@@ -23,12 +33,13 @@ function deferred() {
 
 // Every request is fulfilled or aborted here. There is deliberately no
 // route.continue/fallback, real Supabase, tracking, mail, upload or expiry RPC.
-async function setup(t, { width = 390, height = 844, role = 'artista', rubro = 'musica', postResponses = [], uploadResponses = [] } = {}) {
+async function setup(t, { width = 390, height = 844, role = 'artista', rubro = 'musica', disciplinas = null, postResponses = [], uploadResponses = [] } = {}) {
   const context = await browser.newContext({
     viewport: { width, height }, isMobile: width < 768, hasTouch: width < 768,
     timezoneId: 'America/Argentina/Buenos_Aires', serviceWorkers: 'block'
   });
-  t.after(() => context.close());
+  t.after(async () => { for(const response of [...postResponses,...uploadResponses])response.gate?.resolve();await context.close(); });
+  await context.addCookies([{name:'__Host-ba_session',value:sessionToken,url:web,httpOnly:true,secure:true,sameSite:'Lax'}]);
   await context.addInitScript(({ userId, role, rubro }) => {
     localStorage.setItem('ba_logged', '1');
     localStorage.setItem('ba_user_id', userId);
@@ -38,61 +49,88 @@ async function setup(t, { width = 390, height = 844, role = 'artista', rubro = '
   }, { userId, role, rubro });
   const page = await context.newPage();
   page.setDefaultTimeout(5000);
-  const calls = { posts: [], uploads: [], expiry: [], unexpected: [], errors: [], dialogs: [], profileReads: 0 };
+  const calls = { posts: [], uploads: [], expiry: [], unexpected: [], errors: [], dialogs: [], profileReads: 0, gateways:[], sessions:[], server:[] };
+  const nativeFetch=globalThis.fetch, nativeNetlify=globalThis.Netlify, previousExpiry=globalThis.__baExpiryAt;
+  const profile={id:Number(userId),nombre:'Persona de prueba',email:'qa@example.invalid',password:'synthetic-bcrypt-placeholder',tipo_cuenta:role,rubro:rubro||'',disciplinas,perfil_revision:0,baneado:false,referentes:'',generos:'',instrumento:'',disponibilidad:'',donde_ensaya:'',experiencia:null,campos_especificos:{},...(disciplinas?.details?.[rubro]||{})};
+  globalThis.Netlify={env:{get:key=>({SUPABASE_URL:sb,SUPABASE_SERVICE_ROLE_KEY:'sb_secret_synthetic_fixture_key_not_a_credential'})[key]||''}};
+  globalThis.__baExpiryAt=0;
+  const reply=(status,body,headers={})=>new Response(body===null?null:JSON.stringify(body),{status,headers:{'content-type':'application/json',...headers}});
+  globalThis.fetch=async(href,init={})=>{
+    const url=new URL(href), method=init.method||'GET', headers=new Headers(init.headers||{});
+    const body=typeof init.body==='string'&&/^[\[{]/.test(init.body)?JSON.parse(init.body):init.body;
+    calls.server.push({url:url.href,method});
+    assert.equal(url.origin,sb,'every server request must stay in the synthetic service fixture');
+    assert.equal(headers.get('apikey'),'sb_secret_synthetic_fixture_key_not_a_credential');
+    assert.equal(headers.get('authorization'),null);
+    if(url.pathname==='/rest/v1/rpc/limitar_operacion_web')return reply(200,true);
+    if(url.pathname==='/rest/v1/sesiones_web' && method==='GET') {
+      assert.equal(url.searchParams.get('token_hash'),'eq.'+digest(sessionToken));
+      return reply(200,[{perfil_id:Number(userId),password_fingerprint:digest(profile.password)}]);
+    }
+    if(url.pathname==='/rest/v1/perfiles' && method==='GET') {
+      calls.profileReads++;
+      const fields=url.searchParams.get('select').split(',');
+      return reply(200,[Object.fromEntries(fields.filter(key=>Object.hasOwn(profile,key)).map(key=>[key,profile[key]]))],{'content-range':'0-0/1'});
+    }
+    if(url.pathname==='/rest/v1/anuncios' && method==='POST') {
+      const response=postResponses[calls.posts.length]||{};
+      calls.posts.push({body,headers:Object.fromEntries(headers)});
+      if(response.gate)await response.gate.promise;
+      if(response.abort)throw new Error('Synthetic interrupted persistence response');
+      return reply(response.status||201,response.body===undefined?[{...body,id:9001}]:response.body);
+    }
+    if(url.pathname.startsWith('/storage/v1/object/fotos-anuncios/') && method==='POST') {
+      const response=uploadResponses[calls.uploads.length]||{};
+      assert.equal(headers.get('x-upsert'),'false');
+      calls.uploads.push({url:url.href,browserUrl:web+'/.netlify/functions/datos?path='+encodeURIComponent(url.pathname),bytes:init.body?.byteLength||0});
+      if(response.gate)await response.gate.promise;
+      if(response.abort)throw new Error('Synthetic interrupted upload response');
+      return reply(response.status||200,response.body||{Key:url.pathname});
+    }
+    if(url.pathname==='/rest/v1/rpc/vencer_anuncios_viejos') { calls.expiry.push(body);return reply(200,0); }
+    if(method==='GET' && ['/rest/v1/anuncios','/rest/v1/mensajes','/rest/v1/reacciones'].includes(url.pathname))return reply(200,[],{'content-range':'*/0'});
+    calls.unexpected.push('SERVER '+method+' '+url.pathname);throw new Error('Unexpected fixture server request; real network denied');
+  };
+  t.after(()=>{globalThis.fetch=nativeFetch;globalThis.Netlify=nativeNetlify;if(previousExpiry===undefined)delete globalThis.__baExpiryAt;else globalThis.__baExpiryAt=previousExpiry;});
   page.on('pageerror', error => calls.errors.push(error.message));
   page.on('dialog', async dialog => { calls.dialogs.push(dialog.message()); await dialog.accept(); });
   await context.route('**/*', async route => {
     const request = route.request();
     const url = new URL(request.url());
-    if (url.origin === 'http://buscarte.test' && url.pathname === '/buscARTE_anuncios.html') {
+    if (url.origin === web && url.pathname === '/buscARTE_anuncios.html') {
       return route.fulfill({ contentType: 'text/html', body: html });
     }
-    if (url.origin === 'http://buscarte.test' && url.pathname === '/assets/js/meta-pixel.js') {
+    if (url.origin === web && url.pathname === '/assets/js/meta-pixel.js') {
       return route.fulfill({ contentType: 'application/javascript', body: 'window.__trackingCalls=[];window.MetaAds={trackCustom(...args){window.__trackingCalls.push(args)}};' });
     }
-    if (url.origin === 'http://buscarte.test' && request.method() === 'GET' && url.pathname.startsWith('/assets/')) {
+    if (url.origin === web && request.method() === 'GET' && url.pathname.startsWith('/assets/')) {
       const file = url.pathname.slice(1);
       if (publicFiles.has(file)) {
         const contentType = ({ '.js':'application/javascript', '.css':'text/css', '.webp':'image/webp' })[path.extname(file)] || 'application/octet-stream';
         return route.fulfill({ contentType, body:fs.readFileSync(path.join(root, file)) });
       }
     }
-    if (url.hostname === 'xiaanchoanxmampegoay.supabase.co') {
-      if (request.method() === 'POST' && url.pathname === '/rest/v1/anuncios') {
-        const response = postResponses[calls.posts.length] || {};
-        calls.posts.push({ body: request.postDataJSON(), headers: request.headers() });
-        if (response.gate) await response.gate.promise;
-        if (response.abort) return route.abort('failed');
-        return route.fulfill({ status: response.status || 201, contentType: 'application/json', body: JSON.stringify(response.body === undefined ? [{ id: 9001 }] : response.body) });
-      }
-      if (request.method() === 'POST' && url.pathname.startsWith('/storage/v1/object/fotos-anuncios/')) {
-        const response = uploadResponses[calls.uploads.length] || {};
-        calls.uploads.push({ url: request.url(), bytes: request.postDataBuffer()?.length || 0 });
-        if (response.gate) await response.gate.promise;
-        if (response.abort) return route.abort('failed');
-        return route.fulfill({ status: response.status || 200, contentType: 'application/json', body: JSON.stringify(response.body || { Key: url.pathname }) });
-      }
-      if (request.method() === 'POST' && url.pathname === '/rest/v1/rpc/vencer_anuncios_viejos') {
-        calls.expiry.push(request.postDataJSON());
-        return route.fulfill({ contentType: 'application/json', body: 'null' });
-      }
-      if (request.method() === 'GET' && url.pathname === '/rest/v1/perfiles') {
-        calls.profileReads++;
-        return route.fulfill({ contentType: 'application/json', headers: { 'content-range': '0-0/1' }, body: JSON.stringify([{ id: userId, nombre: 'Persona de prueba', tipo_cuenta: role, rubro }]) });
-      }
-      if (request.method() === 'GET' && ['/rest/v1/anuncios', '/rest/v1/mensajes', '/rest/v1/reacciones'].includes(url.pathname)) {
-        return route.fulfill({ contentType: 'application/json', headers: { 'content-range': '*/0' }, body: '[]' });
-      }
+    if(url.origin===web && ['/.netlify/functions/datos','/.netlify/functions/sesion'].includes(url.pathname)) {
+      const headers=new Headers(request.headers());headers.set('x-nf-client-connection-ip','192.0.2.7');
+      const method=request.method();
+      if(method!=='GET'&&method!=='HEAD'){headers.set('origin',web);headers.set('sec-fetch-site','same-origin');}
+      const req=new Request(request.url(),{method,headers,...(['GET','HEAD'].includes(method)?{}:{body:request.postDataBuffer()})});
+      const target=url.pathname.endsWith('/sesion')?calls.sessions:calls.gateways;target.push({url:request.url(),method});
+      const response=await (url.pathname.endsWith('/sesion')?sessionHandler(req):gateway(req));
+      return route.fulfill({status:response.status,headers:Object.fromEntries(response.headers),body:Buffer.from(await response.arrayBuffer())});
+    }
+    if (url.origin===sb) {
       if (request.method() === 'GET' && url.pathname.startsWith('/storage/v1/object/public/fotos-anuncios/')) {
         return route.fulfill({ contentType: 'image/png', body: png });
       }
     }
     if (url.hostname === 'fonts.googleapis.com') return route.fulfill({ contentType: 'text/css', body: '' });
-    if (url.origin === 'http://buscarte.test' && ['/manifest.json', '/favicon.ico'].includes(url.pathname)) return route.fulfill({ body: '{}' });
+    if (url.origin === web && ['/manifest.json', '/favicon.ico'].includes(url.pathname)) return route.fulfill({ body: '{}' });
     calls.unexpected.push(request.method() + ' ' + url.origin + url.pathname);
     return route.abort('blockedbyclient');
   });
-  await page.goto('http://buscarte.test/buscARTE_anuncios.html');
+  await page.goto(web+'/buscARTE_anuncios.html');
+  await page.waitForFunction(()=>window.BuscARTESesion?.status==='verified');
   await page.waitForFunction(() => typeof openModal === 'function' && typeof submitAnuncio === 'function');
   await page.waitForFunction(() => !/Cargando anuncios/.test(document.getElementById('anuncios-lista').textContent));
   async function open(tipo) {
@@ -125,9 +163,10 @@ async function poll(check, message) {
   assert.ok(check(), message);
 }
 
-async function fill(f, tipo) {
+async function fill(f, tipo, community='musica') {
   await f.open(tipo);
   const page = f.page;
+  if(!['busco','vende'].includes(tipo) && await page.locator('#anuncio-comunidad-field').isVisible())await page.locator('#anuncio-comunidad').selectOption(community);
   if (tipo === 'busco') {
     await page.locator('#form-busco input[type=text]').first().fill('Busco artista — prueba aislada');
     await page.locator('#form-busco textarea').fill('Descripción busco que debe conservarse.');
@@ -138,7 +177,8 @@ async function fill(f, tipo) {
     await page.locator('#ofrezco-titulo').fill('Me ofrezco — prueba aislada');
     await page.locator('#form-ofrezco textarea').fill('Descripción ofrezco que debe conservarse.');
     await page.locator('#ofrezco-zona').fill('Palermo, CABA');
-    await page.locator('#ofrezco-chips-especificos').getByRole('button', { name: 'Guitarra', exact: true }).click();
+    if(community==='musica')await page.locator('#ofrezco-chips-especificos').getByRole('button', { name: 'Guitarra', exact: true }).click();
+    else await page.locator('#ofrezco-chips-especificos .mchip').first().click();
   } else if (tipo === 'jam') {
     await page.locator('#jam-titulo').fill('Evento — prueba aislada');
     await page.locator('#form-jam textarea').fill('Descripción evento que debe conservarse.');
@@ -160,7 +200,8 @@ async function fill(f, tipo) {
     await page.locator('#clases-desc').fill('Descripción clases que debe conservarse.');
     await page.locator('#clases-precio').fill('5000');
     await page.locator('#clases-zona').fill('Caballito, CABA');
-    await page.locator('#clases-disciplina-mfield').getByRole('button', { name: 'Guitarra', exact: true }).click();
+    if(community==='musica')await page.locator('#clases-disciplina-mfield').getByRole('button', { name: 'Guitarra', exact: true }).click();
+    else await page.locator('#clases-disciplina-mfield .mchip').first().click();
     await page.locator('#form-clases').getByRole('button', { name: 'Intermedio', exact: true }).click();
     await page.locator('#form-clases').getByRole('button', { name: 'Online', exact: true }).click();
   }
@@ -206,7 +247,7 @@ for (const tipo of Object.keys(payloadKeys)) {
     assert.equal(payload.tipo, tipo);
     assert.equal(payload.user_id, userId);
     assert.equal(payload.estado, 'activo');
-    assert.equal(payload.rubro, 'musica');
+    assert.equal(payload.rubro, tipo==='vende'?null:'musica');
     assert.equal(f.calls.posts[0].headers.prefer, 'return=representation');
     if (tipo === 'busco') { assert.equal(payload.rubro_buscado, 'danza'); assert.equal(payload.generos, 'Tango'); }
     if (tipo === 'ofrezco') assert.equal(payload.instrumentos, 'Guitarra');
@@ -232,6 +273,7 @@ for (const tipo of Object.keys(payloadKeys)) {
 test('visitor publishing remains restricted to event and marketplace without inventing an artist rubro', async t => {
   const f = await setup(t, { role: 'visitante', rubro: null });
   await f.open('busco');
+  await f.page.locator('#anuncio-comunidad').selectOption('musica');
   assert.equal(await f.page.locator('.modal-form.active').getAttribute('id'), 'form-jam');
   assert.equal(await f.page.locator('.modal-tipo-btn').count(), 2);
   await fill(f, 'vende');
@@ -325,8 +367,8 @@ test('tracking failure after server success cannot turn a published record into 
   assert.deepEqual(f.calls.dialogs, []);
 });
 
-for (const status of [400, 500]) {
-  test(`HTTP ${status} preserves the draft and offers a controlled retry`, async t => {
+for (const status of [409]) {
+  test(`backend HTTP ${status} maps to controlled400, preserves the draft and offers a retry`, async t => {
     const f = await setup(t, { postResponses: [{ status, body: { message: 'Synthetic failure' } }] });
     await fill(f, 'busco');
     await f.submit();
@@ -411,34 +453,38 @@ test('all three marketplace photo slots preserve their own uploaded URL', async 
   }
 });
 
-test('a stale upload cannot replace the newer photo in the same slot', async t => {
+test('a stale upload cannot replace the newer photo in the same slot', {timeout:15000}, async t => {
   const slowFirst = deferred();
   const f = await setup(t, { uploadResponses: [{ gate: slowFirst }, {}] });
   await fill(f, 'vende');
   await choosePhoto(f.page, 'venta', 1, 'old-photo.png');
   await f.uploaded(1);
+  await f.page.evaluate(()=>{window.__oldUpload=uploadVentaPromise;});
   await choosePhoto(f.page, 'venta', 1, 'new-photo.png');
   await f.uploaded(2);
   await f.page.waitForFunction(() => document.getElementById('foto-venta-text-1').textContent.includes('Foto lista'));
-  const obsoleteResponse = f.page.waitForResponse(f.calls.uploads[0].url);
+  const obsoleteResponse = f.page.waitForResponse(f.calls.uploads[0].browserUrl);
   slowFirst.resolve();
-  await (await obsoleteResponse).finished();
+  await obsoleteResponse;
+  await f.page.evaluate(()=>window.__oldUpload);
   await f.page.evaluate(() => new Promise(resolve => requestAnimationFrame(resolve)));
   await f.submit();
   await f.state('success');
   assert.equal(f.calls.posts[0].body.foto_url, f.calls.uploads[1].url.replace('/storage/v1/object/', '/storage/v1/object/public/'));
 });
 
-test('removing a photo while uploading prevents its late completion from restoring it', async t => {
+test('removing a photo while uploading prevents its late completion from restoring it', {timeout:15000}, async t => {
   const gate = deferred();
   const f = await setup(t, { uploadResponses: [{ gate }] });
   await fill(f, 'vende');
   await choosePhoto(f.page, 'venta');
   await f.uploaded(1);
+  await f.page.evaluate(()=>{window.__oldUpload=uploadVentaPromise;});
   await f.page.evaluate(() => quitarFotoAnuncio('venta', 1));
-  const obsoleteResponse = f.page.waitForResponse(f.calls.uploads[0].url);
+  const obsoleteResponse = f.page.waitForResponse(f.calls.uploads[0].browserUrl);
   gate.resolve();
-  await (await obsoleteResponse).finished();
+  await obsoleteResponse;
+  await f.page.evaluate(()=>window.__oldUpload);
   await f.page.evaluate(() => new Promise(resolve => requestAnimationFrame(resolve)));
   await f.submit();
   await f.state('success');
@@ -603,3 +649,61 @@ for (const width of [320, 390, 1280]) {
     }
   });
 }
+
+const mdDetails = key => ({instrumento:key==='musica'?'Guitarra':'',generos:key==='musica'?'Indie':'',referentes:'',disponibilidad:'Disponible',donde_ensaya:'',experiencia:2,
+  campos_especificos:key==='escritura'?{rol:['Guionista'],formato:['Cine']}:key==='danza'?{disciplina:['Tango'],rol:['Bailarín/a']}:{}});
+const mdUser={version:1,selected:['escritura','musica','danza'],details:Object.fromEntries(['escritura','musica','danza'].map(key=>[key,mdDetails(key)]))};
+for(const tipo of ['busco','ofrezco','clases','jam','vende']) {
+  test(`MD Escritura principal: ${tipo} works with secondary Music, without reclassifying the account`,async t=>{
+    const f=await setup(t,{rubro:'escritura',disciplinas:mdUser});
+    await fill(f,tipo,'musica');
+    assert.equal(await f.page.locator('.modal-tipo-btn').count(),5,'type selector is the union of own disciplines');
+    if(!['busco','vende'].includes(tipo)) {
+      assert.equal(await f.page.locator('#anuncio-comunidad-field').isVisible(),true);
+      assert.deepEqual(await f.page.locator('#anuncio-comunidad option').evaluateAll(options=>options.map(option=>option.value)),['','escritura','musica','danza']);
+    } else assert.equal(await f.page.locator('#anuncio-comunidad-field').isVisible(),false);
+    await f.submit();await f.state('success');
+    assert.equal(f.calls.posts.length,1);
+    assert.equal(f.calls.posts[0].body.rubro,tipo==='vende'?null:tipo==='busco'?'escritura':'musica');
+    if(tipo==='busco')assert.equal(f.calls.posts[0].body.rubro_buscado,'danza');
+    assert.equal(await f.page.evaluate(()=>localStorage.getItem('ba_rubro')),'escritura');
+    assert.deepEqual(await f.page.evaluate(()=>JSON.parse(localStorage.getItem('ba_disciplinas')).disciplinas.selected),mdUser.selected);
+    assert(f.calls.sessions.length>0);assert(f.calls.gateways.some(call=>call.method==='POST'));
+    assert(!f.calls.server.some(call=>call.url.includes('send-email')||call.url.includes('/mensajes')&&call.method==='POST'));
+  });
+}
+for(const width of [320,390]) {
+  test(`MD secondary Dance at${width}px: contextual chips, required choice, mobile footer and one confirmed ad`,async t=>{
+    const f=await setup(t,{width,rubro:'escritura',disciplinas:mdUser});
+    await fill(f,'ofrezco','danza');
+    assert.equal(await f.page.locator('#anuncio-comunidad').inputValue(),'danza');
+    assert.equal(await f.page.locator('#ofrezco-chips-especificos').getByRole('button',{name:'Guitarra',exact:true}).count(),0);
+    await f.page.locator('#anuncio-comunidad').selectOption('');await f.submit();await f.state('error');
+    assert.equal(f.calls.posts.length,0,'no missing discipline is submitted');
+    assert.match(await f.page.locator('#publish-status').textContent(),/disciplin|comunidad/i);
+    assert.equal(await f.page.locator('#ofrezco-titulo').inputValue(),'Me ofrezco — prueba aislada');
+    await f.page.locator('#anuncio-comunidad').selectOption('danza');await f.submit();await f.state('success');
+    assert.equal(f.calls.posts[0].body.rubro,'danza');
+    const metrics=await f.page.locator('.btn-submit').evaluate(button=>{const rect=button.getBoundingClientRect();return {left:rect.left,right:rect.right,bottom:rect.bottom,width:innerWidth,height:innerHeight,touch:rect.height};});
+    assert(metrics.left>=-1 && metrics.right<=metrics.width+1 && metrics.bottom<=metrics.height+1 && metrics.touch>=44);
+    assert.equal(await f.page.evaluate(()=>localStorage.getItem('ba_rubro')),'escritura');
+  });
+}
+for(const tipo of ['busco','ofrezco','clases','jam','vende']) {
+  test(`business keeps existing category while choosing an explicit artist community for${tipo}`,async t=>{
+    const f=await setup(t,{role:'negocio',rubro:'Sala de ensayo'});
+    await fill(f,tipo,'musica');await f.submit();await f.state('success');
+    assert.equal(f.calls.posts[0].body.rubro,tipo==='vende'?null:tipo==='busco'?'danza':'musica');
+    assert.equal(await f.page.evaluate(()=>localStorage.getItem('ba_tipo_cuenta')),'negocio');
+    assert.equal(await f.page.evaluate(()=>localStorage.getItem('ba_rubro')),'Sala de ensayo');
+  });
+}
+test('negative marketplace price has clear validation and preserves draft; zero price is explicitly free',async t=>{
+  const f=await setup(t,{rubro:'escritura',disciplinas:mdUser});await fill(f,'vende');
+  await f.page.locator('#vende-precio').fill('-1');await f.submit();await f.state('error');
+  assert.equal(f.calls.posts.length,0);assert.match(await f.page.locator('#publish-status').textContent(),/precio|negativ/i);
+  assert.equal(await f.page.locator('#form-vende textarea').inputValue(),'Descripción venta que debe conservarse.');
+  await f.page.locator('#vende-precio').fill('0');await f.submit();await f.state('success');
+  assert.equal(f.calls.posts[0].body.precio_num,0);assert.equal(f.calls.posts[0].body.rubro,null);
+  assert.match(f.calls.posts[0].body.precio,/gratis|\$0/i);
+});

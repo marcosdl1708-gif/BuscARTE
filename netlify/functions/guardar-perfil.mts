@@ -1,21 +1,21 @@
 import type { Config } from '@netlify/functions';
-import { sessionUser, rate } from '../lib/session.mjs';
+import { sessionUser, rate, serverConfig, trustedOrigin } from '../lib/session.mjs';
+import { RUBROS, DETAIL_FIELDS, prepareProfileChanges, revision } from '../lib/disciplinas.mjs';
 
 declare const Netlify: { env: { get(name: string): string | undefined } };
 
 // Owner verified from an HttpOnly server session. The credential fallback keeps
 // older open editor tabs safe during the coordinated release; never trusts IDs.
-const ORIGINS = new Set(['https://buscarte.com.ar', 'https://www.buscarte.com.ar']);
-const MAX_BODY = 32 * 1024;
-const RUBROS = new Set(['musica', 'actuacion', 'audiovisual', 'modelaje', 'diseno', 'tatuaje', 'danza', 'maquillaje', 'circo', 'escritura']);
+const MAX_BODY = 96 * 1024;
 const TEXT_LIMITS: Record<string, number> = {
   nombre: 200, bio: 300, instrumento: 2000, generos: 2000,
   disponibilidad: 2000, donde_ensaya: 1000, videos: 8000,
   redes: 8000, celular: 80, referentes: 4000,
   provincia: 200, ciudad: 200, barrio: 200
 };
-const NULLABLE = new Set(['celular', 'provincia', 'ciudad', 'barrio']);
-const FIELDS = new Set([...Object.keys(TEXT_LIMITS), 'experiencia', 'edad', 'campos_especificos', 'rubro', 'tipo_cuenta', 'foto_url']);
+const NULLABLE = new Set(['celular', 'provincia', 'ciudad', 'barrio', ...DETAIL_FIELDS]);
+const FIELDS = new Set([...Object.keys(TEXT_LIMITS), 'experiencia', 'edad', 'campos_especificos', 'rubro', 'tipo_cuenta', 'foto_url', 'disciplinas']);
+const RETURN_FIELDS = ['id', ...FIELDS, 'perfil_revision'];
 const unsafeKeys = new Set(['__proto__', 'prototype', 'constructor']);
 const object = (value: unknown): value is Record<string, any> => value !== null && typeof value === 'object' && !Array.isArray(value);
 const text = (value: unknown, limit: number): value is string => typeof value === 'string' && value.length <= limit && !value.includes('\0');
@@ -28,6 +28,7 @@ const json = (status: number, body: unknown) => new Response(JSON.stringify(body
   status, headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' }
 });
 const fail = (status: number) => json(status, { error: ({ 400: 'Datos de guardado inválidos.', 401: 'Email o contraseña incorrectos.', 403: 'No se permite guardar este perfil.', 405: 'Método no permitido.', 502: 'No pudimos confirmar el guardado. Revisá el perfil antes de reintentar.', 503: 'El guardado no está disponible temporalmente.' } as Record<number, string>)[status] });
+const conflict = () => json(409, { error: 'El perfil cambió en otra pestaña. Conservamos tus cambios; revisá la versión actual antes de volver a guardar.', code: 'PROFILE_CONFLICT' });
 
 function safeJson(value: unknown, depth = 0): boolean {
   if (depth > 8) return false;
@@ -46,25 +47,6 @@ function jsonObject(value: unknown): Record<string, unknown> | null {
 }
 const canonical = (value: any): string => JSON.stringify(value, (_key, item) =>
   object(item) ? Object.fromEntries(Object.keys(item).sort().map(key => [key, item[key]])) : item);
-
-function serverConfig() {
-  try {
-    const rawUrl = Netlify.env.get('SUPABASE_URL') || 'https://xiaanchoanxmampegoay.supabase.co';
-    const key = Netlify.env.get('SUPABASE_SERVICE_ROLE_KEY') || Netlify.env.get('SUPABASE_SERVICE_KEY') || Netlify.env.get('SUPABASE_KEY');
-    if (!rawUrl || !key) return null;
-    const url = new URL(rawUrl);
-    if (url.protocol !== 'https:' || url.username || url.password || url.pathname !== '/' || url.search || url.hash) return null;
-    const secret = /^sb_secret_[A-Za-z0-9_-]{16,}$/.test(key);
-    if (!secret) {
-      const parts = key.split('.');
-      if (parts.length !== 3 || JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf8')).role !== 'service_role') return null;
-    }
-    const headers: Record<string, string> = { apikey: key, 'Content-Type': 'application/json' };
-    // Opaque secret keys are not JWTs and must not be sent as Bearer tokens.
-    if (!secret) headers.Authorization = 'Bearer ' + key;
-    return { origin: url.origin, headers };
-  } catch { return null; }
-}
 
 async function readPayload(request: Request) {
   if (!request.body || Number(request.headers.get('content-length') || 0) > MAX_BODY) throw new Error('body');
@@ -92,11 +74,13 @@ function validChanges(changes: Record<string, any>): boolean {
       if (key === 'nombre' && !value.trim()) return false;
       if (key === 'redes' && !jsonObject(value)) return false;
     } else if (key === 'experiencia') {
-      if (!Number.isInteger(value) || value < 0 || value > 100) return false;
+      if (value !== null && (!Number.isInteger(value) || value < 0 || value > 100)) return false;
     } else if (key === 'edad') {
       if (value !== null && (!Number.isInteger(value) || value < 15 || value > 120)) return false;
     } else if (key === 'campos_especificos') {
-      if (!jsonObject(value)) return false;
+      if (value !== null && !jsonObject(value)) return false;
+    } else if (key === 'disciplinas') {
+      if (!object(value) || !safeJson(value)) return false;
     } else if (!text(value, 40)) return false;
   }
   return true;
@@ -104,14 +88,14 @@ function validChanges(changes: Record<string, any>): boolean {
 
 export default async function guardarPerfil(request: Request): Promise<Response> {
   if (request.method !== 'POST') return fail(405);
-  const requestOrigin = request.headers.get('origin') || '';
-  if (!ORIGINS.has(requestOrigin) || new URL(request.url).origin !== requestOrigin) return fail(403);
+  if (!trustedOrigin(request)) return fail(403);
   if (request.headers.get('content-type')?.split(';')[0].trim().toLowerCase() !== 'application/json') return fail(400);
   let payload: Record<string, any>;
   try { payload = await readPayload(request); } catch { return fail(400); }
-  if (!object(payload) || Object.keys(payload).some(key => !['email', 'password', 'profileId', 'changes', 'operation'].includes(key)) ||
+  if (!object(payload) || !safeJson(payload) || Object.keys(payload).some(key => !['email', 'password', 'profileId', 'changes', 'operation', 'expectedRevision'].includes(key)) ||
       !idText(payload.profileId) || !object(payload.changes) ||
-      ![undefined, 'save', 'verify'].includes(payload.operation)) return fail(400);
+      ![undefined, 'save', 'verify'].includes(payload.operation) ||
+      (payload.expectedRevision !== undefined && revision(payload.expectedRevision) === null)) return fail(400);
   const verifyOnly = payload.operation === 'verify';
   if (verifyOnly ? Object.keys(payload.changes).length !== 0 : !validChanges(payload.changes)) return fail(400);
   const backend = serverConfig();
@@ -140,18 +124,32 @@ export default async function guardarPerfil(request: Request): Promise<Response>
     if (typeof user.email !== 'string' || (credentials && user.email.trim().toLowerCase() !== email) ||
         ![undefined, null, false].includes(user.baneado)) return fail(502);
     if (verifyOnly) return json(200, [{ id: user.id }]);
-    const changes = { ...payload.changes };
-    const rubro = Object.hasOwn(changes, 'rubro') ? changes.rubro : (user.rubro || 'musica');
-    const tipo = user.tipo_cuenta || 'artista';
+    // Re-read state after authentication. CAS closes the race between this read
+    // and UPDATE; stale new editors cannot overwrite another tab's disciplines.
+    const currentUrl = new URL(backend.origin + '/rest/v1/perfiles');
+    currentUrl.searchParams.set('id', 'eq.' + verifiedId);
+    currentUrl.searchParams.set('select', 'id,tipo_cuenta,rubro,baneado,disciplinas,perfil_revision,' + DETAIL_FIELDS.join(','));
+    currentUrl.searchParams.set('limit', '1');
+    const currentResponse = await fetch(currentUrl, { headers: backend.headers, signal, redirect: 'error' });
+    if (!currentResponse.ok) return fail(502);
+    const currentRows = await currentResponse.json();
+    if (!Array.isArray(currentRows) || currentRows.length !== 1 || idText(currentRows[0].id) !== verifiedId) return fail(502);
+    const current = currentRows[0];
+    if (current.baneado === true) return fail(403);
+    let changes = { ...payload.changes };
+    const rubro = Object.hasOwn(changes, 'rubro') ? changes.rubro : current.rubro;
+    const tipo = current.tipo_cuenta;
     if (!['artista', 'negocio', 'visitante'].includes(tipo) ||
         (tipo === 'artista' && !RUBROS.has(rubro)) ||
-        (tipo !== 'artista' && Object.hasOwn(changes, 'rubro') && changes.rubro !== user.rubro) ||
+        (tipo !== 'artista' && Object.hasOwn(changes, 'rubro') && changes.rubro !== current.rubro) ||
+        (tipo !== 'artista' && Object.hasOwn(changes, 'disciplinas')) ||
         (Object.hasOwn(changes, 'tipo_cuenta') && changes.tipo_cuenta !== tipo)) return fail(403);
     // Only artists use the ten-rubro selector. Businesses retain their existing
     // category and visitors retain their empty rubro; never change either role.
-    // This does not introduce multiple rubros, additional profiles or new categories.
     delete changes.tipo_cuenta;
     if (!Object.keys(changes).length) return fail(400);
+    try { changes = prepareProfileChanges(current, changes, payload.expectedRevision); }
+    catch (error) { return error instanceof Error && error.message === 'conflict' ? conflict() : fail(400); }
     if (Object.hasOwn(changes, 'foto_url')) {
       let photo: URL;
       try { photo = new URL(changes.foto_url); } catch { return fail(400); }
@@ -163,23 +161,24 @@ export default async function guardarPerfil(request: Request): Promise<Response>
     const target = new URL(backend.origin + '/rest/v1/perfiles');
     target.searchParams.set('id', 'eq.' + verifiedId);
     target.searchParams.set('or', '(baneado.is.null,baneado.eq.false)');
-    target.searchParams.set('select', 'id,campos_especificos,generos,foto_url,rubro,edad');
+    target.searchParams.set('perfil_revision', 'eq.' + current.perfil_revision);
+    target.searchParams.set('select', RETURN_FIELDS.join(','));
     const update = await fetch(target, {
       method: 'PATCH', headers: { ...backend.headers, Prefer: 'return=representation' }, body: JSON.stringify(changes), signal, redirect: 'error'
     });
     if (!update.ok) return fail(502);
-    const rows = await update.json();
+    const responseText = await update.text();
+    if (!responseText) return fail(502); // A 204 cannot confirm a requested representation.
+    const rows = JSON.parse(responseText);
+    if (Array.isArray(rows) && rows.length === 0) return conflict();
     if (!Array.isArray(rows) || rows.length !== 1 || !object(rows[0]) || idText(rows[0].id) !== verifiedId) return fail(502);
-    if ((Object.hasOwn(changes, 'rubro') && rows[0].rubro !== changes.rubro) ||
-        (Object.hasOwn(changes, 'edad') && rows[0].edad !== changes.edad) ||
-        (Object.hasOwn(changes, 'generos') && rows[0].generos !== changes.generos) ||
-        (Object.hasOwn(changes, 'foto_url') && rows[0].foto_url !== changes.foto_url)) return fail(502);
-    if (Object.hasOwn(changes, 'campos_especificos')) {
-      const confirmed = jsonObject(rows[0].campos_especificos);
-      if (!confirmed || canonical(confirmed) !== canonical(jsonObject(changes.campos_especificos))) return fail(502);
+    for (const [key, value] of Object.entries(changes)) {
+      const stored = key === 'campos_especificos' && rows[0][key] !== null ? jsonObject(rows[0][key]) : rows[0][key];
+      const requested = key === 'campos_especificos' && value !== null ? jsonObject(value) : value;
+      if (!Object.hasOwn(rows[0], key) || canonical(stored) !== canonical(requested)) return fail(502);
     }
     // Only explicitly selected profile fields may leave the server.
-    return json(200, [Object.fromEntries(['id', 'campos_especificos', 'generos', 'foto_url', 'rubro', 'edad'].filter(key => Object.hasOwn(rows[0], key)).map(key => [key, rows[0][key]]))]);
+    return json(200, [Object.fromEntries(RETURN_FIELDS.filter(key => Object.hasOwn(rows[0], key)).map(key => [key, rows[0][key]]))]);
   } catch { return fail(502); }
 }
 

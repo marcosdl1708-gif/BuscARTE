@@ -4,7 +4,7 @@
   if (window.BuscARTESesion) return;
   const nativeFetch = window.fetch.bind(window);
   const databaseOrigin = 'https://xiaanchoanxmampegoay.supabase.co';
-  const identityKeys = ['ba_logged', 'ba_user_id', 'ba_name', 'ba_email', 'ba_tipo_cuenta', 'ba_rubro', 'ba_referentes', 'ba_generos'];
+  const identityKeys = ['ba_logged', 'ba_user_id', 'ba_name', 'ba_email', 'ba_tipo_cuenta', 'ba_rubro', 'ba_referentes', 'ba_generos', 'ba_disciplinas'];
   const privatePages = new Set(['buscARTE_perfil.html', 'buscARTE_mensajes.html', 'buscARTE_guardados.html', 'buscARTE_mis_anuncios.html', 'buscARTE_generador.html']);
   const pagePaths = new Map(['index','buscARTE_index','buscARTE_anuncio_detalle','buscARTE_anuncios','buscARTE_busqueda','buscARTE_contacto','buscARTE_generador','buscARTE_guardados','buscARTE_login','buscARTE_mensajes','buscARTE_mis_anuncios','buscARTE_perfil','buscARTE_perfil_publico','buscARTE_privacidad','buscARTE_recuperar','buscARTE_registro','buscARTE_reset','buscARTE_seguridad_infantil','buscARTE_terminos'].map(name => ['/' + name.toLowerCase(), name + '.html']));
   let user = null;
@@ -77,6 +77,7 @@
     if (previous && previous !== String(value.id)) ['ba_msg_last_seen', 'ba_msg_read_by_user', 'ba_after_login'].forEach(remove);
     write('ba_user_id', value.id); write('ba_name', value.nombre || ''); write('ba_email', value.email || '');
     write('ba_tipo_cuenta', value.tipo_cuenta || ''); write('ba_rubro', value.rubro || '');
+    write('ba_disciplinas', JSON.stringify({id:String(value.id),disciplinas:value.disciplinas ?? null,perfil_revision:value.perfil_revision ?? 0}));
     write('ba_referentes', value.referentes || ''); write('ba_generos', value.generos || ''); write('ba_logged', '1');
   }
   function clearIdentity() { identityKeys.forEach(remove); user = null; }
@@ -135,8 +136,8 @@
     if (id != null && String(id) !== String(user.id)) return null;
     return user;
   }
-  async function refresh() {
-    if (!refreshPending) refreshPending = verify({ reason:'expired' }).finally(() => { refreshPending = null; });
+  async function refresh(options = {}) {
+    if (!refreshPending) refreshPending = verify({ reason:'expired',...(options.reload === false ? {reload:false} : {}) }).finally(() => { refreshPending = null; });
     return refreshPending;
   }
   async function logout(destination = 'index.html') {

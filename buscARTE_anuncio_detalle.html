@@ -2,6 +2,7 @@
 <html lang="es" data-ba-design="a2">
 <head>
 <script src="/assets/js/sesion-segura.js"></script>
+  <script src="/assets/js/disciplinas.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- SEO: canónica única por id. Mismo caso que perfil_publico: contenido cargado
@@ -438,6 +439,7 @@
 <style>html:not([data-music-tools="true"]) a[href*="buscarte_generador" i] { display: none !important; }</style>
 <script src="/assets/js/menu-cuenta.js"></script>
 <link rel="stylesheet" href="/assets/css/escena.css">
+<link rel="stylesheet" href="/assets/css/cursor.css">
 </head>
 <body>
 
@@ -1432,8 +1434,9 @@
     const zona = a.zona || a.lugar || ''
 
     // ── Aplicar color del rubro ──
-    // Para "busco", el color es el del rubro buscado (tablón donde aparece); si no, el del autor.
-    const rubroColorKey = (tipo === 'busco' && a.rubro_buscado) ? a.rubro_buscado : (autor.rubro || a.rubro || 'musica')
+    // El rubro de una publicación es histórico: cambiar el principal del autor
+    // no reclasifica ni recolorea sus anuncios existentes.
+    const rubroColorKey = (tipo === 'busco' && a.rubro_buscado) ? a.rubro_buscado : (a.rubro || autor.rubro || 'musica')
     const rc = RUBRO_COLORS[rubroColorKey] || RUBRO_COLORS.musica
     document.documentElement.style.setProperty('--neon', rc.text)
     const prevStyle = document.getElementById('rubro-detail-style')
@@ -1579,10 +1582,13 @@
 
       let autor = { nombre: 'Usuario', instrumento: 'Usuario de buscARTE', ciudad: '' }
       if (a.user_id) {
-        const pRes = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${encodeURIComponent(a.user_id)}&select=id,nombre,instrumento,ciudad,rubro`, { headers: hdrs })
+        const pRes = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${encodeURIComponent(a.user_id)}&select=id,nombre,instrumento,ciudad,rubro,tipo_cuenta,disciplinas`, { headers: hdrs })
         if (pRes.ok) {
           const perfiles = await pRes.json()
-          if (Array.isArray(perfiles) && perfiles[0]) autor = perfiles[0]
+          if (Array.isArray(perfiles) && perfiles[0]) {
+            autor = perfiles[0]
+            if (window.BuscARTEDisciplinas?.has(autor, a.rubro)) autor = window.BuscARTEDisciplinas.project(autor, a.rubro)
+          }
         }
       }
 
@@ -1865,5 +1871,6 @@ if ('serviceWorker' in navigator) {
 </div>
 <script src="/assets/js/escena.js"></script>
 <script src="/assets/js/escena-fondos.js"></script>
+<script src="/assets/js/cursor.js"></script>
 </body>
 </html>

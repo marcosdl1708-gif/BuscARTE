@@ -11,6 +11,7 @@ const { default:datos, config:datosConfig } = await import('../netlify/functions
 const { default:sesion } = await import('../netlify/functions/sesion.mjs');
 const { default:guardarPerfil } = await import('../netlify/functions/guardar-perfil.mts');
 const { sessionUser, serverConfig } = await import('../netlify/lib/session.mjs');
+const { normalizeDisciplines, disciplinesFor, prepareProfileChanges, projectProfile, RUBROS, DETAIL_FIELDS } = await import('../netlify/lib/disciplinas.mjs');
 globalThis.fetch = nativeFetch;
 
 const web = 'https://buscarte.com.ar';
@@ -22,10 +23,11 @@ const oldPasswordHash = 'synthetic-bcrypt-placeholder';
 const cookie = '__Host-ba_session=' + token;
 const syntheticUser = { id:701, nombre:'Persona propia', email:'owner@example.invalid',
   password:oldPasswordHash, tipo_cuenta:'artista', rubro:'musica',
-  referentes:'', generos:'', baneado:false };
+  referentes:'', generos:'', baneado:false, disciplinas:null,perfil_revision:0,
+  instrumento:'Batería',disponibilidad:'Disponible',donde_ensaya:'',experiencia:0,campos_especificos:{},edad:null };
 const ordinaryUser = (id, rubro='danza') => ({ id, nombre:'Persona fixture '+id,
   email:'user'+id+'@example.invalid', password:'synthetic-password-'+id,
-  tipo_cuenta:'artista', rubro, baneado:false });
+  tipo_cuenta:'artista', rubro, baneado:false,disciplinas:null,perfil_revision:0 });
 
 function request(path, options={}) {
   const method = options.method || 'GET';
@@ -112,13 +114,21 @@ async function withBackend(options, action) {
           const profile=profiles.get(Number(rawId.slice(3)));
           return reply(200,profile?[projection(profile,url.searchParams.get('select'))]:[]);
         }
-        return reply(200,[...profiles.values()].filter(p=>!p.baneado).map(p=>projection(p,url.searchParams.get('select'))));
+        let rows=[...profiles.values()].filter(p=>!p.baneado);
+        const context=url.searchParams.get('and')?.match(/disciplinas->selected\.cs\.\["([a-z]+)"\]/)?.[1];
+        if(context)rows=rows.filter(p=>p.tipo_cuenta==='artista'&&(p.disciplinas?p.disciplinas.selected.includes(context):p.rubro===context));
+        return reply(200,rows.map(p=>projection(p,url.searchParams.get('select'))));
       }
       if(url.pathname==='/rest/v1/perfiles' && method==='PATCH') {
         assert.equal(url.searchParams.get('id'),'eq.701');
         assert.equal(url.searchParams.get('or'),'(baneado.is.null,baneado.eq.false)');
         const profile=profiles.get(701);
+        if(options.profileFailure)return reply(500,{private:'synthetic profile failure'});
+        assert.equal(url.searchParams.get('perfil_revision'),'eq.'+(body.perfil_revision-1));
+        if(options.conflict || url.searchParams.get('perfil_revision')!=='eq.'+profile.perfil_revision)return reply(200,[]);
         profiles.set(701,{...profile,...body});
+        if(options.profileMinimal)return reply(204,null);
+        if(options.profilePartial)profiles.get(701).generos='not-confirmed-fixture';
         return reply(200,options.profileUnconfirmed?[]:[projection(profiles.get(701),url.searchParams.get('select'))]);
       }
       if(url.pathname==='/rest/v1/rpc/login_usuario') {
@@ -458,7 +468,8 @@ test('ad writes reject forged owner/privilege fields and derive discipline from 
     assert.equal((await datos(request('/rest/v1/anuncios',{method:'POST',body:{...ad,user_id:999}}))).status,403);
     assert.equal((await datos(request('/rest/v1/anuncios',{method:'POST',body:{...ad,oculto:false}}))).status,403);
     assert.equal(apiCalls('/rest/v1/anuncios','POST').length,0);
-    assert.equal((await datos(request('/rest/v1/anuncios',{method:'POST',body:ad}))).status,201);
+    assert.equal((await datos(request('/rest/v1/anuncios',{method:'POST',body:ad}))).status,403);
+    assert.equal((await datos(request('/rest/v1/anuncios',{method:'POST',body:{...ad,rubro:'musica'}}))).status,201);
     const [saved]=apiCalls('/rest/v1/anuncios','POST');
     assert.equal(saved.body.user_id,'701');assert.equal(saved.body.rubro,'musica');assert.equal(saved.body.estado,'activo');
   });
@@ -520,7 +531,7 @@ test('profile save with verified cookie never asks legacy RPC credentials and co
     assert.equal(apiCalls('/rest/v1/perfiles','PATCH').length,0);
     const save=await guardarPerfil(request('/unused',{method:'POST',body:{profileId:701,changes:{generos:'Jazz',edad:26}}}));
     assert.equal(save.status,200);
-    assert.deepEqual(await save.json(),[{id:701,generos:'Jazz',rubro:'musica',edad:26}]);
+    const [row]=await save.json();assert.equal(row.id,701);assert.equal(row.generos,'Jazz');assert.equal(row.rubro,'musica');assert.equal(row.edad,26);assert.equal(row.perfil_revision,1);
     assert.equal(apiCalls('/rest/v1/rpc/login_usuario').length,0);
     assert.equal(apiCalls('/rest/v1/perfiles','PATCH')[0].url.searchParams.get('id'),'eq.701');
   });
@@ -570,4 +581,220 @@ test('security test source has no real network transport or credential ingestion
   const source=readFileSync(new URL(import.meta.url),'utf8');
   assert(!source.includes('process' + '.env'));
   assert(source.includes('globalThis.fetch=async'));
+});
+
+const musicDetails = { instrumento:'Batería, instrumento histórico desconocido',generos:'Indie, género histórico',referentes:'Referencia propia',
+  disponibilidad:'Sesiones',donde_ensaya:'Lugar musical',experiencia:7,campos_especificos:{rol:['Percusión'],legacy_extra:['opción fuera de catálogo']} };
+const danceDetails = { instrumento:'',generos:'',referentes:'',disponibilidad:'Doy clases',donde_ensaya:'Estudio de danza',experiencia:3,
+  campos_especificos:{rol:['Bailarín/a'],disciplina:['Contemporáneo'],nivel:['Avanzado'],estilo:['histórico']} };
+const multi = (selected=['musica','danza']) => ({version:1,selected,details:Object.fromEntries(selected.map(key=>[key,structuredClone(key==='musica'?musicDetails:key==='danza'?danceDetails:{...danceDetails,campos_especificos:{rol:['histórico-'+key]}})]))});
+const multiUser = (principal='musica',selected=['musica','danza']) => ({...multi(selected).details[principal],rubro:principal,disciplinas:multi(selected),perfil_revision:4});
+const saveRequest = (changes,extra={}) => request('/unused',{method:'POST',body:{profileId:701,changes,...extra}});
+
+test('all ten legacy rubros adapt exact independent values without dropping unknown choices or backfilling',()=>{
+  for(const rubro of RUBROS) {
+    const source={tipo_cuenta:'artista',rubro,...musicDetails,disciplinas:null,perfil_revision:0};
+    const adapted=disciplinesFor(source);
+    assert.deepEqual(adapted,{version:1,selected:[rubro],details:{[rubro]:musicDetails}});
+    assert.equal(source.disciplinas,null);
+    assert.deepEqual(disciplinesFor({...source,campos_especificos:JSON.stringify(musicDetails.campos_especificos)}).details[rubro].campos_especificos,musicDetails.campos_especificos);
+    assert.equal(projectProfile(source,rubro).rubro_principal,rubro);
+  }
+  assert.equal(disciplinesFor({tipo_cuenta:'negocio',rubro:'Sala de ensayo',disciplinas:null}),null);
+  assert.equal(disciplinesFor({tipo_cuenta:'visitante',rubro:'',disciplinas:null}),null);
+});
+test('legacy nulls and explicit empty options remain distinct; missing detail keys normalize null only',()=>{
+  const normalized=normalizeDisciplines({version:1,selected:['danza'],details:{danza:{instrumento:'',generos:null,campos_especificos:{rol:[]}}}},'danza');
+  assert.equal(normalized.details.danza.instrumento,'');assert.equal(normalized.details.danza.generos,null);
+  assert.deepEqual(normalized.details.danza.campos_especificos,{rol:[]});
+  for(const field of ['referentes','disponibilidad','donde_ensaya','experiencia'])assert.equal(normalized.details.danza[field],null);
+});
+test('malformed membership, wrong namespaces/types and unsafe/excessive nested data fail closed',()=>{
+  const invalid=[null,{}, {version:2,selected:['musica'],details:{musica:{}}},
+    {version:1,selected:[],details:{}}, {version:1,selected:['musica','musica'],details:{musica:{}}},
+    {version:1,selected:['unknown'],details:{unknown:{}}}, {version:1,selected:['musica'],details:{musica:{},danza:{}}},
+    {version:1,selected:['musica'],details:{}}, {version:1,selected:['musica'],details:{musica:{email:'private@example.invalid'}}},
+    {version:1,selected:['musica'],details:{musica:{instrumento:[]}}}, {version:1,selected:['musica'],details:{musica:{experiencia:1.5}}},
+    {version:1,selected:['musica'],details:{musica:{experiencia:-1}}}, {version:1,selected:['musica'],details:{musica:{campos_especificos:[]}}},
+    {version:1,selected:['musica'],details:{musica:{generos:'x'.repeat(2001)}}},
+    JSON.parse('{"version":1,"selected":["musica"],"details":{"musica":{"campos_especificos":{"constructor":{"x":1}}}}}')];
+  for(const value of invalid)assert.throws(()=>normalizeDisciplines(value,'musica'));
+  assert.throws(()=>normalizeDisciplines(multi(),'circo'));
+  const oversized=multi([...RUBROS]);for(const key of oversized.selected)oversized.details[key]={...musicDetails,referentes:'é'.repeat(4000),instrumento:'é'.repeat(2000)};
+  assert.throws(()=>normalizeDisciplines(oversized,'musica'));
+});
+test('explicit MD save needs revision/principal and rejects contradictory mirrors or privilege/role fields',async()=>{
+  const cases=[[{disciplinas:multi()}, {},400], [{disciplinas:multi(),rubro:'circo'},{expectedRevision:0},400],
+    [{disciplinas:multi(),rubro:'musica',generos:'Contradictorio'},{expectedRevision:0},400],
+    [{disciplinas:multi(),tipo_cuenta:'negocio'},{expectedRevision:0},403],
+    [{disciplinas:multi(),baneado:false},{expectedRevision:0},400]];
+  for(const [changes,extra,status] of cases)await withBackend({},async({apiCalls})=>{
+    assert.equal((await guardarPerfil(saveRequest(changes,extra))).status,status);
+    assert.equal(apiCalls('/rest/v1/perfiles','PATCH').length,0);
+  });
+  for(const tipo_cuenta of ['visitante','negocio'])await withBackend({user:{tipo_cuenta}},async({apiCalls})=>{
+    assert.equal((await guardarPerfil(saveRequest({disciplinas:multi()},{expectedRevision:0}))).status,403);
+    assert.equal(apiCalls('/rest/v1/perfiles','PATCH').length,0);
+  });
+});
+test('add second discipline and switch principal atomically mirrors only its own details',async()=>{
+  await withBackend({},async({apiCalls,profiles})=>{
+    const first=await guardarPerfil(saveRequest({disciplinas:multi(),rubro:'musica',bio:'Compartida'},{expectedRevision:0}));
+    assert.equal(first.status,200);const [saved]=await first.json();assert.equal(saved.perfil_revision,1);
+    assert.deepEqual(saved.disciplinas.details.musica,musicDetails);assert.deepEqual(saved.disciplinas.details.danza,danceDetails);
+    assert.equal(profiles.get(701).bio,'Compartida');
+    const second=await guardarPerfil(saveRequest({disciplinas:multi(),rubro:'danza'},{expectedRevision:1}));
+    assert.equal(second.status,200);const [changed]=await second.json();assert.equal(changed.perfil_revision,2);
+    for(const key of DETAIL_FIELDS)assert.deepEqual(changed[key],danceDetails[key]);
+    assert.equal(changed.rubro,'danza');assert.deepEqual(changed.disciplinas.details.musica,musicDetails);
+    assert.equal(apiCalls('/rest/v1/perfiles','PATCH').length,2);
+    assert.equal(apiCalls('/rest/v1/anuncios','PATCH').length,0,'principal changes must never rewrite historical ads');
+    assert.equal(apiCalls('/rest/v1/perfiles','PATCH')[1].url.searchParams.get('perfil_revision'),'eq.1');
+  });
+});
+test('all ten principal changes retain every other namespace; full save confirms authoritative revision',async()=>{
+  const data=multi([...RUBROS]);
+  await withBackend({user:multiUser('musica',[...RUBROS])},async({profiles})=>{
+    let expectedRevision=4;
+    for(const principal of RUBROS) {
+      const res=await guardarPerfil(saveRequest({disciplinas:data,rubro:principal},{expectedRevision}));
+      assert.equal(res.status,200,principal);const [saved]=await res.json();
+      assert.equal(saved.rubro,principal);assert.equal(saved.perfil_revision,++expectedRevision);
+      assert.deepEqual(saved.disciplinas,data);
+      for(const key of DETAIL_FIELDS)assert.deepEqual(saved[key],data.details[principal][key]);
+    }
+    assert.equal(profiles.get(701).id,701);
+  });
+});
+test('remove discipline cannot leave hidden publicly exposed namespaces; re-add is deliberate empty data',async()=>{
+  await withBackend({user:multiUser()},async({profiles})=>{
+    const removed=await guardarPerfil(saveRequest({disciplinas:multi(['musica']),rubro:'musica'},{expectedRevision:4}));
+    assert.equal(removed.status,200);assert(!Object.hasOwn(profiles.get(701).disciplinas.details,'danza'));
+    const data={version:1,selected:['musica','danza'],details:{musica:musicDetails,danza:{}}};
+    const added=await guardarPerfil(saveRequest({disciplinas:data,rubro:'musica'},{expectedRevision:5}));
+    assert.equal(added.status,200);
+    for(const field of DETAIL_FIELDS)assert.equal(profiles.get(701).disciplinas.details.danza[field],null);
+  });
+});
+test('cached old writer merges principal details without erasing secondary; silent principal switch is conflict',async()=>{
+  await withBackend({user:multiUser()},async({profiles,apiCalls})=>{
+    const res=await guardarPerfil(saveRequest({generos:'Nuevo musical',campos_especificos:{rol:['Percusión'],nuevo:['unknown']}}));
+    assert.equal(res.status,200);assert.equal(profiles.get(701).disciplinas.details.musica.generos,'Nuevo musical');
+    assert.deepEqual(profiles.get(701).disciplinas.details.danza,danceDetails);
+    const switched=await guardarPerfil(saveRequest({rubro:'danza',generos:''}));
+    assert.equal(switched.status,409);assert.equal((await switched.json()).code,'PROFILE_CONFLICT');
+    assert.equal(profiles.get(701).rubro,'musica');assert.equal(apiCalls('/rest/v1/perfiles','PATCH').length,1);
+  });
+  await withBackend({},async({profiles})=>{
+    assert.equal((await guardarPerfil(saveRequest({rubro:'danza',generos:'',campos_especificos:{disciplina:['Salsa']}}))).status,200);
+    assert.equal(profiles.get(701).disciplinas,null,'a purely legacy editor does not fabricate namespaces');
+  });
+});
+test('two tabs and read-to-write races return explicit409 without silently overwriting state',async()=>{
+  await withBackend({user:multiUser()},async({apiCalls,profiles})=>{
+    const changes={disciplinas:multi(),rubro:'danza'};
+    assert.equal((await guardarPerfil(saveRequest(changes,{expectedRevision:4}))).status,200);
+    const stale=await guardarPerfil(saveRequest({disciplinas:multi(['musica']),rubro:'musica'},{expectedRevision:4}));
+    assert.equal(stale.status,409);assert.equal((await stale.json()).code,'PROFILE_CONFLICT');
+    assert.equal(profiles.get(701).rubro,'danza');assert.equal(profiles.get(701).perfil_revision,5);
+    assert.equal(apiCalls('/rest/v1/perfiles','PATCH').length,1);
+  });
+  await withBackend({conflict:true,user:multiUser()},async({profiles})=>{
+    const before=structuredClone(profiles.get(701));const res=await guardarPerfil(saveRequest({bio:'Nuevo'},{expectedRevision:4}));
+    assert.equal(res.status,409);assert.deepEqual(profiles.get(701),before);
+  });
+});
+test('missing/unsafe revision never becomes a writable profile',async()=>{
+  for(const perfil_revision of [undefined,null,-1,1.5,Number.MAX_SAFE_INTEGER+1])await withBackend({user:{perfil_revision}},async({apiCalls})=>{
+    assert.equal((await guardarPerfil(saveRequest({generos:'Jazz'}))).status,400);assert.equal(apiCalls('/rest/v1/perfiles','PATCH').length,0);
+  });
+  for(const expectedRevision of [-1,1.5,'0',Number.MAX_SAFE_INTEGER+1])await withBackend({},async({apiCalls})=>{
+    assert.equal((await guardarPerfil(saveRequest({generos:'Jazz'},{expectedRevision}))).status,400);assert.equal(apiCalls('/rest/v1/perfiles','PATCH').length,0);
+  });
+});
+test('204 minimal, partial representation and failure after update never falsely confirm a save',async()=>{
+  for(const options of [{profileMinimal:true},{profilePartial:true},{profileFailure:true}])await withBackend(options,async()=>{
+    const res=await guardarPerfil(saveRequest({generos:'Jazz'},{expectedRevision:0}));assert.equal(res.status,502);
+    assert(!(await res.text()).includes('synthetic profile failure'));
+  });
+});
+test('public membership queries include secondary artists once, project contextual data and preserve real principal',async()=>{
+  await withBackend({user:multiUser()},async({apiCalls})=>{
+    const res=await datos(request('/rest/v1/perfiles?select=id,nombre,rubro,rubro_principal,instrumento,generos,campos_especificos,disciplinas&tipo_cuenta=eq.artista&rubro=eq.danza&order=created_at.desc&limit=20',{signed:false}));
+    assert.equal(res.status,200);const rows=await res.json();const own=rows.find(row=>row.id===701);
+    assert(own);assert.equal(rows.filter(row=>row.id===701).length,1);assert.equal(own.rubro,'danza');assert.equal(own.rubro_principal,'musica');
+    assert.equal(own.instrumento,'');assert.equal(own.generos,'');assert.deepEqual(own.campos_especificos,danceDetails.campos_especificos);
+    const query=apiCalls('/rest/v1/perfiles','GET')[0].url.searchParams;
+    assert.equal(query.get('rubro'),null);assert(query.get('and').includes('and(disciplinas.is.null,rubro.eq.danza)'));
+    assert(query.get('and').includes('disciplinas->selected.cs.["danza"]'));assert(!query.get('select').includes('rubro_principal'));
+    assert.equal(query.get('limit'),'20');assert.equal(query.get('order'),'created_at.desc');
+  });
+});
+test('contextual queries never apply a secondary filter to principal mirrors or allow fake affinity context',async()=>{
+  await withBackend({user:multiUser()},async({apiCalls})=>{
+    const res=await datos(request('/rest/v1/perfiles?select=id,rubro,instrumento&rubro=eq.danza&instrumento=eq.Batería',{signed:false}));
+    assert.equal(res.status,200);const params=apiCalls('/rest/v1/perfiles','GET')[0].url.searchParams;
+    assert.equal(params.get('instrumento'),null);assert(params.get('and').includes('disciplinas->details->danza->>instrumento.eq.Batería'));
+    assert(params.get('and').includes('and(disciplinas.is.null,instrumento.eq.Batería)'));
+    assert.throws(()=>projectProfile({...syntheticUser,...multiUser()},'circo'));
+    const bad=await datos(request('/rest/v1/perfiles?select=id&rubro=eq.danza&or=(generos.ilike.*Indie*,instrumento.ilike.*Batería*)',{signed:false}));
+    assert.equal(bad.status,400,'unimplemented nested contextual detail predicates must fail closed');
+  });
+});
+test('principal public reads, private email projection and verified session MD cache stay compatible',async()=>{
+  await withBackend({user:multiUser('danza')},async()=>{
+    const principal=await datos(request('/rest/v1/perfiles?select=id,rubro,rubro_principal,generos,disciplinas,perfil_revision&id=eq.701',{signed:false}));
+    const [row]=await principal.json();assert.equal(row.rubro,'danza');assert.equal(row.rubro_principal,'danza');assert.equal(row.generos,'');
+    const session=await sesion(sessionRequest());const {user}=await session.json();assert.deepEqual(user.disciplinas,multi());assert.equal(user.perfil_revision,4);
+    assert(!Object.hasOwn(user,'password'));assert(!Object.hasOwn(user,'password_fingerprint'));
+    const login=await datos(request('/rest/v1/rpc/login_usuario',{method:'POST',signed:false,body:{p_email:'owner@example.invalid',p_password:'correct-fixture'}}));
+    const identity=await login.json();assert.deepEqual(identity.disciplinas,multi());assert.equal(identity.perfil_revision,4);
+  });
+});
+test('business and visitor saves retain categories/roles/NULL MD and never become artists',async()=>{
+  for(const [tipo_cuenta,rubro] of [['negocio','Sala de ensayo'],['visitante','']])await withBackend({user:{tipo_cuenta,rubro}},async({profiles})=>{
+    assert.equal((await guardarPerfil(saveRequest({bio:'Información compartida'},{expectedRevision:0}))).status,200);
+    assert.equal(profiles.get(701).tipo_cuenta,tipo_cuenta);assert.equal(profiles.get(701).rubro,rubro);assert.equal(profiles.get(701).disciplinas,null);
+    const publicResult=await datos(request('/rest/v1/perfiles?select=id&rubro=eq.musica',{signed:false}));
+    assert(!(await publicResult.json()).some(row=>row.id===701));
+  });
+});
+test('artist ads select any own discipline for Ofrezco/Clases/Evento/Busco, foreign is rejected, marketplace transversal',async()=>{
+  await withBackend({user:multiUser()},async({apiCalls,profiles})=>{
+    const base={user_id:701,titulo:'Fixture MD',descripcion:'Contenido',rubro:'danza'};
+    for(const tipo of ['ofrezco','clases','jam','busco'])assert.equal((await datos(request('/rest/v1/anuncios',{method:'POST',body:{...base,tipo,...(tipo==='busco'?{rubro_buscado:'circo'}:{})}}))).status,201,tipo);
+    assert(apiCalls('/rest/v1/anuncios','POST').every(call=>call.body.rubro==='danza'));
+    assert.equal(apiCalls('/rest/v1/anuncios','POST')[3].body.rubro_buscado,'circo');
+    assert.equal((await datos(request('/rest/v1/anuncios',{method:'POST',body:{...base,tipo:'ofrezco',rubro:'circo'}}))).status,403);
+    assert.equal((await datos(request('/rest/v1/anuncios',{method:'POST',body:{...base,tipo:'vende',rubro:'circo',categoria_producto:'Instrumentos'}}))).status,201);
+    assert.equal(apiCalls('/rest/v1/anuncios','POST')[4].body.rubro,null);
+    assert.equal(profiles.get(701).rubro,'musica');assert.equal(apiCalls('/rest/v1/perfiles','PATCH').length,0);
+  });
+});
+test('ad audit rejects malformed scalars/prices/date/JSON/photos and accepts real uploader paths',async()=>{
+  const base={user_id:701,tipo:'jam',titulo:'Fixture',descripcion:'Contenido',rubro:'musica'};
+  const invalid=[{descripcion:{}},{generos:[]},{precio_num:-1},{precio_num:'100'},{precio_num:1e13},
+    {fecha_evento:'not-a-date'},{fecha_evento:'2026-10-20'},{campos_especificos:[]},
+    {foto_url:sb+'/storage/v1/object/public/fotos-anuncios/999-abc.jpg'},
+    {foto_url:sb+'/storage/v1/object/public/fotos-anuncios/701-abc.svg'},
+    {foto_url:sb+'/storage/v1/object/public/fotos-anuncios/701-abc.jpg?private=1'},
+    {foto_url:'https://evil.example.invalid/701-photo.jpg'},{rubro_buscado:'unknown'}, {vistas:999}];
+  for(const patch of invalid)await withBackend({},async({apiCalls})=>{
+    assert((await datos(request('/rest/v1/anuncios',{method:'POST',body:{...base,...patch}}))).status>=400);
+    assert.equal(apiCalls('/rest/v1/anuncios','POST').length,0);
+  });
+  await withBackend({},async({apiCalls})=>{
+    const data={...base,fecha_evento:'2026-10-20T19:00:00.000Z',precio_num:0,campos_especificos:{nuevo:['unknown']},foto_url:sb+'/storage/v1/object/public/fotos-anuncios/701-1791910800000-jam-abc-123.webp'};
+    assert.equal((await datos(request('/rest/v1/anuncios',{method:'POST',body:data}))).status,201);
+    assert.equal(apiCalls('/rest/v1/anuncios','POST')[0].body.foto_url,data.foto_url);
+  });
+});
+test('every ad management action uses verified owner, rejects spoofs and never edits profile disciplines',async()=>{
+  await withBackend({user:multiUser()},async({apiCalls})=>{
+    for(const p_accion of ['pausar','reactivar','republicar','eliminar'])assert.equal((await datos(request('/rest/v1/rpc/gestionar_anuncio',{method:'POST',body:{p_anuncio_id:91,p_user_id:701,p_accion}}))).status,200);
+    assert.equal((await datos(request('/rest/v1/rpc/gestionar_anuncio',{method:'POST',body:{p_anuncio_id:91,p_user_id:999,p_accion:'eliminar'}}))).status,403);
+    assert.equal((await datos(request('/rest/v1/rpc/gestionar_anuncio',{method:'POST',body:{p_anuncio_id:91,p_user_id:701,p_accion:'arbitrary'}}))).status,403);
+    assert.equal(apiCalls('/rest/v1/perfiles','PATCH').length,0);
+    assert(apiCalls('/rest/v1/rpc/gestionar_anuncio').every(call=>call.body.p_user_id==='701'));
+  });
 });

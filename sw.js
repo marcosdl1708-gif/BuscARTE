@@ -1,6 +1,6 @@
 // ⚠️ IMPORTANTE: subí este número en CADA deploy (v3 → v4 → v5...).
 // Si no lo cambiás, el navegador puede seguir sirviendo los archivos viejos cacheados.
-const CACHE_VERSION = 'buscarte-v24-2026-10-13-escena-segura';
+const CACHE_VERSION = 'buscarte-v25-2026-10-13-multidisciplina-cursor';
 const OFFLINE_URL = '/index.html';
 
 const SHELL = [
@@ -24,10 +24,13 @@ const SHELL = [
   '/assets/js/inicio-sesion.js',
   '/assets/css/inicio-sesion.css',
   '/assets/css/escena.css',
+  '/assets/css/cursor.css',
+  '/assets/js/cursor.js',
   '/assets/js/escena.js',
   '/assets/js/escena-fondos.js',
   '/assets/js/menu-cuenta.js',
   '/assets/js/sesion-segura.js',
+  '/assets/js/disciplinas.js',
   '/manifest.json',
   '/icons/icon-192.png',
   '/icons/icon-512.png'

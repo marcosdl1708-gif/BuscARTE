@@ -72,7 +72,8 @@ async function setup(t, { width = 390, mode = 'ready', rpcFailure = false } = {}
   const context = await browser.newContext({ viewport: { width, height: 844 }, isMobile: width < 768, hasTouch: width < 768, serviceWorkers: 'block' });
   t.after(() => context.close());
   const page = await context.newPage();
-  const calls = { rpc: [], emails: [], unexpected: [], errors: [], dialogs: [], sdk: 0 };
+  const calls = { rpc: [], sessions:[], gateway:[], emails: [], unexpected: [], errors: [], dialogs: [], sdk: 0 };
+  let sessionUser=null;
   page.on('pageerror', error => calls.errors.push(error.message));
   page.on('dialog', async dialog => { calls.dialogs.push(dialog.message()); await dialog.dismiss(); });
   await context.route('**/*', async route => {
@@ -89,9 +90,23 @@ async function setup(t, { width = 390, mode = 'ready', rpcFailure = false } = {}
       if (mode === 'blocked' && calls.sdk === 1) return route.abort('blockedbyclient');
       return route.fulfill({ contentType: 'application/javascript', body: mode === 'timeout' && calls.sdk === 1 ? '' : fakeSdk(mode === 'timeout' ? 'ready' : mode) });
     }
-    if (url.hostname === 'xiaanchoanxmampegoay.supabase.co' && url.pathname === '/rest/v1/rpc/registrar_usuario') {
-      calls.rpc.push({ body: request.postDataJSON(), headers: request.headers() });
-      return route.fulfill({ status: rpcFailure ? 500 : 200, contentType: 'application/json', body: JSON.stringify(rpcFailure ? { error: 'synthetic failure' } : { id: 'fixture-user-only' }) });
+    if (url.origin==='http://buscarte.test' && url.pathname==='/.netlify/functions/sesion') {
+      calls.sessions.push({method:request.method(),authenticated:!!sessionUser});
+      if(request.method()==='POST') {assert.deepEqual(request.postDataJSON(),{action:'logout'});sessionUser=null;return route.fulfill({contentType:'application/json',body:'{"ok":true}'});}
+      assert.equal(request.method(),'GET');
+      return route.fulfill({status:sessionUser?200:401,contentType:'application/json',body:JSON.stringify(sessionUser?{user:sessionUser}:{code:'SESSION_REQUIRED',error:'Synthetic anonymous session.'})});
+    }
+    if (url.origin==='http://buscarte.test' && url.pathname==='/.netlify/functions/datos') {
+      const api=new URL(url.searchParams.get('path'),'https://fixture.invalid');
+      calls.gateway.push({method:request.method(),path:api.pathname});
+      assert.equal(request.headers().apikey,undefined);assert.equal(request.headers().authorization,undefined);
+      if(request.method()==='POST' && api.pathname==='/rest/v1/rpc/registrar_usuario') {
+        const body=request.postDataJSON();calls.rpc.push({body,headers:request.headers()});
+        assert.equal(body.captcha_token,'fixture-token','The actual widget response reaches the verified gateway');
+        if(!rpcFailure)sessionUser={id:210,nombre:body.p_nombre,email:body.p_email,tipo_cuenta:body.p_tipo_cuenta,rubro:body.p_rubro || '',referentes:body.p_referentes || '',generos:body.p_generos || '',disciplinas:null,perfil_revision:0};
+        return route.fulfill({status:rpcFailure?500:200,contentType:'application/json',body:JSON.stringify(rpcFailure?{error:'synthetic failure'}:sessionUser)});
+      }
+      calls.unexpected.push('Unexpected gateway '+request.method()+' '+api.pathname);return route.abort('blockedbyclient');
     }
     if (url.origin === 'http://buscarte.test' && url.pathname === '/.netlify/functions/send-email') {
       calls.emails.push(request.postDataJSON());
@@ -158,11 +173,14 @@ for (const role of Object.keys(paths)) {
     assert.equal(f.calls.rpc[0].body.p_tipo_cuenta, role);
     assert.equal(f.calls.rpc[0].body.p_email, 'persona@example.invalid');
     assert.deepEqual(Object.keys(f.calls.rpc[0].body).sort(), [
+      'captcha_token',
       'p_email', 'p_password', 'p_nombre', 'p_provincia', 'p_ciudad', 'p_barrio', 'p_instrumento',
       'p_generos', 'p_disponibilidad', 'p_referentes', 'p_bio', 'p_tipo_cuenta', 'p_rubro', 'p_campos_especificos'
     ].sort());
-    assert.equal(await f.page.evaluate(() => localStorage.getItem('ba_user_id')), 'fixture-user-only');
-    assert.equal(f.calls.emails.length, role === 'artista' ? 1 : 0);
+    assert.equal(await f.page.evaluate(() => localStorage.getItem('ba_user_id')), '210');
+    assert.equal(await f.page.evaluate(() => window.BuscARTESesion.status), 'verified');
+    assert.ok(f.calls.sessions.some(call=>call.authenticated),'Created account waits for simulated cookie verification');
+    assert.equal(f.calls.emails.length,0,'Welcome mail is owned by server registration, not the browser');
   });
 }
 

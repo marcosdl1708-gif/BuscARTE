@@ -1,7 +1,7 @@
 import { backend, backendJson, trustedOrigin, sessionUser, startSession, endSession, clearCookie, readJson, readBytes, json, id, object, rate, notify } from '../lib/session.mjs';
+import { RUBROS, DETAIL_FIELDS, belongsTo, projectProfile, detailObject } from '../lib/disciplinas.mjs';
 
-const RUBROS = new Set(['musica','actuacion','audiovisual','modelaje','diseno','tatuaje','danza','maquillaje','circo','escritura']);
-const PROFILE = 'id,created_at,nombre,instrumento,generos,provincia,ciudad,barrio,bio,referentes,disponibilidad,donde_ensaya,redes,videos,es_premium,foto_url,celular,baneado,experiencia,edad,genero_principal,tipo_cuenta,rubro,campos_especificos';
+const PROFILE = 'id,created_at,nombre,instrumento,generos,provincia,ciudad,barrio,bio,referentes,disponibilidad,donde_ensaya,redes,videos,es_premium,foto_url,celular,baneado,experiencia,edad,genero_principal,tipo_cuenta,rubro,campos_especificos,disciplinas,perfil_revision';
 const COLUMNS = {
   perfiles: PROFILE,
   anuncios: 'id,created_at,user_id,tipo,titulo,descripcion,instrumentos,generos,zona,estado,vistas,fecha_evento,lugar,precio_entrada,link_evento,contacto_evento,categoria_producto,marca,condicion,precio,foto_url,precio_num,nivel,modalidad,oculto,oculto_at,vencido_at,foto_url_2,foto_url_3,rubro,rubro_buscado,tags,campos_especificos',
@@ -59,6 +59,40 @@ async function responseFor(path, request, method=request.method, payload, extra=
   if (request.method==='HEAD' || response.status===204) return new Response(null,{status:response.status,headers});
   return new Response(await response.text(),{status:response.status,headers});
 }
+async function profileResponse(params,request) {
+  const context=params.get('rubro')?.replace(/^eq\./,'');
+  const contextual=params.get('rubro')?.startsWith('eq.') && RUBROS.has(context);
+  const requested=params.get('select').split(',');
+  if(params.has('rubro_principal') || params.get('order')?.split(',').some(part=>part.split('.')[0]==='rubro_principal'))return fail(400);
+  // Virtual principal is never passed as a nonexistent SQL column. Internal
+  // fields permit contextual projection; only requested fields leave the API.
+  const internal=new Set(requested.filter(key=>key!=='rubro_principal'));
+  for(const key of ['rubro','tipo_cuenta','disciplinas',...DETAIL_FIELDS])internal.add(key);
+  params.set('select',[...internal].join(','));
+  if(contextual) {
+    params.delete('rubro');
+    andFilter(params,'tipo_cuenta.eq.artista');
+    andFilter(params,'or(and(disciplinas.is.null,rubro.eq.'+context+'),disciplinas->selected.cs.["'+context+'"])');
+    for(const key of DETAIL_FIELDS)if(params.has(key)) {
+      const value=params.get(key);params.delete(key);
+      const path='disciplinas->details->'+context+(key==='experiencia'?'->':'->>')+key;
+      andFilter(params,'or(and(disciplinas.is.null,'+key+'.'+value+'),and(disciplinas.not.is.null,'+path+'.'+value+'))');
+    }
+    // Arbitrary nested detail predicates need a fully contextual expression;
+    // silently applying them to principal mirrors would create false matches.
+    const raw=new URL(request.url).searchParams.get('path'), source=new URL(raw,'https://xiaanchoanxmampegoay.supabase.co');
+    if(['or','and'].some(key=>DETAIL_FIELDS.some(field=>new RegExp('(?:^|[,(])'+field+'\\.').test(source.searchParams.get(key)||''))))return fail(400);
+  }
+  const response=await backend('/rest/v1/perfiles?'+params,{method:request.method,headers:{Prefer:prefer(request)}});
+  if(!response.ok)return fail(502);
+  const headers={'Cache-Control':'no-store','Content-Type':'application/json; charset=utf-8','X-Content-Type-Options':'nosniff'};
+  const range=response.headers.get('content-range');if(range)headers['Content-Range']=range;
+  if(request.method==='HEAD')return new Response(null,{status:response.status,headers});
+  const rows=await response.json();if(!Array.isArray(rows))return fail(502);
+  const fields=new Set([...requested,...(requested.includes('rubro')?['rubro_principal']:[])]);
+  const projected=rows.map(row=>projectProfile(row,contextual?context:null)).map(row=>Object.fromEntries([...fields].filter(key=>Object.hasOwn(row,key)).map(key=>[key,row[key]])));
+  return new Response(JSON.stringify(projected),{status:response.status,headers});
+}
 async function profileExists(profileId) {
   const rows = await backendJson('/rest/v1/perfiles?id=eq.' + id(profileId) + '&select=id,baneado&limit=1');
   return Array.isArray(rows) && rows.length===1 && rows[0].baneado!==true;
@@ -104,7 +138,7 @@ async function authRpc(name, request, context) {
     if(context?.waitUntil)context.waitUntil(task);else await task;
   }
   // The legacy response shape remains intact; cookie is the only authority.
-  return json(200,user,{'Set-Cookie':session.cookie});
+  return json(200,{...user,disciplinas:session.user.disciplinas??null,perfil_revision:session.user.perfil_revision},{'Set-Cookie':session.cookie});
 }
 async function storage(request, route, user) {
   if(request.method!=='POST')return fail(405);
@@ -188,14 +222,22 @@ async function write(table, route, request, user, context) {
     if(!await rate(request,'ad',5,300))return fail(429);
     const allowed=COLUMNS.anuncios.split(',').filter(field=>!['id','created_at','vistas','oculto','oculto_at','vencido_at'].includes(field));
     if(!only(payload,allowed) || !same(payload.user_id,user) || !['busco','ofrezco','clases','jam','vende'].includes(payload.tipo) || !str(payload.titulo,300) || !payload.titulo.trim() || (user.tipo_cuenta==='visitante'&&!['jam','vende'].includes(payload.tipo)))return fail(403);
-    for(const [key,value] of Object.entries(payload)) { if(value!==null && typeof value==='string' && !str(value,8000))return fail(400); }
+    if(!['artista','negocio','visitante'].includes(user.tipo_cuenta))return fail(403);
+    for(const [key,value] of Object.entries(payload)) {
+      if(['user_id','estado'].includes(key))continue;
+      if(key==='precio_num') { if(value!==null && (typeof value!=='number'||!Number.isFinite(value)||value<0||value>1e12))return fail(400); }
+      else if(key==='campos_especificos') { try { detailObject(value); }catch{return fail(400);} }
+      else if(value!==null && !str(value,8000))return fail(400);
+    }
+    if(payload.fecha_evento!==undefined && payload.fecha_evento!==null && payload.fecha_evento!=='' && (!/^\d{4}-\d{2}-\d{2}T/.test(payload.fecha_evento)||!Number.isFinite(Date.parse(payload.fecha_evento))))return fail(400);
     for(const key of ['foto_url','foto_url_2','foto_url_3'])if(payload[key]) {
-      try { const photo=new URL(payload[key]);if(photo.origin!=='https://xiaanchoanxmampegoay.supabase.co' || !photo.pathname.startsWith('/storage/v1/object/public/fotos-anuncios/'+uid+'-') || photo.search || photo.hash)return fail(403); }catch{return fail(400);}
+      try { const photo=new URL(payload[key]);const prefix='/storage/v1/object/public/fotos-anuncios/'+uid+'-';if(photo.origin!=='https://xiaanchoanxmampegoay.supabase.co' || photo.username || photo.password || !photo.pathname.startsWith(prefix) || !/^[A-Za-z0-9-]+\.(?:jpg|jpeg|png|webp)$/.test(photo.pathname.slice(prefix.length)) || photo.search || photo.hash)return fail(403); }catch{return fail(400);}
     }
     if(payload.rubro_buscado && !RUBROS.has(payload.rubro_buscado))return fail(400);
     if(user.tipo_cuenta!=='artista' && payload.tipo!=='vende' && !RUBROS.has(payload.rubro))return fail(400,'Elegí la comunidad a la que se dirige el anuncio.');
+    if(user.tipo_cuenta==='artista' && payload.tipo!=='vende' && !belongsTo(user,payload.rubro??user.rubro))return fail(403,'Elegí una disciplina de tu perfil para publicar.');
     payload.user_id=uid;payload.estado='activo';
-    payload.rubro=user.tipo_cuenta==='artista'?user.rubro:(payload.tipo==='vende'?null:payload.rubro);
+    payload.rubro=payload.tipo==='vende'?null:(user.tipo_cuenta==='artista'?(payload.rubro??user.rubro):payload.rubro);
     return responseFor('/rest/v1/anuncios',request,'POST',payload);
   }
   return fail(405);
@@ -246,10 +288,10 @@ export default async function datos(request, context) {
     }
     if(!table || !Object.hasOwn(COLUMNS,table))return fail(403);
     if(mutating)return await write(table,route,request,user,context);
-    const privateColumns=table==='perfiles'&&user?['email']:table==='reacciones'?['user_id']:[];
+    const privateColumns=table==='perfiles'?[...(user?['email']:[]),'rubro_principal']:table==='reacciones'?['user_id']:[];
     const params=query(route.search,table,privateColumns);
     if(table==='perfiles') {
-      if(privateColumns.length)params.set('id','eq.'+id(user.id));
+      if(user)params.set('id','eq.'+id(user.id));
       andFilter(params,'or(baneado.is.null,baneado.eq.false)');
     }
     if(table==='mensajes')andFilter(params,'or(de_user_id.eq.'+id(user.id)+',para_user_id.eq.'+id(user.id)+')');
@@ -270,6 +312,7 @@ export default async function datos(request, context) {
         globalThis.__baExpiryAt=Date.now(); await backend('/rest/v1/rpc/vencer_anuncios_viejos',{method:'POST',body:'{}'});
       }
     }
+    if(table==='perfiles')return await profileResponse(params,request);
     return await responseFor('/rest/v1/'+table+'?'+params,request);
   } catch { return fail(503); }
 }

@@ -1,0 +1,39 @@
+/* A visible native pointer is the baseline, including when JavaScript fails.
+   Descendants inherit their control's semantics instead of legacy cursor:none. */
+html body { cursor:auto!important; }
+html body * { cursor:inherit!important; }
+html body :is(a[href],button,summary,label[for],select,[role="button"],[role="link"],[onclick],.nav-avatar-wrap,.conv-item,.anuncio) { cursor:pointer!important; }
+html body :is(input,textarea,[contenteditable=""],[contenteditable="true"],[role="textbox"]) { cursor:text!important; }
+html body :is(input[type="button"],input[type="submit"],input[type="reset"],input[type="checkbox"],input[type="radio"],input[type="range"],input[type="color"],input[type="file"],input[type="image"]) { cursor:pointer!important; }
+html body [draggable="true"] { cursor:grab!important; }
+html body :is([disabled],[aria-disabled="true"],fieldset[disabled] input,fieldset[disabled] button,fieldset[disabled] select,fieldset[disabled] textarea) { cursor:not-allowed!important; }
+html body [aria-busy="true"] { cursor:progress!important; }
+
+/* Unique IDs do not revive or clash with the legacy hidden cursor controllers. */
+#ba-cursor,
+#ba-cursor * { pointer-events:none!important; user-select:none!important; }
+#ba-cursor {
+  display:none!important; position:fixed; top:0; left:0;
+  width:34px; height:34px; border:1.5px solid var(--neon,#d4f53c);
+  border-radius:50%; background:rgba(11,15,10,.13);
+  box-shadow:0 0 0 1px rgba(6,8,5,.85),0 0 0 2px rgba(241,238,230,.2);
+  z-index:2147483647; transform:translate3d(-100px,-100px,0) translate(-50%,-50%);
+  contain:layout style; opacity:1; visibility:visible;
+}
+#ba-cursor[data-ba-cursor-visible="true"]:not([hidden]) { display:block!important; }
+#ba-cursor[data-ba-cursor-interactive="true"] { width:42px;height:42px;background:rgba(212,245,60,.08); }
+#ba-cursor-dot {
+  position:absolute; top:50%;left:50%;width:4px;height:4px;
+  border-radius:50%;background:var(--neon,#d4f53c);
+  box-shadow:0 0 0 1px #10150d;transform:translate(-50%,-50%);
+}
+
+/* Hide the native pointer only on the exact, currently rendered mouse target.
+   New/changed DOM targets retain their native pointer before JS can respond. */
+@media (hover:hover) and (pointer:fine) and (min-width:901px) and (prefers-reduced-motion:no-preference) and (forced-colors:none) {
+  html[data-ba-cursor-active="true"]:has(#ba-cursor[data-ba-cursor-visible="true"]:not([hidden])) body[data-ba-cursor-hit="true"],
+  html[data-ba-cursor-active="true"]:has(#ba-cursor[data-ba-cursor-visible="true"]:not([hidden])) body [data-ba-cursor-hit="true"] { cursor:none!important; }
+}
+@media (hover:none), (pointer:coarse), (max-width:900px), (prefers-reduced-motion:reduce), (forced-colors:active) {
+  #ba-cursor { display:none!important; }
+}

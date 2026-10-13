@@ -7,9 +7,9 @@ const {chromium}=require(process.env.BUSCARTE_PLAYWRIGHT_MODULE||'playwright');
 const root=path.resolve(__dirname,'..'),origin='http://127.0.0.1:4196';
 const published=JSON.parse(fs.readFileSync(path.join(root,'site-files.json'),'utf8'));
 const sources=new Map(published.map(file=>[file,fs.readFileSync(path.join(root,file))]));
-const initial={id:210,nombre:'Persona sintética',email:'qa@example.invalid',tipo_cuenta:'artista',rubro:'musica',instrumento:'Batería',generos:'Rock, Pop',referentes:'',bio:'Presentación sintética.',provincia:'CABA',ciudad:'Buenos Aires (CABA)',barrio:'Almagro',campos_especificos:null,foto_url:null};
-let browser;
-before(async()=>{browser=await chromium.launch({headless:true,channel:process.platform==='win32'?'msedge':undefined});});
+const initial={id:210,nombre:'Persona sintética',email:'qa@example.invalid',tipo_cuenta:'artista',rubro:'musica',instrumento:'Batería',generos:'Rock, Pop',referentes:'',bio:'Presentación sintética.',provincia:'CABA',ciudad:'Buenos Aires (CABA)',barrio:'Almagro',campos_especificos:null,foto_url:null,disciplinas:null,perfil_revision:0};
+let browser,serverMD;
+before(async()=>{serverMD=await import('../netlify/lib/disciplinas.mjs');browser=await chromium.launch({headless:true,channel:process.platform==='win32'?'msedge':undefined});});
 after(async()=>{await browser?.close();});
 async function setup(t,{file='buscARTE_perfil.html',width=390,signed=true,cached=true,type='artista',rubro='musica',signupFailure=null}={}) {
   const context=await browser.newContext({viewport:{width,height:844},isMobile:width<768,hasTouch:width<768,serviceWorkers:'block'});
@@ -36,7 +36,7 @@ async function setup(t,{file='buscARTE_perfil.html',width=390,signed=true,cached
       assert.equal(body.email,undefined);assert.equal(body.password,undefined);assert.equal(String(body.profileId),'210');
       if(state.failSave||!state.user)return reply({error:'Sesión vencida'},401);
       if(body.operation==='verify')return reply([{id:210}]);
-      state.profile={...state.profile,...body.changes};state.user={...state.user,...body.changes};return reply([state.profile]);
+      state.profile={...state.profile,...serverMD.prepareProfileChanges(state.profile,body.changes,body.expectedRevision)};state.user={...state.profile};return reply([state.profile]);
     }
     if(url.origin===origin&&url.pathname==='/.netlify/functions/reset-password'){
       const body=request.postDataJSON();state.calls.push({path:'reset-password',method,body});
@@ -77,7 +77,7 @@ for(const width of [320,390,1280])test('cookie-only edit saves and reloads genre
   await f.page.locator('#save-bar .btn-neon').click();await f.page.waitForFunction(()=>!isSavingProfile);
   assert.match(await f.page.locator('#profile-status').innerText(),/guardado correctamente/);
   assert.equal(await f.page.locator('#profile-reauth-dialog').count(),0);
-  const writes=f.state.calls.filter(call=>call.path==='guardar-perfil');assert.equal(writes.length,1);assert.equal(writes[0].body.changes.generos,'Jazz, Pop');
+  const writes=f.state.calls.filter(call=>call.path==='guardar-perfil');assert.equal(writes.length,1);assert.equal(writes[0].body.changes.disciplinas.details.musica.generos,'Jazz, Pop');assert.equal(writes[0].body.expectedRevision,0);
   await f.page.reload();await f.page.waitForFunction(()=>!isLoadingProfile&&!!perfilCargado);assert.deepEqual(await f.page.locator('#chips-gen .selected').allTextContents(),['Jazz','Pop']);
   assert.ok(await f.page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
 });

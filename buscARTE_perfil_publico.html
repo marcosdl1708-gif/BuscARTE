@@ -2,6 +2,7 @@
 <html lang="es" data-ba-design="a2">
 <head>
 <script src="/assets/js/sesion-segura.js"></script>
+  <script src="/assets/js/disciplinas.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- SEO: canónica única por id. Resuelve "Duplicada sin canónica" en GSC.
@@ -762,6 +763,15 @@
   body[data-profile-state="own"] .profile-body { grid-template-columns:minmax(0,1fr); }
   #contact-card { scroll-margin-top:80px; }
 </style>
+<style>
+  .md-profile-section[hidden] {display:none!important;}
+  .md-profile-chips {display:flex;flex-wrap:wrap;gap:8px;margin:15px 0;}
+  .md-profile-chips a {min-height:44px;display:inline-flex;align-items:center;white-space:normal;max-width:100%;}
+  .md-profile-card {border-left:2px solid var(--neon);padding:14px 16px;margin:14px 0;scroll-margin-top:110px;min-width:0;}
+  .md-profile-card h3 {font-size:1rem;margin-bottom:10px;}
+  .md-profile-card p {color:var(--gris);font-size:.85rem;line-height:1.65;overflow-wrap:anywhere;margin:6px 0;}
+  .md-profile-card strong {color:var(--blanco);font-weight:500;}
+</style>
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0a0a0a">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -772,6 +782,7 @@
 <style>html:not([data-music-tools="true"]) a[href*="buscarte_generador" i] { display: none !important; }</style>
 <script src="/assets/js/menu-cuenta.js"></script>
 <link rel="stylesheet" href="/assets/css/escena.css">
+<link rel="stylesheet" href="/assets/css/cursor.css">
 </head>
 <body data-profile-state="loading">
 
@@ -895,6 +906,13 @@
       <p class="bio-text" id="perfil-bio-text">—</p>
     </div>
 
+    <section class="section md-profile-section" id="md-profile" hidden aria-labelledby="md-profile-title">
+      <h2 class="section-title" id="md-profile-title">Sus disciplinas</h2>
+      <p id="md-profile-note" class="bio-text"></p>
+      <div class="md-profile-chips" id="md-profile-links"></div>
+      <div id="md-profile-cards"></div>
+    </section>
+
     <div class="section">
       <div class="section-title" id="section-title-generos"><span class="icon">🎵</span> Géneros</div>
       <div class="generos-grid" id="perfil-generos">—</div>
@@ -956,6 +974,40 @@
   let perfilCargaVersion = 0;
   let perfilObjetivoId = '';
   let ultimoEspectador = sesionPerfilId();
+
+  function renderDisciplinasPublicas(p) {
+    const section=document.getElementById('md-profile');
+    const md=window.BuscARTEDisciplinas.read(p);
+    section.hidden=md.selected.length<2 || (p.tipo_cuenta && p.tipo_cuenta !== 'artista');
+    if (section.hidden) return;
+    const context=new URLSearchParams(location.search).get('rubro');
+    const main=window.BuscARTEDisciplinas.primary(p);
+    const validContext=md.selected.includes(context) ? context : main;
+    document.getElementById('md-profile-note').textContent=(validContext!==main ? 'Encontraste este perfil en '+window.BuscARTEDisciplinas.labels[validContext]+'. ' : '')+'Su disciplina principal es '+window.BuscARTEDisciplinas.labels[main]+'. Una persona, un mismo contacto.';
+    const links=document.getElementById('md-profile-links');links.replaceChildren();
+    const cards=document.getElementById('md-profile-cards');cards.replaceChildren();
+    const names={instrumento:'Instrumentos, voz o roles',generos:'Géneros',referentes:'Referentes',disponibilidad:'Disponible para',donde_ensaya:'Ensayo',experiencia:'Experiencia',rol:'Rol',tipo_escena:'Tipo de escena',especialidad:'Especialidad',formato:'Formato',tipo_trabajo:'Tipo de trabajo',genero:'Género',estilo:'Estilo',soporte:'Soporte',color:'Color',promo:'Promociones',disciplina:'Estilos de danza',nivel:'Nivel',modalidad:'Modalidad'};
+    const valueText=value=>Array.isArray(value)?value.join(', '):value && typeof value==='object'?JSON.stringify(value):String(value ?? '');
+    const readable=value=>value!=null && valueText(value).trim()!=='' && valueText(value)!=='[]' && valueText(value)!=='{}';
+    for (const key of md.selected) {
+      const link=document.createElement('a');link.href='#md-public-'+key;link.className='genero-chip';link.textContent=window.BuscARTEDisciplinas.labels[key]+(key===main?' · Principal':'');links.append(link);
+      const card=document.createElement('section');card.className='md-profile-card';card.id='md-public-'+key;card.dataset.disciplina=key;
+      const title=document.createElement('h3');title.textContent=window.BuscARTEDisciplinas.labels[key]+(key===main?' · Principal':'');card.append(title);
+      const detail=md.details[key];let count=0;
+      const row=(field,value)=>{if(!readable(value))return;const line=document.createElement('p');const label=document.createElement('strong');label.textContent=(names[field]||field)+': ';line.append(label,document.createTextNode(valueText(value)));card.append(line);count++;};
+      if(key==='musica')for(const field of ['instrumento','generos','referentes','donde_ensaya'])row(field,detail[field]);
+      const aliasMap=Object.fromEntries(Object.entries(CAMPO_LEGACY_IDS[key] || {}).flatMap(([canonical,aliases])=>aliases.map(alias=>[alias,canonical])));
+      const fields=detail.campos_especificos || {};
+      const rendered=new Set();
+      for(const [field,value]of Object.entries(fields)) {const canonical=aliasMap[field]||field;if(rendered.has(canonical) || (canonical!==field && Object.hasOwn(fields,canonical)))continue;rendered.add(canonical);row(canonical,value);}
+      row('disponibilidad',detail.disponibilidad);
+      if(detail.experiencia!=null)row('experiencia',detail.experiencia===0?'Está comenzando':detail.experiencia+(detail.experiencia===1?' año':' años'));
+      if(!count){const empty=document.createElement('p');empty.textContent='Los detalles de esta disciplina todavía no están completos.';card.append(empty);}
+      cards.append(card);
+    }
+    // La principal conserva el banner; los namespaces completos reemplazan las secciones duplicadas.
+    for(const id of ['perfil-generos','perfil-disponibilidad','section-referentes']) {const node=document.getElementById(id);const block=node?.classList.contains('section')?node:node?.closest('.section');if(block)block.style.display='none';}
+  }
 
   function objetivoPerfilId() {
     const params = new URLSearchParams(location.search);
@@ -1040,36 +1092,44 @@
   let saved = false;
   // GUARDAR / DESGUARDAR PERFIL
   let yaGuardado = false
+  let guardandoPerfil = false
 
   async function toggleSave() {
+    if (guardandoPerfil) return
     actualizarAccionesPerfil()
     if (!perfilAjenoDisponible()) return
     const miId = sesionPerfilId()
     if (!miId) { window.location.href = 'buscARTE_login.html'; return }
     const perfilId = normalizarPerfilId(perfilCargado.id)
     const btn = document.getElementById('save-btn')
-
+    guardandoPerfil=true;btn.disabled=true
+    try {
     if (yaGuardado) {
-      await fetch(`${SUPABASE_URL}/rest/v1/perfiles_guardados?user_id=eq.${miId}&perfil_id=eq.${perfilId}`, {
+      const response=await fetch(`${SUPABASE_URL}/rest/v1/perfiles_guardados?user_id=eq.${miId}&perfil_id=eq.${perfilId}`, {
         method: 'DELETE', headers: hdrs
       })
+      if (!response.ok) throw new Error('No pudimos quitar el perfil de guardados.')
       if (sesionPerfilId() !== miId || normalizarPerfilId(perfilCargado?.id) !== perfilId || esPerfilPropio()) return
       yaGuardado = false
       btn.textContent = '♡ Guardar perfil'
       btn.style.background = ''
       btn.style.color = ''
     } else {
-      await fetch(`${SUPABASE_URL}/rest/v1/perfiles_guardados`, {
+      const response=await fetch(`${SUPABASE_URL}/rest/v1/perfiles_guardados`, {
         method: 'POST',
         headers: { ...hdrs, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
         body: JSON.stringify({ user_id: parseInt(miId), perfil_id: parseInt(perfilId) })
       })
+      if (!response.ok) throw new Error('No pudimos confirmar el perfil guardado.')
       if (sesionPerfilId() !== miId || normalizarPerfilId(perfilCargado?.id) !== perfilId || esPerfilPropio()) return
       yaGuardado = true
       btn.textContent = '♥ Guardado'
       btn.style.background = 'rgba(255,85,85,.15)'
       btn.style.color = '#ff5555'
     }
+    } catch (_) {
+      if (sesionPerfilId()===miId && normalizarPerfilId(perfilCargado?.id)===perfilId) {btn.textContent=yaGuardado?'No se quitó · Reintentar':'No se guardó · Reintentar';btn.setAttribute('aria-live','polite');}
+    } finally {guardandoPerfil=false;btn.disabled=false}
   }
 
   async function compartirPerfil() {
@@ -1209,11 +1269,11 @@
   // Alias históricos del editor/registro, separados por rubro para no mezclar roles.
   const CAMPO_LEGACY_IDS = {
     actuacion: { rol:['chips-rol-act','chips-rol-actuacion'], tipo_escena:['chips-escena','chips-tipo-escena'] },
-    audiovisual: { rol:['chips-rol-av'], especialidad:['chips-esp-av'] },
+    audiovisual: { rol:['chips-rol-av'], especialidad:['chips-esp-av'], formato:['chips-formato-av'] },
     modelaje: { tipo_trabajo:['chips-tipo-modelo'], genero:['chips-genero-modelo'] },
-    diseno: { rol:['chips-rol-dis','chips-rol-diseno'], estilo:['chips-estilo-dis','chips-estilo-diseno'] },
-    tatuaje: { rol:['chips-rol-tatu'], estilo:['chips-estilo-tatu'] },
-    danza: { rol:['chips-rol-dan','chips-rol-danza'], disciplina:['chips-disc-dan','chips-disciplina-danza'] },
+    diseno: { rol:['chips-rol-dis','chips-rol-diseno'], estilo:['chips-estilo-dis','chips-estilo-diseno'], soporte:['chips-soporte-dis'] },
+    tatuaje: { rol:['chips-rol-tatu'], estilo:['chips-estilo-tatu'],color:['chips-color-tatu'],promo:['promo-field'] },
+    danza: { rol:['chips-rol-dan','chips-rol-danza'], disciplina:['chips-disc-dan','chips-disciplina-danza'],nivel:['chips-nivel-dan','chips-nivel-danza'] },
     maquillaje: { rol:['chips-rol-maq'], especialidad:['chips-esp-maq'] },
     circo: { especialidad:['chips-rol-cir','chips-rol-circo'], modalidad:['chips-mod-cir','chips-modalidad-circo'] },
     escritura: { rol:['chips-rol-esc','chips-rol-escritura'], formato:['chips-formato-esc','chips-formato-escritura'] },
@@ -1374,7 +1434,7 @@
   // instrumento/rubro/stats/resumen IA ni secciones artísticas. Solo identidad y contacto.
   function renderPerfilVisitante(p) {
     const instEl = document.getElementById('perfil-instrumento')
-    if (instEl) instEl.textContent = 'Usuario de buscARTE'
+    if (instEl) instEl.textContent = p.tipo_cuenta==='negocio' ? (p.rubro || 'Negocio / espacio') : 'Usuario de buscARTE'
     // Resumen IA: no aplica a un visitante sin datos artísticos
     const aiLabel = document.querySelector('.ai-label')
     if (aiLabel) aiLabel.style.display = 'none'
@@ -1429,7 +1489,7 @@
 
     try {
       // Solicitar sólo presentación; nunca descargar hashes o tokens de recuperación.
-      const fields = 'id,nombre,instrumento,generos,provincia,ciudad,barrio,bio,referentes,disponibilidad,donde_ensaya,redes,videos,es_premium,foto_url,celular,baneado,experiencia,edad,genero_principal,tipo_cuenta,rubro,campos_especificos'
+      const fields = 'id,nombre,instrumento,generos,provincia,ciudad,barrio,bio,referentes,disponibilidad,donde_ensaya,redes,videos,es_premium,foto_url,celular,baneado,experiencia,edad,genero_principal,tipo_cuenta,rubro,campos_especificos,disciplinas,perfil_revision'
       const res = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${encodeURIComponent(id)}&select=${fields}`, { headers: hdrs })
       if (!res.ok) throw new Error('No se pudo cargar el perfil: ' + res.status)
       const [p] = await res.json()
@@ -1465,15 +1525,16 @@
       // visto. Usarlo hacía que un perfil ajeno heredara la disciplina del espectador
       // (p.ej. un visitante sin rubro se mostraba como "Músico" si lo miraba un músico).
       const urlRubro = new URLSearchParams(window.location.search).get('rubro')
-      const rubro = p.rubro || urlRubro || 'musica'
+      const rubro = window.BuscARTEDisciplinas.primary(p) || ''
 
       // Un visitante no es artista: no tiene instrumento/rubro/stats. Render mínimo y honesto.
-      if (p.tipo_cuenta === 'visitante') {
+      if (p.tipo_cuenta && p.tipo_cuenta !== 'artista') {
         renderPerfilVisitante(p)
       } else {
         // Aplicar color, secciones y labels según rubro
         aplicarRubroPerfil(rubro, p)
       }
+      renderDisciplinasPublicas(p)
 
       // Hero background name
       const heroBg = document.getElementById('hero-bg-name')
@@ -1591,23 +1652,16 @@
       document.querySelector('.match-big').style.display = 'none'
       document.querySelector('.match-big-label').style.display = 'none'
       actualizarAccionesPerfil()
-      let miReferentes = leerCachePerfil('ba_referentes') || ''
-      let miGeneros = leerCachePerfil('ba_generos') || ''
-      // Si no está en localStorage, intentar cargar desde Supabase
-      if (!miReferentes && leerCachePerfil('ba_user_id')) {
-        try {
-          const miRes = await fetch(`${SUPABASE_URL}/rest/v1/perfiles?id=eq.${leerCachePerfil('ba_user_id')}&select=referentes,generos`, { headers: hdrs })
-          const [miP] = await miRes.json()
-          if (request !== perfilCargaVersion) return
-          if (miP) { miReferentes = miP.referentes||''; miGeneros = miP.generos||'' }
-        } catch(e) {}
-      }
+      const miMusica=window.BuscARTEDisciplinas.project(window.BuscARTEDisciplinas.own() || {},'musica')
+      const suMusica=window.BuscARTEDisciplinas.project(p,'musica')
+      const miReferentes=miMusica?.referentes || ''
+      const miGeneros=miMusica?.generos || ''
       const afinidadEl = document.querySelector('.match-big')
-      if (afinidadEl && p.id !== parseInt(leerCachePerfil('ba_user_id'))) {
+      if (afinidadEl && miMusica && suMusica && p.id !== parseInt(leerCachePerfil('ba_user_id'))) {
         const misRef = miReferentes.toLowerCase().split(',').map(r=>r.trim()).filter(Boolean)
-        const susRef = (p.referentes||'').toLowerCase().split(',').map(r=>r.trim()).filter(Boolean)
+        const susRef = (suMusica.referentes||'').toLowerCase().split(',').map(r=>r.trim()).filter(Boolean)
         const misGen = miGeneros.toLowerCase().split(',').map(g=>g.trim()).filter(Boolean)
-        const susGen = (p.generos||'').toLowerCase().split(',').map(g=>g.trim()).filter(Boolean)
+        const susGen = (suMusica.generos||'').toLowerCase().split(',').map(g=>g.trim()).filter(Boolean)
         let pts = 0
         misRef.forEach(r => { if (susRef.some(sr => sr.includes(r) || r.includes(sr))) pts += 2 })
         misGen.forEach(g => { if (susGen.includes(g)) pts += 1 })
@@ -1979,5 +2033,6 @@ if ('serviceWorker' in navigator) {
 </script>
 <script src="/assets/js/escena.js"></script>
 <script src="/assets/js/escena-fondos.js"></script>
+<script src="/assets/js/cursor.js"></script>
 </body>
 </html>
