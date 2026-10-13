@@ -33,6 +33,7 @@ function existingFiles(directory, prefix = '') {
     const relative = prefix + name;
     const stat = fs.lstatSync(path.join(directory, name));
     if (stat.isSymbolicLink()) throw new Error(`Unexpected link in dist: ${relative}`);
+    if (relative === 'netlify.toml' && !stat.isFile()) throw new Error(`Unexpected filesystem entry in dist: ${relative}`);
     if (stat.isDirectory()) result.push(...existingFiles(path.join(directory, name), relative + '/'));
     else if (stat.isFile()) {
       if (stat.nlink > 1) throw new Error(`Unexpected hard link in dist: ${relative}`);
@@ -41,6 +42,25 @@ function existingFiles(directory, prefix = '') {
     else throw new Error(`Unexpected filesystem entry in dist: ${relative}`);
   }
   return result;
+}
+
+function quarantineCachedNetlifyConfig(root, output) {
+  // Netlify post-processing can leave its generated config in cached dist.
+  // Keep it recoverable outside publication; never clean arbitrary output.
+  const source = checkedPath(output, 'netlify.toml');
+  const stat = fs.lstatSync(source);
+  if (!stat.isFile() || stat.isSymbolicLink() || stat.nlink !== 1) {
+    throw new Error('Cached Netlify config must be a regular single-link file.');
+  }
+  const parent = checkedPath(root, '.netlify/build-quarantine');
+  fs.mkdirSync(parent, { recursive: true });
+  // Revalidate ancestors after mkdir as well. A unique destination prevents
+  // overwriting an earlier quarantine or another task's recoverable file.
+  checkedPath(root, '.netlify/build-quarantine');
+  const directory = fs.mkdtempSync(path.join(parent, 'cached-dist-config-'));
+  const destination = checkedPath(directory, 'netlify.toml');
+  fs.renameSync(source, destination);
+  return destination;
 }
 
 // No network calls, HTML transformations or recursive deletion. Only the explicit
@@ -60,11 +80,16 @@ export function buildSite(sourceRoot = projectRoot) {
     return { relative, bytes: fs.readFileSync(source) };
   });
 
-  // Fail closed if previous output contains anything not explicitly approved.
-  // Do not automatically delete files that could belong to another task.
-  for (const relative of existingFiles(output)) {
-    if (!allowed.has(relative.toLowerCase())) {
-      throw new Error(`Unexpected file in dist: ${relative}. Review this generated folder before rebuilding.`);
+  // Scan ALL output before making any changes, including symlinks/hard links.
+  // Only trusted Netlify CI may quarantine its exact generated config; local
+  // builds and any other unknown output remain fail-closed and untouched.
+  const unexpected = existingFiles(output).filter(relative => !allowed.has(relative.toLowerCase()));
+  let quarantinedConfig;
+  if (unexpected.length) {
+    if (process.env.NETLIFY === 'true' && unexpected.length === 1 && unexpected[0] === 'netlify.toml') {
+      quarantinedConfig = quarantineCachedNetlifyConfig(root, output);
+    } else {
+      throw new Error(`Unexpected file in dist: ${unexpected[0]}. Review this generated folder before rebuilding.`);
     }
   }
   fs.mkdirSync(output, { recursive: true });
@@ -77,10 +102,11 @@ export function buildSite(sourceRoot = projectRoot) {
     }
   }
   if (existingFiles(output).length !== entries.length) throw new Error('Unexpected final publication file count.');
-  return { output, files: entries.length };
+  return { output, files: entries.length, ...(quarantinedConfig ? { quarantinedConfig } : {}) };
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const result = buildSite();
+  if (result.quarantinedConfig) console.log(`Retained cached Netlify config outside publish at ${result.quarantinedConfig}`);
   console.log(`Verified ${result.files} public files in ${result.output}`);
 }
