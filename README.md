@@ -3,7 +3,13 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
-## Estado operativo — cursor y multidisciplina, 13/10/2026
+## Estado operativo — cursor continuo y filtros, 13/10/2026
+
+Publicado a las 19:28 ART: fuente `98b07bf5dea663f8aee5f29f25483c63641ab22b`, deploy `6aceb0967c1d2013614da922`, caché v26, 69 archivos públicos. El círculo de escritorio ahora lo dibuja el navegador, sin alternancia por movimiento/click/scroll/menú; campos y preferencias de accesibilidad conservan el cursor nativo. “Rubro” queda a 16 px del separador en Anuncios; Artistas también comprobado. A2, colores y mobile preservados.
+
+105/105 pruebas de cursor, 125/125 de filtros y build26 aprobados. Dominio publicado: 68 recursos, 35 rutas y cuatro exclusiones verificadas. Siete funciones Node 24 con digests idénticos y ambos cron sin cambios. Sin nuevas escrituras, cuentas, anuncios, correos, esquema ni cambios de multidisciplina. Ver `docs/release-cursor-filtros-final-20261013.md`. Guía ajena/preview conservados y excluidos. Cierre documental con `[skip netlify]`, sin otro deploy.
+
+## Histórico — cursor y multidisciplina, 13/10/2026
 
 Publicado a las 18:51 ART: fuente `3731821a0fce409b6946202d7d04d734f425d6cf`, deploy `6acea7bc84635ed9a960b4a6`, caché v25, 69 archivos públicos. Cursor circular de escritorio restaurado con respaldo nativo; en móviles, campos de texto y preferencias de accesibilidad se conserva el comportamiento nativo. Las 19 páginas mantienen A2 y las diez identidades por rubro.
 
