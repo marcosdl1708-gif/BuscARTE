@@ -3,7 +3,17 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
-## Estado operativo — A2 y sesiones seguras, 13/10/2026
+## Estado operativo — cursor y multidisciplina, 13/10/2026
+
+Publicado a las 18:51 ART: fuente `3731821a0fce409b6946202d7d04d734f425d6cf`, deploy `6acea7bc84635ed9a960b4a6`, caché v25, 69 archivos públicos. Cursor circular de escritorio restaurado con respaldo nativo; en móviles, campos de texto y preferencias de accesibilidad se conserva el comportamiento nativo. Las 19 páginas mantienen A2 y las diez identidades por rubro.
+
+Multidisciplina real, no demo: una cuenta/ID, una principal, detalles separados. Búsquedas contextuales, perfiles públicos, guardados y publicación desde una disciplina secundaria; anuncios históricos y Marketplace no se reclasifican. Guardado atómico con revisión y conflicto 409 sin descartar el borrador. Las 332 cuentas existentes no se convirtieron ni reescribieron. Migraciones remotas aditivas `20261013213500` y `20261013213526`; **no ejecutar db push/pull ni importar Auth histórico**.
+
+Auditoría frontend/browser + servidor + SQL temporal y prueba real acotada aprobadas. Cinco anuncios de prueba publicados y pausados; cuenta y anuncios eliminados mediante el flujo autenticado propio al finalizar. Cero datos QA retenidos, cero correos/contactos/subidas de prueba. Comparaciones agregadas de perfiles/artes/anuncios y conteos de chats coinciden antes/después. Siete funciones Node 24 y dos cron intactos, 68 recursos/35 rutas/4 exclusiones comprobados en producción. Ver `docs/release-multidisciplina-cursor-20261013.md`.
+
+La conversión a Supabase Auth es una alternativa futura, **no un requisito pendiente del login actual**: las sesiones seguras HttpOnly ya funcionan con las cuentas existentes. Validación física de la app/teclado y captcha humano real siguen a cargo de testers; pasos incrementales en el informe. Guía ajena intacta/excluida. Este cierre documental lleva `[skip netlify]` para no duplicar el deploy.
+
+## Histórico — A2 y sesiones seguras, 13/10/2026
 
 Publicado a las 18:01 ART: fuente `82fcdbf91b294c881eaf22105d3c2119606a756a`, deploy `6ace9c13d1532ff6e861b174`, caché v24. A2 está en las 19 páginas; el fondo conserva la pintura pero es fijo, sin el control de movimiento. Construcción explícita: 66 archivos en `dist/`, sin controles/datos de demo, PNG originales, prompts, pruebas ni documentos privados. Preview A/B/C y prototipo multidisciplina quedan fuera del paquete. Ver `docs/release-a2-sesiones-20261013.md` y `docs/prueba-cierre-a2-20261013.md`.
 
