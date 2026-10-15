@@ -38,6 +38,40 @@ test('privacy has consistent disclosures, distinct opt-ins, moderation scope and
   assert.equal(f.state.calls.some(call=>!['GET','HEAD'].includes(call.method)),false,'opening a deletion request never deletes or sends anything');
   await f.page.screenshot({path:path.join(output,'delete-request-320.png'),animations:'disabled'});
 });
+for(const width of [320,390])test(`${width}px: retention policy states Gmail opt-in limits and manual backup review without a blanket purge promise`,async t=>{
+  const f=await setup(t,{route:'buscARTE_privacidad.html#conservacion',width,height:844});
+  const section=f.page.locator('#conservacion');await section.waitFor({state:'visible'});
+  assert.equal(await section.locator('h2').textContent(),'Conservación de correos y respaldos');
+  const text=(await section.textContent()).replace(/\s+/g,' ').trim();
+  assert.match(text,/Gmail/u,'identify the mailbox provider, not a universal deletion mechanism');
+  for(const term of ['a partir de 60 días completos desde el cierre registrado','otros 30 días',
+    'revisión manual','No hay una rotación automática general','no se usan para reactivar una cuenta eliminada'])
+    assert(text.includes(term),term);
+  assert.match(text,/(?:no|sin)[^.!?]*\b90\b|\b90\b[^.!?]*(?:no|sin)[^.!?]*(?:garant|máxim|exact)/iu,
+    '90 days must be explicitly qualified, not promised as an absolute maximum');
+  const backupSentences=text.split(/[.!?](?:\s|$)/u).filter(sentence=>/respaldo|resguardo|copia de seguridad/iu.test(sentence));
+  for(const sentence of backupSentences) {
+    const positiveThirtyDayPromise=/\b30\b[^.!?]*(?:máxim|garanti|rotaci)|(?:máxim|garanti|rotaci)[^.!?]*\b30\b/iu.test(sentence);
+    assert(!positiveThirtyDayPromise||/\bno\b|sin|pendiente/iu.test(sentence),
+      'manual backup review must not silently become a guaranteed 30-day rotation');
+  }
+  await section.scrollIntoViewIfNeeded();
+  const layout=await section.evaluate(node=>({
+    viewport:innerWidth,documentWidth:document.documentElement.scrollWidth,
+    rects:[node,...node.querySelectorAll('h2,p,li,a')].flatMap(element=>Array.from(element.getClientRects(),
+      rect=>({left:rect.left,right:rect.right,width:rect.width}))).filter(rect=>rect.width>0)
+  }));
+  assert(layout.documentWidth<=layout.viewport+1,'retention copy does not create horizontal page overflow');
+  assert(layout.rects.every(rect=>rect.left>=-1&&rect.right<=layout.viewport+1),'retention paragraphs and links fit the mobile viewport');
+  await f.page.screenshot({path:path.join(output,`conservacion-${width}.png`),animations:'disabled'});
+  const contact=section.locator('a').filter({hasText:/Contacto/iu}).first();
+  assert.equal(await contact.count(),1,'a public contact route remains reachable from the retention explanation');
+  const href=await contact.getAttribute('href');assert.equal(new URL(href,origin).pathname,'/buscARTE_contacto.html');
+  await contact.focus();assert.equal(await contact.evaluate(node=>node===document.activeElement),true);
+  await contact.click();await f.page.waitForLoadState('load');await f.page.locator('#c-email').waitFor({state:'visible'});
+  assert.equal(f.state.calls.some(call=>!['GET','HEAD'].includes(call.method)),false,'reading retention or opening Contacto never deletes or sends anything');
+});
+
 test('terms clearly require explicit acceptance and do not subscribe or imply public profile hiding',async t=>{
   const f=await setup(t,{route:'buscARTE_terminos.html',width:390});const text=await f.page.locator('main').textContent();
   for(const term of ['2026-10-15','expresamente','opcional','sin borrar el historial'])assert(text.toLowerCase().includes(term.toLowerCase()),term);

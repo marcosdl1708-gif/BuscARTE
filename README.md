@@ -3,6 +3,14 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
+## Conservación administrativa — cierre seguro (15/10/2026)
+
+Con el «Go con ese cierre seguro» del responsable se activó el proceso diario de Gmail, sólo para consultas administrativas incorporadas y cerradas manualmente. `setupRetention()` terminó a las 13:03:47 ART con cuenta y etiquetas verificadas; la vista Activadores confirmó **un único `dailyRetention`**. La primera pasada supervisada, a las 13:04:35, terminó en `ACTIVE`, con cero casos examinados, errores o movimientos. No se incorporaron ni retiraron correos históricos. Después de 60 días completos desde el cierre observado pueden pasar a Papelera los mensajes capturados sin cambios; Gmail normalmente los purga otros 30 días después, sin garantía de máximo exacto. Conservar/reabrir detiene retiros y permite recuperar sólo lo que aún siga disponible. El operador debe revisar incidencias; el script no envía avisos externos garantizados.
+
+Respaldos: registro privado inicializado con **cero copias elegibles**, control de lectura válido y cero acciones. Históricos conocidos registrados para revisión manual el 22/10/2026, sin automatismo, traslado ni eliminación. No se acredita respaldo productivo íntegro/restaurable ni cumplimiento de un máximo general de 30 días. Claves Android, fuentes y snapshot mixto permanecen protegidos; antes de una restauración deben reaplicarse las eliminaciones atendidas. Evidencia privada en `../BuscARTE-resguardos/retention-manual-20261015/`; operación y límites en `tools/retention/OPERACION.md` y los README de las herramientas. No se cambiaron usuarios, Supabase, Auth, Android, permisos del script ni planes pagos.
+
+La política incorpora Gmail y explica estos límites de conservación, revisión manual y ejercicio de derechos sin prometer purgas generales. Preparado el único corte v30, con sólo `buscARTE_privacidad.html` y la versión de caché de `sw.js` como cambios públicos; 120 pruebas de empaquetado/herramientas y siete de privacidad aprobadas, incluidas 320/390 px y contacto sin envío. Build de 74 archivos permitidos. La publicación y su verificación se registran en el cierre del release; los estados inferiores son históricos.
+
 ## Corte coordinado v29 publicado — 15/10/2026, 11:39 ART
 
 Publicado el único deploy autorizado: **`6ad0e58de9ad9d25ec4c832a`**, fuente **`d5e73188a789e17ee18c3dc3838563a861261c5a`**, caché v29 y build explícito de 74 archivos permitidos. Sustituye v28 / `0c352d9` / deploy `6ad0cab54252a45ecea3bfa6`. La guía ajena y `preview/` siguen intactos y excluidos; no se publicó el original ni se modificaron Android/Auth.

@@ -1,0 +1,14 @@
+{
+  "timeZone": "America/Argentina/Buenos_Aires",
+  "runtimeVersion": "V8",
+  "exceptionLogging": "NONE",
+  "dependencies": {
+    "enabledAdvancedServices": [
+      { "userSymbol": "Gmail", "serviceId": "gmail", "version": "v1" }
+    ]
+  },
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/gmail.modify",
+    "https://www.googleapis.com/auth/script.scriptapp"
+  ]
+}
