@@ -39,6 +39,7 @@
   "assets/js/menu-cuenta.js",
   "assets/js/sesion-segura.js",
   "assets/js/disciplinas.js",
+  "assets/js/email-preferencias.js",
   "assets/js/meta-pixel.js",
   "assets/js/registro-captcha.js",
   "assets/vendor/supabase-2.112.3.min.js",

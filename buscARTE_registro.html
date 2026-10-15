@@ -91,6 +91,10 @@
   .field input::placeholder, .field textarea::placeholder { color: var(--gris2); }
   .field textarea { resize: vertical; min-height: 90px; }
   .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .registro-mail-choice { display:flex; align-items:flex-start; gap:.75rem; margin:1.25rem 0 .4rem; font-size:.85rem; line-height:1.6; color:var(--blanco); }
+  .registro-mail-choice input { flex:0 0 auto; width:20px; height:20px; margin:.15rem 0 0; accent-color:var(--neon); }
+  .registro-mail-choice input:focus-visible { outline:2px solid var(--neon); outline-offset:3px; }
+  .registro-mail-help { margin:0 0 1rem 2rem; font-size:.78rem; line-height:1.5; color:var(--gris); }
   /* CHIPS */
   .chips-label { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gris); margin-bottom: 0.8rem; display: block; }
   .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.4rem; }
@@ -403,6 +407,12 @@
         </select>
       </div>
       </details>
+
+      <label class="registro-mail-choice" for="reg-email-marketing">
+        <input type="checkbox" id="reg-email-marketing" aria-describedby="reg-email-marketing-help">
+        <span>Novedades y oportunidades de BuscARTE por email (hasta un resumen mensual)</span>
+      </label>
+      <p class="registro-mail-help" id="reg-email-marketing-help">Opcional. Podés cambiar tu preferencia o darte de baja cuando quieras.</p>
 
       <div class="form-actions">
         <button type="button" class="btn-back" onclick="goStep('tipo')">← Atrás</button>
@@ -1202,6 +1212,7 @@ async function crearPerfil(btn) {
       },
       body: JSON.stringify({
         captcha_token: captchaResponse,
+        email_marketing_opt_in: document.getElementById('reg-email-marketing')?.checked === true,
         p_email: email,
         p_password: password,
         p_nombre: nombreCompleto,
@@ -1311,6 +1322,7 @@ async function crearNegocio(btn) {
       headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
       body: JSON.stringify({
         captcha_token: captchaResponse,
+        email_marketing_opt_in: document.getElementById('reg-email-marketing')?.checked === true,
         p_email: email,
         p_password: password,
         p_nombre: nombre,
@@ -1400,6 +1412,7 @@ async function crearVisitante(btn) {
       headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
       body: JSON.stringify({
         captcha_token: captchaResponse,
+        email_marketing_opt_in: document.getElementById('reg-email-marketing')?.checked === true,
         p_email: email, p_password: password, p_nombre: nombre,
         p_provincia: provincia, p_ciudad: '', p_barrio: '',
         p_instrumento: '', p_generos: '', p_disponibilidad: '', p_referentes: '', p_bio: '',

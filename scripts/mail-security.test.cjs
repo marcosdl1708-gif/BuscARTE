@@ -4,7 +4,6 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const crypto = require('node:crypto');
-const { execFileSync } = require('node:child_process');
 
 // Hermetic server fixtures. Native fetch, real env, credentials, SMTP, API
 // clients and sockets are never exposed inside these VMs.
@@ -23,15 +22,6 @@ const fixtureEnv = {
   URL:production, ADMIN_EMAIL:'admin@example.invalid'
 };
 const plain = value => JSON.parse(JSON.stringify(value));
-function previous(file) {
-  // Pin the last pre-security release, not a moving HEAD with renamed handlers.
-  return execFileSync('git', ['show', `1785b2f40e214511d7c8790e016f82b707450eb6:${file}`], { cwd:root, encoding:'utf8', windowsHide:true });
-}
-function bounded(source, start, end) {
-  const first = source.indexOf(start), last = source.indexOf(end, first + start.length);
-  assert(first >= 0 && last > first);
-  return source.slice(first, last).replace(/\r\n/g, '\n').trim();
-}
 function request(payload, options = {}) {
   return new Request(production + '/.netlify/functions/' + (options.function || 'send-email'), {
     method:options.method || 'POST',
@@ -42,7 +32,7 @@ function request(payload, options = {}) {
   });
 }
 function runtime(file, options = {}) {
-  const calls = [], unexpected = [], logs = [], env = { ...fixtureEnv, ...options.env };
+  const calls = [], unexpected = [], logs = [], queued = [], dispatched = [], planned = [], env = { ...fixtureEnv, ...options.env };
   const state = { resetUsed:false };
   const response = (status, data, extra = {}) => new Response(JSON.stringify(data), {
     status, headers:{ 'content-type':'application/json', ...extra }
@@ -88,15 +78,6 @@ function runtime(file, options = {}) {
         return response(200, [], { 'content-range':'0-0/4' });
       }
     }
-    if (url.href === 'https://api.resend.com/emails' && method === 'POST') {
-      assert.equal(init.headers.Authorization, 'Bearer ' + env.RESEND_API_KEY);
-      if (options.mailFails) return response(500, { private:'synthetic vendor detail must never escape' });
-      return response(200, { id:'synthetic-resend-message' });
-    }
-    if (url.href === production + '/.netlify/functions/send-email' && method === 'POST' && options.scheduled) {
-      assert(init.headers['x-buscarte-secret'], 'no scheduled email may use an empty secret');
-      return response(options.mailFails ? 503 : 200, { ok:!options.mailFails });
-    }
     unexpected.push(url.href);
     throw new Error('Unexpected fixture request');
   };
@@ -107,6 +88,22 @@ function runtime(file, options = {}) {
     console:{ log:(...args) => logs.push(args), warn:(...args) => logs.push(args), error:(...args) => logs.push(args) },
     setTimeout:callback => { callback(); return 1; }, clearTimeout:() => {}
   });
+  context.__mailService={
+    enqueue:async value=>{
+      queued.push(plain(value));
+      if(options.queueFails)throw new Error('Synthetic private queue error');
+      return{id:'11111111-2222-4333-8444-555555555555'};
+    },
+    dispatch:async id=>{
+      dispatched.push(id);
+      if(options.dispatchThrows)throw new Error('Synthetic private provider error');
+      return options.mailFails||options.deferred?{status:'deferred',reason:'provider_unknown'}:{status:'sent',id:'synthetic-resend-message'};
+    }
+  };
+  context.__planner={
+    planProfileReminders:async()=>{planned.push('profile');if(!context.__security.serverConfig()||options.plannerFails)throw new Error('configuration');return 120;},
+    planMonthlySummary:async()=>{planned.push('monthly');if(!context.__security.serverConfig()||options.plannerFails)throw new Error('configuration');return 332;}
+  };
   const disciplines = read('netlify/lib/disciplinas.mjs').replace(/^export /gm, '');
   vm.runInContext('(function(){\n' + disciplines + '\n;globalThis.__normalizeDisciplines = normalizeDisciplines;\n})();', context, { timeout:1000 });
   const helper = read('netlify/lib/session.mjs')
@@ -118,6 +115,7 @@ function runtime(file, options = {}) {
   if (file.endsWith('.mjs')) {
     source = source.replace(/^import \{([^}]+)\} from 'node:crypto';\s*/m, 'const {$1} = __crypto;\n')
       .replace(/^import \{([^}]+)\} from '\.\.\/lib\/session\.mjs';\s*/m, 'const {$1} = __security;\n')
+      .replace(/^import \{ mailService \} from '\.\.\/lib\/mail-runtime\.mjs';\s*/m, 'const mailService=__mailService;\n')
       .replace('export default async function ', 'async function ')
       .replace(/^export /gm, '');
     const handlerName = file === 'send-email.mjs' ? 'sendEmail' : 'resetPassword';
@@ -125,18 +123,20 @@ function runtime(file, options = {}) {
   } else {
     context.exports = {};
     source = source.replace("await import('../lib/session.mjs')", 'await Promise.resolve(__security)');
+    source = source.replace("await import('../lib/mail-planner.mjs')", 'await Promise.resolve(__planner)');
     source += '\n;globalThis.__handler = exports.handler;';
   }
   vm.runInContext('(function(){\n' + source + '\n})();', context, { timeout:1000 });
   return { handle:context.__handler, config:plain(context.__config || {}),
-    secret:() => context.__security.internalMailSecret(), calls, unexpected, logs, state };
+    secret:() => context.__security.internalMailSecret(), calls, queued, dispatched, planned, unexpected, logs, state };
 }
 
-test('all mail templates and recovery HTML remain exactly unchanged', () => {
-  assert.equal(bounded(read('netlify/functions/send-email.mjs'), 'function escapeHtml', 'export default'),
-    bounded(previous('netlify/functions/send-email.js'), 'function escapeHtml', 'exports.handler'));
-  assert.equal(bounded(read('netlify/functions/reset-password.mjs'), 'function resetEmailHtml', 'async function sendResetEmail'),
-    bounded(previous('netlify/functions/reset-password.js'), 'function resetEmailHtml', 'async function sendResetEmail'));
+test('mail handlers delegate durable sending and do not bypass quota through direct provider requests', () => {
+  for(const file of ['send-email.mjs','reset-password.mjs']) {
+    assert(read('netlify/functions/'+file).includes("from '../lib/mail-runtime.mjs'"));
+    assert(!read('netlify/functions/'+file).includes('https://api.resend.com/emails'));
+  }
+  assert(read('netlify/lib/mail-templates.mjs').includes('export function buildEmail'));
 });
 test('native rate limits retain function endpoint names and no CORS is returned', async () => {
   for (const [file, maximum] of [['send-email.mjs',180], ['reset-password.mjs',20]]) {
@@ -148,6 +148,7 @@ test('native rate limits retain function endpoint names and no CORS is returned'
     assert.equal(res.headers.get('access-control-allow-origin'),null);
     assert.equal(res.headers.get('cache-control'),'no-store');
     assert.equal(run.calls.length,0);
+    assert.equal(run.queued.length,0);
   }
 });
 for (const type of ['bienvenida','mensaje','novedades','resumen_mensual','perfil_incompleto','reset']) {
@@ -156,9 +157,13 @@ for (const type of ['bienvenida','mensaje','novedades','resumen_mensual','perfil
     const payload = { tipo:type, destinatario:'user@example.invalid', datos:{ nombre:'Persona', preview:'fixture' } };
     assert.equal((await run.handle(request(payload))).status,403);
     assert.equal(run.calls.length,0);
+    assert.equal(run.queued.length,0);
     const result = await run.handle(request(payload, { headers:{ 'x-buscarte-secret':run.secret() } }));
     assert.equal(result.status,200);
-    assert.equal(run.calls.length,1);
+    assert.equal(run.queued.length,1);
+    assert.equal(run.dispatched.length,1);
+    assert.equal(run.queued[0].tipo,type);
+    assert.equal(run.queued[0].destinatario,'user@example.invalid');
     assert.equal(run.unexpected.length,0);
   });
 }
@@ -167,9 +172,11 @@ test('missing internal secret/service key and wrong secret fail closed', async (
   const body = { tipo:'bienvenida', destinatario:'user@example.invalid', datos:{} };
   assert.equal((await missing.handle(request(body, { headers:{ 'x-buscarte-secret':'forged' } }))).status,403);
   assert.equal(missing.calls.length,0);
+  assert.equal(missing.queued.length,0);
   const configured = runtime('send-email.mjs');
   assert.equal((await configured.handle(request(body, { headers:{ 'x-buscarte-secret':configured.secret().replace(/^./,'x') } }))).status,403);
   assert.equal(configured.calls.length,0);
+  assert.equal(configured.queued.length,0);
 });
 test('derived secret is deterministic; long configured legacy secret remains compatible', () => {
   const derived = runtime('send-email.mjs');
@@ -183,10 +190,11 @@ test('public contact requires correct origin and forces admin recipient', async 
   assert.equal((await run.handle(request(contact, { headers:{ origin:'https://evil.example.invalid' } }))).status,403);
   assert.equal((await run.handle(request(contact, { headers:{ origin:'' } }))).status,403);
   assert.equal(run.calls.length,0);
+  assert.equal(run.queued.length,0);
   assert.equal((await run.handle(request(contact))).status,200);
-  const sent = JSON.parse(run.calls.find(call => call.url.includes('api.resend')).body);
-  assert.deepEqual(sent.to,['admin@example.invalid']);
-  assert.equal(sent.reply_to,'reply@example.invalid');
+  const sent = run.queued[0];
+  assert.equal(sent.destinatario,'admin@example.invalid');
+  assert.equal(sent.datos.email,'reply@example.invalid');
   assert.equal(run.unexpected.length,0);
 });
 test('contact rejects excessive/invalid data and honors distributed limiter', async () => {
@@ -194,57 +202,66 @@ test('contact rejects excessive/invalid data and honors distributed limiter', as
   assert.equal((await run.handle(request({ ...contact, datos:{ ...contact.datos, mensaje:'x'.repeat(3001) } }))).status,400);
   assert.equal((await run.handle(request(contact, { raw:'x'.repeat(16385) }))).status,400);
   assert.equal((await run.handle(request(contact, { headers:{ 'content-type':'text/plain' } }))).status,415);
-  assert(!run.calls.some(call => call.url.includes('api.resend')));
+  assert.equal(run.queued.length,0);
   const limited = runtime('send-email.mjs', { rateAllowed:false });
   assert.equal((await limited.handle(request(contact))).status,429);
   assert.equal(limited.calls.length,1);
+  assert.equal(limited.queued.length,0);
 });
 test('report sender is validated by real session, not supplied reporter ID', async () => {
   const run = runtime('send-email.mjs');
   const body = { tipo:'reporte', datos:{ perfilId:'702', motivo:'Spam', reporterId:'999', reporterNombre:'Spoofed' } };
   assert.equal((await run.handle(request(body))).status,401);
+  assert.equal(run.queued.length,0);
   assert.equal((await run.handle(request(body, { headers:{ cookie:'__Host-ba_session=' + sessionToken } }))).status,200);
-  const sent = JSON.parse(run.calls.find(call => call.url.includes('api.resend')).body);
-  assert(sent.html.includes('Autor real'));
-  assert(sent.html.includes('701'));
-  assert(!sent.html.includes('Spoofed'));
+  const sent = run.queued[0];
+  assert.equal(sent.datos.reporterNombre,'Autor real');
+  assert.equal(sent.datos.reporterId,'701');
+  assert(!JSON.stringify(sent).includes('Spoofed'));
   assert.equal(run.unexpected.length,0);
 });
-test('provider failures never expose response details or log private contents', async () => {
+test('provider deferral acknowledges durable queue while queue failures hide details and private contents', async () => {
   const run = runtime('send-email.mjs', { mailFails:true });
   const res = await run.handle(request(contact));
-  assert.equal(res.status,502);
-  assert(!JSON.stringify(await res.json()).includes('synthetic vendor'));
+  assert.equal(res.status,202);
+  assert.deepEqual(await res.json(),{ok:true,queued:true,id:'11111111-2222-4333-8444-555555555555'});
+  assert.equal(run.queued.length,1);
   assert.equal(run.logs.length,0);
+  const failed=runtime('send-email.mjs',{queueFails:true});
+  const result=await failed.handle(request(contact));assert.equal(result.status,503);assert(!JSON.stringify(await result.json()).includes('Synthetic'));assert.equal(failed.dispatched.length,0);assert.equal(failed.logs.length,0);
 });
 test('reset validates origin, body, configuration and rate before protected work', async () => {
   const run = runtime('reset-password.mjs');
   const body = { accion:'solicitar', email:'user@example.invalid' };
   assert.equal((await run.handle(request(body, { headers:{ origin:'https://evil.example.invalid' } }))).status,403);
   assert.equal(run.calls.length,0);
+  assert.equal(run.queued.length,0);
   const missing = runtime('reset-password.mjs', { env:{ SUPABASE_SERVICE_ROLE_KEY:'' } });
   assert.equal((await missing.handle(request(body))).status,503);
   assert.equal(missing.calls.length,0);
+  assert.equal(missing.queued.length,0);
   const limited = runtime('reset-password.mjs', { rateAllowed:false });
   assert.equal((await limited.handle(request(body))).status,429);
   assert.equal(limited.calls.length,1);
+  assert.equal(limited.queued.length,0);
 });
-test('reset request stores only hash and keeps existing/nonexistent outcomes neutral', async () => {
+test('reset queues metadata without raw token and keeps existing/nonexistent outcomes neutral', async () => {
   const run = runtime('reset-password.mjs');
   const body = { accion:'solicitar', email:'USER@example.invalid' };
   const positive = await run.handle(request(body));
   assert.deepEqual(await positive.json(),{ ok:true });
-  const sent = JSON.parse(run.calls.find(call => call.url.includes('api.resend')).body);
-  const raw = sent.html.match(/token=([a-f0-9]{64})/)[1];
-  assert.equal(digest(raw),run.state.resetHash);
-  assert.notEqual(raw,run.state.resetHash);
+  assert.equal(run.queued.length,1);
+  assert.equal(run.queued[0].tipo,'reset');assert.equal(run.queued[0].perfilId,701);assert.equal(run.queued[0].destinatario,'user@example.invalid');
+  assert.deepEqual(run.queued[0].datos,{nombre:'Persona fixture'});assert.match(run.queued[0].eventKey,/^reset:701:\d+$/);
+  assert.equal(run.calls.filter(call=>call.method==='PATCH').length,0,'expiry/token hash starts in quota-controlled dispatch, not request handler');
+  assert.equal(run.dispatched.length,1);
   const missing = runtime('reset-password.mjs', { exists:false });
   assert.deepEqual(await (await missing.handle(request(body))).json(),{ ok:true });
-  assert(!missing.calls.some(call => call.url.includes('api.resend')));
+  assert.equal(missing.queued.length,0);assert.equal(missing.dispatched.length,0);
   assert.equal(run.unexpected.length,0);
 });
 test('reset request provider errors remain neutral with no private logging', async () => {
-  for (const options of [{ backendFails:true }, { mailFails:true }]) {
+  for (const options of [{ backendFails:true }, { mailFails:true }, { queueFails:true }, { dispatchThrows:true }]) {
     const run = runtime('reset-password.mjs',options);
     assert.deepEqual(await (await run.handle(request({ accion:'solicitar', email:'user@example.invalid' }))).json(),{ ok:true });
     assert.equal(run.logs.length,0);
@@ -287,30 +304,26 @@ test('new reset password enforces bcrypt 72 UTF8 bytes, not merely character cou
   const boundary = 'é'.repeat(36), allowed = runtime('reset-password.mjs', { passwordExpected:boundary });
   assert.equal((await (await allowed.handle(request({ accion:'cambiar', token, nueva_password:boundary }))).json()).ok,true);
 });
-test('scheduled functions fail closed without configuration and never send an empty secret', async () => {
+test('scheduled candidate functions fail closed without configuration and never bypass the queue with HTTP sends', async () => {
   for (const file of ['recordatorio-perfil.js','resumen-mensual.js']) {
     const missing = runtime(file, { scheduled:true, env:{ SUPABASE_SERVICE_ROLE_KEY:'', INTERNAL_SECRET:'' } });
-    assert.equal((await missing.handle({})).statusCode,500);
+    assert.equal((await missing.handle({})).statusCode,503);
     assert.equal(missing.calls.length,0);
     const run = runtime(file, { scheduled:true, users:[{ id:701, email:'user@example.invalid', nombre:'Persona', foto_url:'', bio:'' }] });
     assert.equal((await run.handle({})).statusCode,200);
-    const mails = run.calls.filter(call => call.url.endsWith('/.netlify/functions/send-email'));
-    assert.equal(mails.length,1);
-    assert.equal(mails[0].headers['x-buscarte-secret'],run.secret());
+    assert.deepEqual(run.planned,[file==='recordatorio-perfil.js'?'profile':'monthly']);
+    assert.equal(run.calls.length,0);assert.equal(run.queued.length,0);
     assert(!JSON.stringify(run.logs).includes('user@example.invalid'));
     assert.equal(run.unexpected.length,0);
   }
 });
-test('scheduled cadence/eligibility and monthly 90-recipient cap remain unchanged', async () => {
+test('daily candidate generation and five-minute worker replace the fixed 90-recipient monthly slice', async () => {
   const config = read('netlify.toml');
-  assert(config.includes('schedule = "0 13 * * 1"'));
+  assert(config.includes('schedule = "0 13 * * *"'));
   assert(config.includes('schedule = "0 13 1 * *"'));
-  for (const file of ['recordatorio-perfil.js','resumen-mensual.js']) assert(read('netlify/functions/'+file).includes('const DELAY_MS = 400;'));
-  const complete = runtime('recordatorio-perfil.js', { scheduled:true, users:[{ email:'user@example.invalid', foto_url:'photo', bio:'Perfil completo fixture' }] });
-  await complete.handle({});
-  assert(!complete.calls.some(call => call.url.endsWith('/.netlify/functions/send-email')));
-  const monthly = runtime('resumen-mensual.js', { scheduled:true, users:Array.from({ length:95 },(_,i)=>({ id:i+1, email:'user'+i+'@example.invalid' })) });
-  await monthly.handle({});
-  assert.equal(monthly.calls.filter(call => call.url.endsWith('/.netlify/functions/send-email')).length,90);
-  assert.equal(monthly.unexpected.length,0);
+  assert(config.includes('schedule = "*/5 * * * *"'));
+  for(const file of ['recordatorio-perfil.js','resumen-mensual.js']) {
+    assert(!read('netlify/functions/'+file).includes('SEND_EMAIL_URL'));
+    const failed=runtime(file,{plannerFails:true});assert.equal((await failed.handle({})).statusCode,503);assert.equal(failed.calls.length,0);
+  }
 });

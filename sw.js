@@ -1,6 +1,6 @@
 // ⚠️ IMPORTANTE: subí este número en CADA deploy (v3 → v4 → v5...).
 // Si no lo cambiás, el navegador puede seguir sirviendo los archivos viejos cacheados.
-const CACHE_VERSION = 'buscarte-v27-2026-10-15-mobile-retorno';
+const CACHE_VERSION = 'buscarte-v28-2026-10-15-emails';
 const OFFLINE_URL = '/index.html';
 
 const SHELL = [
@@ -30,6 +30,7 @@ const SHELL = [
   '/assets/js/escena-fondos.js',
   '/assets/js/menu-cuenta.js',
   '/assets/js/sesion-segura.js',
+  '/assets/js/email-preferencias.js',
   '/assets/js/disciplinas.js',
   '/manifest.json',
   '/icons/icon-192.png',

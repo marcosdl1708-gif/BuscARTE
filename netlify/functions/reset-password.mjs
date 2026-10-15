@@ -1,11 +1,10 @@
-import { randomBytes, createHash } from 'node:crypto';
+import { createHash } from 'node:crypto';
 import { rate, readJson, serverConfig, trustedOrigin } from '../lib/session.mjs';
+import { mailService } from '../lib/mail-runtime.mjs';
 
 function environment(name) {
   return globalThis.Netlify?.env?.get(name) || process.env[name] || '';
 }
-const FROM_EMAIL = environment('FROM_EMAIL') || 'buscARTE <hola@buscarte.com.ar>';
-const BASE_URL = environment('URL') || 'https://buscarte.com.ar';
 
 const JSON_HEADERS = {
   'Content-Type': 'application/json; charset=utf-8',
@@ -17,25 +16,12 @@ function json(statusCode, payload) {
   return new Response(JSON.stringify(payload), { status:statusCode, headers:JSON_HEADERS });
 }
 
-function escapeHtml(value = '') {
-  return String(value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
 function normalizeEmail(value = '') {
   return String(value).trim().toLowerCase();
 }
 
 function isEmail(value = '') {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value).trim());
-}
-
-function makeToken() {
-  return randomBytes(32).toString('hex');
 }
 
 // Guardamos solo el hash del token en la DB. El token crudo viaja en el email.
@@ -69,51 +55,6 @@ async function supabaseFetch(path, options = {}) {
   return data;
 }
 
-function resetEmailHtml(nombre, resetUrl) {
-  const firstName = nombre ? String(nombre).split(' ')[0] : '';
-  return `
-    <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#0a0a0a;color:#f2ede4;padding:2rem;border-radius:8px">
-      <h1 style="font-size:2rem;text-align:center;margin:0 0 1rem">busc<span style="color:#d4f53c">ARTE</span></h1>
-      <h2 style="color:#d4f53c">Recuperar contraseña 🔑</h2>
-      <p>Hola ${escapeHtml(firstName)}! Recibimos una solicitud para resetear tu contraseña.</p>
-      <div style="text-align:center;margin:2rem 0">
-        <a href="${escapeHtml(resetUrl)}" style="background:#d4f53c;color:#000;padding:1rem 2rem;text-decoration:none;font-weight:bold;border-radius:4px;display:inline-block">
-          Crear nueva contraseña →
-        </a>
-      </div>
-      <p style="color:#888;font-size:.8rem;text-align:center">Este link expira en 1 hora. Si no solicitaste esto, ignorá este email.</p>
-    </div>`;
-}
-
-async function sendResetEmail(email, nombre, token) {
-  const resetUrl = `${BASE_URL}/buscARTE_reset.html?token=${encodeURIComponent(token)}`;
-  const key = environment('RESEND_API_KEY');
-  if (!key) throw new Error('configuration');
-
-  const response = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${key}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      from: FROM_EMAIL,
-      to: [email],
-      subject: 'Recuperá tu contraseña de buscARTE 🔑',
-      html: resetEmailHtml(nombre, resetUrl)
-    }),
-    redirect:'error',
-    signal:AbortSignal.timeout(15000)
-  });
-
-  const data = await readJsonSafe(response);
-  if (!response.ok) {
-    throw new Error('mail');
-  }
-
-  return data;
-}
-
 async function solicitar(emailRaw) {
   const email = normalizeEmail(typeof emailRaw === 'string' ? emailRaw : '');
 
@@ -127,16 +68,11 @@ async function solicitar(emailRaw) {
 
   if (!usuario || !/^[1-9]\d*$/.test(String(usuario.id || ''))) return json(200, { ok: true });
 
-  const token = makeToken();
-  const expires = new Date(Date.now() + 60 * 60 * 1000).toISOString();
-
-  await supabaseFetch(`/rest/v1/perfiles?id=eq.${usuario.id}`, {
-    method: 'PATCH',
-    headers: { 'Prefer': 'return=minimal' },
-    body: JSON.stringify({ reset_token: hashToken(token), reset_expires: expires })
-  });
-
-  await sendResetEmail(email, usuario.nombre, token);
+  // The queue contains no raw token. Dispatch derives a stable secret token,
+  // stores only its hash, and starts its one-hour expiry when it can actually send.
+  const job = await mailService.enqueue({tipo:'reset',destinatario:email,perfilId:usuario.id,
+    datos:{nombre:usuario.nombre},eventKey:'reset:'+usuario.id+':'+Math.floor(Date.now()/300000)});
+  await mailService.dispatch(job.id);
 
   return json(200, { ok: true });
 }

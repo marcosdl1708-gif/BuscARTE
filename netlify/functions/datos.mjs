@@ -114,6 +114,11 @@ async function captcha(token, request) {
 async function authRpc(name, request, context) {
   if(!await rate(request,name,name==='login_usuario'?60:10,name==='login_usuario'?900:3600))return fail(429);
   const payload=await readJson(request);
+  const marketingOptIn=name==='registrar_usuario' && payload.email_marketing_opt_in===true;
+  if(name==='registrar_usuario') {
+    if(payload.email_marketing_opt_in!==undefined && typeof payload.email_marketing_opt_in!=='boolean')return fail(400);
+    delete payload.email_marketing_opt_in;
+  }
   if(!str(payload.p_email,254) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.p_email.trim()) || !str(payload.p_password,name==='registrar_usuario'?72:4096) || payload.p_password.length<(name==='registrar_usuario'?8:1) || (name==='registrar_usuario' && Buffer.byteLength(payload.p_password)>72))return fail(400);
   payload.p_email=payload.p_email.trim().toLowerCase();
   if(!await rate(request,name+'-account',name==='login_usuario'?15:3,900,payload.p_email))return fail(429);
@@ -130,11 +135,17 @@ async function authRpc(name, request, context) {
   const user=Array.isArray(result)?result[0]:result;
   if(!object(user) || user.error || !id(user.id))return json(name==='login_usuario'?401:400,{error:name==='registrar_usuario' && user?.error==='duplicate_email'?'duplicate_email':'Email o contraseña incorrectos.'});
   if(user.baneado===true)return fail(403);
+  if(marketingOptIn) {
+    try {
+      const {mailService}=await import('../lib/mail-runtime.mjs');
+      await mailService.savePreferences({id:user.id,email:payload.p_email},{marketing_opt_in:true,onboarding_disabled:false});
+    } catch { console.warn('Email preferences unavailable'); }
+  }
   let session;
   try { session=await startSession(user.id); }
   catch(error) { if(name==='registrar_usuario')return json(200,{...user,session_pending:true});throw error; }
   if(name==='registrar_usuario') {
-    const task=notify('bienvenida',session.user.email,{nombre:session.user.nombre}).catch(()=>{});
+    const task=notify('bienvenida',session.user.email,{nombre:session.user.nombre},{perfilId:session.user.id}).catch(()=>{});
     if(context?.waitUntil)context.waitUntil(task);else await task;
   }
   // The legacy response shape remains intact; cookie is the only authority.
@@ -213,7 +224,7 @@ async function write(table, route, request, user, context) {
     const result=await backend('/rest/v1/mensajes',{method:'POST',headers:{Prefer:'return=representation'},body:JSON.stringify({de_user_id:uid,para_user_id:id(payload.para_user_id),anuncio_id:payload.anuncio_id?id(payload.anuncio_id):null,contenido:payload.contenido.trim()})});
     if(!result.ok)return fail(502);
     const saved=await result.json(); if(!Array.isArray(saved)||saved.length!==1||!id(saved[0].id))return fail(502);
-    const task=(async()=>{const [recipient]=await backendJson('/rest/v1/perfiles?id=eq.'+id(payload.para_user_id)+'&select=email,nombre&limit=1');if(recipient?.email)await notify('mensaje',recipient.email,{remitente:user.nombre||'Una persona de buscARTE',preview:payload.contenido.slice(0,120)});})().catch(()=>{});
+    const task=(async()=>{const [recipient]=await backendJson('/rest/v1/perfiles?id=eq.'+id(payload.para_user_id)+'&select=email,nombre&limit=1');if(recipient?.email)await notify('mensaje',recipient.email,{remitente:user.nombre||'Una persona de buscARTE',preview:payload.contenido.slice(0,120)},{perfilId:payload.para_user_id,eventKey:'message:'+saved[0].id});})().catch(()=>{});
     if(context?.waitUntil)context.waitUntil(task);else await task;
     return json(201,saved);
   }

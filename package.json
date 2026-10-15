@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "buscARTE — red de artistas argentinos (sitio estático + Netlify Functions)",
   "scripts": {
+    "test:email-engagement": "node --test scripts/mail-templates-engagement.test.mjs scripts/mail-profile.test.mjs scripts/mail-runtime.test.mjs scripts/mail-planner.test.mjs scripts/mail-endpoints.test.cjs scripts/mail-security.test.cjs",
     "build": "node scripts/build-site.mjs",
     "test": "node --test scripts/build-site.test.mjs",
     "test:backend-seguro": "node --test scripts/datos-seguridad.test.mjs scripts/mail-security.test.cjs",

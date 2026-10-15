@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createHash, createHmac } from 'node:crypto';
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 
 // Real ESM handlers and their real shared helper, with a fail-closed transport.
@@ -11,6 +11,7 @@ const { default:datos, config:datosConfig } = await import('../netlify/functions
 const { default:sesion } = await import('../netlify/functions/sesion.mjs');
 const { default:guardarPerfil } = await import('../netlify/functions/guardar-perfil.mts');
 const { sessionUser, serverConfig } = await import('../netlify/lib/session.mjs');
+const { mailService } = await import('../netlify/lib/mail-runtime.mjs');
 const { normalizeDisciplines, disciplinesFor, prepareProfileChanges, projectProfile, RUBROS, DETAIL_FIELDS } = await import('../netlify/lib/disciplinas.mjs');
 globalThis.fetch = nativeFetch;
 
@@ -59,6 +60,7 @@ function projection(row, select) {
 }
 async function withBackend(options, action) {
   const previousFetch=globalThis.fetch, previousNetlify=globalThis.Netlify;
+  const previousMail={enqueue:mailService.enqueue,dispatch:mailService.dispatch,savePreferences:mailService.savePreferences};
   const previousExpiry=globalThis.__baExpiryAt;
   const env = { SUPABASE_URL:sb, SUPABASE_SERVICE_ROLE_KEY:serviceKey,
     HCAPTCHA_SECRET:'synthetic-hcaptcha-secret', ...options.env };
@@ -66,7 +68,7 @@ async function withBackend(options, action) {
   if(options.deleted)profiles.delete(701);
   if(options.banned)profiles.get(701).baneado=true;
   if(options.changedPassword)profiles.get(701).password='new-synthetic-password-hash';
-  const calls=[], unexpected=[], notifications=[];
+  const calls=[], unexpected=[], notifications=[], dispatches=[], preferenceWrites=[];
   const state={ registered:false, messageSaved:false, deleted:false, sessionCreated:false };
   const sessions=new Map([[digest(token),{perfil_id:701,password_fingerprint:options.badFingerprint?'0'.repeat(64):digest(oldPasswordHash)}]]);
   const reply=(status,value,headers={})=>new Response(value===null?null:JSON.stringify(value),{
@@ -75,6 +77,22 @@ async function withBackend(options, action) {
   const apiCalls=(name,method)=>calls.filter(c=>c.url.pathname===name&&(!method||c.method===method));
   globalThis.Netlify={ env:{ get:name=>env[name] || '' } };
   globalThis.__baExpiryAt=0;
+  // The real ESM gateway and session helper still run. Only the mail-service
+  // boundary is replaced, including imports performed dynamically by notify.
+  mailService.enqueue=async payload=>{
+    if(payload.tipo==='bienvenida')assert(state.registered&&state.sessionCreated,'welcome can only follow persisted account/session');
+    if(payload.tipo==='mensaje')assert(state.messageSaved,'message email can only follow confirmed insert');
+    notifications.push(structuredClone(payload));
+    if(options.queueFails)throw new Error('Synthetic queue failure');
+    return{id:'synthetic-job-'+notifications.length};
+  };
+  mailService.dispatch=async id=>{dispatches.push(id);return{status:options.mailDeferred?'deferred':'sent',id:'synthetic-provider-id'};};
+  mailService.savePreferences=async(user,value)=>{
+    assert(state.registered,'marketing permission can only follow persisted registration');
+    preferenceWrites.push({user:structuredClone(user),value:structuredClone(value)});
+    if(options.preferencesFail)throw new Error('Synthetic preferences failure');
+    return value;
+  };
   globalThis.fetch=async(href,init={})=>{
     const url=new URL(href), method=init.method || 'GET';
     const headers=new Headers(init.headers || {});
@@ -138,6 +156,7 @@ async function withBackend(options, action) {
       }
       if(url.pathname==='/rest/v1/rpc/registrar_usuario') {
         assert(!Object.hasOwn(body,'captcha_token'),'captcha must not be forwarded to the legacy RPC');
+        assert(!Object.hasOwn(body,'email_marketing_opt_in'),'consent flag must not be forwarded to legacy RPC');
         if(options.duplicate)return reply(200,{error:'duplicate_email'});
         state.registered=true;
         profiles.set(703,{ ...ordinaryUser(703,body.p_rubro), nombre:body.p_nombre,email:body.p_email,tipo_cuenta:body.p_tipo_cuenta });
@@ -190,22 +209,16 @@ async function withBackend(options, action) {
       assert.equal(form.get('secret'),'synthetic-hcaptcha-secret');
       return reply(200,{success:options.captchaValid!==false,hostname:options.captchaHostname || 'buscarte.com.ar'});
     }
-    if(url.href===web+'/.netlify/functions/send-email') {
-      assert.equal(headers.get('x-buscarte-secret'),createHmac('sha256',serviceKey).update('buscarte-internal-mail-v1').digest('hex'));
-      if(body.tipo==='bienvenida')assert(state.registered&&state.sessionCreated,'welcome can only follow persisted account/session');
-      if(body.tipo==='mensaje')assert(state.messageSaved,'message email can only follow confirmed insert');
-      notifications.push(body);
-      return reply(200,{ok:true});
-    }
     unexpected.push({url:url.href,method});
     throw new Error('Unexpected request, real network denied');
   };
   try {
-    const result=await action({calls,apiCalls,notifications,state,profiles});
+    const result=await action({calls,apiCalls,notifications,dispatches,preferenceWrites,state,profiles});
     assert.deepEqual(unexpected,[],'no request may fall through to a real transport');
     return result;
   } finally {
     globalThis.fetch=previousFetch;globalThis.Netlify=previousNetlify;
+    Object.assign(mailService,previousMail);
     if(previousExpiry===undefined)delete globalThis.__baExpiryAt;else globalThis.__baExpiryAt=previousExpiry;
   }
 }
@@ -348,7 +361,7 @@ test('message email follows confirmed persistence only; recipient comes from ser
     const success=!options.messageFail&&!options.messageUnconfirmed;
     assert.equal(response.status,success?201:502);
     assert.equal(notifications.length,success?1:0);
-    if(success)assert.deepEqual(notifications[0],{tipo:'mensaje',destinatario:'user702@example.invalid',datos:{remitente:'Persona propia',preview:'Mensaje fixture'}});
+    if(success)assert.deepEqual(notifications[0],{tipo:'mensaje',destinatario:'user702@example.invalid',datos:{remitente:'Persona propia',preview:'Mensaje fixture'},perfilId:702,eventKey:'message:61'});
     assert.equal(apiCalls('/rest/v1/mensajes','POST').length,1);
   });
 });
@@ -415,6 +428,46 @@ test('registration requires server captcha and preserves all three account types
     assert.equal(notifications.length,1);
     assert.equal(notifications[0].destinatario,'new@example.invalid');
   });
+});
+
+test('registration consent is explicit, normalized, bound to created ID and excluded from legacy RPC',async()=>{
+  for(const [role,rubro] of [['artista','danza'],['negocio','Sala de ensayo'],['visitante','']])await withBackend({},async({preferenceWrites,apiCalls,notifications})=>{
+    const body={...registration(role,rubro),email_marketing_opt_in:true};body.p_email=' NEW@example.invalid ';
+    const result=await datos(request('/rest/v1/rpc/registrar_usuario',{method:'POST',signed:false,body}));
+    assert.equal(result.status,200);assert.equal(preferenceWrites.length,1);
+    assert.deepEqual(preferenceWrites[0],{user:{id:703,email:'new@example.invalid'},value:{marketing_opt_in:true,onboarding_disabled:false}});
+    assert.equal(apiCalls('/rest/v1/rpc/registrar_usuario','POST')[0].body.p_email,'new@example.invalid');
+    assert.equal(Object.hasOwn(apiCalls('/rest/v1/rpc/registrar_usuario','POST')[0].body,'email_marketing_opt_in'),false);
+    assert.equal(notifications[0].perfilId,703);
+  });
+});
+test('registration absent or false consent never writes a subscription or opt-out for historical defaults',async()=>{
+  for(const extra of [{},{email_marketing_opt_in:false}])await withBackend({},async({preferenceWrites,notifications})=>{
+    assert.equal((await datos(request('/rest/v1/rpc/registrar_usuario',{method:'POST',signed:false,body:{...registration(),...extra}}))).status,200);
+    assert.deepEqual(preferenceWrites,[]);assert.equal(notifications.length,1);
+  });
+});
+test('registration rejects nonboolean consent before legacy registration or preference writes',async()=>{
+  for(const value of ['true',1,null,{},[]])await withBackend({},async({preferenceWrites,apiCalls,notifications})=>{
+    assert.equal((await datos(request('/rest/v1/rpc/registrar_usuario',{method:'POST',signed:false,body:{...registration(),email_marketing_opt_in:value}}))).status,400);
+    assert.equal(apiCalls('/rest/v1/rpc/registrar_usuario','POST').length,0);assert.deepEqual(preferenceWrites,[]);assert.deepEqual(notifications,[]);
+  });
+});
+test('a deferred welcome or failed ancillary queue never turns persisted registration into a second signup',async()=>{
+  for(const options of [{mailDeferred:true},{queueFails:true}])await withBackend(options,async({state,notifications})=>{
+    const result=await datos(request('/rest/v1/rpc/registrar_usuario',{method:'POST',signed:false,body:registration()}));
+    assert.equal(result.status,200);assert.equal((await result.json()).id,703);assert(state.registered&&state.sessionCreated);assert(result.headers.get('set-cookie'));assert.equal(notifications.length,1);
+  });
+});
+test('optional preference failure preserves successful registration and never logs the address',async()=>{
+  const previousWarn=console.warn,warnings=[];console.warn=(...args)=>warnings.push(args);
+  try {
+    await withBackend({preferencesFail:true},async({state,preferenceWrites,notifications})=>{
+      const result=await datos(request('/rest/v1/rpc/registrar_usuario',{method:'POST',signed:false,body:{...registration(),email_marketing_opt_in:true}}));
+      assert.equal(result.status,200);assert.equal((await result.json()).id,703);assert(state.registered&&state.sessionCreated);assert(result.headers.get('set-cookie'));assert.equal(preferenceWrites.length,1);assert.equal(notifications.length,1);
+    });
+    assert(!JSON.stringify(warnings).includes('example.invalid'));
+  } finally {console.warn=previousWarn;}
 });
 test('missing/invalid/wrong-host captcha never creates profile or sends welcome',async()=>{
   for(const options of [{env:{HCAPTCHA_SECRET:''}},{captchaValid:false},{captchaHostname:'attacker.example.invalid'}])await withBackend(options,async({apiCalls,notifications})=>{

@@ -115,9 +115,9 @@ export async function rate(request, scope, maximum, seconds, subject = '') {
   const allowed = await backendJson('/rest/v1/rpc/limitar_operacion_web', { method: 'POST', body: JSON.stringify({ p_scope: scope, p_actor_hash: hash(scope + ':' + (subject || address)), p_limit: maximum, p_seconds: seconds }) });
   return allowed === true;
 }
-export async function notify(tipo, destinatario, datos) {
-  const secret = internalMailSecret();
-  if (!secret) return;
-  const response = await fetch('https://buscarte.com.ar/.netlify/functions/send-email', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-buscarte-secret': secret }, body: JSON.stringify({ tipo, destinatario, datos }), signal: AbortSignal.timeout(8000), redirect: 'error' });
-  if (!response.ok) console.warn('Mail notification unavailable');
+export async function notify(tipo, destinatario, datos, options = {}) {
+  // The event is durable before attempting the provider; no recursive HTTP call.
+  const { mailService } = await import('./mail-runtime.mjs');
+  const job = await mailService.enqueue({ tipo,destinatario,datos,...options });
+  return mailService.dispatch(job.id);
 }

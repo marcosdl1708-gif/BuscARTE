@@ -25,5 +25,9 @@
   schedule = "0 13 1 * *"
 
 [functions."recordatorio-perfil"]
-  # Cada lunes, 10:00 ART
-  schedule = "0 13 * * 1"
+  # Cada día, 10:00 ART. Sólo genera eventos deduplicados; no envía el lote.
+  schedule = "0 13 * * *"
+
+[functions."email-worker"]
+  # Despacha pendientes con prioridad transaccional y cuota atómica compartida.
+  schedule = "*/5 * * * *"

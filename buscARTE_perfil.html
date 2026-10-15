@@ -242,6 +242,15 @@
   }
   .section-title .s-icon { font-size: 1.1rem; }
   .section-desc { font-size: 0.82rem; color: var(--gris); margin-bottom: 1.8rem; line-height: 1.6; }
+  #mail-preferences { scroll-margin-top:110px; }
+  .mail-preferences-choice { display:flex; align-items:flex-start; gap:.75rem; margin:1rem 0; font-size:.88rem; line-height:1.6; color:var(--blanco); }
+  .mail-preferences-choice input { flex:0 0 auto; width:20px; height:20px; margin:.15rem 0 0; accent-color:var(--neon); }
+  .mail-preferences-choice input:focus-visible { outline:2px solid var(--neon); outline-offset:3px; }
+  .mail-preferences-actions { display:flex; flex-wrap:wrap; align-items:center; gap:.75rem; margin-top:1.2rem; }
+  .mail-preferences-actions button { min-height:44px; }
+  .mail-preferences-actions button:disabled { opacity:.6; cursor:default; }
+  .mail-preferences-feedback { min-height:1.5em; margin-top:.8rem; font-size:.82rem; line-height:1.6; color:var(--gris); }
+  .mail-preferences-feedback[data-state="error"] { color:#ffb9ad; }
 
   /* CAMPOS */
   .field { margin-bottom: 1.2rem; }
@@ -962,6 +971,7 @@
     <div class="sidebar-section">
       <div class="sidebar-label">Cuenta</div>
       <a href="buscARTE_perfil_publico.html" class="sidebar-link" id="sidebar-public-link"><span class="icon">👁️</span> Ver perfil público</a>
+      <a href="#mail-preferences" class="sidebar-link" onclick="setActive(this)"><span class="icon" aria-hidden="true">✉️</span> Emails de BuscARTE</a>
       <a href="#" class="sidebar-link" onclick="logout()"><span class="icon">↩️</span> Cerrar sesión</a>
       <a href="#peligro" class="sidebar-link" style="color:#ff5555;border-left-color:#3a1111" onclick="setActive(this)"><span class="icon">🗑️</span> Eliminar cuenta</a>
     </div>
@@ -1364,6 +1374,24 @@
       <p class="hint">💡 Tip: los perfiles con al menos un video reciben 3 veces más mensajes. Vale la pena subir aunque sea uno.</p>
     </div>
 
+
+    <section class="config-section" id="mail-preferences" aria-labelledby="mail-preferences-title" aria-busy="true">
+      <h2 class="section-title" id="mail-preferences-title"><span class="s-icon" aria-hidden="true">✉️</span> Emails de BuscARTE</h2>
+      <p class="section-desc">Elegí qué querés recibir. Los correos de seguridad y los avisos de tu cuenta se mantienen para que puedas usar BuscARTE.</p>
+      <label class="mail-preferences-choice" for="mail-marketing-opt-in">
+        <input type="checkbox" id="mail-marketing-opt-in" disabled>
+        <span>Novedades y oportunidades de BuscARTE por email (hasta un resumen mensual)</span>
+      </label>
+      <label class="mail-preferences-choice" for="mail-onboarding-enabled">
+        <input type="checkbox" id="mail-onboarding-enabled" disabled>
+        <span>Recordatorios con ayuda para completar mi perfil</span>
+      </label>
+      <div class="mail-preferences-actions">
+        <button type="button" class="btn-neon" id="mail-preferences-save" disabled>Guardar preferencias</button>
+        <button type="button" class="btn-ghost" id="mail-preferences-retry" hidden>Reintentar</button>
+      </div>
+      <p class="mail-preferences-feedback" id="mail-preferences-feedback" role="status" aria-live="polite" aria-atomic="true">Cargando tus preferencias…</p>
+    </section>
 
     <!-- ZONA DE PELIGRO -->
     <div class="danger-zone" id="peligro">
@@ -3093,6 +3121,7 @@ if ('serviceWorker' in navigator) {
   })();
 
 </script>
+<script src="/assets/js/email-preferencias.js"></script>
 <script src="/assets/js/escena.js"></script>
 <script src="/assets/js/escena-fondos.js"></script>
 <script src="/assets/js/cursor.js"></script>
