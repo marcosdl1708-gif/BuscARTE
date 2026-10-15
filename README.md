@@ -3,6 +3,14 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
+## Estado operativo — emails con cupo compartido, 15/10/2026
+
+Publicado a las **09:44 ART**, fuente `0c352d9`, deploy `6ad0cab54252a45ecea3bfa6`, caché v28 y 70 archivos permitidos. Conserva el arreglo móvil de hoy. Cola duradera y reserva atómica para todos los mails: techo de 90 intentos diarios/2.700 mensuales; engagement 20/600, prioridad transaccional y reintentos idempotentes. Clave de envío y plan preservados; presupuesto inicializado explícitamente y actualizado con cabeceras del proveedor.
+
+Bienvenida y recordatorios renovados; cinco básicos reales, ventanas a partir de 48 horas/siete días, baja firmada y preferencias independientes. Marketing requiere opt-in opcional; sin suscripción implícita de cuentas históricas. Resumen para toda la audiencia elegible mediante cola, sin el recorte fijo de 90. Migración remota aditiva `20261015124058`; archivo local `20261015121825_email_engagement_queue.sql`. No ejecutar db push/pull ni importar Auth histórico.
+
+177 comprobaciones de código/seguridad/empaquetado, 25 SQL aisladas, 31 de interfaz; límites/leases/permisos también comprobados con rollback en PostgreSQL real. Producción: 69 recursos/35 rutas/4 exclusiones y nueve controles de endpoints, once funciones Node 24 y tres cron confirmados. Cola/preferencias vacías al cerrar; 333 perfiles y procedimientos previos preservados, sin correos de prueba. El siguiente envío natural y el render nativo Gmail/Outlook quedan como validaciones físicas, no realizadas desde herramientas. Ver `docs/email-engagement-20261015.md`. Cierre documental `[skip netlify]`, sin repetir deploy.
+
 ## Estado operativo — mobile y retorno a Artistas, 15/10/2026
 
 Publicado a las 09:26 ART: fuente `aa4f8ac17bf321e633da56af1bbaf29372b06419`, deploy `6ad0c656fae3a210383bc9ca`, caché v27. Respuestas rápidas del chat visibles, menú Mi cuenta recorrible en horizontal y retorno Artistas→perfil→Atrás que conserva filtros, orden, cantidad cargada y posición de la persona por entrada de historial. Ver `docs/release-mobile-retorno-20261015.md` y el registro de preparación `docs/qa-mobile-retorno-20261015.md`.

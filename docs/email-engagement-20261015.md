@@ -31,4 +31,10 @@ Tras migrar: 333 perfiles, hashes de registro/reset/límites anteriores iguales;
 
 Cron: generación de recordatorios diaria 13:00 UTC; resumen día 1 13:00 UTC; despacho cada cinco minutos. El despacho de engagement sólo ocurre entre 10:00 y 18:59 ART. El paquete publica sólo los 70 archivos revisados en `dist/`, nunca documentos, backups o credenciales.
 
-La confirmación del deploy, fuente y comprobaciones públicas se añade al cerrar la publicación. Evidencia y vistas sintéticas privadas en `../BuscARTE-resguardos/auditoria-emails-20261015/`.
+## Publicación confirmada
+
+Publicado a las **09:44:52 ART**, fuente `0c352d9492995b67a2577ec56582a5829af07cd6`, deploy `6ad0cab54252a45ecea3bfa6`, caché v28. Once funciones Node 24 y tres cron coinciden con el corte revisado. Escaneo de 189 archivos sin coincidencias de secretos. GitHub rechazó inicialmente una cadena sintética del fixture; se construyó esa cadena en la prueba y se reemplazó únicamente el commit local no publicado, sin excepciones al escaneo ni force push.
+
+69 recursos servidos, 35 rutas y cuatro exclusiones comprobados contra el build; nueve controles públicos de funciones aprobados (incluido 403 de protección Netlify para el worker programado). Ningún envío de prueba. Cola/preferencias vacías; presupuesto inicial 3/131 sin consumo nuevo en la verificación; 333 perfiles y hashes de los procedimientos anteriores conservados. El siguiente envío natural y el render nativo de los clientes de correo siguen pendientes de validación, sin atribuirles una prueba no realizada.
+
+Evidencia y vistas sintéticas privadas en `../BuscARTE-resguardos/auditoria-emails-20261015/`. Cierre documental con `[skip netlify]`, sin un segundo deploy. La copia canónica conserva sus cambios ajenos de guía/preview; trabajo aislado en `../BuscARTE-web-emails-20261015`.
