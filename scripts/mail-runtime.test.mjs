@@ -15,7 +15,7 @@ function fixture(options = {}) {
   let clock = new Date('2026-10-18T15:00:00.000Z');
   const person = fixturePerson(options.person);
   const preferences = { marketing_opt_in:false, onboarding_disabled:false, ...options.preferences };
-  const jobs = new Map(), calls = [], posts = [], providerResults = [...(options.providerResults || [])];
+  const jobs = new Map(), messages = new Map(), calls = [], posts = [], providerResults = [...(options.providerResults || [])];
   const budget = { daily:options.daily ?? 0, monthly:options.monthly ?? 0, engagementDaily:options.engagementDaily ?? 0, engagementMonthly:options.engagementMonthly ?? 0 };
   const environment = name => ({RESEND_API_KEY:'test-send-only-key', RESEND_USAGE_API_KEY:options.readKey === false ? '' : 'test-read-only-key', FROM_EMAIL:'buscARTE <hola@buscarte.com.ar>'}[name] || '');
   const usageBody = () => ({emails:{daily:{used:options.providerDaily ?? 0, limit:100, resets_at:new Date(Date.UTC(clock.getUTCFullYear(), clock.getUTCMonth(), clock.getUTCDate()+1)).toISOString()},monthly:{used:options.providerMonthly ?? 0, limit:3000, resets_at:new Date(Date.UTC(clock.getUTCFullYear(), clock.getUTCMonth()+1, 1)).toISOString()}}});
@@ -27,6 +27,10 @@ function fixture(options = {}) {
     calls.push({path, method:request.method || 'GET', input:clone(input)});
     if (path.startsWith('/rest/v1/rpc/')) {
       const name = path.slice('/rest/v1/rpc/'.length);
+      if (name === 'estado_bloqueo_web') {
+        assert.equal(input.p_actor_id,'43');assert.equal(input.p_otro_id,String(person.id));
+        return {blocked_by_me:false,restricted:false};
+      }
       if (name === 'mail_usage_snapshot') {
         if (options.initialized === false) return null;
         const snapshot = usageBody();
@@ -127,6 +131,14 @@ function fixture(options = {}) {
       if (request.method === 'POST') { Object.assign(preferences,input); return null; }
       return [clone(preferences)];
     }
+    if (path.startsWith('/rest/v1/mensajes?')) {
+      const messageId=new URL(path,'https://fixture.invalid').searchParams.get('id')?.replace(/^eq\./,'');
+      return messages.has(messageId)?[clone(messages.get(messageId))]:[];
+    }
+    if (path.startsWith('/rest/v1/email_outbox?')) {
+      const jobId=new URL(path,'https://fixture.invalid').searchParams.get('id')?.replace(/^eq\./,'');
+      const job=jobs.get(jobId);return job?[{status:job.status,lease_token:job.lease_token}]:[];
+    }
     throw new Error(`Unexpected backend path ${path}`);
   };
   const transport = async (url, request = {}) => {
@@ -149,7 +161,12 @@ function fixture(options = {}) {
     return new Response(JSON.stringify(result.body || {}), {status:result.status,headers:{'Content-Type':'application/json',...result.headers}});
   };
   const service = createMailService({backendJson:db,fetch:transport,environment,secret:()=>SECRET,now:()=>new Date(clock)});
-  const enqueue = (tipo = 'mensaje', changes = {}) => service.enqueue({tipo,destinatario:person.email,perfilId:person.id,datos:tipo === 'perfil_incompleto' ? {etapa:'48h'} : {nombre:person.nombre,remitente:'Pedro',preview:'Hola'},eventKey:'test:'+randomUUID(),...changes});
+  const enqueue = (tipo = 'mensaje', changes = {}) => {
+    const messageId=String(messages.size+100);
+    const eventKey=changes.eventKey || (tipo==='mensaje'?'message:'+messageId:'test:'+randomUUID());
+    if(tipo==='mensaje' && /^message:[1-9]\d*$/.test(eventKey))messages.set(eventKey.slice(8),{id:Number(eventKey.slice(8)),de_user_id:43,para_user_id:person.id});
+    return service.enqueue({tipo,destinatario:person.email,perfilId:person.id,datos:tipo === 'perfil_incompleto' ? {etapa:'48h'} : {nombre:person.nombre,remitente:'Pedro',preview:'Hola'},...changes,eventKey});
+  };
   return {service,enqueue,jobs,person,preferences,calls,posts,budget,row,advance:ms=>{clock=new Date(clock.getTime()+ms);},setTime:value=>{clock=new Date(value);}};
 }
 

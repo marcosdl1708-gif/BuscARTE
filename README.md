@@ -3,6 +3,20 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
+## Preparación local — bloqueo y reportes, 15/10/2026
+
+**No publicado ni aplicado a la base real.** Rama `codex/moderacion-local-20261015`, base `f724412` sobre la publicación v28 indicada abajo. Candidato de caché v29 y 72 archivos públicos permitidos; no confundir el `dist/` local con producción. Sin push, deploy, correos reales, reenvío a Google ni cambios de Android/Auth/cuentas. Guía ajena y `preview/` preservadas y excluidas del commit/paquete.
+
+Bloquear/desbloquear desde chat o perfil impide nuevos mensajes en ambos sentidos, sin borrar el historial ni ocultar perfiles/contactos públicos. El servidor verifica la sesión HttpOnly; la identidad no proviene del cliente. Los reportes nuevos se guardan con referencia y reintento idempotente antes de confirmar, admiten motivo/detalle y contexto de conversación verificado, sin copiar automáticamente el historial. El aviso administrativo usa la cola existente; no se creó un panel de moderación ni una sanción automática. Reportar no bloquea por sí solo. Compatibilidad: el antiguo endpoint de reporte por email sigue autenticado y disponible para interfaces en caché, pero esos reportes legacy no se convierten retrospectivamente en registros nuevos.
+
+Migración puntual candidata `supabase/migrations/20261015125839_user_blocks_reports.sql`: dos tablas privadas con RLS y rutinas sólo para el servidor, bloqueo por par en la base y cancelación de avisos de mensajes pendientes/arrendados. La cola revalida el mensaje, el bloqueo y su lease antes del proveedor, conservando cupos y preferencias actuales. No puede retirar un correo que ya cruzó ese límite y está en vuelo. No ejecutar `db push/pull` ni importar migraciones históricas.
+
+Validación local aislada: **458 comprobaciones aprobadas, cero fallos, una omitida explícitamente**. Incluye 222 de interfaz/navegación/sesión (123 escenarios A2, 27 controles móviles, retorno a Artistas y 18 casos nuevos de moderación) y 236 de servidor, SQL, correo y empaquetado. El PostgreSQL/WASM ejecutó 28 casos SQL; la única omisión es contención real entre dos sesiones independientes. Sin desvíos de fuente durante las matrices finales; build verificado de 72 archivos. Capturas revisadas: reporte a 320 px y campo/Enviar visibles en chat compacto; durante la revisión se corrigió esa regresión de altura.
+
+Antes de autorizar una publicación: comprobar estructura/permisos actuales y rollback, probar concurrencia en PostgreSQL con dos sesiones y acordar la aplicación puntual + deploy coordinado; si la verificación falla, no publicar el frontend ni el guard de envío. Después corresponde prueba física Android/teclado/red con testers. Evidencia privada: `../BuscARTE-resguardos/moderacion-local-20261015/result.json` y `../BuscARTE-resguardos/moderacion-final-ui-20261015/`.
+
+La auditoría de Play del 15/10 quedó en `../BuscARTE-resguardos/play-console-20261015/audit.json`: producción aún inactiva, solicitud no aprobada y botón deshabilitado; el panel mostraba 12 testers y cinco días continuos de los 14 adicionales. No se estableció una causa específica de rechazo distinta de la indicación general de más pruebas. Políticas sin incidencias visibles no equivalen a aprobación de producción. Ficha/capturas, coherencia de privacidad/Data Safety y ajustes nativos siguen como bloques separados, pendientes de nuevo OK; este bloque no certifica aprobación de Google.
+
 ## Estado operativo — emails con cupo compartido, 15/10/2026
 
 Publicado a las **09:44 ART**, fuente `0c352d9`, deploy `6ad0cab54252a45ecea3bfa6`, caché v28 y 70 archivos permitidos. Conserva el arreglo móvil de hoy. Cola duradera y reserva atómica para todos los mails: techo de 90 intentos diarios/2.700 mensuales; engagement 20/600, prioridad transaccional y reintentos idempotentes. Clave de envío y plan preservados; presupuesto inicializado explícitamente y actualizado con cabeceras del proveedor.

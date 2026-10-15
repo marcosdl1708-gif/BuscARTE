@@ -53,6 +53,7 @@ for (const [width, height] of [[320, 568], [390, 844], [844, 390]]) {
     const f = await setup(t, 'buscARTE_mensajes.html', width, height);
     await f.page.locator('.conv-item').first().click();
     await f.page.locator('#quick-replies.visible').waitFor();
+    if(process.env.BUSCARTE_MOBILE_BASELINE!=='1')await f.page.waitForFunction(()=>document.querySelector('#chat-moderation').dataset.status==='allowed');
     const result = { test: t.name };
     results.push(result);
     const first = f.page.locator('.quick-reply').first();

@@ -31,6 +31,10 @@ async function setup(t,{file='buscARTE_perfil.html',width=390,signed=true,cached
       if(method==='POST'){assert.deepEqual(request.postDataJSON(),{action:'logout'});state.user=null;return reply({ok:true});}
       return state.user?reply({user:state.user}):reply({error:'Sesión requerida',code:'SESSION_REQUIRED'},401);
     }
+    if(url.origin===origin&&url.pathname==='/.netlify/functions/email-preferences'&&method==='GET'){
+      state.calls.push({path:'email-preferences',method});
+      return state.user?reply({marketing_opt_in:false,onboarding_disabled:false}):reply({code:'SESSION_REQUIRED'},401);
+    }
     if(url.origin===origin&&url.pathname==='/.netlify/functions/guardar-perfil'){
       const body=request.postDataJSON();state.calls.push({path:'guardar-perfil',method,body});
       assert.equal(body.email,undefined);assert.equal(body.password,undefined);assert.equal(String(body.profileId),'210');

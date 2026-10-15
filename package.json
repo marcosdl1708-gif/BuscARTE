@@ -15,6 +15,8 @@
     "test:escena": "node --test scripts/escena-release.test.cjs scripts/escena-reported-layout.test.cjs",
     "test:mobile-controls": "node --test scripts/mobile-controls.test.cjs",
     "test:busqueda-retorno": "node --test scripts/busqueda-retorno.test.cjs",
+    "test:moderacion": "node --test scripts/moderacion-security.test.mjs scripts/moderacion-browser.test.cjs",
+    "test:moderacion-sql": "node --test scripts/moderacion-sql.test.mjs",
     "test:inicio": "node --test scripts/inicio-sesion.test.cjs",
     "test:inicio-visual": "node --test scripts/inicio-visual.test.cjs",
     "test:perfil": "node --test scripts/perfil-propio.test.cjs",

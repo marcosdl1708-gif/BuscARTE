@@ -1,5 +1,6 @@
 import { backend, backendJson, trustedOrigin, sessionUser, startSession, endSession, clearCookie, readJson, readBytes, json, id, object, rate, notify } from '../lib/session.mjs';
 import { RUBROS, DETAIL_FIELDS, belongsTo, projectProfile, detailObject } from '../lib/disciplinas.mjs';
+import { assertCanCommunicate, ModerationError, moderationFailure, moderationBackendError } from '../lib/moderacion.mjs';
 
 const PROFILE = 'id,created_at,nombre,instrumento,generos,provincia,ciudad,barrio,bio,referentes,disponibilidad,donde_ensaya,redes,videos,es_premium,foto_url,celular,baneado,experiencia,edad,genero_principal,tipo_cuenta,rubro,campos_especificos,disciplinas,perfil_revision';
 const COLUMNS = {
@@ -53,7 +54,10 @@ function prefer(request) {
 }
 async function responseFor(path, request, method=request.method, payload, extra={}) {
   const response = await backend(path, { method, headers:{ Prefer:prefer(request),...extra }, ...(payload===undefined?{}:{body:JSON.stringify(payload)}) });
-  if (!response.ok) return fail(response.status===409?400:502);
+  if (!response.ok) {
+    const blocked=await moderationBackendError(response);if(blocked)return moderationFailure(blocked);
+    return fail(response.status===409?400:502);
+  }
   const headers = { 'Cache-Control':'no-store','Content-Type':'application/json; charset=utf-8','X-Content-Type-Options':'nosniff' };
   const range = response.headers.get('content-range'); if (range) headers['Content-Range']=range;
   if (request.method==='HEAD' || response.status===204) return new Response(null,{status:response.status,headers});
@@ -199,11 +203,20 @@ async function write(table, route, request, user, context) {
       if(!only(payload,['user1_id','user2_id','anuncio_id','ultimo_mensaje','updated_at']) || !id(payload.user1_id) || !id(payload.user2_id) || (!same(payload.user1_id,user)&&!same(payload.user2_id,user)) || id(payload.user1_id)===id(payload.user2_id))return fail(403);
       const other=same(payload.user1_id,user)?id(payload.user2_id):id(payload.user1_id);
       if(!await profileExists(other))return fail(403);
+      await assertCanCommunicate(uid,other);
       if(payload.anuncio_id) { const ad=await adExists(payload.anuncio_id);if(!ad || (id(ad.user_id)!==uid && id(ad.user_id)!==other))return fail(403); }
       return responseFor('/rest/v1/conversaciones',request,'POST',{user1_id:id(payload.user1_id),user2_id:id(payload.user2_id),anuncio_id:payload.anuncio_id?id(payload.anuncio_id):null,ultimo_mensaje:'',updated_at:new Date().toISOString()});
     }
     if(request.method==='PATCH') {
       if(!only(payload,['ultimo_mensaje','updated_at','anuncio_id']) || !str(payload.ultimo_mensaje,8000))return fail(400);
+      // A preview update is not allowed to bypass a block or rewrite unrelated
+      // conversations. Require one exact, session-owned conversation.
+      const conversationId=params.get('id')?.replace(/^eq\./,'');
+      if(!id(conversationId) || route.searchParams.get('id')!=='eq.'+id(conversationId))return fail(400);
+      const conversations=await backendJson('/rest/v1/conversaciones?id=eq.'+id(conversationId)+'&select=user1_id,user2_id&limit=1');
+      const current=conversations?.[0];
+      if(!current || (!same(current.user1_id,user)&&!same(current.user2_id,user)))return fail(403);
+      await assertCanCommunicate(uid,same(current.user1_id,user)?current.user2_id:current.user1_id);
       // Never let a preview update move a conversation to somebody else's ad.
       if(payload.anuncio_id) {
         const conversationId=params.get('id')?.replace(/^eq\./,'');
@@ -219,10 +232,14 @@ async function write(table, route, request, user, context) {
   }
   if(table==='mensajes') {
     if(request.method!=='POST' || !only(payload,['de_user_id','para_user_id','anuncio_id','contenido']) || !same(payload.de_user_id,user) || !id(payload.para_user_id) || same(payload.para_user_id,user) || !str(payload.contenido,8000) || !payload.contenido.trim() || !await profileExists(payload.para_user_id))return fail(403);
+    await assertCanCommunicate(uid,payload.para_user_id);
     if(!await rate(request,'message',30,60))return fail(429);
     if(payload.anuncio_id) { const ad=await adExists(payload.anuncio_id);if(!ad || (id(ad.user_id)!==uid && id(ad.user_id)!==id(payload.para_user_id)))return fail(403); }
     const result=await backend('/rest/v1/mensajes',{method:'POST',headers:{Prefer:'return=representation'},body:JSON.stringify({de_user_id:uid,para_user_id:id(payload.para_user_id),anuncio_id:payload.anuncio_id?id(payload.anuncio_id):null,contenido:payload.contenido.trim()})});
-    if(!result.ok)return fail(502);
+    if(!result.ok) {
+      const blocked=await moderationBackendError(result);if(blocked)return moderationFailure(blocked);
+      return fail(502);
+    }
     const saved=await result.json(); if(!Array.isArray(saved)||saved.length!==1||!id(saved[0].id))return fail(502);
     const task=(async()=>{const [recipient]=await backendJson('/rest/v1/perfiles?id=eq.'+id(payload.para_user_id)+'&select=email,nombre&limit=1');if(recipient?.email)await notify('mensaje',recipient.email,{remitente:user.nombre||'Una persona de buscARTE',preview:payload.contenido.slice(0,120)},{perfilId:payload.para_user_id,eventKey:'message:'+saved[0].id});})().catch(()=>{});
     if(context?.waitUntil)context.waitUntil(task);else await task;
@@ -325,6 +342,6 @@ export default async function datos(request, context) {
     }
     if(table==='perfiles')return await profileResponse(params,request);
     return await responseFor('/rest/v1/'+table+'?'+params,request);
-  } catch { return fail(503); }
+  } catch(error) { return error instanceof ModerationError?moderationFailure(error):fail(503); }
 }
 export const config = { path:'/.netlify/functions/datos',rateLimit:{windowLimit:180,windowSize:60,aggregateBy:['ip','domain'],action:'rate_limit'} };

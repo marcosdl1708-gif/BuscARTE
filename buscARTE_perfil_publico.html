@@ -3,6 +3,8 @@
 <head>
 <script src="/assets/js/sesion-segura.js"></script>
   <script src="/assets/js/disciplinas.js"></script>
+<script src="/assets/js/moderacion.js"></script>
+<link rel="stylesheet" href="/assets/css/moderacion.css">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- SEO: canónica única por id. Resuelve "Duplicada sin canónica" en GSC.
@@ -945,9 +947,11 @@
 
     <div class="sidebar-card" id="contact-card" hidden>
       <div class="sidebar-card-title">Enviar mensaje</div>
+      <div id="profile-moderation" hidden></div>
       <div class="contact-form">
-        <textarea placeholder="Escribí tu mensaje..." aria-label="Mensaje para este perfil"></textarea>
-        <button class="btn-send" onclick="sendMessage()">Enviar →</button>
+        <textarea placeholder="Escribí tu mensaje..." aria-label="Mensaje para este perfil" maxlength="1000"></textarea>
+        <button class="btn-send" onclick="sendMessage()" disabled>Enviar →</button>
+        <p id="profile-send-error" role="alert"></p>
         <p class="login-note">¿No tenés cuenta? <a href="buscARTE_registro.html">Registrate gratis</a> para contactar artistas.</p>
       </div>
     </div>
@@ -974,6 +978,17 @@
   let perfilCargaVersion = 0;
   let perfilObjetivoId = '';
   let ultimoEspectador = sesionPerfilId();
+  let enviandoContacto = false;
+  let ultimoContactoMostrado = '';
+  const borradoresContacto = new Map();
+  const perfilModeracion = window.BuscARTEModeracion.create({mount:'#profile-moderation',onChange:actualizarEstadoEnvioPerfil});
+
+  function actualizarEstadoEnvioPerfil() {
+    const send = document.querySelector('.contact-form .btn-send');
+    const textarea = document.querySelector('.contact-form textarea');
+    textarea.readOnly = perfilModeracion.state.status === 'restricted';
+    send.disabled = enviandoContacto || (!send.dataset.delivered && !perfilModeracion.canSend(perfilCargado?.id));
+  }
 
   function volverAResultados(event) {
     if (event && (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)) return true;
@@ -1074,13 +1089,11 @@
     const affinity = document.querySelector('.profile-match-hero');
     affinity.hidden = !ready || own || affinity.querySelector('.match-big')?.style.display !== 'block';
     document.querySelector('.login-note').hidden = !!uid;
-    if (!ready || own) {
-      document.getElementById('report-overlay')?.classList.remove('open');
-    }
     if (uid !== ultimoEspectador) {
+      borradoresContacto.clear(); ultimoContactoMostrado = '';
       document.querySelector('.contact-form textarea').value = '';
       const send = document.querySelector('.btn-send');
-      send.textContent = 'Enviar →'; send.disabled = false;
+      send.textContent = 'Enviar →'; send.disabled = true; delete send.dataset.delivered;
       send.style.background = ''; send.style.opacity = '';
       send.onclick = sendMessage;
       yaGuardado = false;
@@ -1089,6 +1102,19 @@
       ultimoEspectador = uid;
       if (ready && !own && uid) verificarGuardado(perfilCargado.id);
     }
+    if (ready && !own) {
+      const contacto = uid + ':' + normalizarPerfilId(perfilCargado.id);
+      if (contacto !== ultimoContactoMostrado) {
+        const textarea=document.querySelector('.contact-form textarea'),send=document.querySelector('.contact-form .btn-send');
+        if (ultimoContactoMostrado) borradoresContacto.set(ultimoContactoMostrado,textarea.value);
+        textarea.value=borradoresContacto.get(contacto)||'';
+        ultimoContactoMostrado=contacto;
+        delete send.dataset.delivered; send.textContent='Enviar →'; send.onclick=sendMessage; send.style.background=''; send.style.opacity='';
+        document.getElementById('profile-send-error').textContent='';
+      }
+    }
+    perfilModeracion.setTarget(ready && !own ? {perfilId:perfilCargado.id,nombre:perfilCargado.nombre} : null);
+    actualizarEstadoEnvioPerfil();
   }
   function refrescarAccionesPerfil() {
     if (objetivoPerfilId() !== perfilObjetivoId) { cargarPerfilPublico(); return; }
@@ -1723,12 +1749,15 @@
   cargarPerfilPublico()
 
   async function sendMessage() {
+    if (enviandoContacto) return
     actualizarAccionesPerfil()
     if (!perfilAjenoDisponible()) return
     const ta = document.querySelector('.contact-form textarea')
     const btn = document.querySelector('.btn-send')
     const texto = ta.value.trim()
     if (!texto) { ta.focus(); return }
+    if (texto.length > 1000) { document.getElementById('profile-send-error').textContent = 'Máximo 1000 caracteres.'; return }
+    const original = ta.value
 
     const miId = sesionPerfilId()
     const paraId = normalizarPerfilId(perfilCargado.id)
@@ -1741,12 +1770,16 @@
       window.location.href = 'buscARTE_login.html'
       return
     }
+    if (!perfilModeracion.canSend(paraId)) { actualizarEstadoEnvioPerfil(); perfilModeracion.focusStatus(); return }
 
     btn.textContent = 'Enviando...'
     btn.style.opacity = '0.7'
     btn.disabled = true
+    enviandoContacto = true
+    document.getElementById('profile-send-error').textContent = ''
 
     try {
+      if (!await perfilModeracion.ensureAllowed(paraId) || !mismoContacto()) { perfilModeracion.focusStatus(); return }
       if (!paraId) {
         // Sin ID en la URL no hay destinatario: no fingir que se envió
         btn.textContent = 'Enviar →'
@@ -1775,7 +1808,7 @@
           headers: { ...hdrs, 'Prefer': 'return=representation' },
           body: JSON.stringify({ user1_id: parseInt(miId), user2_id: parseInt(paraId), ultimo_mensaje: texto })
         })
-        if (!nueva.ok) throw new Error('No se pudo crear la conversación.');
+        if (!nueva.ok) { await perfilModeracion.handleSendFailure(nueva,paraId); throw new Error('No se pudo crear la conversación.'); }
         const [conv] = await nueva.json()
         if (!mismoContacto()) return
         convId = conv.id
@@ -1787,7 +1820,7 @@
         headers: { ...hdrs, 'Prefer': 'return=minimal' },
         body: JSON.stringify({ de_user_id: parseInt(miId), para_user_id: parseInt(paraId), contenido: texto })
       })
-      if (!mensajeGuardado.ok) throw new Error('No se pudo confirmar el mensaje. Conservamos tu texto.');
+      if (!mensajeGuardado.ok) { await perfilModeracion.handleSendFailure(mensajeGuardado,paraId); throw new Error('No se pudo confirmar el mensaje. Conservamos tu texto.'); }
       if (!mismoContacto()) return
 
       // Actualizar último mensaje
@@ -1801,7 +1834,8 @@
       btn.textContent = '✓ Mensaje enviado'
       btn.style.background = '#a8c832'
       btn.style.opacity = '1'
-      ta.value = ''
+      if (ta.value === original) ta.value = ''
+      btn.dataset.delivered = 'true'
       setTimeout(()=>{
         if (!mismoContacto()) return
         btn.textContent = 'Ver en mensajes →'
@@ -1812,11 +1846,15 @@
 
     } catch(e) {
       if (!mismoContacto()) return
-      alert('Error al enviar. Intentá de nuevo.')
+      document.getElementById('profile-send-error').textContent = 'No se pudo enviar. Conservamos tu mensaje; intentá de nuevo.'
       console.error(e)
       btn.textContent = 'Enviar →'
       btn.style.opacity = '1'
       btn.disabled = false
+    } finally {
+      enviandoContacto = false
+      if (mismoContacto() && !btn.dataset.delivered) { btn.textContent = 'Enviar →'; btn.style.opacity = '1'; }
+      actualizarEstadoEnvioPerfil()
     }
   }
 
@@ -1870,87 +1908,10 @@
   function logout() { return window.BuscARTESesion.logout(); }
 
   // ─── REPORTAR PERFIL ───
-  let reportMotivo = '';
   function abrirReporte() {
     actualizarAccionesPerfil();
     if (!perfilAjenoDisponible()) return;
-    const ov = document.getElementById('report-overlay');
-    const formC = document.getElementById('report-form-content');
-    const successC = document.getElementById('report-success');
-    const errorC = document.getElementById('report-error');
-    const detalle = document.getElementById('report-detail');
-    const send = document.getElementById('btn-send-report');
-    reportMotivo = '';
-    document.querySelectorAll('.report-option').forEach(b => b.classList.remove('selected'));
-    if (formC) formC.style.display = 'block';
-    if (successC) successC.style.display = 'none';
-    if (errorC) errorC.style.display = 'none';
-    if (detalle) { detalle.value = ''; detalle.classList.remove('visible'); }
-    if (send) { send.textContent = 'Enviar reporte'; send.disabled = true; }
-    if (ov) ov.classList.add('open');
-  }
-  function cerrarReporte() {
-    const ov = document.getElementById('report-overlay');
-    if (ov) ov.classList.remove('open');
-  }
-  function selectMotivo(btn, motivo) {
-    reportMotivo = motivo;
-    document.querySelectorAll('.report-option').forEach(b => b.classList.remove('selected'));
-    if (btn) btn.classList.add('selected');
-    const send = document.getElementById('btn-send-report');
-    const detalle = document.getElementById('report-detail');
-    const errorC = document.getElementById('report-error');
-    if (send) send.disabled = false;
-    if (detalle) detalle.classList.add('visible');
-    if (errorC) errorC.style.display = 'none';
-  }
-  async function enviarReporte() {
-    actualizarAccionesPerfil();
-    if (!perfilAjenoDisponible()) return;
-    if (!reportMotivo) return;
-    const send = document.getElementById('btn-send-report');
-    const detalle = document.getElementById('report-detail')?.value?.trim() || '';
-    const params = new URLSearchParams(window.location.search);
-    const perfilId = params.get('id') || '';
-    const perfilNombre = (document.getElementById('perfil-nombre')?.textContent || '').replace(/\s+/g, ' ').trim();
-    const errorC = document.getElementById('report-error');
-    const fallback = document.getElementById('report-email-fallback');
-    if (errorC) errorC.style.display = 'none';
-    if (send) { send.textContent = 'Enviando...'; send.disabled = true; }
-    try {
-      const response = await fetch('/.netlify/functions/send-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          tipo: 'reporte',
-          datos: {
-            perfilId: perfilId,
-            perfilNombre: perfilNombre,
-            motivo: reportMotivo,
-            detalle: detalle,
-            reporterId: leerCachePerfil('ba_user_id') || 'anónimo',
-            reporterNombre: leerCachePerfil('ba_name') || 'Usuario no informado',
-            url: window.location.href
-          }
-        })
-      });
-      if (!response.ok) throw new Error(`El servidor respondió ${response.status}`);
-
-      const formC = document.getElementById('report-form-content');
-      const successC = document.getElementById('report-success');
-      if (formC) formC.style.display = 'none';
-      if (successC) successC.style.display = 'block';
-      setTimeout(cerrarReporte, 2500);
-    } catch (e) {
-      console.error('Error enviando reporte:', e);
-      if (fallback) {
-        const asunto = 'Reporte de perfil en buscARTE';
-        const cuerpo = `Perfil: ${perfilNombre || 'Sin nombre'}\nID: ${perfilId || 'No informado'}\nMotivo: ${reportMotivo}\nDetalles: ${detalle || 'Sin detalles'}\nEnlace: ${window.location.href}`;
-        fallback.href = `mailto:BuscARTE.webmail@gmail.com?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
-      }
-      if (errorC) errorC.style.display = 'block';
-      if (send) { send.textContent = 'Reintentar'; send.disabled = false; }
-    }
+    perfilModeracion.report(document.activeElement);
   }
 
 
@@ -2003,36 +1964,6 @@ function closeMbnPanel(){
 function mbnLogout() { return window.BuscARTESesion.logout(); }
 </script>
 
-<div class="report-modal-overlay" id="report-overlay" onclick="if(event.target===this)cerrarReporte()">
-  <div class="report-modal">
-    <div id="report-form-content">
-      <div class="report-modal-title">Reportar perfil</div>
-      <div class="report-modal-sub" id="report-sub">¿Por qué querés reportar este perfil?</div>
-      <div class="report-options">
-        <button type="button" class="report-option" onclick="selectMotivo(this,'Explotación, abuso o riesgo infantil')">🛡️ Explotación, abuso o riesgo infantil</button>
-        <button class="report-option" onclick="selectMotivo(this,'Contenido inapropiado')">🚫 Contenido inapropiado u ofensivo</button>
-        <button class="report-option" onclick="selectMotivo(this,'Spam o publicidad')">📢 Spam o publicidad no autorizada</button>
-        <button class="report-option" onclick="selectMotivo(this,'Perfil falso')">🎭 Perfil falso o identidad robada</button>
-        <button class="report-option" onclick="selectMotivo(this,'Comportamiento abusivo')">⚠️ Comportamiento abusivo o acoso</button>
-        <button class="report-option" onclick="selectMotivo(this,'Otro')">💬 Otro motivo</button>
-      </div>
-      <textarea class="report-detail" id="report-detail" placeholder="Contanos más detalles (opcional)..."></textarea>
-      <div class="report-actions">
-        <button class="btn-report-cancel" onclick="cerrarReporte()">Cancelar</button>
-        <button class="btn-report-send" id="btn-send-report" onclick="enviarReporte()" disabled>Enviar reporte</button>
-      </div>
-      <div class="report-error" id="report-error" role="alert">
-        No pudimos enviar el reporte. Reintentá o
-        <a id="report-email-fallback" href="mailto:BuscARTE.webmail@gmail.com?subject=Reporte%20de%20perfil%20en%20buscARTE">envialo por correo</a>.
-      </div>
-    </div>
-    <div class="report-success" id="report-success" style="display:none">
-      <div class="report-success-icon">✅</div>
-      <div class="report-success-title">Reporte enviado</div>
-      <div class="report-success-sub">Lo revisamos a la brevedad. Gracias por ayudarnos a mantener la comunidad sana.</div>
-    </div>
-  </div>
-</div>
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {

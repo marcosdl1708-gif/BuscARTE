@@ -106,6 +106,11 @@ async function withBackend(options, action) {
         assert.equal(method,'POST');
         return reply(200,options.denyScope!==body.p_scope);
       }
+      if(url.pathname==='/rest/v1/rpc/estado_bloqueo_web') {
+        assert.equal(method,'POST');
+        assert.equal(body.p_actor_id,'701');assert.equal(body.p_otro_id,'702');
+        return reply(200,{blocked_by_me:false,restricted:false});
+      }
       if(url.pathname==='/rest/v1/sesiones_web') {
         if(method==='POST') {
           if(options.sessionStartFail)return reply(500,{private:'synthetic session detail'});

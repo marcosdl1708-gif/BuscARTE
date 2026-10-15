@@ -69,6 +69,14 @@ transport = transport.replace('  async function api(request, url) {', `
 const saveStart=transport.indexOf("    if (route === '/.netlify/functions/guardar-perfil') {"),saveEnd=transport.indexOf("    if (route === '/.netlify/functions/send-email')",saveStart);
 assert.ok(saveStart>0&&saveEnd>saveStart,'Known synthetic save boundary');
 transport=transport.slice(0,saveStart)+`
+    if (route === '/.netlify/functions/moderacion') {
+      if (method !== 'GET') return fail('Fixture: moderation mutations require their own test.',405);
+      return qaSessionId ? json({blocked_by_me:false,restricted:false}) : fail('Fixture session required.',401);
+    }
+    if (route === '/.netlify/functions/email-preferences') {
+      if (method !== 'GET') return fail('Fixture: preference mutations require their own test.',405);
+      return qaSessionId ? json({marketing_opt_in:false,onboarding_disabled:false}) : fail('Fixture session required.',401);
+    }
     if (route === '/.netlify/functions/guardar-perfil') {
       if (method !== 'POST') return fail('Fixture: save method denied.',405);
       const user=state.perfiles.find(row=>sameId(row.id,qaSessionId));

@@ -2,6 +2,7 @@ import { createHash, createHmac, randomUUID, timingSafeEqual } from 'node:crypto
 import { backendJson, environment, internalMailSecret } from './session.mjs';
 import { buildEmail } from './mail-templates.mjs';
 import { missingBasics } from './mail-profile.mjs';
+import { readModerationState } from './moderacion.mjs';
 
 export const MAIL_LIMITS = Object.freeze({ daily:90, engagementDaily:20, monthly:2700, engagementMonthly:600 });
 const BASE = 'https://buscarte.com.ar';
@@ -65,6 +66,21 @@ export function createMailService(deps={}) {
     const rows=await db('/rest/v1/email_preferences?perfil_id=eq.'+id+'&email=eq.'+encodeURIComponent(normalizeEmail(email))+'&select=marketing_opt_in,onboarding_disabled&limit=1');
     return Array.isArray(rows)&&rows.length?rows[0]:{marketing_opt_in:false,onboarding_disabled:false};
   }
+  async function messageRestriction(job,person,checkLease=false) {
+    if(job.tipo!=='mensaje')return null;
+    const messageId=/^message:([1-9]\d{0,14})$/.exec(job.event_key||'')?.[1];
+    if(!messageId || !person)return 'message_unverified';
+    const rows=await db('/rest/v1/mensajes?id=eq.'+messageId+'&select=id,de_user_id,para_user_id&limit=1');
+    if(!Array.isArray(rows)||rows.length!==1||String(rows[0].id)!==messageId||
+      String(rows[0].para_user_id)!==String(person.id)||!profileId(rows[0].de_user_id)||String(rows[0].de_user_id)===String(person.id))return 'message_unverified';
+    const state=await readModerationState(rows[0].de_user_id,person.id,rpc);
+    if(state.restricted)return 'communication_blocked';
+    if(checkLease) {
+      const leases=await db('/rest/v1/email_outbox?id=eq.'+job.id+'&select=status,lease_token&limit=1');
+      if(!Array.isArray(leases)||leases.length!==1||leases[0].status!=='leased'||leases[0].lease_token!==job.lease_token)return 'message_cancelled';
+    }
+    return null;
+  }
   async function savePreferences(user,value) {
     if(!profileId(user.id)||!validEmail(normalizeEmail(user.email)))throw new Error('identity');
     await db('/rest/v1/email_preferences?on_conflict=perfil_id,email',{
@@ -119,6 +135,8 @@ export function createMailService(deps={}) {
       if(job.perfil_id&&(!person||person.baneado||normalizeEmail(person.email)!==job.recipient)) {
         await finish(job,'cancelled','profile_changed');return {status:'cancelled'};
       }
+      const restricted=await messageRestriction(job,person);
+      if(restricted) {await finish(job,'cancelled',restricted);return {status:'cancelled'};}
       const prefs=person?await preferences(person.id,person.email):null;
       if(job.category==='engagement') {
         const onboarding=job.tipo==='perfil_incompleto' && job.data?.etapa!=='reactivacion';
@@ -179,6 +197,11 @@ export function createMailService(deps={}) {
           await finish(job,'cancelled','reset_superseded');return {status:'cancelled'};
         }
       }
+      // A block can occur while rendering or waiting for a quota. Recheck the
+      // persisted message pair immediately before the provider boundary. Jobs
+      // cancelled by the DB block trigger are never intentionally resurrected.
+      const latestRestriction=await messageRestriction(job,person,true);
+      if(latestRestriction) {await finish(job,'cancelled',latestRestriction);return {status:'cancelled'};}
       const response=await transport('https://api.resend.com/emails',{
         method:'POST',headers:{Authorization:'Bearer '+key,'Content-Type':'application/json','Idempotency-Key':'buscarte/'+job.id},
         body:JSON.stringify(payload),redirect:'error',signal:AbortSignal.timeout(8000)

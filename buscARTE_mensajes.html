@@ -3,6 +3,8 @@
 <head>
 <script src="/assets/js/sesion-segura.js"></script>
   <script src="/assets/js/disciplinas.js"></script>
+<script src="/assets/js/moderacion.js"></script>
+<link rel="stylesheet" href="/assets/css/moderacion.css">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>buscARTE — Mensajes</title>
@@ -283,7 +285,6 @@
       <div class="chat-header-actions">
         <span class="chat-toolbar-pill" id="chat-status-pill">Activo</span>
         <button type="button" class="chat-action-btn soft" onclick="cargarMensajes(true)">Actualizar</button>
-        <button type="button" class="chat-action-btn soft" onclick="reportarConversacion()">Reportar</button>
         <a id="chat-ver-perfil" class="chat-action-btn chat-profile-btn" hidden>Ver perfil →</a>
       </div>
     </header>
@@ -300,6 +301,8 @@
       </div>
     </div>
     <div class="chat-input-area" id="chat-input-area">
+      <div class="chat-compose-tools" aria-label="Seguridad y respuestas rápidas">
+      <div id="chat-moderation" hidden></div>
       <div class="quick-replies" id="quick-replies">
         <div class="quick-reply-label" id="quick-reply-label">Respuestas rápidas</div>
         <div class="quick-reply-actions" role="group" aria-labelledby="quick-reply-label">
@@ -309,10 +312,11 @@
           <button type="button" class="quick-reply" onclick="insertQuickReply('Genial, pasame más data y vemos cómo seguimos.')">Pedir data</button>
         </div>
       </div>
+      </div>
       <div class="composer-disabled-note" id="composer-note">Seleccioná una conversación para escribir.</div>
       <div class="chat-input-wrap">
         <textarea id="chat-input" placeholder="Escribí un mensaje..." rows="1" maxlength="1000" onkeydown="handleKey(event)" oninput="autoResize(this); updateComposerState()"></textarea>
-        <button class="chat-send-btn" id="chat-send-btn" onclick="sendMessage()" disabled>↑</button>
+        <button class="chat-send-btn" id="chat-send-btn" onclick="sendMessage()" aria-label="Enviar mensaje" disabled>↑</button>
       </div>
       <div class="chat-input-hint">
         <span>Enter para enviar · Shift+Enter para nueva línea</span>
@@ -375,6 +379,8 @@
   try { readByUser = JSON.parse(localStorage.getItem('ba_msg_read_by_user') || '{}') || {}; } catch(_) { readByUser = {}; }
   // Firma del último render de mensajes — evita re-renderizar (y romper el scroll) en el polling.
   let ultimaFirmaMsgs = '';
+  const borradoresChat = new Map();
+  const chatModeracion = window.BuscARTEModeracion.create({mount:'#chat-moderation',onChange:updateComposerState,showReport:true});
 
   // No inferir una sesión desde el ID guardado en el navegador.
 
@@ -605,7 +611,10 @@
   }
 
   async function abrirConv(conv) {
+    if (convActiva && String(convActiva.id) !== String(conv.id)) borradoresChat.set(String(convActiva.id),document.getElementById('chat-input').value);
+    if (!convActiva || String(convActiva.id) !== String(conv.id)) document.getElementById('chat-input').value = borradoresChat.get(String(conv.id)) || '';
     convActiva = conv;
+    chatModeracion.setTarget({perfilId:conv.otroId,conversacionId:conv.id,nombre:conv.nombre});
     document.querySelectorAll('.conv-item').forEach(i => i.classList.toggle('active', String(i.dataset.convId) === String(conv.id)));
     document.getElementById('chat-panel').classList.add('mobile-visible');
     document.getElementById('chat-header').style.display = 'flex';
@@ -746,6 +755,7 @@
       document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
       return;
     }
+    if (!chatModeracion.canSend(convActiva.otroId)) { updateComposerState(); chatModeracion.focusStatus(); return; }
     const original = input.value;
     const conversacionEnviada = convActiva;
     const destinoEnviado = conversacionEnviada.otroId;
@@ -754,12 +764,13 @@
     btn.disabled = true;
     btn.textContent = '…';
     try {
+      if (!await chatModeracion.ensureAllowed(destinoEnviado) || convActiva !== conversacionEnviada) { chatModeracion.focusStatus(); return; }
       const res = await fetch(`${SUPABASE_URL}/rest/v1/mensajes`, {
         method:'POST',
         headers: { ...headers, 'Prefer':'return=minimal' },
         body: JSON.stringify({ de_user_id: normalizeId(miUserId), para_user_id: normalizeId(destinoEnviado), contenido: text })
       });
-      if (!res.ok) throw new Error('mensaje ' + res.status + ': ' + await res.text());
+      if (!res.ok) { await chatModeracion.handleSendFailure(res,destinoEnviado); throw new Error('mensaje ' + res.status); }
 
       const patch = await fetch(`${SUPABASE_URL}/rest/v1/conversaciones?id=eq.${filterValue(conversacionEnviada.id)}`, {
         method:'PATCH',
@@ -772,7 +783,7 @@
       if (convActiva === conversacionEnviada) {
         // Una persona puede seguir escribiendo mientras llega la respuesta.
         // No borrar ese nuevo borrador ni el de otra conversación.
-        if (input.value === original) input.value = '';
+        if (input.value === original) { input.value = ''; borradoresChat.delete(String(conversacionEnviada.id)); }
         autoResize(input);
         updateComposerState();
         await cargarMensajes(true);
@@ -795,7 +806,7 @@
 
   function insertQuickReply(text) {
     const input = document.getElementById('chat-input');
-    if (!input) return;
+    if (!input || input.readOnly) return;
     input.value = text;
     autoResize(input);
     updateComposerState();
@@ -811,7 +822,10 @@
       count.textContent = len + '/1000';
       count.classList.toggle('warning', len > 900);
     }
-    if (btn) btn.disabled = enviandoMensaje || !convActiva || !input || !input.value.trim();
+    const restricted = chatModeracion.state.status === 'restricted';
+    if (input) input.readOnly = restricted;
+    document.querySelectorAll('.quick-reply').forEach(button => { button.disabled = restricted; });
+    if (btn) btn.disabled = enviandoMensaje || !convActiva || !input || !input.value.trim() || !chatModeracion.canSend(convActiva.otroId);
   }
 
   function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
@@ -826,19 +840,7 @@
 
   function reportarConversacion() {
     if (!convActiva) return;
-    const params = new URLSearchParams({
-      asunto: 'Reportar una conversación',
-      mensaje: [
-        'Quiero reportar una conversación de buscARTE.',
-        `Conversación: ${convActiva.id || 'No informada'}`,
-        `Usuario: ${convActiva.nombre || 'No informado'}`,
-        `ID del usuario: ${convActiva.otroId || 'No informado'}`,
-        `Enlace: ${window.location.href}`,
-        '',
-        'Motivo y detalles (no adjuntes material ilegal):'
-      ].join('\n')
-    });
-    window.location.href = `buscARTE_contacto.html?${params.toString()}`;
+    chatModeracion.report(document.activeElement);
   }
 
   function initNav() {

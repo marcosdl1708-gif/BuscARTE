@@ -54,6 +54,7 @@ function runtime(file, options={}) {
   const runtimeSource=read('netlify/lib/mail-runtime.mjs')
     .replace(/^import \{([^}]+)\} from 'node:crypto';\s*/m,'const {$1}=__crypto;\n')
     .replace(/^import \{([^}]+)\} from '\.\/session\.mjs';\s*/m,'const {$1}=__security;\n')
+    .replace(/^import \{ readModerationState \} from '\.\/moderacion\.mjs';\s*/m,'const readModerationState=()=>{throw new Error("Unexpected message dispatch in endpoint fixture");};\n')
     .replace(/^import \{ buildEmail \} from '\.\/mail-templates\.mjs';\s*/m,'const buildEmail=()=>{throw new Error("Unexpected rendering");};\n')
     .replace(/^import \{ missingBasics \} from '\.\/mail-profile\.mjs';\s*/m,'const missingBasics=()=>[];\n');
   module(runtimeSource,'__mail','mailService,signMailToken,verifyMailToken,emailHash');

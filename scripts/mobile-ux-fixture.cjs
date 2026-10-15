@@ -38,6 +38,14 @@ async function setupFixture({ browser, sources = snapshot(), route = 'buscARTE_b
       state.calls.push({ method, path: 'sesion' });
       if (method === 'GET') return state.user ? reply({ user: state.user }) : reply({ code: 'SESSION_REQUIRED' }, 401);
     }
+    if (url.origin === origin && url.pathname === '/.netlify/functions/moderacion' && method === 'GET') {
+      state.calls.push({method,path:'moderacion',query:url.search});
+      return state.user ? reply({blocked_by_me:false,restricted:false}) : reply({code:'SESSION_REQUIRED'},401);
+    }
+    if (url.origin === origin && url.pathname === '/.netlify/functions/email-preferences' && method === 'GET') {
+      state.calls.push({method,path:'email-preferences'});
+      return state.user ? reply({marketing_opt_in:false,onboarding_disabled:false}) : reply({code:'SESSION_REQUIRED'},401);
+    }
     if (url.origin === origin && url.pathname === '/.netlify/functions/datos') {
       const raw = url.searchParams.get('path');
       if (!raw || !/^\/rest\/v1\//.test(raw)) { state.unexpected.push('Invalid gateway path'); return routeHandler.abort(); }
