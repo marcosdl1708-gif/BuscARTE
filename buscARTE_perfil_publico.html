@@ -791,7 +791,7 @@
 
 <nav>
   <a href="index.html" class="nav-logo">busc<span>ARTE</span></a>
-  <a href="buscARTE_busqueda.html" class="nav-back">← Volver a resultados</a>
+  <a href="buscARTE_busqueda.html" class="nav-back" onclick="return volverAResultados(event)">← Volver a resultados</a>
   <div class="nav-right">
       <div class="nav-guest" id="nav-guest">
       <a href="buscARTE_login.html" class="btn-ghost">Ingresar</a>
@@ -974,6 +974,34 @@
   let perfilCargaVersion = 0;
   let perfilObjetivoId = '';
   let ultimoEspectador = sesionPerfilId();
+
+  function volverAResultados(event) {
+    if (event && (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)) return true;
+    try {
+      const referrer = new URL(document.referrer);
+      const path = referrer.pathname.replace(/\/+$/, '').replace(/\.html$/i, '').toLowerCase();
+      if (referrer.origin === location.origin && ['/buscarte_busqueda', '/artistas', '/musicos'].includes(path) && history.length > 1) {
+        // Una pestaña nueva puede tener referrer, pero no la lista anterior.
+        if (window.navigation?.entries) {
+          const entries = window.navigation.entries();
+          const current = entries.findIndex(entry => entry.key === window.navigation.currentEntry?.key);
+          const previous = entries[current - 1];
+          if (!previous) return true;
+          const previousUrl = new URL(previous.url);
+          const previousPath = previousUrl.pathname.replace(/\/+$/, '').replace(/\.html$/i, '').toLowerCase();
+          if (previousUrl.origin !== location.origin || !['/buscarte_busqueda', '/artistas', '/musicos'].includes(previousPath)) return true;
+        }
+        history.back();
+        return false;
+      }
+    } catch (_) { /* Perfil compartido o pestaña nueva: usar el enlace de búsqueda. */ }
+    return true;
+  }
+  (function prepararRetornoResultados() {
+    const rubro = new URLSearchParams(location.search).get('rubro');
+    const link = document.querySelector('.nav-back');
+    if (link && window.BuscARTEDisciplinas.keys.includes(rubro)) link.href = 'buscARTE_busqueda.html?rubro=' + encodeURIComponent(rubro);
+  })();
 
   function renderDisciplinasPublicas(p) {
     const section=document.getElementById('md-profile');

@@ -140,9 +140,10 @@
   .chat-input-hint { font-size:.65rem;color:var(--gris2);margin-top:.4rem;display:flex;justify-content:space-between;gap:1rem; }
   .send-error { color:var(--rojo); }
 
-  .quick-replies { display:none; flex-wrap:wrap; gap:.45rem; margin-bottom:.75rem; }
+  .quick-replies { display:none; flex-direction:column; gap:.45rem; margin-bottom:.75rem; min-width:0; }
   .quick-replies.visible { display:flex; }
   .quick-reply-label { width:100%; font-size:.62rem; color:var(--gris2); letter-spacing:.12em; text-transform:uppercase; margin-bottom:.05rem; }
+  .quick-reply-actions { display:flex; flex-wrap:wrap; gap:.45rem; min-width:0; }
   .quick-reply { background:#0d0d0d; border:1px solid var(--gris3); color:var(--gris); padding:.38rem .7rem; font-size:.68rem; letter-spacing:.04em; cursor:none; transition:all .15s; font-family:var(--font-body); }
   .quick-reply:hover { border-color:var(--neon); color:var(--neon); background:rgba(212,245,60,.04); }
   .chat-toolbar-pill { font-size:.62rem; color:var(--gris2); border:1px solid #242424; padding:.28rem .6rem; text-transform:uppercase; letter-spacing:.08em; white-space:nowrap; }
@@ -191,8 +192,8 @@
     .chat-context-bar { padding:.45rem 1rem !important; }
     .chat-messages { padding:1rem !important; }
     .chat-input-area { padding:.65rem 1rem !important; }
-    .quick-replies { overflow-x:auto; flex-wrap:nowrap; padding-bottom:.2rem; }
-    .quick-reply-label { flex:0 0 100%; }
+    .quick-reply-actions { overflow-x:auto; flex-wrap:nowrap; padding-bottom:.2rem; overscroll-behavior-x:contain; scrollbar-width:thin; }
+    .quick-reply { flex:0 0 auto; white-space:nowrap; }
     .msg { max-width:88% !important; }
     .chat-header-actions .soft, .chat-header-actions .chat-toolbar-pill { display:none; }
     .chat-input-hint { font-size:.6rem; }
@@ -300,11 +301,13 @@
     </div>
     <div class="chat-input-area" id="chat-input-area">
       <div class="quick-replies" id="quick-replies">
-        <div class="quick-reply-label">Respuestas rápidas</div>
-        <button type="button" class="quick-reply" onclick="insertQuickReply('Hola, vi tu perfil y me interesa conectar. ¿Tenés disponibilidad?')">Disponibilidad</button>
-        <button type="button" class="quick-reply" onclick="insertQuickReply('Buenas, ¿te copa coordinar un encuentro esta semana?')">Coordinar encuentro</button>
-        <button type="button" class="quick-reply" onclick="insertQuickReply('Hola, te escribo por el anuncio. ¿Sigue vigente?')">Anuncio vigente</button>
-        <button type="button" class="quick-reply" onclick="insertQuickReply('Genial, pasame más data y vemos cómo seguimos.')">Pedir data</button>
+        <div class="quick-reply-label" id="quick-reply-label">Respuestas rápidas</div>
+        <div class="quick-reply-actions" role="group" aria-labelledby="quick-reply-label">
+          <button type="button" class="quick-reply" onclick="insertQuickReply('Hola, vi tu perfil y me interesa conectar. ¿Tenés disponibilidad?')">Disponibilidad</button>
+          <button type="button" class="quick-reply" onclick="insertQuickReply('Buenas, ¿te copa coordinar un encuentro esta semana?')">Coordinar encuentro</button>
+          <button type="button" class="quick-reply" onclick="insertQuickReply('Hola, te escribo por el anuncio. ¿Sigue vigente?')">Anuncio vigente</button>
+          <button type="button" class="quick-reply" onclick="insertQuickReply('Genial, pasame más data y vemos cómo seguimos.')">Pedir data</button>
+        </div>
       </div>
       <div class="composer-disabled-note" id="composer-note">Seleccioná una conversación para escribir.</div>
       <div class="chat-input-wrap">

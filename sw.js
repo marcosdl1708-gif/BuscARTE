@@ -1,6 +1,6 @@
 // ⚠️ IMPORTANTE: subí este número en CADA deploy (v3 → v4 → v5...).
 // Si no lo cambiás, el navegador puede seguir sirviendo los archivos viejos cacheados.
-const CACHE_VERSION = 'buscarte-v26-2026-10-13-cursor-filtros';
+const CACHE_VERSION = 'buscarte-v27-2026-10-15-mobile-retorno';
 const OFFLINE_URL = '/index.html';
 
 const SHELL = [

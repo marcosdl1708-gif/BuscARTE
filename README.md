@@ -3,6 +3,12 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
+## Preparación local — mobile y retorno a Artistas, 15/10/2026
+
+Bloque 2 preparado en `codex/mobile-ux-retorno-20261015`, todavía sin publicar: respuestas rápidas del chat visibles, menú Mi cuenta recorrible en horizontal y retorno Artistas→perfil→Atrás que conserva filtros, orden, cantidad cargada y posición de la persona por entrada de historial. Caché candidata v27. Ver `docs/qa-mobile-retorno-20261015.md` para alcance, pruebas aisladas y límites físicos.
+
+Producción continúa en el corte v26 inferior; no confundir `dist/` local con lo publicado. Esperar OK para deploy y para pasar al bloque posterior de Play Console. Guía/preview ajenas preservadas, sin cambios de datos, funciones, Auth ni Android.
+
 ## Estado operativo — cursor continuo y filtros, 13/10/2026
 
 Publicado a las 19:28 ART: fuente `98b07bf5dea663f8aee5f29f25483c63641ab22b`, deploy `6aceb0967c1d2013614da922`, caché v26, 69 archivos públicos. El círculo de escritorio ahora lo dibuja el navegador, sin alternancia por movimiento/click/scroll/menú; campos y preferencias de accesibilidad conservan el cursor nativo. “Rubro” queda a 16 px del separador en Anuncios; Artistas también comprobado. A2, colores y mobile preservados.

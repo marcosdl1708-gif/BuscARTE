@@ -1023,6 +1023,102 @@
   let offset = 0;
   let perfilesCache = null;
   let activeFilters = { instrumentos: [], generos: [], ciudad: '', barrio: '', busca: [], referente: '', rubros_chips: [] };
+  let resultsRequest = 0;
+  let resultsLoading = false;
+  let departingProfile = '';
+  let positionRestore = 0;
+  let pendingSearchRestore = null;
+  let searchGesture = 0;
+  ['touchstart', 'wheel', 'pointerdown', 'keydown'].forEach(event => {
+    window.addEventListener(event, () => { searchGesture++; }, { passive: true });
+  });
+
+  // Sólo la entrada actual del historial conserva el recorrido. No guardamos
+  // perfiles, sesiones ni una búsqueda global que contamine otras pestañas.
+  function readSearchHistory() {
+    try {
+      const navigation = performance.getEntriesByType('navigation')[0]?.type;
+      if (navigation !== 'back_forward' && navigation !== 'reload') return null;
+      const saved = history.state?.baSearchReturn;
+      if (!saved || saved.version !== 1 || saved.url !== location.pathname + location.search || saved.rubro !== rubroActivo) return null;
+      if (!Array.isArray(saved.chips) || saved.chips.length > 100 || saved.chips.some(value => typeof value !== 'string' || value.length > 120)) return null;
+      if (['search', 'ciudad', 'barrio', 'referente'].some(key => typeof saved[key] !== 'string' || saved[key].length > 2000)) return null;
+      if (!['afinidad', 'recientes', 'nombre'].includes(saved.sort) || !['grid', 'list'].includes(saved.view)) return null;
+      if (!Number.isInteger(saved.count) || saved.count < 0 || saved.count > MAX_FETCH) return null;
+      if (!Number.isFinite(saved.y) || saved.y < 0 || saved.y > 1000000) return null;
+      if (typeof saved.anchor !== 'string' || !/^\d{0,20}$/.test(saved.anchor) || !Number.isFinite(saved.anchorTop) || Math.abs(saved.anchorTop) > 1000000) return null;
+      return saved;
+    } catch (_) { return null; }
+  }
+
+  function saveSearchHistory(anchorId = '') {
+    try {
+      const cards = [...document.querySelectorAll('.musician-card[data-id]')];
+      const anchor = cards.find(card => card.dataset.id === (anchorId || departingProfile)) ||
+        cards.find(card => { const r = card.getBoundingClientRect(); return r.bottom > 90 && r.top < innerHeight; });
+      const prior = history.state && typeof history.state === 'object' && !Array.isArray(history.state) ? history.state : {};
+      history.replaceState({ ...prior, baSearchReturn: {
+        version: 1, url: location.pathname + location.search, rubro: rubroActivo,
+        search: document.getElementById('main-search')?.value || '',
+        chips: [...document.querySelectorAll('.fchip.on')].map(chip => chip.textContent.trim()),
+        ciudad: activeFilters.ciudad, barrio: document.getElementById('barrio-input')?.value || '',
+        referente: document.getElementById('referente-input')?.value || '',
+        sort: document.getElementById('sort-select')?.value || 'afinidad',
+        view: document.getElementById('musicians-grid')?.classList.contains('list-view') ? 'list' : 'grid',
+        count: offset || pendingSearchRestore?.count || 0,
+        y: anchor ? Math.max(0, scrollY) : pendingSearchRestore?.y ?? Math.max(0, scrollY),
+        anchor: anchor?.dataset.id || pendingSearchRestore?.anchor || '',
+        anchorTop: anchor ? anchor.getBoundingClientRect().top : pendingSearchRestore?.anchorTop || 0
+      } }, '');
+    } catch (_) { /* El historial restringido no debe impedir explorar artistas. */ }
+  }
+
+  function restoreSearchControls(saved) {
+    document.getElementById('main-search').value = saved.search;
+    document.getElementById('sort-select').value = saved.sort;
+    document.getElementById('barrio-input').value = saved.barrio;
+    const referente = document.getElementById('referente-input');
+    if (referente) referente.value = saved.referente;
+    const ciudad = document.getElementById('ciudad-select');
+    ciudad.value = [...ciudad.options].some(option => option.value === saved.ciudad) ? saved.ciudad : 'Todo el país';
+    activeFilters.ciudad = ciudad.value === 'Todo el país' ? '' : ciudad.value;
+    activeFilters.barrio = saved.barrio.trim();
+    activeFilters.referente = referente ? saved.referente.trim() : '';
+    document.querySelectorAll('.fchip').forEach(chip => chip.classList.toggle('on', saved.chips.includes(chip.textContent.trim())));
+    setView(saved.view);
+  }
+
+  async function restoreSearchPosition(saved, request, gesture) {
+    const restore = ++positionRestore;
+    // Fuentes tardías y dos frames de layout; no fijamos un timeout que pierda
+    // el retorno con una conexión lenta ni luchamos contra el gesto del usuario.
+    if (document.fonts?.ready) await document.fonts.ready;
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    if (request !== resultsRequest || restore !== positionRestore || gesture !== searchGesture) return;
+    const anchor = [...document.querySelectorAll('.musician-card[data-id]')].find(card => card.dataset.id === saved.anchor);
+    const target = anchor ? scrollY + anchor.getBoundingClientRect().top - saved.anchorTop : saved.y;
+    const max = Math.max(0, document.documentElement.scrollHeight - innerHeight);
+    const previous = document.documentElement.style.scrollBehavior;
+    document.documentElement.style.scrollBehavior = 'auto';
+    window.scrollTo({ top: Math.max(0, Math.min(target, max)), behavior: 'instant' });
+    document.documentElement.style.scrollBehavior = previous;
+  }
+
+  document.addEventListener('click', event => {
+    const link = event.target.closest?.('.musician-card .card-cta');
+    if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || (link.target && link.target !== '_self')) return;
+    departingProfile = link.closest('.musician-card').dataset.id;
+    saveSearchHistory(departingProfile);
+  }, true);
+  let searchScrollTimer;
+  window.addEventListener('pagehide', () => { clearTimeout(searchScrollTimer); saveSearchHistory(); });
+  window.addEventListener('pageshow', event => { if (event.persisted) departingProfile = ''; });
+  window.addEventListener('scroll', () => {
+    clearTimeout(searchScrollTimer);
+    searchScrollTimer = setTimeout(() => {
+      if (offset && !resultsLoading) saveSearchHistory();
+    }, 180);
+  }, { passive: true });
 
   const INSTR_LABELS = ['Guitarra', 'Bajo', 'Batería', 'Teclado', 'Voz / Canto', 'Saxo', 'Violín', 'Cello', 'Trompeta', 'Flauta', 'Percusión', 'DJ/Prod.', 'Bandoneón', 'Charango', 'Arpa', 'Acordeón', 'Contrabajo', 'Clarinete', 'Cajón', 'Bombo leguero', 'Quena / Zampoña', 'Ukelele', 'Controlador MIDI', 'Técnico de sonido', 'Operador de sonido FOH', 'Operador de sonido de monitores', 'Operador de iluminación', 'Stage / Asistente de escenario', 'Stage Manager', 'Compositor / Arreglador', 'Productor', 'Mix & Mastering', 'Manager', 'Otro'];
   const BUSCA_LABELS = ['Banda', 'Sesiones', 'Zapada', 'Proyecto', 'Clases'];
@@ -1344,10 +1440,18 @@
     }
   }
 
-  async function cargarMusicos(append = false) {
+  async function cargarMusicos(append = false, restore = null) {
     const grid = document.getElementById('musicians-grid');
     const btnLoad = document.getElementById('btn-load-more');
     if (!grid) return;
+    if (append && resultsLoading) return;
+    const request = ++resultsRequest;
+    const gesture = searchGesture;
+    resultsLoading = true;
+    pendingSearchRestore = restore;
+    positionRestore++;
+    departingProfile = '';
+    if (btnLoad) btnLoad.disabled = true;
 
     if (!append) {
       grid.innerHTML = '<div style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--gris);font-size:.88rem" id="loading-state">Cargando...</div>';
@@ -1357,6 +1461,7 @@
 
     try {
       const perfiles = await fetchProfiles();
+      if (request !== resultsRequest) return;
       const filtered = getFilteredProfiles(perfiles);
       const hasFilters = Boolean(
         document.getElementById('main-search')?.value?.trim() ||
@@ -1373,11 +1478,14 @@
       if (!filtered.length) {
         grid.innerHTML = emptyStateHtml(hasFilters);
         if (btnLoad) btnLoad.style.display = 'none';
+        if (restore) restoreSearchPosition(restore, request, gesture).catch(() => {});
         return;
       }
 
-      const pageItems = filtered.slice(offset, offset + PER_PAGE);
-      const bridgeAfter = Math.min(5, pageItems.length - 1);
+      const anchorIndex = restore?.anchor ? filtered.findIndex(profile => String(profile.id) === restore.anchor) : -1;
+      const restoredCount = restore ? Math.min(MAX_FETCH, Math.max(PER_PAGE, restore.count, anchorIndex + 1)) : PER_PAGE;
+      const pageItems = filtered.slice(offset, offset + restoredCount);
+      const bridgeAfter = Math.min(5, Math.min(PER_PAGE, pageItems.length) - 1);
       pageItems.forEach((p, i) => {
         grid.insertAdjacentHTML('beforeend', buildCard(p));
         if (!append && filtered.length > 3 && i === bridgeAfter) {
@@ -1387,15 +1495,27 @@
       offset += pageItems.length;
 
       if (btnLoad) btnLoad.style.display = offset < filtered.length ? 'inline-block' : 'none';
+      if (restore) restoreSearchPosition(restore, request, gesture).catch(() => {}).finally(() => {
+        if (request === resultsRequest) saveSearchHistory();
+      });
+      else saveSearchHistory();
     } catch (e) {
+      if (request !== resultsRequest) return;
       console.error(e);
       grid.innerHTML = '<div style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--gris)">Error al cargar los perfiles. Verificá tu conexión e intentá de nuevo.</div>';
       updateResultText(0);
       if (btnLoad) btnLoad.style.display = 'none';
+    } finally {
+      if (request === resultsRequest) {
+        resultsLoading = false;
+        pendingSearchRestore = null;
+        if (btnLoad) btnLoad.disabled = false;
+      }
     }
   }
 
   function loadMore() {
+    if (resultsLoading) return;
     const btn = document.getElementById('btn-load-more');
     if (btn) btn.textContent = 'Cargando...';
     cargarMusicos(true).finally(() => { if (btn) btn.textContent = 'Cargar más →'; });
@@ -1429,7 +1549,7 @@
     applyFilters();
   }
 
-  function applyFilters() {
+  function applyFilters(restore = null) {
     const onChips = [...document.querySelectorAll('.fchip.on')].map(c => c.textContent.trim());
     if (rubroActivo === 'musica') {
       activeFilters.instrumentos = onChips.filter(c => INSTR_LABELS.includes(c));
@@ -1443,7 +1563,7 @@
       activeFilters.busca = [];
     }
     renderActiveFilters();
-    cargarMusicos(false);
+    cargarMusicos(false, restore);
   }
 
   function setCiudad(val) {
@@ -1483,6 +1603,7 @@
     document.getElementById('musicians-grid')?.classList.toggle('list-view', v === 'list');
     document.getElementById('btn-grid')?.classList.toggle('active', v === 'grid');
     document.getElementById('btn-list')?.classList.toggle('active', v === 'list');
+    if (offset) saveSearchHistory();
   }
 
   function doSearch() {
@@ -1532,7 +1653,9 @@
       activeFilters.referente = refParam;
     }
 
-    applyFilters();
+    const saved = readSearchHistory();
+    if (saved) restoreSearchControls(saved);
+    applyFilters(saved);
   }
 
   window.addEventListener('DOMContentLoaded', function() {
