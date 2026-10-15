@@ -3,7 +3,8 @@
 
   var PIXEL_ID = '1982530688931438';
   var PROJECT = 'buscarte';
-  var CONSENT_KEY = 'buscarte_meta_consent_v1';
+  var CONSENT_KEY = 'buscarte_meta_consent_v2_2026-10-15';
+  var LEGACY_CONSENT_KEY = 'buscarte_meta_consent_v1';
   var SENT_PREFIX = 'buscarte_meta_sent_v1:';
   var PRIVACY_URL = '/buscARTE_privacidad.html';
   var BLOCKED_PATH = /(?:login|recuperar|reset|mensajes|perfil|mis_anuncios|guardados)/i;
@@ -12,6 +13,7 @@
   var BLOCKED_PARAM = /(?:^|_)(?:email|mail|phone|telefono|celular|name|nombre|first_name|last_name|username|user_id|address|direccion|bio|description|message|mensaje|title|titulo)(?:_|$)/i;
   var pending = [];
   var initialized = false;
+  var unpersistedDenial = false;
   var consent = readConsent();
 
   function storage(scope) {
@@ -24,14 +26,23 @@
     if (!store) return 'unknown';
     try {
       var value = store.getItem(CONSENT_KEY);
-      return value === 'granted' || value === 'denied' ? value : 'unknown';
+      if (value === 'granted' || value === 'denied') return value;
+      if (value !== null) return 'unknown';
+      // A refusal remains a refusal; old permission does not accept a new disclosure.
+      if (store.getItem(LEGACY_CONSENT_KEY) === 'denied') {
+        try { store.setItem(CONSENT_KEY, 'denied'); } catch (_) {}
+        return 'denied';
+      }
+      return 'unknown';
     } catch (_) { return 'unknown'; }
   }
 
   function writeConsent(value) {
     var store = storage('local');
-    if (!store) return;
-    try { store.setItem(CONSENT_KEY, value); } catch (_) {}
+    if (!store) return false;
+    // Cached v1 pages must not interpret the renewed decision as old permission.
+    try { store.setItem(LEGACY_CONSENT_KEY, 'denied'); } catch (_) {}
+    try { store.setItem(CONSENT_KEY, value); return true; } catch (_) { return false; }
   }
 
   function trackingAllowedHere() {
@@ -98,7 +109,7 @@
   }
 
   function dispatch(item) {
-    if (!initialized || consent !== 'granted' || wasSent(item.key, item.scope)) return false;
+    if (!initialized || consent !== 'granted' || !trackingAllowedHere() || wasSent(item.key, item.scope)) return false;
     try {
       window.fbq(item.custom ? 'trackCustom' : 'track', item.name, cleanParams(item.params));
       markSent(item.key, item.scope);
@@ -121,6 +132,7 @@
   }
 
   function queueOrSend(name, params, custom, key, scope) {
+    refreshConsent();
     if (!trackingAllowedHere() || consent === 'denied' || !/^[A-Za-z][A-Za-z0-9_]{0,49}$/.test(name)) return false;
     var item = { name: name, params: params || {}, custom: !!custom, key: key || '', scope: scope || 'local' };
     if (wasSent(item.key, item.scope)) return false;
@@ -141,6 +153,9 @@
       try {
         document.cookie = name + '=; Max-Age=0; path=/; SameSite=Lax';
         document.cookie = name + '=; Max-Age=0; path=/; domain=.' + window.location.hostname + '; SameSite=Lax';
+        if (/\.buscarte\.com\.ar$/i.test(window.location.hostname)) {
+          document.cookie = name + '=; Max-Age=0; path=/; domain=.buscarte.com.ar; SameSite=Lax';
+        }
       } catch (_) {}
     });
   }
@@ -155,10 +170,20 @@
     if (banner) banner.remove();
   }
 
-  function setConsent(allow) {
-    var previous = consent;
-    consent = allow === true || allow === 'granted' ? 'granted' : 'denied';
-    writeConsent(consent);
+  function revokePixel() {
+    if (!initialized || !window.fbq) return;
+    try {
+      if (!window.fbq.callMethod && Array.isArray(window.fbq.queue)) {
+        // The SDK can still be downloading: do not let it replay pre-revocation events.
+        window.fbq.queue = window.fbq.queue.filter(function (command) {
+          return command && !/^track/.test(command[0]) && command[0] !== 'consent';
+        });
+        window.fbq.queue.unshift(['consent', 'revoke']);
+      } else window.fbq('consent', 'revoke');
+    } catch (_) {}
+  }
+
+  function applyConsent(previous) {
     removeBanner();
     if (consent === 'granted') {
       if (initialized && previous !== 'granted') {
@@ -170,10 +195,32 @@
       }
     } else {
       pending.length = 0;
-      if (initialized && window.fbq) window.fbq('consent', 'revoke');
+      revokePixel();
       removeMetaCookies();
+      if (consent === 'unknown') showBanner();
     }
     updateStatus();
+  }
+
+  function setConsent(allow) {
+    var previous = consent;
+    consent = allow === true || allow === 'granted' ? 'granted' : 'denied';
+    var persisted = writeConsent(consent);
+    unpersistedDenial = consent === 'denied' && !persisted;
+    applyConsent(previous);
+  }
+
+  function refreshConsent() {
+    var store = storage('local');
+    if (!store) return;
+    try { store.getItem(CONSENT_KEY); } catch (_) { return; }
+    var previous = consent;
+    var current = readConsent();
+    // A failed local write must never resurrect an older stored permission.
+    if (unpersistedDenial && current !== 'denied') return;
+    unpersistedDenial = false;
+    consent = current;
+    if (consent !== previous) applyConsent(previous);
   }
 
   function showBanner(force) {
@@ -193,7 +240,7 @@
     banner.id = 'ba-meta-consent';
     banner.setAttribute('role', 'dialog');
     banner.setAttribute('aria-label', 'Preferencias de medición');
-    banner.innerHTML = '<p><strong>Medición opcional con Meta.</strong> Si permitís, Meta Pixel usa cookies e identificadores del navegador y recibe tu dirección IP, URL visitada y eventos generales para medir visitas, registros, publicaciones o contactos y mejorar campañas propias de buscARTE. No enviamos tu email, teléfono, nombre ni el texto de tus publicaciones. Podés usar la plataforma con Solo necesarias y cambiar tu elección en <a href="' + PRIVACY_URL + '#localstorage" target="_blank" rel="noopener noreferrer">Privacidad</a>.</p><div class="ba-meta-actions"><button type="button" data-deny>Solo necesarias</button><button type="button" data-allow>Permitir medición</button></div>';
+    banner.innerHTML = '<p><strong>Medición y publicidad opcionales con Meta.</strong> Si permitís, compartimos con Meta cookies e identificadores del navegador, tu dirección IP, URL visitada y eventos generales para medir visitas, registros, publicaciones o contactos y mejorar campañas propias de buscARTE. No agregamos tu email, teléfono, nombre ni el texto de tus publicaciones a nuestros eventos de medición. Podés usar la plataforma con Solo necesarias y cambiar tu elección en <a href="' + PRIVACY_URL + '#localstorage" target="_blank" rel="noopener noreferrer">Privacidad</a>.</p><div class="ba-meta-actions"><button type="button" data-deny>Solo necesarias</button><button type="button" data-allow>Permitir medición</button></div>';
     banner.querySelector('[data-deny]').addEventListener('click', function () { setConsent(false); });
     banner.querySelector('[data-allow]').addEventListener('click', function () { setConsent(true); });
     document.body.appendChild(banner);
@@ -209,8 +256,20 @@
     getConsent: function () { return consent; }
   };
 
+  window.addEventListener('storage', function (event) {
+    if (event.key !== CONSENT_KEY && event.key !== null) return;
+    var store = storage('local');
+    if (event.storageArea && event.storageArea !== store) return;
+    refreshConsent();
+  });
+  window.addEventListener('pageshow', refreshConsent);
+  window.addEventListener('focus', refreshConsent);
+
   if (consent === 'granted') initPixel();
-  else if (consent === 'unknown') showBanner();
+  else {
+    removeMetaCookies();
+    if (consent === 'unknown') showBanner();
+  }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', updateStatus, { once: true });
   else updateStatus();
 })();

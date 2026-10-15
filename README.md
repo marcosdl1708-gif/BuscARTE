@@ -3,6 +3,20 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
+## Preparación local — consentimiento Meta y borrador Data Safety, 15/10/2026
+
+**Sin publicar ni enviar declaraciones.** Continuación local de `3beed84`, mismo candidato v29 y 74 archivos públicos permitidos. Sin push, deploy/preview, cambios de SQL/Supabase, Android, campañas, Pixel ID, nombres de eventos, deduplicación, correo ni usuarios. Las migraciones candidatas anteriores siguen sin aplicar. Guía ajena y `preview/` preservados y excluidos.
+
+La nueva clave `buscarte_meta_consent_v2_2026-10-15` no hereda autorizaciones v1: pide una elección ante la explicación actualizada antes de cargar Meta. El rechazo anterior se respeta sin volver a mostrar el aviso. Al elegir se conserva v1 denegado para que páginas antiguas recargadas no reutilicen permiso viejo. Nuevas pestañas y páginas recuperadas por foco/BFCache revalidan; los eventos propios también comprueban la decisión antes de enviarse. Una revocación cuyo guardado falle no puede resucitar un permiso anterior. Se vacían eventos pendientes incluso si el SDK aún está descargándose, y sólo se eliminan cookies `_fbp`/`_fbc` accesibles del host/dominio propio, no cookies de sesión. La revocación no retira datos ya recibidos ni puede controlar una pestaña con el código v1 ya cargado: debe recargarse. Los marcadores históricos de conversiones no se reinician.
+
+El aviso identifica explícitamente medición/publicidad y compartición con Meta, sin afirmar que se auditaron ajustes automáticos remotos. Privacidad distingue lo que añade nuestro código de los ajustes del proveedor, explica la nueva elección, su alcance por navegador y los límites de revocación. Permitir Meta sigue separado de los Términos y del opt-in de marketing por correo. No se modifica ninguna campaña ni configuración remota del Pixel.
+
+Validación final aislada: **92/92 comprobaciones aprobadas, cero fallos/omisiones**: 30 contratos de consentimiento/almacenamiento/colas, cuatro casos de navegador real con SDK sintético y dos pestañas, cinco de privacidad y controles a 320/390/horizontal, 27 de menú/chat móvil y 26 de empaquetado. Todas las solicitudes de pruebas se resuelven localmente; no se contactó Meta ni backend real. Build de 74 archivos, capturas revisadas y fuentes finales sin desvíos. `scripts/meta-consent.test.cjs` y `scripts/meta-consent-browser.test.cjs` permiten reproducir los casos nuevos. Evidencia privada: `../BuscARTE-resguardos/meta-consent-20261015/result.json` y capturas `../BuscARTE-resguardos/privacidad-ui-2026-10-15T14-15-31-863Z/`.
+
+Borrador privado de respuestas por campo, con actual→propuesto, evidencia y estados: `../BuscARTE-resguardos/meta-consent-20261015/data-safety-draft.json`. Propone agregar Interacciones en la app e identificadores de navegador y declarar conservadoramente su compartición con Meta; no utiliza automáticamente una exención por tener un banner. Ajusta finalidades reales de análisis, publicidad/comunicaciones y moderación, sin atribuir todas las finalidades a todos los datos. Es un borrador, no un CSV importable ni una declaración guardada. Requiere confirmar configuración remota del Pixel, telemetría/retención de proveedores y clasificación de vídeos/diagnósticos. No se inventaron plazos ni una certificación de Google. Las respuestas deben conciliarse con el artefacto y el corte realmente publicados antes de enviarlas.
+
+Pendientes para el cierre único: resolver esas confirmaciones, revisar ficha/capturas y plan coordinado de activación SQL + deploy; después prueba física Android/teclado/red. La solicitud de producción continúa separada y depende de la elegibilidad/revisión de Google. Este bloque no vuelve a consultar ni cambiar el contador de testers.
+
 ## Cierre de concurrencia y revisión de Play — 15/10/2026
 
 **Sólo validación y documentación local.** El candidato v29 sigue sin publicar y las dos migraciones candidatas no se aplicaron a Supabase. Sin push, deploy, correos reales, cambios de usuarios, Android ni declaraciones guardadas/enviadas a Google.
