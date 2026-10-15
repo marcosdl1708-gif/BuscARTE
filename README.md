@@ -3,6 +3,14 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
+## Avisos para mensajes directos desde la base — 15/10/2026
+
+Activado a las **13:40 ART** mediante migración remota `20261015164039`, fuente local `20261015163645_message_mail_trigger.sql`. Cada nuevo INSERT de mensaje genera atómicamente un aviso genérico en la cola existente, con la misma clave única que el envío web y vigencia de 31 días. De los 333 mensajes del lote aprobado se generaron **332 avisos únicos**; un perfil tiene email incompleto y quedó documentado en evidencia privada, sin inventar ni modificar la dirección.
+
+Reserva atómica: correos distintos de recuperación se detienen al llegar a 70 intentos diarios acumulados; reset conserva margen hasta el techo global de 90. Siguen los límites mensuales/engagement, la prioridad y los tres cron; el worker ya publicado envía tandas cada cinco minutos. **Sólo SQL: v30, las 13 Functions y las demás mejoras publicadas permanecen iguales.** 115 regresiones y 18 pruebas SQL aisladas aprobadas, build de 74 archivos; 31 procedimientos protegidos y avisos de seguridad previos sin cambios. No hubo mensajes/cuentas sintéticos en producción. Ver `docs/message-notifications-20261015.md` para operación y comprobación de entrega.
+
+Primera tanda natural de las **13:45 ART** confirmada: cinco avisos aceptados por Resend y al menos dos `Delivered` observados en la cuenta. Los restantes siguen en cola; no se afirma entrega de todo el lote. Cierre Git con `[skip netlify]`, sin repetir deploy ni aplicar otras migraciones históricas.
+
 ## Conservación administrativa — cierre seguro (15/10/2026)
 
 Con el «Go con ese cierre seguro» del responsable se activó el proceso diario de Gmail, sólo para consultas administrativas incorporadas y cerradas manualmente. `setupRetention()` terminó a las 13:03:47 ART con cuenta y etiquetas verificadas; la vista Activadores confirmó **un único `dailyRetention`**. La primera pasada supervisada, a las 13:04:35, terminó en `ACTIVE`, con cero casos examinados, errores o movimientos. No se incorporaron ni retiraron correos históricos. Después de 60 días completos desde el cierre observado pueden pasar a Papelera los mensajes capturados sin cambios; Gmail normalmente los purga otros 30 días después, sin garantía de máximo exacto. Conservar/reabrir detiene retiros y permite recuperar sólo lo que aún siga disponible. El operador debe revisar incidencias; el script no envía avisos externos garantizados.
