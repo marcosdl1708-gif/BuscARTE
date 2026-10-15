@@ -52,7 +52,7 @@ const registration = (role='artista',rubro='musica') => ({
   p_email:'NEW@example.invalid', p_password:'correct-fixture', p_nombre:'Nueva persona',
   p_provincia:'Buenos Aires', p_ciudad:'La Plata', p_barrio:'', p_instrumento:'',
   p_generos:'', p_disponibilidad:'', p_referentes:'', p_bio:'', p_tipo_cuenta:role,
-  p_rubro:rubro, p_campos_especificos:{}, captcha_token:'synthetic-verified-captcha'
+  p_rubro:rubro, p_campos_especificos:{}, captcha_token:'synthetic-verified-captcha',terms_accepted:true,terms_version:'2026-10-15'
 });
 function projection(row, select) {
   if (!row) return null;
@@ -74,7 +74,10 @@ async function withBackend(options, action) {
   const reply=(status,value,headers={})=>new Response(value===null?null:JSON.stringify(value),{
     status, headers:{ 'content-type':'application/json', ...headers }
   });
-  const apiCalls=(name,method)=>calls.filter(c=>c.url.pathname===name&&(!method||c.method===method));
+  // Keep legacy operation labels in the regression assertions while verifying
+  // the new atomic RPC on the transport boundary below.
+  const apiCalls=(name,method)=>calls.filter(c=>c.url.pathname===(name==='/rest/v1/rpc/registrar_usuario'?'/rest/v1/rpc/registrar_usuario_con_terminos_web':name==='/rest/v1/rpc/eliminar_cuenta'?'/rest/v1/rpc/solicitar_eliminacion_web':name)&&(!method||c.method===method))
+    .map(c=>name==='/rest/v1/rpc/registrar_usuario'?{...c,body:c.body.p_registro}:c);
   globalThis.Netlify={ env:{ get:name=>env[name] || '' } };
   globalThis.__baExpiryAt=0;
   // The real ESM gateway and session helper still run. Only the mail-service
@@ -102,6 +105,7 @@ async function withBackend(options, action) {
       assert.equal(headers.get('apikey'),env.SUPABASE_SERVICE_ROLE_KEY,'service authorization must remain server-side');
       assert.equal(headers.get('authorization'),null,'opaque key must not become Bearer');
       if(options.backendFailure)return reply(500,{private:'synthetic-private-backend-error'});
+      if(url.pathname==='/rest/v1/rpc/estado_terminos_web')return reply(200,{version:'2026-10-15',accepted:options.termsAccepted!==false});
       if(url.pathname==='/rest/v1/rpc/limitar_operacion_web') {
         assert.equal(method,'POST');
         return reply(200,options.denyScope!==body.p_scope);
@@ -159,20 +163,23 @@ async function withBackend(options, action) {
         assert.equal(body.p_email,'owner@example.invalid');
         return reply(200,projection(profiles.get(701),'id,nombre,email,tipo_cuenta,rubro,referentes,generos,baneado'));
       }
-      if(url.pathname==='/rest/v1/rpc/registrar_usuario') {
-        assert(!Object.hasOwn(body,'captcha_token'),'captcha must not be forwarded to the legacy RPC');
-        assert(!Object.hasOwn(body,'email_marketing_opt_in'),'consent flag must not be forwarded to legacy RPC');
+      if(url.pathname==='/rest/v1/rpc/registrar_usuario_con_terminos_web') {
+        assert.deepEqual(Object.keys(body).sort(),['p_registro','p_version']);assert.equal(body.p_version,'2026-10-15');
+        const registration=body.p_registro;
+        assert(!Object.hasOwn(registration,'captcha_token'),'captcha must not be forwarded to the registration RPC');
+        assert(!Object.hasOwn(registration,'email_marketing_opt_in'),'marketing flag must not be forwarded to registration RPC');
+        assert(!Object.hasOwn(registration,'terms_accepted'));assert(!Object.hasOwn(registration,'terms_version'));
         if(options.duplicate)return reply(200,{error:'duplicate_email'});
         state.registered=true;
-        profiles.set(703,{ ...ordinaryUser(703,body.p_rubro), nombre:body.p_nombre,email:body.p_email,tipo_cuenta:body.p_tipo_cuenta });
-        return reply(200,{id:703,nombre:body.p_nombre,email:body.p_email});
+        profiles.set(703,{ ...ordinaryUser(703,registration.p_rubro), nombre:registration.p_nombre,email:registration.p_email,tipo_cuenta:registration.p_tipo_cuenta });
+        return reply(200,{id:703,nombre:registration.p_nombre,email:registration.p_email});
       }
-      if(url.pathname==='/rest/v1/rpc/eliminar_cuenta') {
+      if(url.pathname==='/rest/v1/rpc/solicitar_eliminacion_web') {
         assert.equal(method,'POST');
-        assert.deepEqual(body,{p_user_id:701});
+        assert.deepEqual(body,{p_actor_id:'701'});
         if(options.deleteFail)return reply(200,{ok:false,error:'synthetic private deletion detail'});
         state.deleted=true;profiles.delete(701);
-        return reply(200,{ok:true});
+        return reply(200,{ok:true,job_id:'11111111-2222-4333-8444-555555555555',storage_pending:true});
       }
       if(url.pathname==='/rest/v1/rpc/gestionar_anuncio') {
         assert.equal(body.p_user_id,'701');
@@ -570,7 +577,7 @@ test('account deletion requires fresh password and sends only verified ID to del
   await withBackend({},async({apiCalls,state})=>{
     const res=await datos(request('/rest/v1/rpc/eliminar_cuenta',{method:'POST',body:{p_user_id:701,p_password:'correct-fixture'}}));
     assert.equal(res.status,200);assert.equal(state.deleted,true);
-    assert.deepEqual(apiCalls('/rest/v1/rpc/eliminar_cuenta')[0].body,{p_user_id:701});
+    assert.deepEqual(apiCalls('/rest/v1/rpc/eliminar_cuenta')[0].body,{p_actor_id:'701'});
     assert.match(res.headers.get('set-cookie'),/Max-Age=0/);
   });
 });

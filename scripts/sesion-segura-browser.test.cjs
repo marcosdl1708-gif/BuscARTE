@@ -11,10 +11,10 @@ const initial={id:210,nombre:'Persona sintética',email:'qa@example.invalid',tip
 let browser,serverMD;
 before(async()=>{serverMD=await import('../netlify/lib/disciplinas.mjs');browser=await chromium.launch({headless:true,channel:process.platform==='win32'?'msedge':undefined});});
 after(async()=>{await browser?.close();});
-async function setup(t,{file='buscARTE_perfil.html',width=390,signed=true,cached=true,type='artista',rubro='musica',signupFailure=null}={}) {
+async function setup(t,{file='buscARTE_perfil.html',width=390,signed=true,cached=true,type='artista',rubro='musica',signupFailure=null,termsAccepted=true}={}) {
   const context=await browser.newContext({viewport:{width,height:844},isMobile:width<768,hasTouch:width<768,serviceWorkers:'block'});
   const profile={...initial,tipo_cuenta:type,rubro};
-  const state={user:signed?{...profile}:null,profile,failSave:false,calls:[],unexpected:[],errors:[]};
+  const state={user:signed?{...profile}:null,profile,failSave:false,termsAccepted,calls:[],unexpected:[],errors:[]};
   await context.addInitScript(({cached,type,rubro})=>{
     if(!sessionStorage.getItem('security-qa-init')){
       sessionStorage.setItem('security-qa-init','1');localStorage.setItem('buscarte_meta_consent_v1','denied');
@@ -35,11 +35,17 @@ async function setup(t,{file='buscARTE_perfil.html',width=390,signed=true,cached
       state.calls.push({path:'email-preferences',method});
       return state.user?reply({marketing_opt_in:false,onboarding_disabled:false}):reply({code:'SESSION_REQUIRED'},401);
     }
+    if(url.origin===origin&&url.pathname==='/.netlify/functions/condiciones'){
+      const body=method==='POST'?request.postDataJSON():null;state.calls.push({path:'condiciones',method,body});
+      if(method==='POST'){assert.deepEqual(body,{action:'accept',version:'2026-10-15',accepted:true});state.termsAccepted=true;}
+      return reply({version:'2026-10-15',accepted:state.termsAccepted});
+    }
     if(url.origin===origin&&url.pathname==='/.netlify/functions/guardar-perfil'){
       const body=request.postDataJSON();state.calls.push({path:'guardar-perfil',method,body});
       assert.equal(body.email,undefined);assert.equal(body.password,undefined);assert.equal(String(body.profileId),'210');
       if(state.failSave||!state.user)return reply({error:'Sesión vencida'},401);
       if(body.operation==='verify')return reply([{id:210}]);
+      if(!state.termsAccepted)return reply({code:'TERMS_REQUIRED',version:'2026-10-15',error:'Aceptá los Términos de uso.'},428);
       state.profile={...state.profile,...serverMD.prepareProfileChanges(state.profile,body.changes,body.expectedRevision)};state.user={...state.profile};return reply([state.profile]);
     }
     if(url.origin===origin&&url.pathname==='/.netlify/functions/reset-password'){
@@ -85,6 +91,18 @@ for(const width of [320,390,1280])test('cookie-only edit saves and reloads genre
   await f.page.reload();await f.page.waitForFunction(()=>!isLoadingProfile&&!!perfilCargado);assert.deepEqual(await f.page.locator('#chips-gen .selected').allTextContents(),['Jazz','Pop']);
   assert.ok(await f.page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
 });
+test('actual 320px profile editor preserves draft across terms Cancel and acceptance, then only saves on a fresh click',async t=>{
+  const f=await setup(t,{width:320,termsAccepted:false}),draft='Borrador real del editor conservado.';
+  await f.page.locator('#bio-text').fill(draft);await f.page.locator('#save-bar .btn-neon').click();
+  await f.page.locator('#ba-terms-accepted').waitFor();await f.page.locator('#ba-terms-dialog [data-close]').click();
+  await f.page.waitForFunction(()=>!isSavingProfile);assert.equal(await f.page.locator('#bio-text').inputValue(),draft);assert.notEqual(f.state.profile.bio,draft);
+  await f.page.locator('#save-bar .btn-neon').click();await f.page.locator('#ba-terms-accepted').check();await f.page.locator('.ba-terms-accept').click();
+  await f.page.locator('.ba-terms-success').waitFor();assert.notEqual(f.state.profile.bio,draft,'acceptance alone never saves content');
+  await f.page.locator('#ba-terms-dialog [data-close]').click();await f.page.waitForFunction(()=>!isSavingProfile);
+  assert.equal(await f.page.locator('#bio-text').inputValue(),draft);await f.page.locator('#save-bar .btn-neon').click();await f.page.waitForFunction(()=>!isSavingProfile);
+  assert.equal(f.state.profile.bio,draft);assert.match(await f.page.locator('#profile-status').innerText(),/guardado correctamente/);
+});
+
 test('expired save retains the actual editor draft and succeeds after renewing cookie in another tab',async t=>{
   const f=await setup(t);await f.page.locator('#bio-text').fill('Un borrador que no debe desaparecer.');
   f.state.user=null;f.state.failSave=true;await f.page.locator('#save-bar .btn-neon').click();await f.page.waitForFunction(()=>!isSavingProfile);
@@ -137,6 +155,9 @@ async function registrationFields(page,role='artista',password='Synthetic-only-1
     tipoCuenta=role;rubroSeleccionado='danza';
     document.getElementById('reg-nombre').value='Persona sintética';document.getElementById('reg-email').value='qa@example.invalid';
     document.getElementById('reg-password').value=password;document.getElementById('sel-provincia').value='CABA';
+    // Terms rejection is covered separately; these cases exercise the next
+    // validation boundary (password/captcha/uncertain registration result).
+    document.getElementById('reg-terms-accepted').checked=true;
     document.getElementById('neg-tipo').value='Sala de ensayo';
     window.__qaCaptchaReads=0;
     window.RegistroCaptcha={requireResponse:()=>{window.__qaCaptchaReads++;return 'synthetic-verified-token';},show(){},activate(){},reset(){}};

@@ -17,6 +17,8 @@
     "test:busqueda-retorno": "node --test scripts/busqueda-retorno.test.cjs",
     "test:moderacion": "node --test scripts/moderacion-security.test.mjs scripts/moderacion-browser.test.cjs",
     "test:moderacion-sql": "node --test scripts/moderacion-sql.test.mjs",
+    "test:privacidad": "node --test scripts/account-deletion.test.mjs scripts/deletion-worker.test.cjs scripts/condiciones-security.test.mjs scripts/condiciones-browser.test.cjs scripts/privacidad-browser.test.cjs",
+    "test:privacidad-sql": "node --test scripts/terms-deletion-sql.test.mjs",
     "test:inicio": "node --test scripts/inicio-sesion.test.cjs",
     "test:inicio-visual": "node --test scripts/inicio-visual.test.cjs",
     "test:perfil": "node --test scripts/perfil-propio.test.cjs",

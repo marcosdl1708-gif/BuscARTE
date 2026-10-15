@@ -1,4 +1,6 @@
 [
+  "assets/css/condiciones.css",
+  "assets/js/condiciones.js",
   ".well-known/assetlinks.json",
   "_redirects",
   "assets/css/inicio-sesion.css",

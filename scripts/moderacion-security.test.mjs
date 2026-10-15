@@ -91,6 +91,7 @@ async function fixture(options = {}, run) {
     assert.equal(init.redirect, 'error', 'backend redirects cannot leak privileged headers');
     assert(init.signal, 'every backend operation is bounded by an abort signal');
     if (options.failAll) return response({ details:'private synthetic database detail' }, 500);
+    if (url.pathname === '/rest/v1/rpc/estado_terminos_web') return response({version:'2026-10-15',accepted:true});
     if (url.pathname === '/rest/v1/sesiones_web' && method === 'GET') {
       assert.equal(url.searchParams.get('select'), 'perfil_id,password_fingerprint');
       assert.match(url.searchParams.get('expires_at'), /^gt\./);

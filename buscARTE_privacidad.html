@@ -348,7 +348,7 @@
         <div class="summary-card">
           <div class="summary-icon">🗑️</div>
           <div class="summary-title">Podés eliminar tu cuenta</div>
-          <div class="summary-text">Desde Configurar perfil podés pedir la eliminación de tu cuenta y datos asociados según disponibilidad técnica.</div>
+          <div class="summary-text">Podés eliminar tu cuenta desde Configurar perfil o solicitarlo por Contacto, incluso sin tener instalada la app.</div>
         </div>
       </div>
 
@@ -360,7 +360,8 @@
           <li><strong>Datos de perfil:</strong> especialidad artística, rubro, zona general, bio, experiencia, disponibilidad, foto, links y campos específicos según el rubro elegido.</li>
           <li><strong>Contenido generado por vos:</strong> anuncios, mensajes, reportes, favoritos/guardados, reacciones y nombres guardados del generador.</li>
           <li><strong>Archivos:</strong> fotos de perfil e imágenes que subas a la plataforma.</li>
-          <li><strong>Datos técnicos básicos:</strong> información necesaria para seguridad, funcionamiento, emails transaccionales y diagnóstico de errores. No recopilamos datos de uso detallados ni rastreamos comportamiento con fines publicitarios.</li>
+          <li><strong>Datos técnicos básicos:</strong> información necesaria para seguridad, funcionamiento, notificaciones y diagnóstico de errores. Si autorizás la medición publicitaria opcional, Meta puede recibir datos del navegador, dirección IP, URL visitada y eventos generales de actividad, como se explica más abajo.</li>
+          <li><strong>Preferencias y seguridad:</strong> elección de correos, aceptación de una versión de los Términos de uso con su fecha, bloqueos y reportes enviados.</li>
         </ul>
       </section>
 
@@ -392,16 +393,24 @@
       <section id="mensajes">
         <h2>Mensajes y notificaciones</h2>
         <p>Los mensajes entre usuarios no se muestran públicamente. Podemos usar el contenido mínimo necesario, como una vista previa, para notificar al destinatario que recibió un mensaje.</p>
-        <p>Las notificaciones por email se usan para actividad relevante de la plataforma, como mensajes, recuperación de contraseña o avisos importantes.</p>
+        <p>Los emails transaccionales se usan para mensajes, recuperación de contraseña, bienvenida y actividad relevante de la cuenta. Desde Configurar perfil o los enlaces de baja podés gestionar los recordatorios de perfil y, por separado, las novedades de marketing. Estas últimas requieren una elección opcional: aceptar los Términos de uso no te suscribe.</p>
+        <p>Los enlaces propios de algunos correos pueden registrar que se hizo clic y qué comunicación lo originó, para medir su utilidad y evitar recordatorios innecesarios. Los datos técnicos del envío y su resultado también pueden ser procesados por el proveedor de correo.</p>
+      </section>
+
+      <section id="moderacion">
+        <h2>Bloqueos, reportes y aceptación de términos</h2>
+        <p>Antes de crear o modificar contenido te pedimos aceptar expresamente la versión vigente de los <a href="buscARTE_terminos.html">Términos de uso</a>. Registramos la cuenta, la versión y la fecha; no damos por aceptadas las condiciones por el solo hecho de navegar ni por tener una cuenta anterior.</p>
+        <p>Desde un perfil o conversación podés bloquear a una persona. El bloqueo impide nuevos mensajes en ambos sentidos, conserva el historial y se puede deshacer. No oculta perfiles públicos ni impide que alguien use un contacto externo que hayas publicado.</p>
+        <p>Al reportar guardamos el motivo, el detalle que escribas, las cuentas involucradas, la fecha y, si corresponde, la referencia de la conversación. No copiamos automáticamente todo el historial. El equipo recibe un aviso para revisar el caso. Reportar no bloquea ni sanciona automáticamente a otra persona; el bloqueo es una acción independiente.</p>
       </section>
 
       <section id="servicios">
         <h2>Servicios externos que usamos</h2>
-        <p>Para operar buscARTE usamos servicios de infraestructura. Estos proveedores procesan datos solo en la medida necesaria para prestar el servicio.</p>
+        <p>Para operar buscARTE usamos los siguientes servicios según su finalidad. La medición publicitaria de Meta es opcional y está separada de la infraestructura necesaria para usar la plataforma.</p>
         <ul>
           <li><strong>Supabase:</strong> base de datos, autenticación custom/RPC y almacenamiento de archivos.</li>
           <li><strong>Netlify:</strong> hosting del sitio y funciones serverless.</li>
-          <li><strong>Resend:</strong> envío de emails transaccionales.</li>
+          <li><strong>Resend:</strong> envío y resultado de correos transaccionales, recordatorios y comunicaciones opcionales según tus preferencias.</li>
           <li><strong>Meta:</strong> medición publicitaria opcional mediante Meta Pixel. Solo se carga si la autorizás y puede recibir la URL visitada, datos técnicos del navegador, dirección IP y eventos generales como registro, publicación o contacto.</li>
         </ul>
       </section>
@@ -432,10 +441,13 @@
           <li>Podés editar o completar tu perfil desde <strong>Configurar perfil</strong>.</li>
           <li>Podés pausar, editar o eliminar anuncios desde <strong>Mis anuncios</strong>.</li>
           <li>Podés eliminar guardados y nombres guardados en cualquier momento.</li>
-          <li>Podés solicitar la eliminación completa de tu cuenta escribiéndonos desde el formulario de contacto. La eliminación incluye perfil, anuncios y datos asociados, sujeta a limitaciones técnicas y legales vigentes.</li>
+          <li><strong>Eliminar tu cuenta desde la app o web:</strong> entrá en Configurar perfil, elegí Eliminar cuenta y confirmá con tu contraseña. Se eliminan el perfil, sus anuncios, mensajes, conversaciones, guardados, reacciones y sesiones asociados. Se programa el retiro de las fotos de perfil y anuncios almacenadas por buscARTE, incluidas versiones anteriores identificadas como propias de esa cuenta.</li>
+          <li><strong>Solicitar eliminación sin ingresar o sin instalar la app:</strong> usá <a href="buscARTE_contacto.html?asunto=Eliminar%20mi%20cuenta%20y%20datos">Contacto: Eliminar mi cuenta y datos</a>. Indicá el email de la cuenta para que podamos verificar la titularidad; nunca envíes tu contraseña. Por el mismo canal podés pedir acceso, corrección o eliminación de un dato específico sin borrar toda la cuenta.</li>
           <li>Podés presentar una consulta o reclamo ante la <strong>Agencia de Acceso a la Información Pública (AAIP)</strong> si considerás que tus derechos de privacidad no fueron respetados.</li>
         </ul>
-        <div class="callout">Para ejercer tus derechos o ante cualquier duda sobre privacidad, escribinos desde el <a href="buscARTE_contacto.html">formulario de contacto</a>. Intentaremos responder dentro de los 30 días hábiles.</div>
+        <p>La eliminación de la cuenta y el retiro de archivos son pasos distintos: la limpieza de fotos se realiza en segundo plano y se reintenta si un servicio no responde. La cola conserva únicamente la referencia técnica necesaria hasta confirmar esa limpieza. No prometemos que una copia ya descargada por otra persona o una caché externa desaparezca de inmediato.</p>
+        <p>Los correos ya enviados al equipo, los registros de proveedores y los respaldos no se purgan automáticamente con el botón de eliminar cuenta. Si tu solicitud comprende esos registros, la gestionamos también por Contacto. Cualquier conservación necesaria por seguridad, prevención de fraude u obligación legal debe limitarse a su finalidad y explicarse al tramitar la solicitud; no implica conservar públicamente tu perfil.</p>
+        <div class="callout">Para ejercer tus derechos escribinos por <a href="buscARTE_contacto.html?asunto=Privacidad%20y%20mis%20datos">Contacto: Privacidad y mis datos</a>. La Ley 25.326 establece plazos distintos: diez días corridos para acceso y cinco días hábiles para rectificación, actualización o supresión, desde la recepción del reclamo o la intimación correspondiente. <a href="https://www.argentina.gob.ar/normativa/nacional/ley-25326-64790/texto" target="_blank" rel="noopener noreferrer">Consultar artículos 14 y 16</a>.</div>
       </section>
 
       <section id="menores">

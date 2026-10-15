@@ -127,6 +127,8 @@ async function setup(t, { width = 390, mode = 'ready', rpcFailure = false } = {}
     document.getElementById('reg-nombre').value = 'Persona de prueba';
     document.getElementById('reg-email').value = 'persona@example.invalid';
     document.getElementById('reg-password').value = 'Only-fixture-123!';
+    // This suite exercises captcha, not the separately tested terms prerequisite.
+    document.getElementById('reg-terms-accepted').checked = true;
     document.getElementById('sel-provincia').value = 'Buenos Aires';
     document.getElementById('bio-text').value = 'Texto que no debe perderse';
   });
@@ -173,10 +175,12 @@ for (const role of Object.keys(paths)) {
     assert.equal(f.calls.rpc[0].body.p_tipo_cuenta, role);
     assert.equal(f.calls.rpc[0].body.p_email, 'persona@example.invalid');
     assert.deepEqual(Object.keys(f.calls.rpc[0].body).sort(), [
-      'captcha_token',
+      'captcha_token', 'email_marketing_opt_in', 'terms_version', 'terms_accepted',
       'p_email', 'p_password', 'p_nombre', 'p_provincia', 'p_ciudad', 'p_barrio', 'p_instrumento',
       'p_generos', 'p_disponibilidad', 'p_referentes', 'p_bio', 'p_tipo_cuenta', 'p_rubro', 'p_campos_especificos'
     ].sort());
+    assert.equal(f.calls.rpc[0].body.terms_version,'2026-10-15');assert.equal(f.calls.rpc[0].body.terms_accepted,true);
+    assert.equal(f.calls.rpc[0].body.email_marketing_opt_in,false);
     assert.equal(await f.page.evaluate(() => localStorage.getItem('ba_user_id')), '210');
     assert.equal(await f.page.evaluate(() => window.BuscARTESesion.status), 'verified');
     assert.ok(f.calls.sessions.some(call=>call.authenticated),'Created account waits for simulated cookie verification');

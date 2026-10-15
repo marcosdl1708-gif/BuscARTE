@@ -1,6 +1,7 @@
 import type { Config } from '@netlify/functions';
 import { sessionUser, rate, serverConfig, trustedOrigin } from '../lib/session.mjs';
 import { RUBROS, DETAIL_FIELDS, prepareProfileChanges, revision } from '../lib/disciplinas.mjs';
+import { TermsError, assertTermsAccepted, termsFailure, termsBackendError } from '../lib/condiciones.mjs';
 
 declare const Netlify: { env: { get(name: string): string | undefined } };
 
@@ -124,6 +125,7 @@ export default async function guardarPerfil(request: Request): Promise<Response>
     if (typeof user.email !== 'string' || (credentials && user.email.trim().toLowerCase() !== email) ||
         ![undefined, null, false].includes(user.baneado)) return fail(502);
     if (verifyOnly) return json(200, [{ id: user.id }]);
+    await assertTermsAccepted(verifiedId);
     // Re-read state after authentication. CAS closes the race between this read
     // and UPDATE; stale new editors cannot overwrite another tab's disciplines.
     const currentUrl = new URL(backend.origin + '/rest/v1/perfiles');
@@ -166,7 +168,10 @@ export default async function guardarPerfil(request: Request): Promise<Response>
     const update = await fetch(target, {
       method: 'PATCH', headers: { ...backend.headers, Prefer: 'return=representation' }, body: JSON.stringify(changes), signal, redirect: 'error'
     });
-    if (!update.ok) return fail(502);
+    if (!update.ok) {
+      const terms = await termsBackendError(update);
+      return terms ? termsFailure(terms) : fail(502);
+    }
     const responseText = await update.text();
     if (!responseText) return fail(502); // A 204 cannot confirm a requested representation.
     const rows = JSON.parse(responseText);
@@ -179,7 +184,7 @@ export default async function guardarPerfil(request: Request): Promise<Response>
     }
     // Only explicitly selected profile fields may leave the server.
     return json(200, [Object.fromEntries(RETURN_FIELDS.filter(key => Object.hasOwn(rows[0], key)).map(key => [key, rows[0][key]]))]);
-  } catch { return fail(502); }
+  } catch (error) { return error instanceof TermsError ? termsFailure(error) : fail(502); }
 }
 
 export const config: Config = {

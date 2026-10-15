@@ -13,6 +13,8 @@
   let sequence = 0;
   let logoutPending = false;
   let refreshPending = null;
+  let termsLoader = null;
+  let termsStylesReady = false;
   function read(key) { try { return localStorage.getItem(key) || ''; } catch (_) { return ''; } }
   function write(key, value) { try { localStorage.setItem(key, String(value ?? '')); } catch (_) {} }
   function remove(key) { try { localStorage.removeItem(key); } catch (_) {} }
@@ -160,6 +162,43 @@
     if (url.pathname.startsWith('/storage/v1/object/') && !(method === 'GET' && url.pathname.startsWith('/storage/v1/object/public/'))) return url.pathname + url.search;
     return '';
   }
+  function termsNotice(text, registration = false) {
+    const draw = () => {
+      let element=document.getElementById('ba-terms-notice');
+      if(!element){element=document.createElement('aside');element.id='ba-terms-notice';element.setAttribute('role','alert');element.style.cssText='position:relative;z-index:1005;margin:76px 16px 16px;padding:14px;background:#17200f;color:#f3f1e7;border:1px solid #8d9e73;font:14px/1.5 sans-serif';document.body.prepend(element);}
+      element.replaceChildren(document.createTextNode(text+' '));
+      const link=document.createElement('a');link.href=registration?'buscARTE_registro.html':'buscARTE_terminos.html';link.target='_blank';link.rel='noopener';link.textContent=registration?'Abrir registro actualizado en otra pestaña':'Leer los Términos en otra pestaña';link.style.cssText='color:#def58f;min-height:44px;display:inline-flex;align-items:center;text-decoration:underline';element.append(link);
+    };
+    if(document.body)draw();else document.addEventListener('DOMContentLoaded',draw,{once:true});
+  }
+  function loadTermsUI() {
+    if(window.BuscARTECondiciones&&termsStylesReady)return Promise.resolve();
+    if(termsLoader)return termsLoader;
+    const asset=element=>new Promise((resolve,reject)=>{
+      const timer=setTimeout(()=>{element.remove();reject(new Error('Terms UI timeout'));},15000);
+      element.onload=()=>{clearTimeout(timer);resolve();};
+      element.onerror=()=>{clearTimeout(timer);element.remove();reject(new Error('Terms UI unavailable'));};
+      document.head.append(element);
+    });
+    const script=document.createElement('script');script.src='/assets/js/condiciones.js';
+    const link=document.createElement('link');link.rel='stylesheet';link.href='/assets/css/condiciones.css';
+    termsLoader=Promise.all([
+      window.BuscARTECondiciones?Promise.resolve():asset(script),
+      termsStylesReady?Promise.resolve():asset(link).then(()=>{termsStylesReady=true;})
+    ]).then(()=>{if(!window.BuscARTECondiciones)throw new Error('Terms UI unavailable');}).catch(error=>{termsLoader=null;throw error;});
+    return termsLoader;
+  }
+  async function presentTerms(response, registration = false, actor = '') {
+    if(response.status!==428)return;
+    let data;try{data=await response.clone().json();}catch(_){return;}
+    if(data?.code!=='TERMS_REQUIRED')return;
+    // El servidor ya rechazó la escritura. Nunca repetir un POST/PATCH desde
+    // este wrapper: aceptar condiciones y enviar contenido son actos distintos.
+    if(registration){termsNotice('El registro no se envió. Marcá la casilla de aceptación de Términos antes de crear tu cuenta. Si no aparece, usá el formulario actualizado; conservamos los datos de esta pestaña.',true);return;}
+    if(status!=='verified'||!user||!actor||String(user.id)!==actor)return;
+    try{await loadTermsUI();if(status==='verified'&&String(user?.id)===actor)await window.BuscARTECondiciones.open({version:data.version,actor});}
+    catch(_){termsNotice('No pudimos abrir la aceptación de Términos. No enviamos tu contenido y conservamos el borrador. Volvé a intentar o recargá cuando hayas conservado tus cambios.');}
+  }
   window.fetch = async function (input, options) {
     const original = input instanceof Request ? input : null;
     const init = options || {};
@@ -167,8 +206,13 @@
     const method = String(init.method || original?.method || 'GET').toUpperCase();
     const path = gatewayPath(url, method);
     if (!path) {
+      const actor=status==='verified'?String(user?.id||''):'';
       const response = await nativeFetch(input, options);
       if (url.origin === location.origin && url.pathname === '/.netlify/functions/guardar-perfil' && response.status === 401) expired('expired', true);
+      if(url.origin===location.origin&&!['GET','HEAD'].includes(method)&&['/.netlify/functions/guardar-perfil','/.netlify/functions/datos'].includes(url.pathname)) {
+        const registering=url.pathname.endsWith('/datos')&&new URLSearchParams(url.search).get('path')?.split('?')[0]==='/rest/v1/rpc/registrar_usuario';
+        await presentTerms(response,registering,actor);
+      }
       return response;
     }
     await ready;
@@ -183,6 +227,7 @@
     if (path.startsWith('/storage/v1/object/fotos-perfil/') && headers.has('x-upsert')) safeHeaders.set('x-upsert', headers.get('x-upsert'));
     let body = init.body;
     if (body === undefined && original && !['GET','HEAD'].includes(method)) body = await original.clone().blob();
+    const actor=status==='verified'?String(user?.id||''):'';
     const response = await nativeFetch('/.netlify/functions/datos?path=' + encodeURIComponent(path), {
       method, headers:safeHeaders, ...(body != null ? {body} : {}),
       signal:init.signal || original?.signal, credentials:'same-origin', cache:'no-store', redirect:'error'
@@ -201,6 +246,7 @@
         }
       }
     } else if (!isAuthRoute && response.status === 401) expired('expired', true);
+    if(!['GET','HEAD'].includes(method))await presentTerms(response,authRoute==='/rest/v1/rpc/registrar_usuario',actor);
     return response;
   };
   window.BuscARTESesion = Object.freeze({ ready, require:requireUser, refresh, logout, get user() { return user; }, get status() { return status; } });

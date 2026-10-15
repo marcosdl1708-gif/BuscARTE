@@ -95,6 +95,10 @@
   .registro-mail-choice input { flex:0 0 auto; width:20px; height:20px; margin:.15rem 0 0; accent-color:var(--neon); }
   .registro-mail-choice input:focus-visible { outline:2px solid var(--neon); outline-offset:3px; }
   .registro-mail-help { margin:0 0 1rem 2rem; font-size:.78rem; line-height:1.5; color:var(--gris); }
+  .registro-terms-choice {min-height:44px;min-width:0;}
+  .registro-terms-choice span {min-width:0;}
+  .registro-terms-choice a, #reg-terms-help a {color:var(--neon);text-decoration:underline;text-underline-offset:3px;display:inline-flex;align-items:center;min-height:44px;}
+  #reg-terms-error {color:#ffd2be;}
   /* CHIPS */
   .chips-label { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gris); margin-bottom: 0.8rem; display: block; }
   .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.4rem; }
@@ -407,6 +411,13 @@
         </select>
       </div>
       </details>
+
+      <label class="registro-mail-choice registro-terms-choice" for="reg-terms-accepted">
+        <input type="checkbox" id="reg-terms-accepted" required aria-describedby="reg-terms-help reg-terms-error" onchange="if(this.checked)document.getElementById('reg-terms-error').hidden=true">
+        <span>Leí y acepto los <a href="buscARTE_terminos.html" target="_blank" rel="noopener">Términos de uso</a> de BuscARTE, versión 15/10/2026.</span>
+      </label>
+      <p class="registro-mail-help" id="reg-terms-help">Obligatorio para crear tu cuenta. Consultá también la <a href="buscARTE_privacidad.html" target="_blank" rel="noopener">Política de privacidad</a>. No activa correos de marketing.</p>
+      <p class="registro-mail-help" id="reg-terms-error" role="alert" hidden>Para crear tu cuenta, leé y aceptá los Términos de uso.</p>
 
       <label class="registro-mail-choice" for="reg-email-marketing">
         <input type="checkbox" id="reg-email-marketing" aria-describedby="reg-email-marketing-help">
@@ -875,6 +886,8 @@ function validarDatosCuenta() {
   const passwordError = errorNuevaPassword(pass);
   if (passwordError) { alert(passwordError); goStep('cuenta'); return false; }
   if (!prov) { alert('Por favor seleccioná tu provincia.'); goStep('cuenta'); return false; }
+  const terms=document.getElementById('reg-terms-accepted');
+  if(terms?.checked!==true){goStep('cuenta');document.getElementById('reg-terms-error').hidden=false;terms?.focus();return false;}
   return true;
 }
 
@@ -1213,6 +1226,8 @@ async function crearPerfil(btn) {
       body: JSON.stringify({
         captcha_token: captchaResponse,
         email_marketing_opt_in: document.getElementById('reg-email-marketing')?.checked === true,
+        terms_version: '2026-10-15',
+        terms_accepted: document.getElementById('reg-terms-accepted')?.checked === true,
         p_email: email,
         p_password: password,
         p_nombre: nombreCompleto,
@@ -1323,6 +1338,8 @@ async function crearNegocio(btn) {
       body: JSON.stringify({
         captcha_token: captchaResponse,
         email_marketing_opt_in: document.getElementById('reg-email-marketing')?.checked === true,
+        terms_version: '2026-10-15',
+        terms_accepted: document.getElementById('reg-terms-accepted')?.checked === true,
         p_email: email,
         p_password: password,
         p_nombre: nombre,
@@ -1413,6 +1430,8 @@ async function crearVisitante(btn) {
       body: JSON.stringify({
         captcha_token: captchaResponse,
         email_marketing_opt_in: document.getElementById('reg-email-marketing')?.checked === true,
+        terms_version: '2026-10-15',
+        terms_accepted: document.getElementById('reg-terms-accepted')?.checked === true,
         p_email: email, p_password: password, p_nombre: nombre,
         p_provincia: provincia, p_ciudad: '', p_barrio: '',
         p_instrumento: '', p_generos: '', p_disponibilidad: '', p_referentes: '', p_bio: '',

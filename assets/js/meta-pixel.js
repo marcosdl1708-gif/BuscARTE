@@ -186,13 +186,14 @@
       var style = document.createElement('style');
       style.id = 'ba-meta-consent-style';
       style.textContent = '#ba-meta-consent{position:fixed;z-index:2147483646;left:16px;right:16px;bottom:16px;max-width:760px;margin:auto;background:#111;color:#f5f5f5;border:1px solid #353535;border-left:4px solid #d4f53c;box-shadow:0 18px 55px rgba(0,0,0,.55);padding:16px;font:14px/1.45 Arial,sans-serif}#ba-meta-consent p{margin:0 0 12px}#ba-meta-consent a{color:#d4f53c}#ba-meta-consent .ba-meta-actions{display:flex;gap:8px;flex-wrap:wrap}#ba-meta-consent button{border:1px solid #666;background:transparent;color:#fff;padding:9px 13px;cursor:pointer;font-weight:700}#ba-meta-consent button[data-allow]{background:#d4f53c;border-color:#d4f53c;color:#080808}@media(max-width:560px){#ba-meta-consent{left:8px;right:8px;bottom:8px}#ba-meta-consent button{flex:1}}';
+      style.textContent += '#ba-meta-consent{box-sizing:border-box;max-height:calc(100vh - 16px);max-height:calc(100dvh - 16px);overflow-y:auto}#ba-meta-consent button{min-height:44px}';
       document.head.appendChild(style);
     }
     var banner = document.createElement('aside');
     banner.id = 'ba-meta-consent';
     banner.setAttribute('role', 'dialog');
     banner.setAttribute('aria-label', 'Preferencias de medición');
-    banner.innerHTML = '<p><strong>Medición para mejorar buscARTE.</strong> Si aceptás, usamos el píxel de Meta para saber qué visitas terminan en registros, publicaciones o contactos. No enviamos tu email, teléfono, nombre ni el texto de tus publicaciones. <a href="' + PRIVACY_URL + '">Privacidad</a>.</p><div class="ba-meta-actions"><button type="button" data-deny>Solo necesarias</button><button type="button" data-allow>Permitir medición</button></div>';
+    banner.innerHTML = '<p><strong>Medición opcional con Meta.</strong> Si permitís, Meta Pixel usa cookies e identificadores del navegador y recibe tu dirección IP, URL visitada y eventos generales para medir visitas, registros, publicaciones o contactos y mejorar campañas propias de buscARTE. No enviamos tu email, teléfono, nombre ni el texto de tus publicaciones. Podés usar la plataforma con Solo necesarias y cambiar tu elección en <a href="' + PRIVACY_URL + '#localstorage" target="_blank" rel="noopener noreferrer">Privacidad</a>.</p><div class="ba-meta-actions"><button type="button" data-deny>Solo necesarias</button><button type="button" data-allow>Permitir medición</button></div>';
     banner.querySelector('[data-deny]').addEventListener('click', function () { setConsent(false); });
     banner.querySelector('[data-allow]').addEventListener('click', function () { setConsent(true); });
     document.body.appendChild(banner);

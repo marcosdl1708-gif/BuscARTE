@@ -1,6 +1,7 @@
-import { backend, backendJson, trustedOrigin, sessionUser, startSession, endSession, clearCookie, readJson, readBytes, json, id, object, rate, notify } from '../lib/session.mjs';
+import { backend, backendJson, trustedOrigin, sessionUser, startSession, clearCookie, readJson, readBytes, json, id, object, rate, notify } from '../lib/session.mjs';
 import { RUBROS, DETAIL_FIELDS, belongsTo, projectProfile, detailObject } from '../lib/disciplinas.mjs';
 import { assertCanCommunicate, ModerationError, moderationFailure, moderationBackendError } from '../lib/moderacion.mjs';
+import { TERMS_VERSION, TermsError, assertTermsAccepted, termsFailure, termsBackendError } from '../lib/condiciones.mjs';
 
 const PROFILE = 'id,created_at,nombre,instrumento,generos,provincia,ciudad,barrio,bio,referentes,disponibilidad,donde_ensaya,redes,videos,es_premium,foto_url,celular,baneado,experiencia,edad,genero_principal,tipo_cuenta,rubro,campos_especificos,disciplinas,perfil_revision';
 const COLUMNS = {
@@ -55,6 +56,7 @@ function prefer(request) {
 async function responseFor(path, request, method=request.method, payload, extra={}) {
   const response = await backend(path, { method, headers:{ Prefer:prefer(request),...extra }, ...(payload===undefined?{}:{body:JSON.stringify(payload)}) });
   if (!response.ok) {
+    const terms=await termsBackendError(response);if(terms)return termsFailure(terms);
     const blocked=await moderationBackendError(response);if(blocked)return moderationFailure(blocked);
     return fail(response.status===409?400:502);
   }
@@ -120,6 +122,8 @@ async function authRpc(name, request, context) {
   const payload=await readJson(request);
   const marketingOptIn=name==='registrar_usuario' && payload.email_marketing_opt_in===true;
   if(name==='registrar_usuario') {
+    if(payload.terms_accepted!==true || payload.terms_version!==TERMS_VERSION)return termsFailure(new TermsError(428,'TERMS_REQUIRED'));
+    delete payload.terms_accepted; delete payload.terms_version;
     if(payload.email_marketing_opt_in!==undefined && typeof payload.email_marketing_opt_in!=='boolean')return fail(400);
     delete payload.email_marketing_opt_in;
   }
@@ -135,7 +139,7 @@ async function authRpc(name, request, context) {
     if(!await captcha(payload.captcha_token,request))return fail(400,'No pudimos verificar el captcha. Completalo nuevamente; conservamos tus datos.');
     delete payload.captcha_token;
   }
-  const result=await backendJson('/rest/v1/rpc/'+name,{method:'POST',body:JSON.stringify(payload)});
+  const result=await backendJson('/rest/v1/rpc/'+(name==='registrar_usuario'?'registrar_usuario_con_terminos_web':name),{method:'POST',body:JSON.stringify(name==='registrar_usuario'?{p_registro:payload,p_version:TERMS_VERSION}:payload)});
   const user=Array.isArray(result)?result[0]:result;
   if(!object(user) || user.error || !id(user.id))return json(name==='login_usuario'?401:400,{error:name==='registrar_usuario' && user?.error==='duplicate_email'?'duplicate_email':'Email o contraseña incorrectos.'});
   if(user.baneado===true)return fail(403);
@@ -157,6 +161,7 @@ async function authRpc(name, request, context) {
 }
 async function storage(request, route, user) {
   if(request.method!=='POST')return fail(405);
+  await assertTermsAccepted(user.id);
   if(!await rate(request,'upload',15,60))return fail(429);
   const match=route.pathname.match(/^\/storage\/v1\/object\/(fotos-perfil|fotos-anuncios)\/([A-Za-z0-9-]+\.(?:jpg|jpeg|png|webp))$/);
   if(!match || route.search)return fail(400);
@@ -167,6 +172,10 @@ async function storage(request, route, user) {
   const bytes=await readBytes(request,2*1024*1024);
   const magic= mime==='image/jpeg'?bytes[0]===255&&bytes[1]===216&&bytes[2]===255:mime==='image/png'?bytes.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10])):bytes.subarray(0,4).toString()==='RIFF'&&bytes.subarray(8,12).toString()==='WEBP';
   if(!magic || bytes.length<12)return fail(400);
+  // Recheck after a slow upload body. Deleted accounts cannot start a new
+  // Storage operation with an earlier session result; the delayed deletion
+  // queue also sweeps already in-flight uploads after the handler deadline.
+  if(!await profileExists(user.id))return fail(401);
   const uploaded=await backend(route.pathname,{method:'POST',headers:{'Content-Type':mime,'x-upsert':'false'},body:bytes});
   if(!uploaded.ok)return fail(502);
   return json(200,await uploaded.json());
@@ -176,6 +185,7 @@ async function write(table, route, request, user, context) {
   const params=query(route.search,table,table==='reacciones'?['user_id']:[]);
   // Writes never accept nested representation/privilege fields from the client.
   if(table==='perfiles')return fail(403);
+  if(request.method!=='DELETE' && (['conversaciones','mensajes','anuncios','reacciones'].includes(table) || (table==='artistas_sugeridos' && request.method==='POST')))await assertTermsAccepted(uid);
   if(table==='artistas_sugeridos') {
     // Suggestions are not a privilege-bearing field; a verified user may add a
     // bounded name, never edit the global popularity counter supplied by a browser.
@@ -237,6 +247,7 @@ async function write(table, route, request, user, context) {
     if(payload.anuncio_id) { const ad=await adExists(payload.anuncio_id);if(!ad || (id(ad.user_id)!==uid && id(ad.user_id)!==id(payload.para_user_id)))return fail(403); }
     const result=await backend('/rest/v1/mensajes',{method:'POST',headers:{Prefer:'return=representation'},body:JSON.stringify({de_user_id:uid,para_user_id:id(payload.para_user_id),anuncio_id:payload.anuncio_id?id(payload.anuncio_id):null,contenido:payload.contenido.trim()})});
     if(!result.ok) {
+      const terms=await termsBackendError(result);if(terms)return termsFailure(terms);
       const blocked=await moderationBackendError(result);if(blocked)return moderationFailure(blocked);
       return fail(502);
     }
@@ -303,16 +314,18 @@ export default async function datos(request, context) {
       const payload=await readJson(request);
       if(rpc[1]==='gestionar_anuncio') {
         if(!only(payload,['p_anuncio_id','p_user_id','p_accion']) || !id(payload.p_anuncio_id) || !same(payload.p_user_id,user) || !['pausar','reactivar','republicar','eliminar'].includes(payload.p_accion))return fail(403);
+        if(['reactivar','republicar'].includes(payload.p_accion))await assertTermsAccepted(user.id);
         return await responseFor('/rest/v1/rpc/gestionar_anuncio',request,'POST',{...payload,p_user_id:id(user.id)});
       }
       if(!only(payload,['p_user_id','p_password'])||!same(payload.p_user_id,user)||!str(payload.p_password,4096)||!payload.p_password)return fail(403);
       if(!await rate(request,'delete',3,900))return fail(429);
       const identity=await backendJson('/rest/v1/rpc/login_usuario',{method:'POST',body:JSON.stringify({p_email:user.email,p_password:payload.p_password})});
       if(!same(identity?.id,user))return fail(401);
-      const result=await backendJson('/rest/v1/rpc/eliminar_cuenta',{method:'POST',body:JSON.stringify({p_user_id:Number(id(user.id))})});
-      if(result?.ok!==true)return fail(502);
-      await endSession(request);
-      return json(200,{ok:true},{'Set-Cookie':clearCookie()});
+      const result=await backendJson('/rest/v1/rpc/solicitar_eliminacion_web',{method:'POST',body:JSON.stringify({p_actor_id:id(user.id)})});
+      if(result?.ok!==true || result.storage_pending!==true || typeof result.job_id!=='string' || !/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/i.test(result.job_id))return fail(502);
+      // The atomic procedure already invalidated all account sessions. A second
+      // network DELETE must not turn a committed deletion into a false failure.
+      return json(200,{ok:true,storage_pending:true},{'Set-Cookie':clearCookie()});
     }
     if(!table || !Object.hasOwn(COLUMNS,table))return fail(403);
     if(mutating)return await write(table,route,request,user,context);
@@ -342,6 +355,6 @@ export default async function datos(request, context) {
     }
     if(table==='perfiles')return await profileResponse(params,request);
     return await responseFor('/rest/v1/'+table+'?'+params,request);
-  } catch(error) { return error instanceof ModerationError?moderationFailure(error):fail(503); }
+  } catch(error) { return error instanceof TermsError?termsFailure(error):error instanceof ModerationError?moderationFailure(error):fail(503); }
 }
 export const config = { path:'/.netlify/functions/datos',rateLimit:{windowLimit:180,windowSize:60,aggregateBy:['ip','domain'],action:'rate_limit'} };

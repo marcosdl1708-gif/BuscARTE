@@ -3014,7 +3014,9 @@ if ('serviceWorker' in navigator) {
         throw new Error('No se pudo eliminar la cuenta.');
       }
 
-      if (progress) progress.textContent = '✓ Cuenta eliminada. Cerrando sesión...';
+      const deletion = await res.json();
+      if (deletion?.ok !== true || deletion.storage_pending !== true) throw new Error('No se pudo confirmar la eliminación.');
+      if (progress) progress.textContent = '✓ Cuenta eliminada. Las fotos se retirarán en segundo plano con reintentos si hace falta. Cerrando sesión...';
 
       await window.BuscARTESesion.logout();
     } catch(e) {
