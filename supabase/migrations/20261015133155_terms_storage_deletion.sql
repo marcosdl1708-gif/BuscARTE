@@ -1,5 +1,7 @@
 -- Coordinated local preparation: private terms evidence and durable Storage cleanup.
 -- No historical acceptance/backfill, Auth import or SQL deletion of Storage objects.
+-- Stage before the atomic web release. Keep content guards disabled until v29
+-- endpoints/assets have been verified; the deletion queue trigger stays enabled.
 create table public.aceptaciones_terminos_web (
   perfil_id bigint not null references public.perfiles(id) on delete cascade,
   version text not null check(version ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'),
@@ -205,3 +207,7 @@ grant execute on function public.estado_terminos_web(bigint),public.aceptar_term
   public.registrar_usuario_con_terminos_web(jsonb,text),public.terminos_guardar_mensaje_web(),public.terminos_guardar_perfil_web(),
   public.terminos_guardar_anuncio_web(),public.encolar_eliminacion_storage_web(),public.solicitar_eliminacion_web(bigint),
   public.claim_eliminacion_web(uuid),public.finalizar_eliminacion_web(uuid,uuid,boolean,text) to service_role;
+
+alter table public.mensajes disable trigger terminos_mensaje_insert;
+alter table public.perfiles disable trigger terminos_perfil_update;
+alter table public.anuncios disable trigger terminos_anuncio_write;

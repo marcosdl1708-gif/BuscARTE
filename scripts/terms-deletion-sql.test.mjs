@@ -11,6 +11,8 @@ const {PGlite}=await import(modulePath?pathToFileURL(path.resolve(modulePath)).h
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const file='supabase/migrations/20261015133155_terms_storage_deletion.sql';
 const source=readFileSync(path.join(root,file),'utf8');
+const activationFile='supabase/migrations/20261015143435_activate_terms_guards_after_web_release.sql';
+const activationSource=readFileSync(path.join(root,activationFile),'utf8');
 const db=new PGlite();
 const q=async(sql,params=[]) => (await db.query(sql,params)).rows;
 const rpc=async(name,args=[]) => (await q(`select public.${name}(${args.map((_,i)=>'$'+(i+1)).join(',')}) as value`,args))[0].value;
@@ -48,7 +50,7 @@ await db.exec(readFileSync(path.join(root,'supabase/migrations/20261015125839_us
 const legacyBefore=await q(`select oid,pg_get_functiondef(oid) as body from pg_proc where pronamespace='public'::regnamespace order by oid`);
 await db.exec(`insert into public.perfiles(id,email,password,nombre,bio) values(1,'one@example.invalid','oldhash','One','Historical'),(2,'two@example.invalid','oldhash','Two','Historical'),(3,'three@example.invalid','oldhash','Three','Historical')`);
 const profilesBefore=await q('select * from perfiles order by id');
-await db.exec(source);
+await db.exec('begin;'+source+'commit;');
 after(async()=>{await db.close();});
 async function reset(){await db.exec(`reset role;truncate perfiles restart identity cascade;truncate eliminaciones_storage_web;
   insert into perfiles(id,email,password,nombre,bio) values(1,'one@example.invalid','oldhash','One','Historical'),(2,'two@example.invalid','oldhash','Two','Historical'),(3,'three@example.invalid','oldhash','Three','Historical');set role service_role;`);}
@@ -77,6 +79,37 @@ test('migration changes no historical rows or prior RPC definitions, and grants 
   const routines=await q(`select oid,prosecdef,proconfig from pg_proc where pronamespace='public'::regnamespace and oid not in (select unnest($1::oid[]))`,[legacyBefore.map(row=>row.oid)]);
   assert.equal(routines.length,11);
   for(const routine of routines){assert.equal(routine.prosecdef,false);assert(routine.proconfig.includes('search_path=""'));for(const role of ['anon','authenticated','service_role'])assert.equal((await q(`select has_function_privilege($1,$2,'EXECUTE') as allowed`,[role,routine.oid]))[0].allowed,role==='service_role');}
+});
+
+test('prepared release keeps legacy UGC usable and deletion durable, then activates only the three terms guards',async()=>{
+  const triggerState=()=>q(`select tgname,tgenabled from pg_trigger where not tgisinternal and tgname in
+    ('terminos_mensaje_insert','terminos_perfil_update','terminos_anuncio_write','almacenamiento_eliminacion_perfil') order by tgname`);
+  assert.deepEqual(await triggerState(),[
+    {tgname:'almacenamiento_eliminacion_perfil',tgenabled:'O'},
+    {tgname:'terminos_anuncio_write',tgenabled:'D'},
+    {tgname:'terminos_mensaje_insert',tgenabled:'D'},
+    {tgname:'terminos_perfil_update',tgenabled:'D'}
+  ]);
+  await reset();
+  // The API's explicit guard stays strict even while the SQL triggers are staged.
+  await reject(rpc('exigir_terminos_web',[1]),'42501','TERMS_REQUIRED');
+  await db.exec('begin;');
+  try {
+    await message();await q(`update perfiles set bio='Legacy draft' where id=1`);
+    await q(`insert into anuncios(user_id,titulo) values(1,'Legacy draft')`);
+    const legacy=await rpc('registrar_usuario',Object.values(input()));
+    assert.equal((await rpc('estado_terminos_web',[legacy.id])).accepted,false);
+    assert.equal((await rpc('eliminar_cuenta',[3])).ok,true);
+    assert.equal(await n('eliminaciones_storage_web'),1);
+    assert.equal(await n('aceptaciones_terminos_web'),0);
+  } finally { await db.exec('rollback;reset role;'); }
+  await db.exec('begin;'+activationSource+'commit;');
+  assert((await triggerState()).every(trigger=>trigger.tgenabled==='O'));
+  await reset();
+  await reject(message(),'42501','TERMS_REQUIRED');
+  await reject(q(`update perfiles set bio='Blocked draft' where id=1`),'42501','TERMS_REQUIRED');
+  await reject(q(`insert into anuncios(user_id,titulo) values(1,'Blocked draft')`),'42501','TERMS_REQUIRED');
+  assert.equal(await n('aceptaciones_terminos_web'),0);
 });
 
 test('historical profiles must explicitly accept the exact version; repeat acceptance preserves time',async()=>{
@@ -216,4 +249,5 @@ test('a reused profile ID is protected even if an old cleanup lease exists',asyn
 test('migration byte snapshot stays unchanged and no table has a FK back from the durable queue',async()=>{
   assert.equal((await q(`select count(*)::int as n from pg_constraint where conrelid='public.eliminaciones_storage_web'::regclass and contype='f'`))[0].n,0);
   assert.equal(createHash('sha256').update(readFileSync(path.join(root,file))).digest('hex'),createHash('sha256').update(source).digest('hex'));
+  assert.equal(createHash('sha256').update(readFileSync(path.join(root,activationFile))).digest('hex'),createHash('sha256').update(activationSource).digest('hex'));
 });

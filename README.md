@@ -3,6 +3,20 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
+## Corte coordinado v29 — 15/10/2026, en curso
+
+El usuario autorizó cerrar pendientes y hacer un único deploy. Base de publicación anterior: v28 / `0c352d9` / deploy `6ad0cab54252a45ecea3bfa6`. Se prepara el corte desde `40c9988`, sin incluir la guía ajena ni `preview/`, ni el original/Android/Auth.
+
+Orden de activación comprobado: migración de moderación; términos/borrado preparados con los tres guards de contenido desactivados dentro de la misma transacción; único deploy web/API/SW v29; verificación del dominio/RPC/recursos; migración separada `20261015143435_activate_terms_guards_after_web_release.sql` para activar esos tres guards. El trigger de cola de borrado sigue activo durante la preparación. No ejecutar `db push/pull` ni el archivo de activación antes del deploy. Locks acotados a tres segundos y sentencias a treinta; si el corte web falla, no activar guards. Las cuentas históricas no se dan por aceptadas.
+
+Límite de actualización: una pestaña v28 ya abierta conserva su JavaScript y sus errores genéricos, aunque el servidor sea nuevo. Sus formularios/borradores no se borran automáticamente, pero para aceptar las nuevas condiciones y guardar deberá abrir la versión actualizada; copiar cualquier borrador antes de recargar. No se promete transformar el código de una pestaña antigua ni una prueba física Android no realizada.
+
+Gate sobre `40c9988`: 146/146 comprobaciones de empaquetado, sesión, retorno, móvil, moderación/términos/privacidad. Tras separar la activación: 52 SQL aprobadas y una omisión de PGlite cubierta por nueve carreras PostgreSQL reales (siete esperas observadas). La política ampliada con hCaptcha, Google Fonts y diagnóstico de hosting pasó cinco controles de navegador adicionales. Build explícito de 74 archivos. Evidencia privada `../BuscARTE-resguardos/release-final-20261015/`, `../BuscARTE-resguardos/gate-candidate-40c9988-20261015/` y `../BuscARTE-resguardos/concurrency-final-20261015/run-a147eb8901d6471e9a7cc7a939a317b0/`.
+
+Meta: píxel propio `1982530688931438` comprobado. Correspondencia avanzada, eventos automáticos y eventos sin código desactivados; cookies propias activas sólo con permiso de nuestra web. Se desactivó el añadido automático por IA de detalles de páginas/productos; Meta advierte que reducir esos datos puede afectar la optimización publicitaria. No se modificaron campañas, presupuestos, otros píxeles ni permisos. Nuevas capturas de Play preparadas con UI real, datos de ejemplo y fuentes públicas autorizadas; las antiguas se respaldaron antes de reemplazarlas. Declaraciones de Google deben reflejar los datos reales, sin prometer retenciones no confirmadas ni aprobación de producción.
+
+Esta sección registra preparación/orden, no confirma por sí sola que el deploy y la activación remota estén terminados. Al cerrar, sustituir este estado con IDs y verificaciones reales, usando `[skip netlify]` para la documentación y sin un segundo deploy.
+
 ## Preparación local — consentimiento Meta y borrador Data Safety, 15/10/2026
 
 **Sin publicar ni enviar declaraciones.** Continuación local de `3beed84`, mismo candidato v29 y 74 archivos públicos permitidos. Sin push, deploy/preview, cambios de SQL/Supabase, Android, campañas, Pixel ID, nombres de eventos, deduplicación, correo ni usuarios. Las migraciones candidatas anteriores siguen sin aplicar. Guía ajena y `preview/` preservados y excluidos.
