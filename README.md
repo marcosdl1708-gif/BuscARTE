@@ -3,11 +3,11 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
-## Preparación local — mobile y retorno a Artistas, 15/10/2026
+## Estado operativo — mobile y retorno a Artistas, 15/10/2026
 
-Bloque 2 preparado en `codex/mobile-ux-retorno-20261015`, todavía sin publicar: respuestas rápidas del chat visibles, menú Mi cuenta recorrible en horizontal y retorno Artistas→perfil→Atrás que conserva filtros, orden, cantidad cargada y posición de la persona por entrada de historial. Caché candidata v27. Ver `docs/qa-mobile-retorno-20261015.md` para alcance, pruebas aisladas y límites físicos.
+Publicado a las 09:26 ART: fuente `aa4f8ac17bf321e633da56af1bbaf29372b06419`, deploy `6ad0c656fae3a210383bc9ca`, caché v27. Respuestas rápidas del chat visibles, menú Mi cuenta recorrible en horizontal y retorno Artistas→perfil→Atrás que conserva filtros, orden, cantidad cargada y posición de la persona por entrada de historial. Ver `docs/release-mobile-retorno-20261015.md` y el registro de preparación `docs/qa-mobile-retorno-20261015.md`.
 
-Producción continúa en el corte v26 inferior; no confundir `dist/` local con lo publicado. Esperar OK para deploy y para pasar al bloque posterior de Play Console. Guía/preview ajenas preservadas, sin cambios de datos, funciones, Auth ni Android.
+40/40 regresiones focalizadas, matriz A2 de 123 escenarios y empaquetado 26/26 aprobados. Dominio: 68 recursos, 35 rutas y cuatro exclusiones comprobados; tres recorridos de navegador con estáticos reales y backend sintético aprobados. Siete funciones Node 24 y ambos cron conservados; cinco digests idénticos, dos paquetes cron con nuevo digest y fuentes ejecutables intactas (prueba local NFT: sólo cambia el package.json que contiene los dos scripts QA). Sin cambios de datos, Auth o Android. Reabrir la app conectada para recibir la web nueva; falta la pasada física y el bloque posterior de Play Console, que requiere nuevo OK. Guía/preview ajenas preservadas y excluidas. Cierre documental con `[skip netlify]`, sin segundo deploy.
 
 ## Estado operativo — cursor continuo y filtros, 13/10/2026
 

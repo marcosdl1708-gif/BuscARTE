@@ -1,5 +1,7 @@
 # Bloque 2 — correcciones mobile y retorno a Artistas, 15/10/2026
 
+Registro de preparación anterior al «go». Después se publicó y verificó: ver `release-mobile-retorno-20261015.md`. Las referencias siguientes a «sin publicar» describen aquel momento, no el estado actual.
+
 Preparado sólo en local, rama `codex/mobile-ux-retorno-20261015`, sobre `8d460ff`. Producción comprobada en el bloque anterior: fuente `98b07bf`, deploy `6aceb0967c1d2013614da922`, SW v26. Este bloque no incluye deploy, push ni solicitud a Google Play.
 
 ## Cambios
