@@ -286,6 +286,9 @@
         <span class="chat-toolbar-pill" id="chat-status-pill">Activo</span>
         <button type="button" class="chat-action-btn soft" onclick="cargarMensajes(true)">Actualizar</button>
         <a id="chat-ver-perfil" class="chat-action-btn chat-profile-btn" hidden>Ver perfil →</a>
+        <details id="chat-options" class="ba-mod-options" hidden>
+          <summary aria-label="Más opciones de la conversación" title="Más opciones de la conversación"><span aria-hidden="true">⋯</span></summary>
+        </details>
       </div>
     </header>
     <div class="chat-context-bar" id="chat-context-bar">
@@ -301,7 +304,7 @@
       </div>
     </div>
     <div class="chat-input-area" id="chat-input-area">
-      <div class="chat-compose-tools" aria-label="Seguridad y respuestas rápidas">
+      <div class="chat-compose-tools" aria-label="Estado del chat y respuestas rápidas">
       <div id="chat-moderation" hidden></div>
       <div class="quick-replies" id="quick-replies">
         <div class="quick-reply-label" id="quick-reply-label">Respuestas rápidas</div>
@@ -380,7 +383,7 @@
   // Firma del último render de mensajes — evita re-renderizar (y romper el scroll) en el polling.
   let ultimaFirmaMsgs = '';
   const borradoresChat = new Map();
-  const chatModeracion = window.BuscARTEModeracion.create({mount:'#chat-moderation',onChange:updateComposerState,showReport:true});
+  const chatModeracion = window.BuscARTEModeracion.create({mount:'#chat-moderation',onChange:updateComposerState,showReport:true,actionsMount:'#chat-options'});
 
   // No inferir una sesión desde el ID guardado en el navegador.
 
@@ -830,7 +833,7 @@
 
   function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
   function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
-  function closeMobileChat() { document.getElementById('chat-panel').classList.remove('mobile-visible'); }
+  function closeMobileChat() { document.getElementById('chat-options').open = false; document.getElementById('chat-panel').classList.remove('mobile-visible'); }
 
   function abrirDesdeURLSiHaceFalta() {
     const params = new URLSearchParams(location.search);

@@ -16,7 +16,11 @@ assert.ok(output!==path.join(root,'dist')&&!output.startsWith(path.join(root,'di
 fs.mkdirSync(output,{recursive:true});
 let browser;
 before(async()=>{browser=await chromium.launch({headless:true,channel:process.platform==='win32'?'msedge':undefined});});
-after(async()=>{await browser?.close();console.log('Moderation browser evidence: '+output);});
+after(async()=>{
+  await browser?.close();
+  for(const file of ['assets/js/moderacion.js','assets/css/moderacion.css','buscARTE_mensajes.html'])assert.deepEqual(fs.readFileSync(path.join(root,file)),sources.get(file),'Sources stayed frozen during QA: '+file);
+  console.log('Moderation browser evidence: '+output);
+});
 function deferred(){let resolve;const promise=new Promise(done=>{resolve=done;});return {promise,resolve};}
 async function setup(t,options={}) {
   const width=options.width||390,height=options.height||844;
@@ -78,7 +82,21 @@ const send=page=>page.locator('#chat-send-btn');
 const messagePosts=state=>state.calls.filter(call=>call.kind==='data'&&call.method==='POST'&&call.path==='/rest/v1/mensajes');
 const reportPosts=state=>state.calls.filter(call=>call.kind==='moderation'&&call.body?.action==='report');
 async function allowed(page){await page.waitForFunction(()=>document.querySelector('.ba-mod').dataset.status==='allowed');}
-async function openReport(page,profile=false){await page.locator(profile?'#report-link':'.ba-mod-report').click();await page.locator('dialog[open]').waitFor();}
+const options=page=>page.locator('#chat-options');
+const optionsTrigger=page=>page.locator('#chat-options > summary');
+async function openOptions(page){
+  if(!await options(page).evaluate(el=>el.open))await optionsTrigger(page).click();
+  await page.locator('#chat-options[open] .ba-mod-menu-actions').waitFor();
+}
+async function openReport(page,profile=false){
+  if(!profile)await openOptions(page);
+  await page.locator(profile?'#report-link':'.ba-mod-report').click();await page.locator('dialog[open]').waitFor();
+}
+async function block(page,profile=false){if(!profile)await openOptions(page);await page.locator('.ba-mod-block').click();}
+async function waitForOptionsFocus(page){await page.waitForFunction(()=>document.activeElement===document.querySelector('#chat-options > summary'));}
+async function assertTouchTarget(locator,label){
+  const box=await locator.boundingBox();assert.ok(box&&box.height>=44&&box.width>=44,label+' has a 44px touch target');
+}
 
 test('unknown and unavailable moderation fail closed without hiding history; retry enables a single send',async t=>{
   let unavailable=true;
@@ -86,7 +104,10 @@ test('unknown and unavailable moderation fail closed without hiding history; ret
   await page.locator('#chat-input').fill('Borrador conservado');
   await page.waitForFunction(()=>document.querySelector('.ba-mod').dataset.status==='unavailable');
   assert.equal(await send(page).isDisabled(),true);assert.match(await page.locator('#chat-messages').textContent(),/Mensaje previo del historial/);
+  assert.equal(await options(page).evaluate(el=>el.open),false);
+  assert.equal(await page.locator('.ba-mod-status').isVisible(),true);assert.equal(await page.locator('.ba-mod-retry').isVisible(),true);
   await page.evaluate(()=>sendMessage());assert.equal(messagePosts(state).length,0);
+  assert.equal(await page.locator('.ba-mod-status').evaluate(el=>el===document.activeElement),true,'Unavailable explanation remains focusable without opening options');
   assert.equal(await page.locator('#chat-input').inputValue(),'Borrador conservado');
   unavailable=false;await page.locator('.ba-mod-retry').click();await allowed(page);await send(page).click();
   await page.waitForFunction(()=>!enviandoMensaje);assert.equal(messagePosts(state).length,1);
@@ -96,22 +117,26 @@ test('a pending first check cannot be bypassed with Enter or a direct send call'
   const gate=deferred();
   const {page,state}=await setup(t,{moderation:async({call})=>{if(call.method==='GET')await gate.promise;return null;}});
   t.after(()=>gate.resolve());await page.locator('#chat-input').fill('No enviar durante la comprobación');
+  assert.equal(await mod(page).getAttribute('data-status'),'checking');
+  assert.equal(await page.locator('.ba-mod-status').isVisible(),true);assert.equal(await options(page).evaluate(el=>el.open),false);
   await page.locator('#chat-input').press('Enter');await page.evaluate(()=>sendMessage());
   assert.equal(messagePosts(state).length,0);assert.equal(await send(page).isDisabled(),true);
+  assert.equal(await page.locator('.ba-mod-status').evaluate(el=>el===document.activeElement),true,'Pending explanation is not trapped inside closed options');
   gate.resolve();await allowed(page);assert.equal(await page.locator('#chat-input').inputValue(),'No enviar durante la comprobación');
 });
 
 test('blocking is confirmed, mutually restricts sending, preserves history and can be undone in chat',async t=>{
   const {page,state}=await setup(t);await allowed(page);await page.locator('#chat-input').fill('Texto que se conserva');
-  await page.locator('.ba-mod-block').click();await page.locator('dialog[open] [data-close]').click();
+  await block(page);await page.locator('dialog[open] [data-close]').click();
   assert.equal(state.calls.filter(call=>call.body?.action==='block').length,0);
-  await page.locator('.ba-mod-block').click();assert.match(await page.locator('dialog').textContent(),/ambos sentidos/);
+  await block(page);assert.match(await page.locator('dialog').textContent(),/ambos sentidos/);
   await page.locator('.ba-mod-confirm').click();await page.waitForFunction(()=>document.querySelector('.ba-mod').dataset.status==='restricted');
   assert.equal(await send(page).isDisabled(),true);assert.equal(await page.locator('#chat-input').getAttribute('readonly'),'');
   assert.equal(await page.locator('#chat-input').inputValue(),'Texto que se conserva');assert.match(await page.locator('#chat-messages').textContent(),/Mensaje previo/);
   assert.equal(state.calls.filter(call=>call.body?.action==='block').length,1);
+  assert.equal(await options(page).evaluate(el=>el.open),false);assert.equal(await page.locator('.ba-mod-status').isVisible(),true);
   await page.screenshot({path:path.join(output,'chat-blocked-390.png'),animations:'disabled'});
-  await page.locator('.ba-mod-block').click();await allowed(page);assert.equal(await send(page).isDisabled(),false);
+  await block(page);await allowed(page);assert.equal(await send(page).isDisabled(),false);
   const writes=await page.evaluate(()=>__storageWrites.filter(row=>row.key==='ba_moderacion_revision'));
   assert.equal(writes.length,2);assert.ok(writes.every(row=>/^[a-f0-9-]{36}$/.test(row.value)));
 });
@@ -129,6 +154,7 @@ test('a restriction imposed elsewhere uses neutral wording and can still be repo
   const {page}=await setup(t,{moderation:async({call})=>call.method==='GET'?{body:{blocked_by_me:false,restricted:true}}:null});
   await page.waitForFunction(()=>document.querySelector('.ba-mod').dataset.status==='restricted');
   const text=await mod(page).textContent();assert.match(text,/No se pueden enviar/);assert.doesNotMatch(text,/te bloqueó|bloqueó a|Bloqueaste/);
+  assert.equal(await page.locator('.ba-mod-status').isVisible(),true);assert.equal(await options(page).evaluate(el=>el.open),false);
   await openReport(page);assert.equal(await page.locator('#ba-mod-reason').isVisible(),true);
 });
 
@@ -176,10 +202,12 @@ test('a server-side block racing a send retains the draft and restricts further 
 
 test('profile contact uses the same block/report controls and preserves a failed message',async t=>{
   const {page,state}=await setup(t,{profile:true,data:async({call})=>call.method==='POST'&&call.path==='/rest/v1/mensajes'?{status:503,body:{code:'MODERATION_UNAVAILABLE'}}:null});
+  assert.equal(await options(page).count(),0,'Public profile keeps its existing non-disclosure consumer');
   await allowed(page);await page.locator('.contact-form textarea').fill('Borrador del perfil');await page.locator('.contact-form .btn-send').click();
   await page.waitForFunction(()=>!enviandoContacto&&document.querySelector('.ba-mod').dataset.status==='unavailable');
   assert.equal(await page.locator('.contact-form textarea').inputValue(),'Borrador del perfil');
   assert.equal(await page.locator('.contact-form .btn-send').isDisabled(),true);
+  assert.equal(await page.locator('.ba-mod-block').isVisible(),true);
   await openReport(page,true);await page.locator('#ba-mod-reason').selectOption('spam');await page.locator('.ba-mod-submit').click();await page.locator('.ba-mod-success').waitFor();
   assert.equal('conversacion_id' in reportPosts(state)[0].body,false);
 });
@@ -216,26 +244,27 @@ test('cross-tab block changes trigger a fresh check and preserve the other tab d
   const {page,context,state}=await setup(t);await allowed(page);await page.locator('#chat-input').fill('Borrador en primera pestaña');
   const second=await context.newPage();second.on('pageerror',error=>state.errors.push(error.message));
   await second.goto(origin+'/buscARTE_perfil_publico.html?id=2');await allowed(second);
-  await second.locator('.ba-mod-block').click();await second.locator('.ba-mod-confirm').click();
+  await block(second,true);await second.locator('.ba-mod-confirm').click();
   await page.waitForFunction(()=>document.querySelector('.ba-mod').dataset.status==='restricted');
   assert.equal(await page.locator('#chat-input').inputValue(),'Borrador en primera pestaña');assert.equal(await send(page).isDisabled(),true);
   await second.close();
 });
 
 for(const [width,height] of [[320,720],[390,844],[844,390]])test(`moderation dialog at ${width}x${height}: labels, touch sizes, Escape/focus and scrollable content`,async t=>{
-  const {page}=await setup(t,{width,height});await allowed(page);await openReport(page);
+  const {page}=await setup(t,{width,height});await allowed(page);await openOptions(page);
+  for(const locator of [optionsTrigger(page),page.locator('.ba-mod-report'),page.locator('.ba-mod-block')])await assertTouchTarget(locator,'Chat option');
+  await openReport(page);assert.equal(await options(page).evaluate(el=>el.open),false,'Dialog does not leave the action disclosure open');
   await page.locator('#ba-mod-reason').selectOption('otro');await page.locator('#ba-mod-detail').fill('Borrador del formulario');
   assert.equal(await page.locator('#ba-mod-detail').getAttribute('maxlength'),'2000');
   assert.equal(await page.locator('dialog').getAttribute('aria-labelledby'),'ba-mod-title');
-  for(const locator of [page.locator('.ba-mod-report'),page.locator('.ba-mod-block'),page.locator('.ba-mod-submit'),page.locator('dialog [data-close]')]) {
-    const box=await locator.boundingBox();assert.ok(box.height>=44&&box.width>=44,'44px touch target');
-  }
+  for(const locator of [page.locator('.ba-mod-submit'),page.locator('dialog [data-close]')])await assertTouchTarget(locator,'Dialog control');
   const box=await page.locator('dialog').boundingBox();assert.ok(box.x>=0&&box.x+box.width<=width+1&&box.y>=0&&box.y+box.height<=height+1);
   await page.locator('.ba-mod-submit').scrollIntoViewIfNeeded();await page.screenshot({path:path.join(output,`report-${width}x${height}.png`),animations:'disabled'});
   await page.keyboard.press('Escape');await page.locator('dialog[open]').waitFor({state:'hidden'});
-  assert.equal(await page.locator('.ba-mod-report').evaluate(el=>el===document.activeElement),true);
+  await waitForOptionsFocus(page);
+  assert.equal(await optionsTrigger(page).evaluate(el=>el===document.activeElement),true,'Return focus goes to the visible disclosure trigger');
   await openReport(page);assert.equal(await page.locator('#ba-mod-detail').inputValue(),'Borrador del formulario');
-  await page.keyboard.press('Escape');await page.locator('.ba-mod-block').click();await page.locator('.ba-mod-confirm').click();
+  await page.keyboard.press('Escape');await block(page);await page.locator('.ba-mod-confirm').click();
   await page.waitForFunction(()=>document.querySelector('.ba-mod').dataset.status==='restricted');
   await page.locator('.ba-mod-status').scrollIntoViewIfNeeded();
   await page.screenshot({path:path.join(output,`chat-blocked-${width}x${height}.png`),animations:'disabled'});
@@ -248,8 +277,83 @@ for(const width of [320,390])test(`${width}px compact chat keeps composer visibl
   assert.ok(input.y>=0&&input.y+input.height<=430,'Textarea stays inside compact viewport');
   assert.ok(button.y>=0&&button.y+button.height<=430,'Send stays inside compact viewport');
   assert.equal(await page.locator('#chat-input').inputValue(),'Borrador sintético sin enviar');
-  await page.locator('.ba-mod-report').scrollIntoViewIfNeeded();await page.locator('.ba-mod-report').click();await page.keyboard.press('Escape');
+  await openReport(page);await page.keyboard.press('Escape');
   const reply=page.locator('.quick-reply').last();await reply.scrollIntoViewIfNeeded();assert.equal(await reply.isVisible(),true);
   const finalInput=await page.locator('#chat-input').boundingBox();assert.ok(finalInput.y+finalInput.height<=430);
   await page.screenshot({path:path.join(output,`chat-composer-compact-${width}.png`),animations:'disabled'});
+});
+
+for(const width of [320,390,1440])test(`${width}px normal chat keeps safety actions secondary, keyboard-accessible and inside the header`,async t=>{
+  const height=width===1440?900:844;
+  const {page,state}=await setup(t,{width,height});await allowed(page);
+  assert.equal(await options(page).isVisible(),true);assert.equal(await options(page).evaluate(el=>el.open),false);
+  assert.equal(await mod(page).isVisible(),false,'Allowed chat has no permanent moderation card beside the composer');
+  assert.equal(await page.locator('.ba-mod-block').isVisible(),false);assert.equal(await page.locator('.ba-mod-report').isVisible(),false);
+  assert.match(await optionsTrigger(page).getAttribute('aria-label'),/Más opciones/);
+  await assertTouchTarget(optionsTrigger(page),'More options');
+  const header=await page.locator('#chat-header').boundingBox(),trigger=await optionsTrigger(page).boundingBox();
+  assert.ok(header.height<=104,'Normal chat header does not become a large safety panel');
+  assert.ok(trigger.x>=0&&trigger.x+trigger.width<=width+1&&trigger.y>=header.y&&trigger.y+trigger.height<=header.y+header.height+1,'Trigger fits inside the header and viewport');
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,'No horizontal page overflow');
+  await page.screenshot({path:path.join(output,`chat-normal-${width}.png`),animations:'disabled'});
+  await page.locator('#chat-header').screenshot({path:path.join(output,`chat-header-${width}.png`),animations:'disabled'});
+
+  await optionsTrigger(page).focus();await optionsTrigger(page).press('Enter');
+  await page.locator('#chat-options[open] .ba-mod-report').waitFor();
+  for(const locator of [page.locator('.ba-mod-report'),page.locator('.ba-mod-block')])await assertTouchTarget(locator,'Safety action');
+  const popup=await page.locator('.ba-mod-menu-actions').boundingBox();
+  assert.ok(popup.x>=0&&popup.x+popup.width<=width+1&&popup.y>=0&&popup.y+popup.height<=height+1,'Open options are not clipped outside the viewport');
+  await page.screenshot({path:path.join(output,`chat-options-open-${width}.png`),animations:'disabled'});
+  await page.keyboard.press('Tab');assert.equal(await page.locator('.ba-mod-block').evaluate(el=>el===document.activeElement),true,'First safety action is keyboard reachable');
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(()=>!document.querySelector('#chat-options').open);
+  await waitForOptionsFocus(page);
+  assert.equal(await optionsTrigger(page).evaluate(el=>el===document.activeElement),true,'Escape returns focus to the visible trigger');
+  await optionsTrigger(page).press('Space');await page.locator('#chat-options[open] .ba-mod-report').waitFor();
+  await page.locator('#chat-input').click();
+  await page.waitForFunction(()=>!document.querySelector('#chat-options').open);
+  assert.equal(await page.locator('#chat-input').evaluate(el=>el===document.activeElement),true,'Outside click does not steal focus back to the header');
+
+  await openReport(page);await page.locator('#ba-mod-reason').selectOption('otro');await page.locator('#ba-mod-detail').fill('Borrador situacional sin enviar');
+  await page.keyboard.press('Escape');await page.locator('dialog[open]').waitFor({state:'hidden'});
+  await waitForOptionsFocus(page);
+  assert.equal(await optionsTrigger(page).evaluate(el=>el===document.activeElement),true,'Report closes onto a visible focus target');
+  await openReport(page);assert.equal(await page.locator('#ba-mod-detail').inputValue(),'Borrador situacional sin enviar');
+  await page.keyboard.press('Escape');
+  assert.equal(reportPosts(state).length,0);assert.equal(messagePosts(state).length,0,'Opening/closing safety options creates no content');
+});
+
+for(const width of [320,390,1440])test(`${width}px changing chats closes safety options and preserves conversation drafts`,async t=>{
+  const {page,state}=await setup(t,{width,height:844});await allowed(page);
+  await page.locator('#chat-input').fill('Borrador del contacto Dos');await openOptions(page);
+  await page.evaluate(()=>abrirConvPorId(11));await allowed(page);
+  assert.equal(await options(page).evaluate(el=>el.open),false,'Options do not remain open for a new target');
+  assert.match(await page.locator('#chat-header-name').textContent(),/Artista Tres/);
+  assert.equal(await page.locator('#chat-input').inputValue(),'');
+  await page.locator('#chat-input').fill('Borrador del contacto Tres');await openOptions(page);
+  await page.evaluate(()=>abrirConvPorId(10));await allowed(page);
+  assert.equal(await options(page).evaluate(el=>el.open),false);
+  assert.equal(await page.locator('#chat-input').inputValue(),'Borrador del contacto Dos');
+  await openReport(page);await page.locator('#ba-mod-reason').selectOption('spam');await page.locator('.ba-mod-submit').click();await page.locator('.ba-mod-success').waitFor();
+  assert.equal(reportPosts(state).length,1);assert.equal(reportPosts(state)[0].body.perfil_id,'2');assert.equal(reportPosts(state)[0].body.conversacion_id,'10');
+  assert.equal(messagePosts(state).length,0);
+});
+
+for(const width of [320,390])test(`${width}px returning to the mobile conversation list closes safety options without clearing the draft`,async t=>{
+  const {page,state}=await setup(t,{width,height:844});await allowed(page);
+  await page.locator('#chat-input').fill('Borrador antes de volver');await openOptions(page);
+  await page.locator('.mobile-chat-back').click();
+  assert.equal(await options(page).evaluate(el=>el.open),false);
+  assert.equal(await page.locator('#chat-panel').isVisible(),false);
+  await page.evaluate(()=>abrirConvPorId(10));await allowed(page);
+  assert.equal(await options(page).evaluate(el=>el.open),false);assert.equal(await page.locator('#chat-input').inputValue(),'Borrador antes de volver');
+  assert.equal(messagePosts(state).length,0);assert.equal(reportPosts(state).length,0);
+});
+
+test('profile report keeps its original return-focus target and visible safety controls',async t=>{
+  const {page}=await setup(t,{profile:true});await allowed(page);
+  assert.equal(await options(page).count(),0);assert.equal(await mod(page).isVisible(),true);assert.equal(await page.locator('.ba-mod-block').isVisible(),true);
+  await openReport(page,true);await page.keyboard.press('Escape');await page.locator('dialog[open]').waitFor({state:'hidden'});
+  await page.waitForFunction(()=>document.activeElement===document.querySelector('#report-link'));
+  assert.equal(await page.locator('#report-link').evaluate(el=>el===document.activeElement),true);
 });

@@ -29,13 +29,35 @@
       return data;
     } finally { clearTimeout(timer); }
   }
-  function create({mount, onChange = () => {}, showReport = false}) {
+  function create({mount, onChange = () => {}, showReport = false, actionsMount = null}) {
     const host = typeof mount === 'string' ? document.querySelector(mount) : mount;
     if (!host) throw new Error('Moderation UI needs a mount');
+    // Chat opts into a compact disclosure; profile contact keeps its layout.
+    const options = typeof actionsMount === 'string' ? document.querySelector(actionsMount) : actionsMount;
+    const optionsTrigger = options?.querySelector('summary');
+    host.classList.toggle('ba-mod-compact', !!options);
     host.classList.add('ba-mod'); host.hidden = true;
     host.innerHTML = '<p class="ba-mod-status" role="status" tabindex="-1"></p><div class="ba-mod-actions"><button type="button" class="ba-mod-retry" hidden>Reintentar verificación</button><button type="button" class="ba-mod-block" disabled>Bloquear mensajes</button>' + (showReport ? '<button type="button" class="ba-mod-report">Reportar usuario</button>' : '') + '</div>';
     const statusNode = host.querySelector('.ba-mod-status');
     const retry = host.querySelector('.ba-mod-retry'), blockButton = host.querySelector('.ba-mod-block');
+    const reportButton = host.querySelector('.ba-mod-report');
+    if (options) {
+      const actions = document.createElement('div'); actions.className = 'ba-mod-menu-actions';
+      actions.append(blockButton);
+      if (reportButton) actions.append(reportButton);
+      options.append(actions);
+    }
+    function closeOptions(restoreFocus = false) {
+      if (!options?.open) return;
+      options.open = false;
+      if (restoreFocus) optionsTrigger?.focus({preventScroll:true});
+    }
+    options?.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && options.open) { event.preventDefault(); closeOptions(true); }
+    });
+    if (options) document.addEventListener('click', event => {
+      if (!options.contains(event.target)) closeOptions();
+    });
     const dialog = document.createElement('dialog'); dialog.className = 'ba-mod-dialog';
     dialog.setAttribute('aria-labelledby','ba-mod-title'); dialog.setAttribute('aria-describedby','ba-mod-description');
     dialog.innerHTML = '<div class="ba-mod-dialog-content"><h2 id="ba-mod-title"></h2><p id="ba-mod-description"></p><div class="ba-mod-dialog-body"></div></div>';
@@ -48,7 +70,8 @@
     const title = dialog.querySelector('#ba-mod-title'), description = dialog.querySelector('#ba-mod-description');
     const body = dialog.querySelector('.ba-mod-dialog-body');
     function paint() {
-      host.hidden = !target;
+      host.hidden = !target || (!!options && state.status === 'allowed');
+      if (options) options.hidden = !target;
       statusNode.textContent = ({checking:'Verificando si se pueden enviar mensajes…',
         allowed:'Podés enviar mensajes.',restricted:'No se pueden enviar mensajes en este contacto. El historial sigue disponible.',
         unavailable:'No pudimos verificar los permisos de mensajes. Reintentá para poder enviar.',
@@ -105,7 +128,8 @@
     function open(mode, trigger) {
       if (!target) return null;
       persistDraft();
-      returnFocus = trigger || document.activeElement;
+      returnFocus = options?.contains(trigger || document.activeElement) ? optionsTrigger : trigger || document.activeElement;
+      closeOptions();
       const context = {mode, target:{...target}, revision, user:identity(), token:++dialogToken};
       currentDialog = context;
       body.replaceChildren();
@@ -202,18 +226,20 @@
       }
     }
     retry.onclick = refresh;
-    blockButton.onclick = () => state.blocked_by_me ? changeBlock('unblock') : open('block',blockButton);
-    const reportButton = host.querySelector('.ba-mod-report');
+    blockButton.onclick = () => {
+      if (state.blocked_by_me) { closeOptions(true); changeBlock('unblock'); }
+      else open('block',blockButton);
+    };
     if (reportButton) reportButton.onclick = () => open('report',reportButton);
     function setTarget(value) {
       const next = value && validId(value.perfilId) ? {...value,perfilId:validId(value.perfilId),conversacionId:validId(value.conversacionId)} : null;
       if (target?.perfilId === next?.perfilId && target?.conversacionId === next?.conversacionId) { target=next; return; }
-      close(); target=next; revision++; check++; mutation=false; checkedUser='';
+      close(); closeOptions(); target=next; revision++; check++; mutation=false; checkedUser='';
       state={status:next?'checking':'idle',blocked_by_me:false,restricted:true}; paint();
       if (target) refresh();
     }
     function revalidate() {
-      if (contextUser !== identity()) { contextUser=identity(); revision++; check++; mutation=false; checkedUser=''; close(); }
+      if (contextUser !== identity()) { contextUser=identity(); revision++; check++; mutation=false; checkedUser=''; close(); closeOptions(); }
       if (draftUser && draftUser !== identity()) { close(); drafts.clear(); draftUser=''; }
       if (target && !mutation) refresh();
     }

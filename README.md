@@ -3,6 +3,12 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
+## Preparación local — acciones discretas del chat, 16/10/2026
+
+**Sin publicar, push ni deploy.** Rama `codex/chat-opciones-discretas-20261016`, desde `c4af4d5` (main remoto comprobado). Bloquear/desbloquear y reportar pasan a un desplegable nativo “Más opciones” (⋯) en el encabezado de la conversación. En el uso normal desaparece la tarjeta permanente junto al borrador. Comprobación pendiente, restricción, error y reintento siguen visibles junto al compositor, sin ocultar las causas de un envío deshabilitado. Diálogos conservados, retorno de foco al trigger visible, Escape/clic exterior/cambio de conversación/vuelta a lista cierran el desplegable. Perfil público mantiene su presentación actual.
+
+Sólo UI: sin cambios de endpoints, reglas de bloqueo, reportes, envío, datos, SQL, funciones, correo o Android. 27 casos de moderación cubiertos (13 funcionales y 14 focalizados aprobados), 27 de controles mobile y 26 de empaquetado aprobados. Capturas aisladas revisadas a 320/390/1440 px y compositor a altura 430; sin tráfico real ni usuarios/mensajes/reportes de prueba en producción. Build local de 74 archivos; SW aún v30: **actualizar su versión al acordar el corte**, no publicar el dist como si ya fuera un release. No se certifica un teléfono físico. Evidencia privada `../BuscARTE-resguardos/moderacion-browser-2026-10-16T12-48-39-542Z/` y `moderacion-browser-2026-10-16T12-49-19-120Z/`. Guía ajena y preview intactos/excluidos. Esperar el “go” para publicar este ajuste.
+
 ## Avisos para mensajes directos desde la base — 15/10/2026
 
 Activado a las **13:40 ART** mediante migración remota `20261015164039`, fuente local `20261015163645_message_mail_trigger.sql`. Cada nuevo INSERT de mensaje genera atómicamente un aviso genérico en la cola existente, con la misma clave única que el envío web y vigencia de 31 días. De los 333 mensajes del lote aprobado se generaron **332 avisos únicos**; un perfil tiene email incompleto y quedó documentado en evidencia privada, sin inventar ni modificar la dirección.

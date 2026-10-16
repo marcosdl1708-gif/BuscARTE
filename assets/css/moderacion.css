@@ -1,12 +1,24 @@
 /* Controles de seguridad en chat y perfil; contraste y objetivos táctiles. */
-.ba-mod[hidden],.ba-mod [hidden],.ba-mod-dialog [hidden] {display:none!important;}
+.ba-mod[hidden],.ba-mod [hidden],.ba-mod-options[hidden],.ba-mod-options [hidden],.ba-mod-dialog [hidden] {display:none!important;}
 .ba-mod {font:400 .78rem/1.55 var(--font-body,Arial,sans-serif);border:1px solid #41483f;padding:10px 12px;margin:8px 0 12px;color:#e7e8de;background:#151b14;overflow-wrap:anywhere;}
 .ba-mod-status {margin:0;}
 .ba-mod[data-status="allowed"] .ba-mod-status {color:#b6c6b0;}
 .ba-mod-actions {display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
-.ba-mod button,.ba-mod-dialog button,.ba-mod-dialog a {min-height:44px;min-width:44px;padding:9px 12px;border:1px solid #626957;background:#171c16;color:#f2f1e7;font:500 .8rem/1.4 var(--font-body,Arial,sans-serif);cursor:pointer;white-space:normal;max-width:100%;}
-.ba-mod button:disabled,.ba-mod-dialog button:disabled {opacity:.55;cursor:wait;}
-.ba-mod :focus-visible,.ba-mod-dialog :focus-visible {outline:2px solid #d4f53c;outline-offset:3px;}
+.ba-mod button,.ba-mod-options button,.ba-mod-dialog button,.ba-mod-dialog a {min-height:44px;min-width:44px;padding:9px 12px;border:1px solid #626957;background:#171c16;color:#f2f1e7;font:500 .8rem/1.4 var(--font-body,Arial,sans-serif);cursor:pointer;white-space:normal;max-width:100%;}
+.ba-mod button:disabled,.ba-mod-options button:disabled,.ba-mod-dialog button:disabled {opacity:.55;cursor:wait;}
+.ba-mod :focus-visible,.ba-mod-options :focus-visible,.ba-mod-dialog :focus-visible {outline:2px solid #d4f53c;outline-offset:3px;}
+/* Situational actions belong in the header, never above every draft. */
+#chat-moderation.ba-mod-compact {border:0;padding:0;margin:0 0 8px;background:transparent;color:#d4d8cd;}
+#chat-moderation.ba-mod-compact .ba-mod-actions {margin-top:0;}
+#chat-moderation.ba-mod-compact[data-status="unavailable"] .ba-mod-actions {margin-top:6px;}
+.chat-header:has(.ba-mod-options) {position:relative;z-index:3;}
+.ba-mod-options {position:relative;flex-shrink:0;font-family:var(--font-body,Arial,sans-serif);}
+.ba-mod-options>summary {display:flex;align-items:center;justify-content:center;list-style:none;width:44px;height:44px;padding:0;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--gris,#c4c8bb);font-size:1.6rem;line-height:1;cursor:pointer;}
+.ba-mod-options>summary::-webkit-details-marker {display:none;}
+.ba-mod-options>summary:hover,.ba-mod-options[open]>summary {color:var(--neon,#d4f53c);border-color:#626957;background:#171c16;}
+.ba-mod-menu-actions {position:absolute;right:0;top:calc(100% + 6px);z-index:5;display:flex;flex-direction:column;gap:4px;width:220px;max-width:calc(100vw - 32px);max-height:min(240px,calc(100dvh - 170px));overflow-y:auto;overscroll-behavior:contain;padding:6px;border:1px solid #626957;border-radius:8px;background:#171c16;box-shadow:0 10px 30px #0007;}
+.ba-mod-menu-actions button {width:100%;text-align:left;border-color:transparent;border-radius:4px;background:transparent;}
+.ba-mod-menu-actions button:not(:disabled):hover {border-color:#626957;background:#252d20;}
 .ba-mod-dialog {position:fixed;inset:0;margin:auto;width:min(560px,calc(100% - 24px));max-width:calc(100% - 24px);max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px);overflow:auto;padding:0;border:1px solid #68725b;background:#11170f;color:#f2f1e7;box-shadow:0 20px 80px #000b;font:400 .9rem/1.55 var(--font-body,Arial,sans-serif);}
 .ba-mod-dialog::backdrop {background:#000c;}
 .ba-mod-dialog-content {padding:22px;overflow-wrap:anywhere;}
