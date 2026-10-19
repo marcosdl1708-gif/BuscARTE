@@ -122,6 +122,9 @@
   .msg-wrap { display:flex;flex-direction:column;min-width:0; }
   .msg.sent .msg-wrap { align-items:flex-end; }
   .msg-bubble { padding:.74rem 1rem;font-size:.86rem;line-height:1.56;font-weight:300;max-width:100%;word-break:break-word; }
+  .msg-bubble a.msg-link { color:var(--neon);text-decoration:underline;text-underline-offset:.18em;text-decoration-thickness:1px;overflow-wrap:anywhere;word-break:break-word; }
+  .msg-bubble a.msg-link:hover { text-decoration-thickness:2px; }
+  .msg-bubble a.msg-link:focus-visible { outline:2px solid var(--neon);outline-offset:3px;border-radius:2px; }
   .msg.received .msg-bubble { background:var(--negro2);border:1px solid #1c1c1c;color:var(--blanco);border-radius:0 8px 8px 8px; }
   .msg.sent .msg-bubble { background:rgba(212,245,60,.1);border:1px solid rgba(212,245,60,.2);color:var(--blanco);border-radius:8px 0 8px 8px; }
   .msg-time { font-size:.62rem;color:var(--gris2);flex-shrink:0;margin-top:.25rem; }
@@ -389,6 +392,40 @@
 
   function escapeHTML(value) {
     return String(value ?? '').replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
+  }
+  function formatChatMessage(value) {
+    // Render stored plain text only: never interpret user HTML or URL schemes.
+    const text = String(value ?? '');
+    const urls = /(?:https?:\/\/|www\.)[^\s<>"'\x60\u0000-\u001f\u007f\u2018\u2019\u201c\u201d]+/gi;
+    let html = '', end = 0;
+    for (const match of text.matchAll(urls)) {
+      html += escapeHTML(text.slice(end,match.index));
+      let label = match[0], href = '';
+      const excess = {
+        ')': (label.match(/\)/g) || []).length - (label.match(/\(/g) || []).length,
+        ']': (label.match(/\]/g) || []).length - (label.match(/\[/g) || []).length,
+        '}': (label.match(/\}/g) || []).length - (label.match(/\{/g) || []).length
+      };
+      while (/[.,!?;:)\]}]$/.test(label)) {
+        const last = label.slice(-1);
+        if (Object.prototype.hasOwnProperty.call(excess,last) && excess[last]-- <= 0) break;
+        label = label.slice(0,-1);
+      }
+      // Do not turn fragments of an email/word into links.
+      const embedded = match.index > 0 && /[\p{L}\p{N}_@]/u.test(text[match.index-1]);
+      if (!embedded) {
+        try {
+          const url = new URL(/^www\./i.test(label) ? 'https://' + label : label);
+          if (['http:','https:'].includes(url.protocol) && url.hostname &&
+              url.hostname.toLowerCase() !== 'www.' && !url.username && !url.password) href = url.href;
+        } catch (_) { /* Invalid URL remains escaped text. */ }
+      }
+      html += href
+        ? '<a class="msg-link" href="' + escapeHTML(href) + '" target="_blank" rel="noopener noreferrer nofollow ugc" referrerpolicy="no-referrer">' + escapeHTML(label) + '</a>' + escapeHTML(match[0].slice(label.length))
+        : escapeHTML(match[0]);
+      end = match.index + match[0].length;
+    }
+    return (html + escapeHTML(text.slice(end))).replace(/\r?\n/g,'<br>');
   }
   function normalizeId(value) {
     const n = Number(value);
@@ -735,7 +772,7 @@
       }
       const sent = String(m.de_user_id) === String(miUserId);
       const time = new Date(m.created_at).toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit' });
-      const text = escapeHTML(m.contenido || '').replace(/\n/g, '<br>');
+      const text = formatChatMessage(m.contenido);
       html += sent
         ? `<div class="msg sent"><div class="msg-wrap"><div class="msg-bubble">${text}</div><div class="msg-time">${escapeHTML(time)}</div></div></div>`
         : `<div class="msg received">${avatarHTML(convActiva.perfil, 'msg-avatar')}<div class="msg-wrap"><div class="msg-bubble">${text}</div><div class="msg-time">${escapeHTML(time)}</div></div></div>`;
