@@ -895,3 +895,23 @@ html[data-ba-design="a2"] .anuncio-respond {flex-shrink:0;max-width:100%;margin-
   }
 }
 
+/* Presentación honesta, sin penalizar ni ocultar perfiles que recién empiezan. */
+.ba-profile-initial {display:inline-flex;align-self:flex-start;width:fit-content;max-width:100%;margin:0 0 10px;padding:4px 8px;border:1px dashed var(--gris2,#8b927f);border-radius:5px;color:var(--gris,#c4c8bb);font:400 .68rem/1.4 var(--font-body,Arial,sans-serif);}
+.ba-profile-placeholder {font-style:normal;color:var(--gris,#c4c8bb);}
+.ba-profile-nudge[hidden] {display:none!important;}
+.ba-profile-nudge {display:flex;align-items:center;justify-content:space-between;gap:18px;min-width:0;margin:20px 0;padding:18px 20px;border:1px solid var(--gris3,#515749);border-left:3px solid var(--neon,#d4f53c);border-radius:10px;background:var(--negro2,#20251b);color:var(--blanco,#f1eee6);text-align:left;}
+.ba-profile-nudge-copy {min-width:0;max-width:650px;}
+.ba-profile-nudge h2 {margin:0 0 6px;font:500 1rem/1.35 var(--font-body,Arial,sans-serif);letter-spacing:0;text-transform:none;}
+.ba-profile-nudge p {margin:0 0 6px!important;font:400 .84rem/1.55 var(--font-body,Arial,sans-serif)!important;color:var(--blanco,#f1eee6)!important;overflow-wrap:anywhere;}
+.ba-profile-nudge small {display:block;color:var(--gris,#c4c8bb);font:400 .75rem/1.5 var(--font-body,Arial,sans-serif);}
+.ba-profile-nudge-actions {display:flex;flex-wrap:wrap;gap:8px;align-items:center;flex-shrink:0;max-width:100%;}
+.ba-profile-nudge-actions a,.ba-profile-nudge-actions button {display:inline-flex;align-items:center;justify-content:center;min-height:44px;max-width:100%;padding:9px 12px;border:1px solid var(--gris2,#8b927f);border-radius:6px;background:transparent;color:var(--blanco,#f1eee6);font:500 .78rem/1.4 var(--font-body,Arial,sans-serif);text-align:center;text-decoration:none;cursor:pointer;overflow-wrap:anywhere;}
+.ba-profile-nudge-actions a {border-color:var(--neon,#d4f53c);color:var(--neon,#d4f53c);}
+.ba-profile-nudge-actions button {border-color:transparent;color:var(--gris,#c4c8bb);}
+.ba-profile-nudge-actions :is(a,button):hover {background:var(--negro3,#2b3025);}
+.ba-profile-nudge-actions :focus-visible {outline:2px solid var(--neon,#d4f53c);outline-offset:3px;}
+@media(max-width:900px) {
+  .ba-profile-nudge {flex-direction:column;align-items:stretch;gap:12px;padding:16px;}
+  .ba-profile-nudge-actions {flex-shrink:1;}
+}
+

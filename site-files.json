@@ -45,6 +45,7 @@
   "assets/js/email-preferencias.js",
   "assets/js/moderacion.js",
   "assets/js/meta-pixel.js",
+  "assets/js/perfil-presentacion.js",
   "assets/js/registro-captcha.js",
   "assets/vendor/supabase-2.112.3.min.js",
   "buscARTE_anuncio_detalle.html",

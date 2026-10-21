@@ -3,6 +3,7 @@
 <head>
 <script src="/assets/js/sesion-segura.js"></script>
   <script src="/assets/js/disciplinas.js"></script>
+<script src="/assets/js/perfil-presentacion.js" defer></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- SEO -->
@@ -1022,6 +1023,7 @@
   const MAX_FETCH = 500;
   let offset = 0;
   let perfilesCache = null;
+  const profilePresentations = new WeakMap();
   let activeFilters = { instrumentos: [], generos: [], ciudad: '', barrio: '', busca: [], referente: '', rubros_chips: [] };
   let resultsRequest = 0;
   let resultsLoading = false;
@@ -1223,7 +1225,10 @@
     const rubroEmoji = RUBRO_EMOJIS[rubroCard] || '🎵';
     const refsHtml = refs.length ? `${rubroEmoji} <em>${refs.map(escapeHtml).join(', ')}</em>` : '';
     const subtitulo = config.cardSubtitle(p);
-    const bio = p.bio || (subtitulo ? `${subtitulo} en buscARTE` : 'Artista en buscARTE');
+    const hasBio = typeof p.bio === 'string' && !!p.bio.trim();
+    const bio = hasBio ? p.bio : 'Todavía no agregó su presentación.';
+    let presentation = null;
+    try { presentation = profilePresentations.has(p) ? profilePresentations.get(p) : window.BuscARTEPresentacion?.assess(p,rubroActivo); } catch (_) { /* Optional presentation hint must never block browsing. */ }
     const foto = safeUrl(p.foto_url);
     const id = encodeURIComponent(String(p.id || ''));
 
@@ -1241,7 +1246,8 @@
         </div>
       </div>
       ${tags ? `<div class="card-tags">${tags}</div>` : ''}
-      <div class="card-bio">${escapeHtml(bio)}</div>
+      ${presentation?.initial === true ? '<span class="ba-profile-initial">Perfil inicial</span>' : ''}
+      <div class="card-bio${hasBio ? '' : ' ba-profile-placeholder'}">${escapeHtml(bio)}</div>
       <div class="card-footer">
         <div class="card-refs">${refsHtml}</div>
         <a href="buscARTE_perfil_publico.html?id=${id}&rubro=${rubroActivo}" class="card-cta">Ver perfil →</a>
@@ -1289,6 +1295,10 @@
     for (const row of Array.isArray(data) ? data : []) {
       if (row.baneado === true || (row.tipo_cuenta && row.tipo_cuenta !== 'artista')) continue;
       const p=window.BuscARTEDisciplinas.project(row,rubroActivo);
+      if (p) {
+        // Assess before the tolerant display adapter normalizes legacy data.
+        try { profilePresentations.set(p,window.BuscARTEPresentacion?.assess(row,rubroActivo) || null); } catch (_) { profilePresentations.set(p,null); }
+      }
       if (p && !unique.has(String(p.id))) unique.set(String(p.id),p);
     }
     perfilesCache=[...unique.values()];
