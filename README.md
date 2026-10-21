@@ -3,6 +3,16 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
+## Presentación opcional de perfiles publicada — 20/10/2026
+
+**Publicado a las 23:59 ART**, fuente `ad664c74f90505ae8947239a184b5b0ff53f1269`, deploy `6ad82a9eb88f995f75a5fea2`, caché v33. Un único deploy por Git CD; paquete explícito de 75 archivos. En Artistas, la bio ausente se informa honestamente en lugar del relleno “Músico en buscARTE”. La etiqueta neutra “Perfil inicial” sólo aparece si no hay presentación ni detalle profesional reconocido; la ausencia de foto por sí sola no la activa. Se conserva el diagnóstico anterior a la proyección tolerante: datos ilegibles no se confunden con datos vacíos. No se ocultan perfiles ni se modifica su orden, filtros o enlaces.
+
+En ambos Inicio y Mis anuncios, una sesión de artista verificada puede recibir una sugerencia breve del próximo dato opcional: actividad, presentación o imagen. Considera los diez rubros y la disciplina principal, lleva al panel existente `#completar` y permite “Ahora no” durante la sesión de esa pestaña, por cuenta y pendientes. La lectura adicional sólo usa campos profesionales públicos del propio ID confirmado; falla oculta, no inventa un estado a partir de localStorage y descarta respuestas tardías al cambiar de cuenta. No agrega requisitos ni pasos al registro, modales, correos, premios de visibilidad o restricciones de uso. Sin cambios de datos, SQL, Auth, Functions, cadencias de correo, publicación de anuncios o Android.
+
+40/40 pruebas focalizadas aisladas y 26/26 de empaquetado aprobadas. Incluyen diez rubros, multidisciplina contextual, JSON corrupto, sesión/errores, completar→editor sin escribir, descarte, teclado y 320/390/1440 px; `sourceDrift=[]`. Capturas sintéticas revisadas. Las antiguas suites navegador `inicio-sesion.test.cjs` y `perfil-progreso.test.cjs` aún simulan el transporte Supabase directo y bloquean los endpoints actuales de sesión/gateway: no se cuentan como aprobadas ni se amplió este bloque para reescribirlas; los flujos afectados se ejercitaron con el fixture vigente. GET público real confirmó los campos necesarios sin mutar registros. Producción: 74 recursos iguales al build, 35 rutas y cuatro exclusiones privadas 404; las 13 Functions Node 24 conservan sus digests y los tres cron son idénticos a v32. No se certifica hardware Android.
+
+Evidencia privada: `../BuscARTE-resguardos/perfil-presentacion-2026-10-21T02-58-55-708Z/` y `perfiles-presentacion-release-20261020/`. Guía ajena (SHA256 `CB3FA88AECC1537AF9D936F9997934D3EB1FDB9A88779C4F5AADC9A4D688BB3F`) y `preview/` intactos/excluidos. Cierre documental `[skip netlify]`, sin repetir deploy. Recargar web o reabrir app conectada para recibir v33.
+
 ## Enlaces del chat publicados — 19/10/2026
 
 **Publicado a las 09:10 ART**, fuente `492b26d38bc1d5e97c9a3436a6734868570c054b`, deploy `6ad608a690bf4280a4b3dd0e`, caché v32. Único deploy aprobado mediante Git CD y paquete explícito de 74 archivos. En mensajes enviados y recibidos, HTTP(S) y www se muestran como enlaces subrayados, con ajuste de URLs largas al ancho mobile. Se aplica al renderizar todo el historial: no exige reenviar ni reescribir mensajes. Preview de conversaciones sigue siendo texto, sin enlaces anidados.
