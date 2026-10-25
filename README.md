@@ -5,9 +5,9 @@ No depende del repositorio original ni del worktree de Android para funcionar.
 
 ## Engagement recurrente — corte del 25/10/2026
 
-Preparación de v34 desde `ca70f1e`: seguimiento de perfil cada catorce días desde el día 21, sin límite de meses, con baja/completitud y deduplicación; novedades cada quince días reales para esa preferencia, conservando las opciones mensuales anteriores. Las cuentas históricas pueden pedir ayuda del perfil independientemente de marketing. No se inscriben cuentas sin permiso ni se revierten bajas: la parte solicitada de envíos promocionales forzados no se ejecuta por las condiciones de Resend.
+**Publicado a las 11:51 ART**, fuente `d7ba5a1`, deploy `6ade17731d03bbad9793c390`, v34. Seguimiento de perfil cada catorce días desde el día 21, sin límite de meses, con baja/completitud y deduplicación; novedades cada quince días reales para esa preferencia, conservando las opciones mensuales anteriores. Las cuentas históricas pueden pedir ayuda del perfil independientemente de marketing. No se inscriben cuentas sin permiso ni se revierten bajas: la parte solicitada de envíos promocionales forzados no se ejecuta por las condiciones de Resend.
 
-Engagement 40 intentos diarios/1.200 mensuales; 70 no-reset, 90 globales y 2.700 mensuales preservados. Migración remota `20261025144733` aplicada a las 11:47 ART; las 18 preferencias existentes y los 351 perfiles se conservaron, sin nuevos consentimientos. No hay campaña ni correos de prueba, importación de contactos, nuevas claves, Auth o Android. El worker y los tres cron existentes se conservan. Ver `docs/engagement-recurrente-20261025.md`; cierre de deploy pendiente de comprobación.
+Engagement 40 intentos diarios/1.200 mensuales; 70 no-reset, 90 globales y 2.700 mensuales preservados. Migración remota `20261025144733` aplicada a las 11:47 ART; las 18 preferencias existentes y los 351 perfiles se conservaron, sin nuevos consentimientos. 246 pruebas aprobadas; dominio con 74 recursos/35 rutas/cuatro exclusiones y seis controles seguros de endpoints verificados; 13 Functions Node 24 y tres cron confirmados. No hay campaña ni correos de prueba, importación de contactos, nuevas claves, Auth o Android. Ver `docs/engagement-recurrente-20261025.md`. Cierre documental `[skip netlify]`, sin segundo deploy.
 
 ## Presentación opcional de perfiles publicada — 20/10/2026
 
