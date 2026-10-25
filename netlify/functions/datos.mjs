@@ -121,11 +121,14 @@ async function authRpc(name, request, context) {
   if(!await rate(request,name,name==='login_usuario'?60:10,name==='login_usuario'?900:3600))return fail(429);
   const payload=await readJson(request);
   const marketingOptIn=name==='registrar_usuario' && payload.email_marketing_opt_in===true;
+  const marketingFrequency=name==='registrar_usuario' ? (Object.hasOwn(payload,'email_marketing_frequency')?payload.email_marketing_frequency:'monthly') : null;
   if(name==='registrar_usuario') {
     if(payload.terms_accepted!==true || payload.terms_version!==TERMS_VERSION)return termsFailure(new TermsError(428,'TERMS_REQUIRED'));
     delete payload.terms_accepted; delete payload.terms_version;
     if(payload.email_marketing_opt_in!==undefined && typeof payload.email_marketing_opt_in!=='boolean')return fail(400);
+    if(!['monthly','fortnightly'].includes(marketingFrequency))return fail(400);
     delete payload.email_marketing_opt_in;
+    delete payload.email_marketing_frequency;
   }
   if(!str(payload.p_email,254) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.p_email.trim()) || !str(payload.p_password,name==='registrar_usuario'?72:4096) || payload.p_password.length<(name==='registrar_usuario'?8:1) || (name==='registrar_usuario' && Buffer.byteLength(payload.p_password)>72))return fail(400);
   payload.p_email=payload.p_email.trim().toLowerCase();
@@ -143,10 +146,10 @@ async function authRpc(name, request, context) {
   const user=Array.isArray(result)?result[0]:result;
   if(!object(user) || user.error || !id(user.id))return json(name==='login_usuario'?401:400,{error:name==='registrar_usuario' && user?.error==='duplicate_email'?'duplicate_email':'Email o contraseña incorrectos.'});
   if(user.baneado===true)return fail(403);
-  if(marketingOptIn) {
+  if(name==='registrar_usuario') {
     try {
       const {mailService}=await import('../lib/mail-runtime.mjs');
-      await mailService.savePreferences({id:user.id,email:payload.p_email},{marketing_opt_in:true,onboarding_disabled:false});
+      await mailService.savePreferences({id:user.id,email:payload.p_email},{marketing_opt_in:marketingOptIn,onboarding_disabled:false,marketing_frequency:marketingFrequency},{source:'registration'});
     } catch { console.warn('Email preferences unavailable'); }
   }
   let session;

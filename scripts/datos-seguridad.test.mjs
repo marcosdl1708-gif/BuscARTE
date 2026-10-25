@@ -90,9 +90,9 @@ async function withBackend(options, action) {
     return{id:'synthetic-job-'+notifications.length};
   };
   mailService.dispatch=async id=>{dispatches.push(id);return{status:options.mailDeferred?'deferred':'sent',id:'synthetic-provider-id'};};
-  mailService.savePreferences=async(user,value)=>{
+  mailService.savePreferences=async(user,value,metadata)=>{
     assert(state.registered,'marketing permission can only follow persisted registration');
-    preferenceWrites.push({user:structuredClone(user),value:structuredClone(value)});
+    preferenceWrites.push({user:structuredClone(user),value:structuredClone(value),metadata:structuredClone(metadata)});
     if(options.preferencesFail)throw new Error('Synthetic preferences failure');
     return value;
   };
@@ -168,6 +168,7 @@ async function withBackend(options, action) {
         const registration=body.p_registro;
         assert(!Object.hasOwn(registration,'captcha_token'),'captcha must not be forwarded to the registration RPC');
         assert(!Object.hasOwn(registration,'email_marketing_opt_in'),'marketing flag must not be forwarded to registration RPC');
+        assert(!Object.hasOwn(registration,'email_marketing_frequency'),'marketing frequency must not be forwarded to registration RPC');
         assert(!Object.hasOwn(registration,'terms_accepted'));assert(!Object.hasOwn(registration,'terms_version'));
         if(options.duplicate)return reply(200,{error:'duplicate_email'});
         state.registered=true;
@@ -447,16 +448,32 @@ test('registration consent is explicit, normalized, bound to created ID and excl
     const body={...registration(role,rubro),email_marketing_opt_in:true};body.p_email=' NEW@example.invalid ';
     const result=await datos(request('/rest/v1/rpc/registrar_usuario',{method:'POST',signed:false,body}));
     assert.equal(result.status,200);assert.equal(preferenceWrites.length,1);
-    assert.deepEqual(preferenceWrites[0],{user:{id:703,email:'new@example.invalid'},value:{marketing_opt_in:true,onboarding_disabled:false}});
+    assert.deepEqual(preferenceWrites[0],{user:{id:703,email:'new@example.invalid'},value:{marketing_opt_in:true,onboarding_disabled:false,marketing_frequency:'monthly'},metadata:{source:'registration'}});
     assert.equal(apiCalls('/rest/v1/rpc/registrar_usuario','POST')[0].body.p_email,'new@example.invalid');
     assert.equal(Object.hasOwn(apiCalls('/rest/v1/rpc/registrar_usuario','POST')[0].body,'email_marketing_opt_in'),false);
     assert.equal(notifications[0].perfilId,703);
   });
 });
-test('registration absent or false consent never writes a subscription or opt-out for historical defaults',async()=>{
+test('registration absent or false consent persists a declined subscription only for the new account',async()=>{
   for(const extra of [{},{email_marketing_opt_in:false}])await withBackend({},async({preferenceWrites,notifications})=>{
     assert.equal((await datos(request('/rest/v1/rpc/registrar_usuario',{method:'POST',signed:false,body:{...registration(),...extra}}))).status,200);
-    assert.deepEqual(preferenceWrites,[]);assert.equal(notifications.length,1);
+    assert.deepEqual(preferenceWrites,[{user:{id:703,email:'new@example.invalid'},value:{marketing_opt_in:false,onboarding_disabled:false,marketing_frequency:'monthly'},metadata:{source:'registration'}}]);assert.equal(notifications.length,1);
+  });
+});
+
+test('registration captures a new fortnightly choice without forwarding consent metadata into legacy RPC',async()=>{
+  await withBackend({},async({preferenceWrites,apiCalls})=>{
+    const result=await datos(request('/rest/v1/rpc/registrar_usuario',{method:'POST',signed:false,body:{...registration(),email_marketing_opt_in:true,email_marketing_frequency:'fortnightly'}}));
+    assert.equal(result.status,200);
+    assert.deepEqual(preferenceWrites[0],{user:{id:703,email:'new@example.invalid'},value:{marketing_opt_in:true,onboarding_disabled:false,marketing_frequency:'fortnightly'},metadata:{source:'registration'}});
+    assert.equal(Object.hasOwn(apiCalls('/rest/v1/rpc/registrar_usuario','POST')[0].body,'email_marketing_frequency'),false);
+  });
+});
+
+test('registration rejects invalid frequency before creating the account or preference',async()=>{
+  for(const value of ['weekly','',null,false,15,{},[]])await withBackend({},async({preferenceWrites,apiCalls})=>{
+    assert.equal((await datos(request('/rest/v1/rpc/registrar_usuario',{method:'POST',signed:false,body:{...registration(),email_marketing_opt_in:true,email_marketing_frequency:value}}))).status,400);
+    assert.equal(apiCalls('/rest/v1/rpc/registrar_usuario','POST').length,0);assert.deepEqual(preferenceWrites,[]);
   });
 });
 test('registration rejects nonboolean consent before legacy registration or preference writes',async()=>{

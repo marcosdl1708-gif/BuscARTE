@@ -421,7 +421,7 @@
 
       <label class="registro-mail-choice" for="reg-email-marketing">
         <input type="checkbox" id="reg-email-marketing" aria-describedby="reg-email-marketing-help">
-        <span>Novedades y oportunidades de BuscARTE por email (hasta un resumen mensual)</span>
+        <span>Convocatorias y novedades de BuscARTE por email, cada quince días</span>
       </label>
       <p class="registro-mail-help" id="reg-email-marketing-help">Opcional. Podés cambiar tu preferencia o darte de baja cuando quieras.</p>
 
@@ -1226,6 +1226,7 @@ async function crearPerfil(btn) {
       body: JSON.stringify({
         captcha_token: captchaResponse,
         email_marketing_opt_in: document.getElementById('reg-email-marketing')?.checked === true,
+        ...(document.getElementById('reg-email-marketing')?.checked === true ? {email_marketing_frequency:'fortnightly'} : {}),
         terms_version: '2026-10-15',
         terms_accepted: document.getElementById('reg-terms-accepted')?.checked === true,
         p_email: email,
@@ -1338,6 +1339,7 @@ async function crearNegocio(btn) {
       body: JSON.stringify({
         captcha_token: captchaResponse,
         email_marketing_opt_in: document.getElementById('reg-email-marketing')?.checked === true,
+        ...(document.getElementById('reg-email-marketing')?.checked === true ? {email_marketing_frequency:'fortnightly'} : {}),
         terms_version: '2026-10-15',
         terms_accepted: document.getElementById('reg-terms-accepted')?.checked === true,
         p_email: email,
@@ -1430,6 +1432,7 @@ async function crearVisitante(btn) {
       body: JSON.stringify({
         captcha_token: captchaResponse,
         email_marketing_opt_in: document.getElementById('reg-email-marketing')?.checked === true,
+        ...(document.getElementById('reg-email-marketing')?.checked === true ? {email_marketing_frequency:'fortnightly'} : {}),
         terms_version: '2026-10-15',
         terms_accepted: document.getElementById('reg-terms-accepted')?.checked === true,
         p_email: email, p_password: password, p_nombre: nombre,

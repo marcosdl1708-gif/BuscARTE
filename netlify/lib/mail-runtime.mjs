@@ -4,7 +4,9 @@ import { buildEmail } from './mail-templates.mjs';
 import { missingBasics } from './mail-profile.mjs';
 import { readModerationState } from './moderacion.mjs';
 
-export const MAIL_LIMITS = Object.freeze({ daily:90, engagementDaily:20, monthly:2700, engagementMonthly:600 });
+export const MAIL_LIMITS = Object.freeze({ daily:90, engagementDaily:40, monthly:2700, engagementMonthly:1200 });
+export const FORTNIGHTLY_CONSENT_VERSION = '2026-10-25-fortnightly-v1';
+const ENGAGEMENT_ACTIVATION = Date.parse('2026-10-15T00:00:00Z');
 const BASE = 'https://buscarte.com.ar';
 const ENGAGEMENT = new Set(['perfil_incompleto','resumen_mensual','novedades']);
 const TYPES = new Set(['bienvenida','mensaje','contacto','reporte','reset',...ENGAGEMENT]);
@@ -63,8 +65,8 @@ export function createMailService(deps={}) {
     return Array.isArray(rows)&&rows.length===1?rows[0]:null;
   }
   async function preferences(id,email) {
-    const rows=await db('/rest/v1/email_preferences?perfil_id=eq.'+id+'&email=eq.'+encodeURIComponent(normalizeEmail(email))+'&select=marketing_opt_in,onboarding_disabled&limit=1');
-    return Array.isArray(rows)&&rows.length?rows[0]:{marketing_opt_in:false,onboarding_disabled:false};
+    const rows=await db('/rest/v1/email_preferences?perfil_id=eq.'+id+'&email=eq.'+encodeURIComponent(normalizeEmail(email))+'&select=marketing_opt_in,onboarding_disabled,marketing_frequency,marketing_consent_version,marketing_consented_at,marketing_consent_source,onboarding_consent_version,onboarding_consented_at&limit=1');
+    return Array.isArray(rows)&&rows.length?{...rows[0],marketing_frequency:rows[0].marketing_frequency||'monthly'}:{marketing_opt_in:false,onboarding_disabled:false,marketing_frequency:'monthly'};
   }
   async function messageRestriction(job,person,checkLease=false) {
     if(job.tipo!=='mensaje')return null;
@@ -81,15 +83,29 @@ export function createMailService(deps={}) {
     }
     return null;
   }
-  async function savePreferences(user,value) {
+  async function savePreferences(user,value,options={}) {
     if(!profileId(user.id)||!validEmail(normalizeEmail(user.email)))throw new Error('identity');
+    const previous=await preferences(user.id,user.email);
+    const explicitFrequency=Object.hasOwn(value,'marketing_frequency');
+    const frequency=explicitFrequency?value.marketing_frequency:value.marketing_opt_in===true?'monthly':previous.marketing_frequency||'monthly';
+    if(!['monthly','fortnightly'].includes(frequency))throw new Error('frequency');
+    const consent=value.marketing_opt_in===true && explicitFrequency;
+    const source=['registration','profile'].includes(options.source)?options.source:'profile';
+    const metadata=consent?{
+      marketing_consent_version:frequency==='fortnightly'?FORTNIGHTLY_CONSENT_VERSION:'2026-10-25-monthly-v1',
+      marketing_consented_at:now().toISOString(),marketing_consent_source:source
+    }:{};
+    const hasHelpConsent=previous.onboarding_consent_version==='2026-10-25-profile-help-v1' && safeDate(previous.onboarding_consented_at) && Date.parse(previous.onboarding_consented_at)<=now().getTime();
+    const helpMetadata=options.source==='profile' && value.onboarding_choice===true && value.onboarding_disabled===false && (previous.onboarding_disabled===true||!hasHelpConsent)?{
+      onboarding_consent_version:'2026-10-25-profile-help-v1',onboarding_consented_at:now().toISOString()
+    }:{};
     await db('/rest/v1/email_preferences?on_conflict=perfil_id,email',{
       method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},
-      body:JSON.stringify({perfil_id:user.id,email:normalizeEmail(user.email),marketing_opt_in:value.marketing_opt_in===true,onboarding_disabled:value.onboarding_disabled===true,updated_at:now().toISOString()})
+      body:JSON.stringify({perfil_id:user.id,email:normalizeEmail(user.email),marketing_opt_in:value.marketing_opt_in===true,onboarding_disabled:value.onboarding_disabled===true,marketing_frequency:frequency,...metadata,...helpMetadata,updated_at:now().toISOString()})
     });
     if(value.onboarding_disabled)await rpc('mail_cancel_pending_profile',{p_perfil_id:Number(user.id),p_email:normalizeEmail(user.email),p_scope:'onboarding'});
     if(!value.marketing_opt_in)await rpc('mail_cancel_pending_profile',{p_perfil_id:Number(user.id),p_email:normalizeEmail(user.email),p_scope:'marketing'});
-    return {marketing_opt_in:value.marketing_opt_in===true,onboarding_disabled:value.onboarding_disabled===true};
+    return {marketing_opt_in:value.marketing_opt_in===true,onboarding_disabled:value.onboarding_disabled===true,marketing_frequency:frequency};
   }
   async function enqueue({tipo,destinatario,perfilId=null,datos={},eventKey,dueAt,expiresAt}) {
     const recipient=normalizeEmail(destinatario);
@@ -139,9 +155,22 @@ export function createMailService(deps={}) {
       if(restricted) {await finish(job,'cancelled',restricted);return {status:'cancelled'};}
       const prefs=person?await preferences(person.id,person.email):null;
       if(job.category==='engagement') {
-        const onboarding=job.tipo==='perfil_incompleto' && job.data?.etapa!=='reactivacion';
+        const stage=job.data?.etapa||'48h';
+        const profileHelp=job.tipo==='perfil_incompleto';
+        if(profileHelp&&!['48h','7d','seguimiento','reactivacion'].includes(stage)) {
+          await finish(job,'cancelled','invalid_stage');return {status:'cancelled'};
+        }
+        const helpConsent=prefs?.onboarding_consent_version==='2026-10-25-profile-help-v1' && safeDate(prefs.onboarding_consented_at) && Date.parse(prefs.onboarding_consented_at)<=now().getTime();
+        const onboarding=profileHelp && stage!=='reactivacion' &&
+          ((Number.isFinite(Date.parse(person?.created_at)) && Date.parse(person.created_at)>=ENGAGEMENT_ACTIVATION)||(stage==='seguimiento'&&helpConsent));
         if(!person || (job.tipo==='perfil_incompleto'&&prefs.onboarding_disabled) || (!onboarding&&!prefs.marketing_opt_in)) {
           await finish(job,'cancelled','preference');return {status:'cancelled'};
+        }
+        if((job.tipo==='resumen_mensual' && prefs.marketing_frequency!=='monthly') ||
+          (job.tipo==='novedades' && job.data?.cadencia==='15d' &&
+            (prefs.marketing_frequency!=='fortnightly'||prefs.marketing_consent_version!==FORTNIGHTLY_CONSENT_VERSION||
+             !safeDate(prefs.marketing_consented_at)||Date.parse(prefs.marketing_consented_at)>now().getTime()))) {
+          await finish(job,'cancelled','frequency_changed');return {status:'cancelled'};
         }
         // Daytime in Argentina. An urgent transactional job is dispatched at any hour.
         const hour=(now().getUTCHours()+21)%24;
@@ -149,7 +178,7 @@ export function createMailService(deps={}) {
       }
       let datos={...job.data};
       if(job.tipo==='bienvenida')datos={...datos,tipo_cuenta:person?.tipo_cuenta||'artista'};
-      if(job.tipo==='resumen_mensual' && Array.isArray(datos.proximosEventos)) {
+      if((job.tipo==='resumen_mensual'||(job.tipo==='novedades'&&datos.cadencia==='15d')) && Array.isArray(datos.proximosEventos)) {
         datos.proximosEventos=datos.proximosEventos.filter(event=>safeDate(event.fechaISO)&&Date.parse(event.fechaISO)>now().getTime());
       }
       if(job.tipo==='perfil_incompleto') {

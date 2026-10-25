@@ -1380,11 +1380,19 @@
       <p class="section-desc">Elegí qué querés recibir. Los correos de seguridad y los avisos de tu cuenta se mantienen para que puedas usar BuscARTE.</p>
       <label class="mail-preferences-choice" for="mail-marketing-opt-in">
         <input type="checkbox" id="mail-marketing-opt-in" disabled>
-        <span>Novedades y oportunidades de BuscARTE por email (hasta un resumen mensual)</span>
+        <span>Convocatorias y novedades de BuscARTE por email</span>
       </label>
+      <div class="field" style="max-width:360px">
+        <label for="mail-marketing-frequency">Frecuencia de novedades</label>
+        <select id="mail-marketing-frequency" disabled aria-describedby="mail-frequency-help" style="min-height:44px;font-size:16px">
+          <option value="monthly">Una vez al mes</option>
+          <option value="fortnightly">Cada quince días</option>
+        </select>
+      </div>
+      <p class="section-desc" id="mail-frequency-help">Tu frecuencia actual se conserva hasta que guardes una nueva elección. Podés cancelar estos emails cuando quieras.</p>
       <label class="mail-preferences-choice" for="mail-onboarding-enabled">
         <input type="checkbox" id="mail-onboarding-enabled" disabled>
-        <span>Recordatorios con ayuda para completar mi perfil</span>
+        <span>Recordatorios iniciales y seguimiento cada catorce días mientras mi perfil siga incompleto. Podés cancelarlos cuando quieras.</span>
       </label>
       <div class="mail-preferences-actions">
         <button type="button" class="btn-neon" id="mail-preferences-save" disabled>Guardar preferencias</button>

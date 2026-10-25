@@ -5,15 +5,17 @@
     const section = document.getElementById('mail-preferences');
     if (!section) return;
     const marketing = document.getElementById('mail-marketing-opt-in');
+    const frequency = document.getElementById('mail-marketing-frequency');
     const onboarding = document.getElementById('mail-onboarding-enabled');
     const save = document.getElementById('mail-preferences-save');
     const retry = document.getElementById('mail-preferences-retry');
     const feedback = document.getElementById('mail-preferences-feedback');
-    if (!marketing || !onboarding || !save || !retry || !feedback) return;
+    if (!marketing || !frequency || !onboarding || !save || !retry || !feedback) return;
 
     const endpoint = '/.netlify/functions/email-preferences';
     let loaded = false;
     let pending = false;
+    let helpTouched = false;
 
     function message(text, state) {
       feedback.textContent = text;
@@ -24,6 +26,7 @@
       pending = value;
       section.setAttribute('aria-busy', String(value));
       marketing.disabled = value || !loaded;
+      frequency.disabled = value || !loaded || !marketing.checked;
       onboarding.disabled = value || !loaded;
       save.disabled = value || !loaded;
       retry.disabled = value;
@@ -70,8 +73,16 @@
         if (typeof data?.marketing_opt_in !== 'boolean' || typeof data?.onboarding_disabled !== 'boolean') {
           throw new Error('Invalid preferences');
         }
+        if (data.marketing_frequency !== undefined && !['monthly', 'fortnightly'].includes(data.marketing_frequency)) {
+          throw new Error('Invalid frequency');
+        }
+        if (data.onboarding_consent_required !== undefined && typeof data.onboarding_consent_required !== 'boolean') {
+          throw new Error('Invalid account help preference');
+        }
         marketing.checked = data.marketing_opt_in;
-        onboarding.checked = !data.onboarding_disabled;
+        frequency.value = data.marketing_frequency || 'monthly';
+        onboarding.checked = !data.onboarding_disabled && data.onboarding_consent_required !== true;
+        helpTouched = false;
         loaded = true;
         message('Podés cambiar estas opciones cuando quieras.');
       } catch (error) {
@@ -89,7 +100,9 @@
       if (pending || !loaded) return;
       const preferences = {
         marketing_opt_in: marketing.checked === true,
-        onboarding_disabled: onboarding.checked !== true
+        marketing_frequency: frequency.value,
+        onboarding_disabled: onboarding.checked !== true,
+        ...(helpTouched && onboarding.checked === true ? {onboarding_choice:true} : {})
       };
       busy(true);
       message('Guardando tus preferencias…');
@@ -99,6 +112,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(preferences)
         });
+        helpTouched = false;
         message('Tus preferencias de email quedaron guardadas.');
       } catch (error) {
         message(error.status === 401
@@ -110,7 +124,11 @@
     });
 
     retry.addEventListener('click', load);
-    for (const input of [marketing, onboarding]) {
+    marketing.addEventListener('change', () => {
+      frequency.disabled = pending || !loaded || !marketing.checked;
+    });
+    onboarding.addEventListener('change', () => { helpTouched = true; });
+    for (const input of [marketing, frequency, onboarding]) {
       input.addEventListener('change', () => message('Tenés cambios de email sin guardar. Tocá «Guardar preferencias».'));
     }
     load();

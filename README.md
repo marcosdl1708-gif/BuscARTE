@@ -3,6 +3,12 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
+## Engagement recurrente — corte del 25/10/2026
+
+Preparación de v34 desde `ca70f1e`: seguimiento de perfil cada catorce días desde el día 21, sin límite de meses, con baja/completitud y deduplicación; novedades cada quince días reales para esa preferencia, conservando las opciones mensuales anteriores. Las cuentas históricas pueden pedir ayuda del perfil independientemente de marketing. No se inscriben cuentas sin permiso ni se revierten bajas: la parte solicitada de envíos promocionales forzados no se ejecuta por las condiciones de Resend.
+
+Engagement 40 intentos diarios/1.200 mensuales; 70 no-reset, 90 globales y 2.700 mensuales preservados. Migración remota `20261025144733` aplicada a las 11:47 ART; las 18 preferencias existentes y los 351 perfiles se conservaron, sin nuevos consentimientos. No hay campaña ni correos de prueba, importación de contactos, nuevas claves, Auth o Android. El worker y los tres cron existentes se conservan. Ver `docs/engagement-recurrente-20261025.md`; cierre de deploy pendiente de comprobación.
+
 ## Presentación opcional de perfiles publicada — 20/10/2026
 
 **Publicado a las 23:59 ART**, fuente `ad664c74f90505ae8947239a184b5b0ff53f1269`, deploy `6ad82a9eb88f995f75a5fea2`, caché v33. Un único deploy por Git CD; paquete explícito de 75 archivos. En Artistas, la bio ausente se informa honestamente en lugar del relleno “Músico en buscARTE”. La etiqueta neutra “Perfil inicial” sólo aparece si no hay presentación ni detalle profesional reconocido; la ausencia de foto por sí sola no la activa. Se conserva el diagnóstico anterior a la proyección tolerante: datos ilegibles no se confunden con datos vacíos. No se ocultan perfiles ni se modifica su orden, filtros o enlaces.

@@ -66,14 +66,61 @@ test('reminders request only actual missing fields; complete or unknown fields y
 });
 
 test('stages reflect timing without changing the missing-field request', () => {
-  const timed = ['48h', '7d', 'reactivacion'].map(etapa => buildEmail('perfil_incompleto', { etapa, faltantes:['ubicacion'] }, options));
-  assert.equal(new Set(timed.map(email => email.subject)).size, 3);
+  const timed = ['48h', '7d', 'reactivacion', 'seguimiento'].map(etapa => buildEmail('perfil_incompleto', { etapa, faltantes:['ubicacion'] }, options));
+  assert.equal(new Set(timed.map(email => email.subject)).size, 4);
   assert.match(timed[1].text, /una semana/);
   assert.match(timed[2].text, /Hace un tiempo/);
+  assert.match(timed[3].text, /uno por vez/);
+  assert.doesNotMatch(timed[3].text, /una semana|primer mes|Hace un tiempo|más visibilidad|ranking/);
   for (const email of timed) {
     assert.match(email.text, /Tu ubicación/);
     assert.doesNotMatch(email.text, /Una foto|Una presentación breve|Tu disciplina/);
   }
+});
+
+const fortnight = changes => ({cadencia:'15d',periodo:'10 al 25 de octubre',desdeISO:'2026-10-10T13:00:00.000Z',hastaISO:'2026-10-25T13:00:00.000Z',nuevosArtistas:17,nuevosAnuncios:6,proximosEventos:[{id:73,titulo:'Encuentro de artistas',lugar:'La Plata',fechaISO:'2026-10-26T18:00:00.000Z',fecha:'lunes 26, 15:00'}],...changes});
+
+test('fortnightly news shows the actual period, counters and canonical upcoming-event links', () => {
+  const email = buildEmail('novedades', fortnight(), options);
+  assert.match(email.subject, /17 artistas nuevos y 6 anuncios/);
+  assert.match(email.html, /Novedades cada 15 días/);
+  assert.match(email.text, /10 al 25 de octubre/);
+  assert.match(email.text, /17 artistas nuevos\n6 anuncios publicados/);
+  assert.match(email.text, /Encuentro de artistas · lunes 26, 15:00 · La Plata · https:\/\/buscarte.com.ar\/buscARTE_anuncio_detalle.html\?id=73/);
+  assert.match(email.text, /activaste los avisos de buscARTE cada 15 días/);
+  assert.doesNotMatch(email.text + email.subject, /mensual|durante el mes|último mes/);
+  assert.equal((email.html.match(/data-primary-cta=/g) || []).length, 1);
+  assert.ok(email.text.includes(options.actionUrl));
+  assert.ok(email.text.includes(options.unsubscribeUrl));
+});
+
+test('fortnightly news requires a real chronological period and keeps legacy generic news intact', () => {
+  for (const changes of [{desdeISO:'bad'}, {hastaISO:undefined}, {hastaISO:'2026-10-10T13:00:00.000Z'}, {hastaISO:'2026-10-09T13:00:00.000Z'}]) {
+    assert.equal(buildEmail('novedades', fortnight(changes), options), null);
+  }
+  assert.equal(buildEmail('novedades', fortnight(), {unsubscribeUrl:'https://evil.example'}), null);
+  const fallbackPeriod = buildEmail('novedades', fortnight({periodo:undefined}), options);
+  assert.match(fallbackPeriod.text, /10 de octubre al 25 de octubre/);
+  const legacy = buildEmail('novedades', {}, options);
+  assert.match(legacy.subject, /Volvé a conectar/);
+  assert.match(legacy.text, /Un proyecto puede empezar con una conversación/);
+  assert.doesNotMatch(legacy.text, /cada 15 días|artistas nuevos/);
+});
+
+test('fortnightly news escapes supplied text, drops expired or invalid events, and bounds event count', () => {
+  const attack = '<script>x</script> & " Header:\nBcc:bad';
+  const email = buildEmail('novedades', fortnight({periodo:attack,nuevosArtistas:-2,nuevosAnuncios:'bad',proximosEventos:[
+    {id:1,titulo:'EXPIRED',fechaISO:'2026-10-24T13:00:00Z'},
+    {id:2,titulo:'INVALID',fechaISO:'bad'},
+    {id:3,titulo:attack,lugar:attack,fecha:attack,fechaISO:'2026-10-26T13:00:00Z',url:'https://evil.example'},
+    ...Array.from({length:5},(_,i)=>({id:i+4,titulo:'Kept '+i,fechaISO:'2026-10-27T13:00:00Z'}))
+  ]}), options);
+  assert.match(email.html, /&lt;script&gt;/);
+  assert.doesNotMatch(email.html, /<script|href="https:\/\/evil/);
+  assert.doesNotMatch(email.text, /EXPIRED|INVALID|Kept 2/);
+  assert.match(email.text, /Kept 1/);
+  assert.match(email.text, /0 artistas nuevos\n0 anuncios publicados/);
+  assert.doesNotMatch(email.subject, /[\r\n]/);
 });
 
 test('untrusted content remains text in all HTML contexts and never chooses a link', () => {

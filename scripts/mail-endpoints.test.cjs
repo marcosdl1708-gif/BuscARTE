@@ -78,18 +78,57 @@ function request(file, options={}) {
 const mutations=run=>run.calls.filter(call=>!['GET','HEAD'].includes(call.method)&&!call.url.includes('/rpc/limitar_operacion_web'));
 const tamper=token=>token.replace(/\.[A-Za-z0-9_-]/,value=>'.'+(value[1]==='a'?'b':'a'));
 
-test('preferences GET authenticates cookie and returns only the two preferences',async()=>{
+test('preferences GET authenticates cookie and returns only booleans and frequency',async()=>{
   const denied=runtime('email-preferences');assert.equal((await denied.handle(request('email-preferences',{cookie:false}))).status,401);assert.equal(denied.calls.length,0);
   const invalid=runtime('email-preferences',{sessionValid:false});assert.equal((await invalid.handle(request('email-preferences'))).status,401);assert.equal(mutations(invalid).length,0);
   const run=runtime('email-preferences');const result=await run.handle(request('email-preferences'));
-  assert.deepEqual(await result.json(),{marketing_opt_in:false,onboarding_disabled:false});assert.equal(result.headers.get('cache-control'),'no-store');assert.equal(result.headers.get('access-control-allow-origin'),null);
+  assert.deepEqual(await result.json(),{marketing_opt_in:false,onboarding_disabled:false,marketing_frequency:'monthly',onboarding_consent_required:true});assert.equal(result.headers.get('cache-control'),'no-store');assert.equal(result.headers.get('access-control-allow-origin'),null);
   assert.equal(mutations(run).length,0);assert.deepEqual(run.unexpected,[]);
 });
 test('preferences POST persists current cookie identity and explicit booleans',async()=>{
   const run=runtime('email-preferences');const value={marketing_opt_in:true,onboarding_disabled:false};
-  assert.deepEqual(await(await run.handle(request('email-preferences',{method:'POST',body:value}))).json(),value);
+  assert.deepEqual(await(await run.handle(request('email-preferences',{method:'POST',body:value}))).json(),{...value,marketing_frequency:'monthly'});
   const write=mutations(run)[0];assert.match(write.url,/email_preferences/);assert.equal(write.body.perfil_id,701);assert.equal(write.body.email,'user@example.invalid');
   assert.equal(write.body.marketing_opt_in,true);assert.equal(write.body.onboarding_disabled,false);assert.deepEqual(run.unexpected,[]);
+});
+
+test('preferences captures an explicit fortnightly choice with server-owned source and does not disclose metadata',async()=>{
+  const run=runtime('email-preferences');
+  const value={marketing_opt_in:true,onboarding_disabled:false,marketing_frequency:'fortnightly'};
+  assert.deepEqual(await(await run.handle(request('email-preferences',{method:'POST',body:value}))).json(),value);
+  const write=mutations(run).find(call=>call.url.includes('/email_preferences'));
+  assert.equal(write.body.marketing_frequency,'fortnightly');assert.equal(write.body.marketing_consent_version,'2026-10-25-fortnightly-v1');assert.equal(write.body.marketing_consent_source,'profile');assert(Number.isFinite(Date.parse(write.body.marketing_consented_at)));
+  const readback=await(await run.handle(request('email-preferences'))).json();assert.deepEqual(readback,{...value,onboarding_consent_required:true});assert.equal(Object.hasOwn(readback,'marketing_consent_version'),false);
+});
+
+test('preferences rejects invalid frequency and client-forged consent metadata',async()=>{
+  for(const extra of [{marketing_frequency:'weekly'},{marketing_frequency:null},{marketing_frequency:true},{marketing_frequency:15},{marketing_consent_version:'forged'},{marketing_consented_at:'2020-01-01'},{marketing_consent_source:'registration'},{onboarding_choice:'true'},{onboarding_choice:null},{onboarding_consent_version:'forged'},{onboarding_consented_at:'2020-01-01'}]) {
+    const run=runtime('email-preferences');assert.equal((await run.handle(request('email-preferences',{method:'POST',body:{marketing_opt_in:true,onboarding_disabled:false,...extra}}))).status,400);assert.equal(mutations(run).length,0);
+  }
+});
+
+test('historical profile help requires an active choice and never invents proof for a cached preferences form',async()=>{
+  const run=runtime('email-preferences',{user:{created_at:'2026-09-01T00:00:00Z'}});
+  assert.equal((await(await run.handle(request('email-preferences'))).json()).onboarding_consent_required,true);
+  const ordinary={marketing_opt_in:false,onboarding_disabled:false,marketing_frequency:'monthly'};
+  await run.handle(request('email-preferences',{method:'POST',body:ordinary}));
+  let write=mutations(run).findLast(call=>call.url.includes('/email_preferences'));
+  assert.equal(Object.hasOwn(write.body,'onboarding_consent_version'),false);
+  assert.equal((await(await run.handle(request('email-preferences'))).json()).onboarding_consent_required,true);
+  await run.handle(request('email-preferences',{method:'POST',body:{...ordinary,onboarding_choice:true}}));
+  write=mutations(run).findLast(call=>call.url.includes('/email_preferences'));
+  assert.equal(write.body.onboarding_consent_version,'2026-10-25-profile-help-v1');assert(Number.isFinite(Date.parse(write.body.onboarding_consented_at)));
+  assert.equal((await(await run.handle(request('email-preferences'))).json()).onboarding_consent_required,false);
+});
+
+test('new account cohort needs no retroactive help consent and invalid historical evidence remains unconfirmed',async()=>{
+  const fresh=runtime('email-preferences',{user:{created_at:'2026-10-16T00:00:00Z'}});
+  assert.equal((await(await fresh.handle(request('email-preferences'))).json()).onboarding_consent_required,false);
+  for(const preferences of [{onboarding_consent_version:'forged',onboarding_consented_at:new Date().toISOString()},{onboarding_consent_version:'2026-10-25-profile-help-v1',onboarding_consented_at:new Date(Date.now()+3600000).toISOString()}]) {
+    const old=runtime('email-preferences',{user:{created_at:'2026-09-01T00:00:00Z'},preferences:{marketing_opt_in:false,onboarding_disabled:false,...preferences}});
+    assert.equal((await(await old.handle(request('email-preferences'))).json()).onboarding_consent_required,true);
+  }
+  const contradicted=runtime('email-preferences');assert.equal((await contradicted.handle(request('email-preferences',{method:'POST',body:{marketing_opt_in:false,onboarding_disabled:true,onboarding_choice:true}}))).status,400);
 });
 test('preferences independently cancel only the requested reminder or marketing scope for the authenticated identity',async()=>{
   for(const [body,scopes] of [[{marketing_opt_in:false,onboarding_disabled:true},['onboarding','marketing']],[{marketing_opt_in:true,onboarding_disabled:true},['onboarding']],[{marketing_opt_in:false,onboarding_disabled:false},['marketing']]]) {

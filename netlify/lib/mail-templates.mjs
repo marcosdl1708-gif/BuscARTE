@@ -143,12 +143,13 @@ export function buildEmail(tipo, rawDatos = {}, options = {}) {
   if (tipo === 'perfil_incompleto') {
     const faltantes = missingKeys(datos.faltantes);
     if (!faltantes.length) return null;
-    const etapa = ['48h', '7d', 'reactivacion'].includes(datos.etapa) ? datos.etapa : '48h';
+    const etapa = ['48h', '7d', 'reactivacion', 'seguimiento'].includes(datos.etapa) ? datos.etapa : '48h';
     const href = action(PROFILE_PATH);
-    subject = etapa === 'reactivacion' ? 'Tu próximo paso en buscARTE' : etapa === '7d' ? 'Tu perfil todavía tiene algo más para contar' : 'Mostrá lo que hacés en buscARTE';
-    title = etapa === 'reactivacion' ? 'Volvé con lo que hacés hoy.' : etapa === '7d' ? 'Dale una vuelta a tu perfil.' : 'Que tu perfil hable de vos.';
+    subject = etapa === 'seguimiento' ? 'Tu perfil puede contar un poco más de vos' : etapa === 'reactivacion' ? 'Tu próximo paso en buscARTE' : etapa === '7d' ? 'Tu perfil todavía tiene algo más para contar' : 'Mostrá lo que hacés en buscARTE';
+    title = etapa === 'seguimiento' ? 'Sumá algo de lo que hacés hoy.' : etapa === 'reactivacion' ? 'Volvé con lo que hacés hoy.' : etapa === '7d' ? 'Dale una vuelta a tu perfil.' : 'Que tu perfil hable de vos.';
     preheader = `Podés sumar ${faltantes.map(key => MISSING[key][0].toLowerCase()).join(', ')}.`;
-    const intro = etapa === 'reactivacion' ? 'Hace un tiempo que te sumaste. Si querés volver a conectar con la comunidad, tu perfil puede contar un poco más sobre vos.'
+    const intro = etapa === 'seguimiento' ? 'Tu perfil todavía tiene algunos datos pendientes. Podés sumar uno por vez para que quienes te encuentren conozcan mejor lo que hacés.'
+      : etapa === 'reactivacion' ? 'Hace un tiempo que te sumaste. Si querés volver a conectar con la comunidad, tu perfil puede contar un poco más sobre vos.'
       : etapa === '7d' ? 'Ya pasó una semana desde que te sumaste. Cuando tengas un momento, podés darle un poco más de forma a tu perfil.'
         : 'Ya tenés tu lugar en buscARTE. El próximo paso es contar un poco más sobre lo que hacés.';
     const rows = faltantes.map(key => `<tr><td style="padding:0 0 16px;color:#e0e3d8;font-size:15px;line-height:1.6;word-break:break-word"><strong style="color:#f1eee6">${esc(MISSING[key][0])}</strong><br>${esc(MISSING[key][1])}</td></tr>`).join('');
@@ -220,6 +221,29 @@ export function buildEmail(tipo, rawDatos = {}, options = {}) {
     eyebrow = 'Administración';
     content = `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;margin:0 0 24px;table-layout:fixed">${fields.map(([label, value]) => `<tr><th scope="row" width="38%" align="left" valign="top" style="padding:12px 8px 12px 0;border-bottom:1px solid #414e32;color:#bfc5b7;font-size:14px;line-height:1.6;font-weight:400;word-break:break-word">${esc(label)}</th><td valign="top" style="padding:12px 0;border-bottom:1px solid #414e32;color:#f1eee6;font-size:15px;line-height:1.6;word-break:break-word;overflow-wrap:anywhere">${multiline(value)}</td></tr>`).join('')}</table>` + button('Revisar en Supabase', ADMIN_URL);
     text = `${fields.map(([label, value]) => `${label}: ${value}`).join('\n\n')}\n\nRevisar en Supabase: ${ADMIN_URL}`;
+    return finish();
+  }
+
+  if (tipo === 'novedades' && datos.cadencia === '15d') {
+    const from = Date.parse(datos.desdeISO), until = Date.parse(datos.hastaISO);
+    if (!Number.isFinite(from) || !Number.isFinite(until) || until <= from) return null;
+    const dateLabel = date => new Intl.DateTimeFormat('es-AR', {day:'numeric', month:'long', timeZone:'America/Argentina/Buenos_Aires'}).format(new Date(date));
+    const periodo = clean(datos.periodo, 120) || `${dateLabel(from)} al ${dateLabel(until)}`;
+    const artists = count(datos.nuevosArtistas), ads = count(datos.nuevosAnuncios);
+    const eventos = (Array.isArray(datos.proximosEventos) ? datos.proximosEventos : [])
+      .filter(event => event && typeof event === 'object' && !Array.isArray(event) && Number.isFinite(Date.parse(event.fechaISO)) && Date.parse(event.fechaISO) >= until).slice(0, 3);
+    const eventData = eventos.map(event => ({ titulo:clean(event.titulo, 180) || 'Encuentro de la comunidad', fecha:clean(event.fecha, 100), lugar:clean(event.lugar, 180), href:/^[1-9]\d{0,15}$/.test(String(event.id || '')) ? `${base}/buscARTE_anuncio_detalle.html?id=${encodeURIComponent(event.id)}` : '' }));
+    const href = action('/buscARTE_anuncios.html');
+    subject = `buscARTE: ${artists} artistas nuevos y ${ads} anuncios para descubrir`;
+    title = 'Lo nuevo en la comunidad.';
+    eyebrow = 'Novedades cada 15 días';
+    preheader = `${artists} artistas nuevos y ${ads} anuncios. Un motivo para volver a encontrarnos.`;
+    const counters = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;table-layout:fixed;margin:6px 0 24px"><tr><td width="50%" valign="top" style="padding:20px 8px;background:#1b2417;border-right:2px solid #141813;text-align:center"><p style="margin:0 0 6px;font-size:32px;line-height:1.1;font-weight:700;color:#d4f53c">${artists}</p><p style="margin:0;font-size:14px;line-height:1.5;color:#e0e3d8">artistas nuevos</p></td><td width="50%" valign="top" style="padding:20px 8px;background:#1b2417;text-align:center"><p style="margin:0 0 6px;font-size:32px;line-height:1.1;font-weight:700;color:#d4f53c">${ads}</p><p style="margin:0;font-size:14px;line-height:1.5;color:#e0e3d8">anuncios publicados</p></td></tr></table>`;
+    const eventsHtml = eventData.length ? section('Próximos encuentros', `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;table-layout:fixed">${eventData.map(event => `<tr><td style="padding:0 0 16px;word-break:break-word;overflow-wrap:anywhere"><p style="margin:0 0 4px;font-size:16px;line-height:1.5;font-weight:700;color:#f1eee6">${event.href ? textLink(event.titulo, event.href) : esc(event.titulo)}</p><p style="margin:0;color:#bfc5b7;font-size:14px;line-height:1.6">${esc([event.fecha, event.lugar].filter(Boolean).join(' · '))}</p></td></tr>`).join('')}</table>`) : '';
+    content = paragraph(greeting) + paragraph(`Esto pasó en buscARTE del ${periodo}.`) + counters + eventsHtml
+      + paragraph('Volvé a descubrir búsquedas, propuestas, clases y encuentros de la comunidad. Si tenés una idea o proyecto, también podés compartir tu anuncio.') + button('Ver anuncios', href);
+    text = `${greeting}\n\nEsto pasó en buscARTE del ${periodo}:\n${artists} artistas nuevos\n${ads} anuncios publicados${eventData.length ? '\n\nPróximos encuentros:\n' + eventData.map(event => [event.titulo, event.fecha, event.lugar, event.href].filter(Boolean).join(' · ')).join('\n') : ''}\n\nVolvé a descubrir búsquedas, propuestas, clases y encuentros de la comunidad. También podés compartir tu anuncio.\n\nVer anuncios: ${href}`;
+    footerReason = 'Recibís estas novedades porque activaste los avisos de buscARTE cada 15 días.';
     return finish();
   }
 

@@ -1,6 +1,7 @@
 import { detailObject, projectProfile, RUBROS } from './disciplinas.mjs';
 
 export const DEFAULT_ENGAGEMENT_ACTIVATION = '2026-10-15T00:00:00.000Z';
+export const PROFILE_HELP_CONSENT_VERSION = '2026-10-25-profile-help-v1';
 const DAY = 24 * 60 * 60 * 1000;
 // Keep these discipline fields aligned with basicosPerfil / SECTION_KEYS in the profile editor.
 const DISCIPLINE = {
@@ -76,21 +77,40 @@ export function planEngagement(profile, prefs = {}, now, opts = {}) {
   const id = typeof profile.id === 'number' || typeof profile.id === 'string' ? String(profile.id).trim() : '';
   if (!id || id.length > 100 || /[\u0000-\u0020]/.test(id) || ![current, created, activation].every(Number.isFinite) || current < activation || created > current) return [];
   const candidates = [];
-  function candidate(etapa, due, expires, priority) {
+  function candidate(etapa, due, expires, priority, eventKey = `perfil:${id}:${etapa}:v1`) {
     if (current < due || current >= expires || !Number.isFinite(new Date(due).getTime()) || !Number.isFinite(new Date(expires).getTime())) return;
     candidates.push({
       tipo:'perfil_incompleto', etapa,
-      eventKey:`perfil:${id}:${etapa}:v1`,
+      eventKey,
       dueAtISO:new Date(due).toISOString(),
       expiresAtISO:new Date(expires).toISOString(),
       priority
     });
   }
-  if (created >= activation) {
+  const currentAccount = created >= activation;
+  const helpConsentedAt = timestamp(prefs?.onboarding_consented_at);
+  const explicitHelp = prefs?.onboarding_consent_version === PROFILE_HELP_CONSENT_VERSION
+    && Number.isFinite(helpConsentedAt) && helpConsentedAt <= current;
+  const mayFollowUp = currentAccount || explicitHelp || prefs?.marketing_opt_in === true;
+  // Historical accounts need an explicit applicable choice. For marketing-only
+  // permission, activation gives the existing one-off reactivation its initial
+  // window; a new stage never silently enrolls older, unknown preferences.
+  // A historical account that explicitly requests profile help gets the current
+  // cycle immediately once old enough. Its anchor stays the account's age, not
+  // the consent timestamp: toggling the choice cannot create duplicate cycles.
+  const recurringStart = Math.max(created + 21 * DAY, currentAccount || explicitHelp ? created : activation + 21 * DAY);
+  if (currentAccount) {
     candidate('48h', created + 2 * DAY, created + 6 * DAY, 30);
     candidate('7d', created + 7 * DAY, created + 14 * DAY, 35);
-  } else if (prefs?.marketing_opt_in === true && current - created > 14 * DAY) {
+  } else if (prefs?.marketing_opt_in === true && current - created > 14 * DAY && current < recurringStart) {
     candidate('reactivacion', activation, activation + 90 * DAY, 45);
+  }
+  if (mayFollowUp && current >= recurringStart) {
+    // Only today's cycle is produced. Delayed workers may finish a queued cycle,
+    // but planning after an outage never replays all the skipped fortnights.
+    const cycle = Math.floor((current - recurringStart) / (14 * DAY));
+    const due = recurringStart + cycle * 14 * DAY;
+    candidate('seguimiento', due, due + 28 * DAY, 40, `perfil:${id}:seguimiento:${cycle}:v2`);
   }
   return candidates;
 }

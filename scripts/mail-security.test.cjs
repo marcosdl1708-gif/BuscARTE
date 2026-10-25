@@ -102,6 +102,7 @@ function runtime(file, options = {}) {
   };
   context.__planner={
     planProfileReminders:async()=>{planned.push('profile');if(!context.__security.serverConfig()||options.plannerFails)throw new Error('configuration');return 120;},
+    planFortnightlySummary:async()=>{planned.push('fortnightly');if(!context.__security.serverConfig()||options.plannerFails||options.fortnightlyPlannerFails)throw new Error('configuration');return 2;},
     planMonthlySummary:async()=>{planned.push('monthly');if(!context.__security.serverConfig()||options.plannerFails)throw new Error('configuration');return 332;}
   };
   const disciplines = read('netlify/lib/disciplinas.mjs').replace(/^export /gm, '');
@@ -311,11 +312,17 @@ test('scheduled candidate functions fail closed without configuration and never 
     assert.equal(missing.calls.length,0);
     const run = runtime(file, { scheduled:true, users:[{ id:701, email:'user@example.invalid', nombre:'Persona', foto_url:'', bio:'' }] });
     assert.equal((await run.handle({})).statusCode,200);
-    assert.deepEqual(run.planned,[file==='recordatorio-perfil.js'?'profile':'monthly']);
-    assert.equal(run.calls.length,0);assert.equal(run.queued.length,0);
+    assert.deepEqual(run.planned,file==='recordatorio-perfil.js'?['profile','fortnightly']:['monthly']);
+    assert.equal(run.calls.length,0);assert.equal(run.queued.length,0);assert.equal(run.dispatched.length,0);
+    if(file==='recordatorio-perfil.js')assert.deepEqual(JSON.parse(run.logs[0][1]),{reminders:120,updates:2});
     assert(!JSON.stringify(run.logs).includes('user@example.invalid'));
     assert.equal(run.unexpected.length,0);
   }
+  const fortnightlyFailure=runtime('recordatorio-perfil.js',{fortnightlyPlannerFails:true});
+  assert.equal((await fortnightlyFailure.handle({})).statusCode,503);
+  assert.deepEqual(fortnightlyFailure.planned,['profile','fortnightly']);
+  assert.equal(fortnightlyFailure.calls.length,0);assert.equal(fortnightlyFailure.dispatched.length,0);
+  assert.equal(fortnightlyFailure.unexpected.length,0);
 });
 test('daily candidate generation and five-minute worker replace the fixed 90-recipient monthly slice', async () => {
   const config = read('netlify.toml');

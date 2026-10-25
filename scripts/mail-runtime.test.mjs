@@ -87,6 +87,7 @@ function fixture(options = {}) {
         const engagement = job.category === 'engagement';
         if (budget.monthly >= MAIL_LIMITS.monthly || engagement && budget.engagementMonthly >= MAIL_LIMITS.engagementMonthly) return {allowed:false, reason:'monthly_budget',retry_at:input.p_monthly_reset};
         if (budget.daily >= MAIL_LIMITS.daily || engagement && budget.engagementDaily >= MAIL_LIMITS.engagementDaily) return {allowed:false,reason:'daily_budget',retry_at:input.p_daily_reset};
+        if (job.tipo !== 'reset' && budget.daily >= 70) return {allowed:false,reason:'non_urgent_daily_budget',retry_at:input.p_daily_reset};
         budget.daily++; budget.monthly++;
         if (engagement) { budget.engagementDaily++; budget.engagementMonthly++; }
         job.attempts++;
@@ -171,7 +172,7 @@ function fixture(options = {}) {
 }
 
 test('daily and monthly budget denials defer without any provider POST', async () => {
-  for (const options of [{daily:90},{monthly:2700},{engagementDaily:20},{engagementMonthly:600},{providerDaily:99}]) {
+  for (const options of [{daily:90},{monthly:2700},{engagementDaily:40},{engagementMonthly:1200},{providerDaily:99}]) {
     const f = fixture(options);
     const job = await f.enqueue('perfil_incompleto');
     const result = await f.service.dispatch(job.id);
@@ -195,26 +196,26 @@ test('usage 403 or malformed observations fail closed before reserve or provider
 });
 
 test('transactional and engagement jobs share one atomic daily allowance under concurrency', async () => {
-  const f = fixture({daily:89,monthly:100});
+  const f = fixture({daily:69,monthly:100});
   const transactional = await f.enqueue('mensaje');
   const engagement = await f.enqueue('perfil_incompleto');
   const results = await Promise.all([f.service.dispatch(transactional.id),f.service.dispatch(engagement.id)]);
   assert.equal(results.filter(result=>result.status === 'sent').length,1);
   assert.equal(results.filter(result=>result.status === 'deferred').length,1);
   assert.equal(f.posts.length,1);
-  assert.equal(f.budget.daily,90);
+  assert.equal(f.budget.daily,70);
   assert.equal(f.budget.monthly,101);
   assert.equal(f.calls.filter(call=>call.path?.endsWith('/mail_reserve')).length,2);
 });
 
 test('engagement cap leaves the remaining shared capacity available to transactional mail', async () => {
-  const f = fixture({engagementDaily:20,daily:20});
+  const f = fixture({engagementDaily:40,daily:40});
   const engaged = await f.enqueue('perfil_incompleto');
   assert.equal((await f.service.dispatch(engaged.id)).status,'deferred');
   const transaction = await f.enqueue('mensaje');
   assert.equal((await f.service.dispatch(transaction.id)).status,'sent');
-  assert.equal(f.budget.daily,21);
-  assert.equal(f.budget.engagementDaily,20);
+  assert.equal(f.budget.daily,41);
+  assert.equal(f.budget.engagementDaily,40);
 });
 
 test('two workers cannot claim and send the same queue row concurrently', async () => {
@@ -296,7 +297,7 @@ test('preference changes cancel pending marketing without suppressing a permitte
   const marketing = await f.enqueue('resumen_mensual');
   const onboarding = await f.enqueue('perfil_incompleto');
   const saved = await f.service.savePreferences(f.person,{marketing_opt_in:false,onboarding_disabled:false});
-  assert.deepEqual(saved,{marketing_opt_in:false,onboarding_disabled:false});
+  assert.deepEqual(saved,{marketing_opt_in:false,onboarding_disabled:false,marketing_frequency:'monthly'});
   assert.equal(f.row(marketing.id).status,'cancelled');
   assert.equal(f.row(onboarding.id).status,'pending');
   await f.service.savePreferences(f.person,{marketing_opt_in:false,onboarding_disabled:true});
@@ -435,6 +436,71 @@ test('signed tokens bind purpose, profile and email without including the raw ad
   const [payload,signature] = token.split('.');
   assert.equal(verifyMailToken(payload+'.'+(signature.startsWith('A') ? 'B':'A')+signature.slice(1),SECRET),null);
   assert.ok(!Buffer.from(token.split('.')[0],'base64url').toString().includes('ana@example.com'));
+});
+
+test('follow-up keeps working months later and a historical profile cannot bypass consent by changing stage', async () => {
+  for(const created_at of ['2026-10-15T00:00:00Z','2026-01-01T00:00:00Z']) {
+    const f=fixture({person:{created_at}});f.setTime('2027-03-01T15:00:00Z');
+    const job=await f.enqueue('perfil_incompleto',{datos:{etapa:'seguimiento'}});
+    assert.equal((await f.service.dispatch(job.id)).status,created_at.startsWith('2026-10')?'sent':'cancelled');
+    assert.equal(f.posts.length,created_at.startsWith('2026-10')?1:0);
+  }
+});
+
+test('unknown reminder stages cannot bypass audience restrictions', async () => {
+  const f=fixture();const job=await f.enqueue('perfil_incompleto',{datos:{etapa:'forzado'}});
+  assert.equal((await f.service.dispatch(job.id)).status,'cancelled');assert.equal(f.posts.length,0);
+});
+
+test('historical explicit profile-help choice works independently of newsletters', async () => {
+  for(const evidence of [{onboarding_consent_version:'2026-10-25-profile-help-v1',onboarding_consented_at:'2026-10-25T12:00:00Z'},{}, {onboarding_consent_version:'2026-10-25-profile-help-v1',onboarding_consented_at:'2027-01-01T00:00:00Z'}]) {
+    const f=fixture({person:{created_at:'2026-01-01T00:00:00Z'},preferences:{marketing_opt_in:false,...evidence}});f.setTime('2026-10-25T15:00:00Z');
+    const job=await f.enqueue('perfil_incompleto',{datos:{etapa:'seguimiento'}});const allowed=Object.keys(evidence).length>0&&evidence.onboarding_consented_at.startsWith('2026-10');
+    assert.equal((await f.service.dispatch(job.id)).status,allowed?'sent':'cancelled');assert.equal(f.posts.length,allowed?1:0);
+  }
+});
+
+test('explicit profile-help preference records evidence once without subscribing marketing', async () => {
+  const f=fixture();f.setTime('2026-10-25T15:00:00Z');
+  await f.service.savePreferences(f.person,{marketing_opt_in:false,onboarding_disabled:false,marketing_frequency:'monthly',onboarding_choice:true},{source:'profile'});
+  const first=f.calls.filter(c=>c.path.startsWith('/rest/v1/email_preferences?')&&c.method==='POST').at(-1).input;
+  assert.equal(first.marketing_opt_in,false);assert.equal(first.onboarding_consent_version,'2026-10-25-profile-help-v1');assert.equal(first.onboarding_consented_at,'2026-10-25T15:00:00.000Z');
+  f.advance(86400000);await f.service.savePreferences(f.person,{marketing_opt_in:false,onboarding_disabled:false,marketing_frequency:'monthly',onboarding_choice:true},{source:'profile'});
+  const second=f.calls.filter(c=>c.path.startsWith('/rest/v1/email_preferences?')&&c.method==='POST').at(-1).input;
+  assert.equal(Object.hasOwn(second,'onboarding_consented_at'),false);
+});
+
+test('fortnightly news requires its explicit frequency evidence and rejects future consent', async () => {
+  const base={marketing_opt_in:true,marketing_frequency:'fortnightly',marketing_consent_version:'2026-10-25-fortnightly-v1',marketing_consented_at:'2026-10-25T12:00:00Z'};
+  for(const changes of [{},{marketing_frequency:'monthly'},{marketing_consent_version:null},{marketing_consented_at:null},{marketing_consented_at:'2027-01-01T00:00:00Z'}]) {
+    const f=fixture({preferences:{...base,...changes}});f.setTime('2026-10-25T15:00:00Z');
+    const job=await f.enqueue('novedades',{datos:{cadencia:'15d',desdeISO:'2026-10-10T13:00:00Z',hastaISO:'2026-10-25T13:00:00Z',nuevosArtistas:2,nuevosAnuncios:1,proximosEventos:[]}});
+    const allowed=Object.keys(changes).length===0;
+    assert.equal((await f.service.dispatch(job.id)).status,allowed?'sent':'cancelled');assert.equal(f.posts.length,allowed?1:0);
+  }
+});
+
+test('switching to fortnightly cancels an old monthly queued job before provider', async () => {
+  const f=fixture({preferences:{marketing_opt_in:true,marketing_frequency:'fortnightly'}});
+  const job=await f.enqueue('resumen_mensual');assert.equal((await f.service.dispatch(job.id)).status,'cancelled');assert.equal(f.posts.length,0);
+});
+
+test('cached monthly clients cannot reactivate fortnightly and new explicit choices record server evidence', async () => {
+  const f=fixture({preferences:{marketing_opt_in:false,marketing_frequency:'fortnightly',marketing_consent_version:'2026-10-25-fortnightly-v1'}});f.setTime('2026-10-25T15:00:00Z');
+  const old=await f.service.savePreferences(f.person,{marketing_opt_in:true,onboarding_disabled:false});
+  assert.equal(old.marketing_frequency,'monthly');
+  const first=f.calls.filter(c=>c.path.startsWith('/rest/v1/email_preferences?')&&c.method==='POST').at(-1).input;
+  assert.equal(Object.hasOwn(first,'marketing_consented_at'),false);
+  const updated=await f.service.savePreferences(f.person,{marketing_opt_in:true,onboarding_disabled:false,marketing_frequency:'fortnightly'},{source:'profile'});
+  assert.equal(updated.marketing_frequency,'fortnightly');
+  const stored=f.calls.filter(c=>c.path.startsWith('/rest/v1/email_preferences?')&&c.method==='POST').at(-1).input;
+  assert.equal(stored.marketing_consent_version,'2026-10-25-fortnightly-v1');assert.equal(stored.marketing_consent_source,'profile');assert.equal(stored.marketing_consented_at,'2026-10-25T15:00:00.000Z');
+});
+
+test('password recovery retains the protected allowance after ordinary daily sends stop', async () => {
+  const f=fixture({daily:89});
+  const ordinary=await f.enqueue('mensaje');assert.equal((await f.service.dispatch(ordinary.id)).reason,'non_urgent_daily_budget');
+  const recovery=await f.enqueue('reset');assert.equal((await f.service.dispatch(recovery.id)).status,'sent');assert.equal(f.budget.daily,90);
 });
 
 test('usage rejects changed plan limits and invalid reset timestamps', () => {

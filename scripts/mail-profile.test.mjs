@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { missingBasics, planEngagement, DEFAULT_ENGAGEMENT_ACTIVATION } from '../netlify/lib/mail-profile.mjs';
+import { missingBasics, planEngagement, DEFAULT_ENGAGEMENT_ACTIVATION, PROFILE_HELP_CONSENT_VERSION } from '../netlify/lib/mail-profile.mjs';
 
 const DAY = 86400000;
 const activated = Date.parse(DEFAULT_ENGAGEMENT_ACTIVATION);
@@ -114,10 +114,83 @@ test('historical profiles require explicit marketing consent and an age greater 
   }
   const [due] = planEngagement(user, {marketing_opt_in:true}, at(0));
   assert.deepEqual(due, { tipo:'perfil_incompleto', etapa:'reactivacion', eventKey:'perfil:42:reactivacion:v1', dueAtISO:at(0), expiresAtISO:at(90), priority:45 });
-  assert.deepEqual(planEngagement(user, {marketing_opt_in:true}, at(30)), [due]);
-  assert.deepEqual(planEngagement(user, {marketing_opt_in:true}, at(90)), []);
+  assert.deepEqual(planEngagement(user, {marketing_opt_in:true}, at(20.999)), [due]);
+  assert.equal(planEngagement(user, {marketing_opt_in:true}, at(30))[0].etapa, 'seguimiento');
+  assert.equal(planEngagement(user, {marketing_opt_in:true}, at(90))[0].etapa, 'seguimiento');
   assert.deepEqual(planEngagement(incomplete({created_at:at(-14)}), {marketing_opt_in:true}, at(0)), []);
   assert.equal(planEngagement(incomplete({created_at:at(-14)}), {marketing_opt_in:true}, at(0.01)).length, 1);
+});
+
+test('current accounts get one recurring fortnight from day twenty-one with no month or age cutoff', () => {
+  const user = incomplete();
+  assert.deepEqual(planEngagement(user, {}, at(20.999)), []);
+  const [first] = planEngagement(user, {}, at(21));
+  assert.deepEqual(first, { tipo:'perfil_incompleto', etapa:'seguimiento', eventKey:'perfil:42:seguimiento:0:v2', dueAtISO:at(21), expiresAtISO:at(49), priority:40 });
+  assert.deepEqual(planEngagement(user, {}, at(34.999)), [first]);
+  assert.deepEqual(planEngagement(user, {}, at(35)), [{ ...first, eventKey:'perfil:42:seguimiento:1:v2', dueAtISO:at(35), expiresAtISO:at(63) }]);
+  for (const day of [51, 100, 365, 1000]) {
+    const plans = planEngagement(user, {}, at(day));
+    assert.equal(plans.length, 1, day);
+    assert.equal(plans[0].etapa, 'seguimiento');
+    assert.equal(plans[0].eventKey, `perfil:42:seguimiento:${Math.floor((day - 21) / 14)}:v2`);
+    assert(Date.parse(plans[0].dueAtISO) <= Date.parse(at(day)));
+    assert(Date.parse(plans[0].expiresAtISO) > Date.parse(at(day)));
+  }
+});
+
+test('recurring planning catches up only the current cycle and keeps completion and opt-out stops', () => {
+  const user = incomplete({created_at:at(1)});
+  const plans = planEngagement(user, {marketing_opt_in:false}, at(300));
+  assert.equal(plans.length, 1);
+  assert.equal(plans[0].eventKey, 'perfil:42:seguimiento:19:v2');
+  assert.equal(plans[0].dueAtISO, at(288));
+  assert.equal(plans[0].expiresAtISO, at(316));
+  assert.deepEqual(planEngagement(user, {marketing_opt_in:true,onboarding_disabled:true}, at(300)), []);
+  assert.deepEqual(planEngagement(profile(), {marketing_opt_in:true}, at(300)), []);
+  assert.deepEqual(planEngagement(incomplete({tipo_cuenta:'visitante'}), {marketing_opt_in:true}, at(300)), []);
+});
+
+test('historical recurring follow-up keeps permission gate and never plans initial reactivation beside it', () => {
+  const historical = incomplete({created_at:at(-200)});
+  for (const prefs of [{}, {marketing_opt_in:false}, {marketing_opt_in:'true'}, {marketing_opt_in:1}]) {
+    assert.deepEqual(planEngagement(historical, prefs, at(21)), []);
+    assert.deepEqual(planEngagement(historical, prefs, at(400)), []);
+  }
+  assert.equal(planEngagement(historical, {marketing_opt_in:true}, at(20.99))[0].etapa, 'reactivacion');
+  const [first] = planEngagement(historical, {marketing_opt_in:true}, at(21));
+  assert.equal(first.etapa, 'seguimiento');
+  assert.equal(first.eventKey, 'perfil:42:seguimiento:0:v2');
+  assert.equal(first.dueAtISO, at(21));
+  assert.equal(planEngagement(historical, {marketing_opt_in:true}, at(400)).length, 1);
+  assert.deepEqual(planEngagement(historical, {marketing_opt_in:true,onboarding_disabled:true}, at(400)), []);
+});
+
+test('explicit historical profile help enables only the current ongoing cycle independently of marketing', () => {
+  const historical = incomplete({created_at:at(-200)});
+  const prefs = {marketing_opt_in:false,onboarding_disabled:false,onboarding_consent_version:PROFILE_HELP_CONSENT_VERSION,onboarding_consented_at:at(10)};
+  const [followup] = planEngagement(historical, prefs, at(10));
+  assert.deepEqual(followup, {tipo:'perfil_incompleto',etapa:'seguimiento',eventKey:'perfil:42:seguimiento:13:v2',dueAtISO:at(3),expiresAtISO:at(31),priority:40});
+  assert.equal(planEngagement(historical, {...prefs,onboarding_consented_at:at(12)}, at(12))[0].eventKey, followup.eventKey);
+  assert.equal(planEngagement(historical, {...prefs,onboarding_consented_at:at(13)}, at(13))[0].eventKey, followup.eventKey);
+  assert.equal(planEngagement(historical, prefs, at(400)).length, 1);
+  assert.deepEqual(planEngagement(historical, {...prefs,onboarding_disabled:true}, at(400)), []);
+});
+
+test('historical profile-help evidence must be valid and cannot replay the initial onboarding stages', () => {
+  const historical = incomplete({created_at:at(-1)});
+  const base = {marketing_opt_in:false,onboarding_consent_version:PROFILE_HELP_CONSENT_VERSION,onboarding_consented_at:at(1)};
+  assert.deepEqual(planEngagement(historical, base, at(2)), []);
+  assert.deepEqual(planEngagement(historical, base, at(7)), []);
+  assert.deepEqual(planEngagement(historical, base, at(19.999)), []);
+  assert.equal(planEngagement(historical, base, at(20))[0].etapa, 'seguimiento');
+  for (const prefs of [
+    {...base,onboarding_consent_version:'unknown'},
+    {...base,onboarding_consent_version:undefined},
+    {...base,onboarding_consented_at:undefined},
+    {...base,onboarding_consented_at:null},
+    {...base,onboarding_consented_at:'invalid'},
+    {...base,onboarding_consented_at:at(100)}
+  ]) assert.deepEqual(planEngagement(historical, prefs, at(30)), []);
 });
 
 test('activation boundary and caller-provided activation avoid replaying historical onboarding', () => {

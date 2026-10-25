@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { planMonthlySummary, planProfileReminders } from '../netlify/lib/mail-planner.mjs';
+import { planMonthlySummary, planProfileReminders, planFortnightlySummary } from '../netlify/lib/mail-planner.mjs';
 import { emailHash } from '../netlify/lib/mail-runtime.mjs';
 
 const person = (id, changes = {}) => ({id,email:`artist-${id}@example.com`,nombre:`Artista ${id}`,tipo_cuenta:'artista',rubro:'musica',instrumento:'Guitarra',foto_url:'https://example.com/photo.jpg',bio:'Una presentación',provincia:'Buenos Aires',ciudad:'La Plata',baneado:false,created_at:'2026-01-01T00:00:00.000Z',...changes});
@@ -159,5 +159,145 @@ test('an invalid backend count aborts instead of enqueueing a misleading monthly
     await assert.rejects(planMonthlySummary(new Date('2026-11-01T13:00:00Z')));
     assert.equal(f.batches.length,0);
     assert.equal(f.queued.size,0);
+  });
+});
+
+const fortnightPreference=(profile,changes={})=>preference(profile,{
+  marketing_frequency:'fortnightly',
+  marketing_consent_version:'2026-10-25-fortnightly-v1',
+  marketing_consented_at:'2026-10-25T12:00:00.000Z',
+  ...changes
+});
+
+test('legacy monthly subscribers keep their audience while the new fortnightly choice is separate',async()=>{
+  const profiles=[person(1),person(2),person(3),person(4),person(5)];
+  const preferences=[preference(profiles[0]),preference(profiles[1],{marketing_frequency:'monthly'}),fortnightPreference(profiles[2]),preference(profiles[3],{marketing_frequency:'unexpected'}),preference(profiles[4],{marketing_frequency:'fortnightly'})];
+  await withBackend({profiles,preferences},async f=>{
+    assert.equal(await planMonthlySummary(new Date('2026-11-01T13:00:00Z')),2);
+    assert.deepEqual([...f.queued.values()].map(job=>job.perfil_id),[1,2]);
+    assert.equal(await planFortnightlySummary(new Date('2026-11-01T13:00:00Z')),1);
+    assert.deepEqual([...f.queued.values()].filter(job=>job.tipo==='novedades').map(job=>job.perfil_id),[3]);
+    const prefRequest=f.calls.find(call=>call.url.pathname==='/rest/v1/email_preferences');
+    for(const field of ['marketing_frequency','marketing_consent_version','marketing_consented_at'])assert(prefRequest.url.searchParams.get('select').split(',').includes(field));
+  });
+});
+
+test('fortnightly campaigns require explicit, current, correctly versioned consent without overriding opt-outs',async()=>{
+  const profiles=Array.from({length:10},(_,index)=>person(index+1));
+  const preferences=[
+    fortnightPreference(profiles[1],{marketing_opt_in:false}),
+    fortnightPreference(profiles[2],{marketing_frequency:'monthly'}),
+    fortnightPreference(profiles[3],{marketing_consent_version:null}),
+    fortnightPreference(profiles[4],{marketing_consent_version:'old-version'}),
+    fortnightPreference(profiles[5],{marketing_consented_at:null}),
+    fortnightPreference(profiles[6],{marketing_consented_at:'invalid'}),
+    fortnightPreference(profiles[7],{marketing_consented_at:'2026-10-26T13:00:00Z'}),
+    fortnightPreference(profiles[8],{onboarding_disabled:true}),
+    fortnightPreference(profiles[9],{email:'different@example.com'})
+  ];
+  await withBackend({profiles,preferences},async f=>{
+    assert.equal(await planFortnightlySummary(new Date('2026-10-25T13:00:00Z')),1);
+    assert.deepEqual([...f.queued.values()].map(job=>job.perfil_id),[9]);
+    const job=[...f.queued.values()][0];
+    assert.equal(job.data.cadencia,'15d');
+    assert.equal(job.tipo,'novedades');
+    assert.equal(job.category,'engagement');
+  });
+});
+
+test('fortnightly planning does not start before the fixed activation instant or accept invalid clocks',async()=>{
+  const profile=person(1);
+  await withBackend({profiles:[profile],preferences:[fortnightPreference(profile)]},async f=>{
+    assert.equal(await planFortnightlySummary(new Date('2026-10-25T12:59:59.999Z')),0);
+    assert.equal(f.calls.length,0);
+    for(const stamp of [new Date('invalid'),'2026-10-25T13:00:00Z',null])await assert.rejects(planFortnightlySummary(stamp),/invalid_date/);
+    assert.equal(f.calls.length,0);
+  });
+});
+
+test('exact fifteen-day cycles use one current key and never replay missed history',async()=>{
+  const profile=person(1);
+  await withBackend({profiles:[profile],preferences:[fortnightPreference(profile)]},async f=>{
+    const anchor=new Date('2026-10-25T13:00:00Z');
+    assert.equal(await planFortnightlySummary(anchor),1);
+    assert.equal(await planFortnightlySummary(new Date('2026-11-09T12:59:59.999Z')),1);
+    assert.equal(f.queued.size,1);
+    const first=[...f.queued.values()][0];
+    assert.equal(first.event_key,`fortnightly:1:0:v1:${emailHash(profile.email)}`);
+    assert.equal(first.due_at,anchor.toISOString());
+    assert.equal(first.expires_at,'2026-11-09T13:00:00.000Z');
+    assert.equal(first.data.desdeISO,'2026-10-10T13:00:00.000Z');
+    assert.equal(first.data.hastaISO,anchor.toISOString());
+    assert.match(first.data.periodo,/10.*octubre.*25.*octubre/);
+    assert.equal(await planFortnightlySummary(new Date('2026-11-09T13:00:00Z')),1);
+    assert.equal(f.queued.size,2);
+    const second=[...f.queued.values()][1];
+    assert.equal(second.event_key,`fortnightly:1:1:v1:${emailHash(profile.email)}`);
+    assert.equal(Date.parse(second.data.hastaISO)-Date.parse(first.data.hastaISO),15*86400000);
+    assert.equal(second.data.desdeISO,first.data.hastaISO);
+    assert.equal(await planFortnightlySummary(new Date('2027-02-07T13:00:00Z')),1);
+    assert.equal(f.queued.size,3,'a long outage adds one current cycle, not every missing cycle');
+    assert.equal(f.batches.at(-1).length,1);
+    for(const call of f.calls.filter(call=>call.headers.Prefer==='count=exact')){
+      const [from,until]=call.url.searchParams.getAll('created_at');
+      assert.equal(Date.parse(until.slice(3))-Date.parse(from.slice(4)),15*86400000);
+    }
+  });
+});
+
+test('consent changes within a cycle cannot duplicate mail and an email change does not inherit old consent',async()=>{
+  const profile=person(1),prefs=fortnightPreference(profile);
+  await withBackend({profiles:[profile],preferences:[prefs]},async f=>{
+    const stamp=new Date('2026-10-26T13:00:00Z');
+    assert.equal(await planFortnightlySummary(stamp),1);
+    const first=[...f.queued.values()][0];
+    prefs.marketing_opt_in=false;
+    assert.equal(await planFortnightlySummary(stamp),0);
+    prefs.marketing_opt_in=true;
+    prefs.marketing_consented_at=stamp.toISOString();
+    assert.equal(await planFortnightlySummary(stamp),1);
+    assert.equal(f.queued.size,1);
+    assert.equal([...f.queued.values()][0].id,first.id);
+    profile.email='new-address@example.com';
+    assert.equal(await planFortnightlySummary(stamp),0);
+    assert.equal(f.queued.size,1);
+  });
+});
+
+test('empty fortnightly snapshots enqueue nothing while real future events retain only canonical fields',async()=>{
+  const profile=person(1),preferences=[fortnightPreference(profile)];
+  const stamp=new Date('2026-10-25T13:00:00Z');
+  await withBackend({profiles:[profile],preferences,artistCount:0,adCount:0},async f=>{
+    assert.equal(await planFortnightlySummary(stamp),0);
+    assert.equal(f.batches.length,0);
+  });
+  const events=[
+    {id:18,titulo:'Past',fecha_evento:'2026-10-24T13:00:00Z'},
+    {id:19,titulo:'Encuentro',lugar:'La Plata',fecha_evento:'2026-10-26T21:00:00Z',url:'https://untrusted.example',private_note:'excluded'},
+    {id:20,titulo:'After cycle',fecha_evento:'2026-11-09T13:00:00Z'},
+    {id:21,titulo:'Bad date',fecha_evento:'invalid'}
+  ];
+  await withBackend({profiles:[profile],preferences,artistCount:0,adCount:0,events},async f=>{
+    assert.equal(await planFortnightlySummary(stamp),1);
+    const [job]=[...f.queued.values()];
+    assert.equal(job.data.proximosEventos.length,1);
+    assert.deepEqual(Object.keys(job.data.proximosEventos[0]).sort(),['fecha','fechaISO','id','lugar','titulo']);
+    assert.equal(job.data.proximosEventos[0].id,19);
+    const eventRequest=f.calls.find(call=>call.url.pathname==='/rest/v1/anuncios'&&call.headers.Prefer!=='count=exact');
+    assert.deepEqual(eventRequest.url.searchParams.getAll('fecha_evento'),['gte.2026-10-25T13:00:00.000Z','lt.2026-11-09T13:00:00.000Z']);
+  });
+});
+
+test('fortnightly counts must be known and eligible audiences are queued in bounded batches',async()=>{
+  const profile=person(1),stamp=new Date('2026-10-25T13:00:00Z');
+  await withBackend({profiles:[profile],preferences:[fortnightPreference(profile)],invalidCount:true},async f=>{
+    await assert.rejects(planFortnightlySummary(stamp));
+    assert.equal(f.batches.length,0);
+  });
+  const profiles=Array.from({length:127},(_,index)=>person(index+1));
+  await withBackend({profiles,preferences:profiles.map(profile=>fortnightPreference(profile))},async f=>{
+    assert.equal(await planFortnightlySummary(stamp),127);
+    assert.equal(f.queued.size,127);
+    assert.deepEqual(f.batches.map(batch=>batch.length),[50,50,27]);
   });
 });
