@@ -3,6 +3,7 @@
 <html lang="es" data-ba-design="a2">
 <head>
 <script src="/assets/js/sesion-segura.js"></script>
+<script src="/assets/js/mensajes-lectura.js" defer></script>
 <script src="/assets/js/disciplinas.js"></script>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -3338,17 +3339,7 @@
   }
 
   async function cargarBadgeMensajes(uid) {
-    const badge = document.getElementById('nav-msg-badge')
-    if (!badge || !uid) return
-    try {
-      const lastSeen = localStorage.getItem('ba_msg_last_seen') || new Date().toISOString()
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/mensajes?para_user_id=eq.${qs(uid)}&created_at=gt.${qs(lastSeen)}&select=id&limit=99`, { headers: SB_HEADERS })
-      if (!res.ok) throw new Error('badge')
-      const msgs = await res.json()
-      const count = Array.isArray(msgs) ? msgs.length : 0
-      badge.textContent = count > 99 ? '99+' : count
-      badge.style.display = count > 0 ? 'inline' : 'none'
-    } catch(e) { badge.style.display = 'none' }
+    return window.BuscARTELectura?.refreshBadge();
   }
 
   ;(function initNav(){

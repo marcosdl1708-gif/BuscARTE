@@ -2,6 +2,7 @@
 <html lang="es" data-ba-design="a2">
 <head>
 <script src="/assets/js/sesion-segura.js"></script>
+<script src="/assets/js/mensajes-lectura.js" defer></script>
   <script src="/assets/js/disciplinas.js"></script>
 <script src="/assets/js/perfil-presentacion.js" defer></script>
 <meta charset="UTF-8">
@@ -751,22 +752,7 @@ footer { border-top:1px solid #1c1c1c;padding:2.5rem 3rem;display:flex;justify-c
   // BADGE MENSAJES
   let badgeRequest = 0;
   async function cargarBadgeMensajes(uid) {
-    const request = ++badgeRequest;
-    const badge = document.getElementById('nav-msg-badge');
-    if (badge) { badge.textContent = ''; badge.style.display = 'none'; }
-    if (!badge || !uid) return;
-    try {
-      const lastSeen = localStorage.getItem('ba_msg_last_seen') || new Date().toISOString();
-      const res = await fetch(
-        `https://xiaanchoanxmampegoay.supabase.co/rest/v1/mensajes?para_user_id=eq.${encodeURIComponent(uid)}&created_at=gt.${encodeURIComponent(lastSeen)}&select=id&limit=99`,
-        { headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68', 'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYWFuY2hvYW54bWFtcGVnb2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTAyMjUsImV4cCI6MjA5NDI2NjIyNX0.teLv3hRbkqZcKq3sLWKIz5yplDAJscxv-DYD1-U9u68` } }
-      );
-      const msgs = await res.json();
-      if (request !== badgeRequest) return;
-      const count = Array.isArray(msgs) ? msgs.length : 0;
-      if (count > 0) { badge.textContent = count > 99 ? '99+' : count; badge.style.display = 'inline'; }
-      else badge.style.display = 'none';
-    } catch(e) { if (badge && request === badgeRequest) badge.style.display = 'none'; }
+    return window.BuscARTELectura?.refreshBadge();
   }
 
   // NAV SESSION: sólo presentación; conserva el gate de la migración local.

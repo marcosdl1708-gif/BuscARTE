@@ -2,6 +2,7 @@
 <html lang="es" data-ba-design="a2">
 <head>
 <script src="/assets/js/sesion-segura.js"></script>
+<script src="/assets/js/mensajes-lectura.js" defer></script>
   <script src="/assets/js/disciplinas.js"></script>
 <script src="/assets/js/moderacion.js"></script>
 <link rel="stylesheet" href="/assets/css/moderacion.css">
@@ -378,11 +379,12 @@
   let pollingInterval = null;
   let convFilter = 'todas';
   let unreadByUserId = {};
-  let lastSeenInicial = localStorage.getItem('ba_msg_last_seen') || '1970-01-01T00:00:00.000Z';
-  // Estado de lectura POR usuario: una conversación queda "no leída" solo si llegó un
-  // mensaje después de la última vez que la abriste. Persiste en localStorage.
-  let readByUser = {};
-  try { readByUser = JSON.parse(localStorage.getItem('ba_msg_read_by_user') || '{}') || {}; } catch(_) { readByUser = {}; }
+  let unreadMessages = [];
+  let unreadRequest = 0;
+  let mensajesParaLectura = new Map();
+  const lecturasConfirmadas = new Set();
+  let lecturaTimer = null;
+  let lecturaEnCurso = false;
   // Firma del último render de mensajes — evita re-renderizar (y romper el scroll) en el polling.
   let ultimaFirmaMsgs = '';
   const borradoresChat = new Map();
@@ -479,6 +481,7 @@
     initMobilePanelLinks();
     updateComposerState();
     document.getElementById('composer-note')?.classList.add('visible');
+    document.getElementById('chat-messages').addEventListener('scroll', programarLectura, {passive:true});
     if (PREVIEW_MODE) cargarDemo(); else cargarConversaciones();
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
   });
@@ -509,11 +512,6 @@
       renderConversaciones();
       abrirDesdeURLSiHaceFalta();
 
-      setTimeout(() => {
-        localStorage.setItem('ba_msg_last_seen', new Date().toISOString());
-        const badge = document.getElementById('nav-msg-badge');
-        if (badge) badge.style.display = 'none';
-      }, 1200);
     } catch(e) {
       console.error('Error cargando conversaciones:', e);
       document.getElementById('conv-list-container').innerHTML = `<div class="conv-empty">No se pudieron cargar tus mensajes.<br><button class="chat-action-btn" style="margin-top:1rem" onclick="cargarConversaciones()">Reintentar</button></div>`;
@@ -522,33 +520,83 @@
   }
 
   async function calcularNuevos() {
-    unreadByUserId = {};
+    if (PREVIEW_MODE || !lecturaIdentidadVigente()) return;
+    const request = ++unreadRequest;
     try {
-      // Traemos los mensajes recibidos (recientes) y contamos como "no leído" solo los que
-      // llegaron DESPUÉS de la última vez que abrimos la conversación de ese usuario.
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/mensajes?para_user_id=eq.${filterValue(miUserId)}&select=id,de_user_id,created_at&order=created_at.desc&limit=999`, { headers });
-      if (!res.ok) return;
-      const recibidos = await res.json();
-      let total = 0;
-      recibidos.forEach(m => {
-        const leidoHasta = readByUser[String(m.de_user_id)];
-        if (!leidoHasta || new Date(m.created_at) > new Date(leidoHasta)) {
-          unreadByUserId[String(m.de_user_id)] = (unreadByUserId[String(m.de_user_id)] || 0) + 1;
-          total++;
-        }
-      });
-      const el = document.getElementById('conv-count');
-      const badge = document.getElementById('nav-msg-badge');
-      if (total > 0) {
-        el.textContent = total > 99 ? '99+ nuevos' : `${total} nuevo${total === 1 ? '' : 's'}`;
-        el.style.display = 'inline-block';
-        if (badge) { badge.textContent = total > 99 ? '99+' : total; badge.style.display = 'inline-block'; }
-      } else {
-        el.style.display = 'none';
-        if (badge) badge.style.display = 'none';
-      }
+      const recibidos = await window.BuscARTELectura.unread();
+      if (request !== unreadRequest || !lecturaIdentidadVigente() || !Array.isArray(recibidos)) return;
+      unreadMessages = recibidos.filter(m => m.leido !== true && String(m.para_user_id) === String(miUserId) && !lecturasConfirmadas.has(String(m.id)));
+      pintarNuevos();
+      renderConversaciones();
     } catch(e) {}
   }
+
+  function pintarNuevos() {
+    unreadByUserId = {};
+    for (const m of unreadMessages) unreadByUserId[String(m.de_user_id)] = (unreadByUserId[String(m.de_user_id)] || 0) + 1;
+    const total = unreadMessages.length, el = document.getElementById('conv-count');
+    el.textContent = total > 99 ? '99+ nuevos' : `${total} nuevo${total === 1 ? '' : 's'}`;
+    el.style.display = total ? 'inline-block' : 'none';
+  }
+
+  function lecturaIdentidadVigente() {
+    const session = window.BuscARTESesion;
+    return !PREVIEW_MODE && session?.status === 'verified' && String(session.user?.id) === String(miUserId);
+  }
+
+  function lecturaVisible() {
+    return lecturaIdentidadVigente() && convActiva && document.visibilityState === 'visible' && document.hasFocus() && !document.querySelector('dialog[open]') &&
+      (window.innerWidth > 900 || document.getElementById('chat-panel').classList.contains('mobile-visible'));
+  }
+
+  function programarLectura() {
+    clearTimeout(lecturaTimer);
+    if (lecturaVisible()) lecturaTimer = setTimeout(confirmarLecturaVisible, 120);
+  }
+
+  async function confirmarLecturaVisible() {
+    if (lecturaEnCurso || !lecturaVisible()) return;
+    const conv = convActiva, uid = String(miUserId), container = document.getElementById('chat-messages');
+    const area = container.getBoundingClientRect();
+    const top = Math.max(0,area.top), bottom = Math.min(window.innerHeight,area.bottom);
+    const left = Math.max(0,area.left), right = Math.min(window.innerWidth,area.right);
+    if (bottom <= top || right <= left) return;
+    const ids = [];
+    for (const element of container.querySelectorAll('.msg.received[data-message-id]')) {
+      const id = element.dataset.messageId, message = mensajesParaLectura.get(id);
+      if (!message || message.leido === true || lecturasConfirmadas.has(id) ||
+          String(message.para_user_id) !== uid || String(message.de_user_id) !== String(conv.otroId)) continue;
+      const bubble = element.querySelector('.msg-bubble'), box = bubble?.getBoundingClientRect();
+      if (!box || !bubble.getClientRects().length || getComputedStyle(bubble).visibility !== 'visible') continue;
+      if (box.width > 0 && box.height > 0 && box.bottom > top && box.top < bottom && box.right > left && box.left < right) ids.push(id);
+      if (ids.length === 100) break;
+    }
+    if (!ids.length) return;
+    lecturaEnCurso = true;
+    try {
+      const confirmed = await window.BuscARTELectura.mark(ids);
+      if (!lecturaIdentidadVigente() || String(miUserId) !== uid || !Array.isArray(confirmed)) return;
+      const accepted = new Set(confirmed.map(String).filter(id => ids.includes(id)));
+      if (!accepted.size) return;
+      accepted.forEach(id => lecturasConfirmadas.add(id));
+      unreadMessages = unreadMessages.filter(m => !accepted.has(String(m.id)));
+      pintarNuevos();
+      renderConversaciones();
+      window.BuscARTELectura.changed();
+    } catch (_) { /* Keep unread until the server confirms; retry on the next user/poll event. */ }
+    finally { lecturaEnCurso = false; }
+  }
+
+  window.addEventListener('buscarte:lecturachange', () => { calcularNuevos(); });
+  window.addEventListener('focus', () => { calcularNuevos(); programarLectura(); });
+  window.addEventListener('resize', programarLectura);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { calcularNuevos(); programarLectura(); } else clearTimeout(lecturaTimer); });
+  window.addEventListener('buscarte:sessionchange', () => {
+    if (!lecturaIdentidadVigente()) {
+      ++unreadRequest; clearTimeout(lecturaTimer); mensajesParaLectura.clear(); lecturasConfirmadas.clear();
+      unreadMessages = []; pintarNuevos(); renderConversaciones();
+    }
+  });
 
   async function cargarPerfiles(ids) {
     perfilesPorId = {};
@@ -691,12 +739,8 @@
       ctxLink.style.display = 'none';
     }
 
-    unreadByUserId[String(conv.otroId)] = 0;
-    // Marcar esta conversación como leída (persistente) — evita que reaparezca como "nuevo"
-    if (conv.otroId != null) {
-      readByUser[String(conv.otroId)] = new Date().toISOString();
-      try { localStorage.setItem('ba_msg_read_by_user', JSON.stringify(readByUser)); } catch(_) {}
-    }
+    clearTimeout(lecturaTimer);
+    mensajesParaLectura.clear();
     ultimaFirmaMsgs = '';  // forzar render al cambiar de conversación
     document.getElementById('chat-messages').innerHTML = '<div class="chat-empty"><p class="chat-empty-sub">Cargando mensajes...</p></div>';
     renderConversaciones();
@@ -713,6 +757,7 @@
   async function cargarMensajes(forceScroll) {
     if (!convActiva) return;
     const conversacionConsultada = convActiva;
+    const usuarioConsultado = String(miUserId);
     const container = document.getElementById('chat-messages');
     if (PREVIEW_MODE && window.demoMensajes) {
       const msgs = window.demoMensajes[String(convActiva.id)] || [];
@@ -720,6 +765,7 @@
       container.scrollTop = container.scrollHeight;
       return;
     }
+    if (!lecturaIdentidadVigente()) return;
     const wasAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 80;
     const prevScrollHeight = container.scrollHeight;
     const prevScrollTop = container.scrollTop;
@@ -727,12 +773,19 @@
       const res = await fetch(`${SUPABASE_URL}/rest/v1/mensajes?or=(and(de_user_id.eq.${filterValue(miUserId)},para_user_id.eq.${filterValue(conversacionConsultada.otroId)}),and(de_user_id.eq.${filterValue(conversacionConsultada.otroId)},para_user_id.eq.${filterValue(miUserId)}))&order=created_at.asc`, { headers });
       if (!res.ok) throw new Error('mensajes ' + res.status + ': ' + await res.text());
       const msgs = await res.json();
-      if (convActiva !== conversacionConsultada) return;
+      if (convActiva !== conversacionConsultada || !lecturaIdentidadVigente() || String(miUserId) !== usuarioConsultado) return;
+      mensajesParaLectura = new Map(msgs.filter(m => /^[1-9]\d*$/.test(String(m.id || '')) &&
+        String(m.para_user_id) === usuarioConsultado && String(m.de_user_id) === String(conversacionConsultada.otroId))
+        .map(m => [String(m.id),m]));
+      if (document.visibilityState === 'visible') {
+        calcularNuevos();
+        window.BuscARTELectura.refreshBadge();
+      }
       // Si nada cambió (polling), no re-renderizamos: así no se rompe tu posición de scroll.
       const ultimo = msgs.length ? msgs[msgs.length - 1] : null;
       const firma = msgs.length + '|' + (ultimo ? (ultimo.id + '|' + ultimo.created_at) : '');
       if (!forceScroll && firma === ultimaFirmaMsgs) {
-        localStorage.setItem('ba_msg_last_seen', new Date().toISOString());
+        programarLectura();
         return;
       }
       ultimaFirmaMsgs = firma;
@@ -743,14 +796,10 @@
         // Estás leyendo mensajes viejos: mantenemos la posición (no rebotar al fondo).
         container.scrollTop = container.scrollHeight - (prevScrollHeight - prevScrollTop);
       }
-      localStorage.setItem('ba_msg_last_seen', new Date().toISOString());
-      // Marcar leído (persistente) los mensajes de esta conversación
-      if (convActiva && convActiva.otroId != null) {
-        readByUser[String(convActiva.otroId)] = new Date().toISOString();
-        try { localStorage.setItem('ba_msg_read_by_user', JSON.stringify(readByUser)); } catch(_) {}
-      }
+      programarLectura();
     } catch(e) {
-      if (convActiva !== conversacionConsultada) return;
+      if (convActiva !== conversacionConsultada || !lecturaIdentidadVigente() || String(miUserId) !== usuarioConsultado) return;
+      mensajesParaLectura.clear();
       console.error('Error cargando mensajes:', e);
       container.innerHTML = `<div class="chat-empty"><span class="chat-empty-icon">⚠️</span><div class="chat-empty-title">No se pudieron cargar los mensajes</div><p class="chat-empty-sub">Revisá tu conexión e intentá de nuevo.</p></div>`;
     }
@@ -775,7 +824,7 @@
       const text = formatChatMessage(m.contenido);
       html += sent
         ? `<div class="msg sent"><div class="msg-wrap"><div class="msg-bubble">${text}</div><div class="msg-time">${escapeHTML(time)}</div></div></div>`
-        : `<div class="msg received">${avatarHTML(convActiva.perfil, 'msg-avatar')}<div class="msg-wrap"><div class="msg-bubble">${text}</div><div class="msg-time">${escapeHTML(time)}</div></div></div>`;
+        : `<div class="msg received"${/^[1-9]\d*$/.test(String(m.id || '')) ? ` data-message-id="${escapeHTML(m.id)}"` : ''}>${avatarHTML(convActiva.perfil, 'msg-avatar')}<div class="msg-wrap"><div class="msg-bubble">${text}</div><div class="msg-time">${escapeHTML(time)}</div></div></div>`;
     });
     container.innerHTML = html;
   }

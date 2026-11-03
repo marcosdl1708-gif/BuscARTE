@@ -40,6 +40,7 @@
   "assets/js/buscarte-config.js",
   "assets/js/inicio-sesion.js",
   "assets/js/menu-cuenta.js",
+  "assets/js/mensajes-lectura.js",
   "assets/js/sesion-segura.js",
   "assets/js/disciplinas.js",
   "assets/js/email-preferencias.js",

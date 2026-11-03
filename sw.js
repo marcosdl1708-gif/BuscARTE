@@ -1,6 +1,6 @@
 // ⚠️ IMPORTANTE: subí este número en CADA deploy (v3 → v4 → v5...).
 // Si no lo cambiás, el navegador puede seguir sirviendo los archivos viejos cacheados.
-const CACHE_VERSION = 'buscarte-v34-2026-10-25-emails-recurrentes';
+const CACHE_VERSION = 'buscarte-v35-2026-11-03-mensajes-lectura';
 const OFFLINE_URL = '/index.html';
 
 const SHELL = [

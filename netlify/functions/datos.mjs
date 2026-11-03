@@ -185,9 +185,26 @@ async function storage(request, route, user) {
 }
 async function write(table, route, request, user, context) {
   const uid=id(user.id), payload=request.method==='DELETE'?null:await readJson(request);
-  const params=query(route.search,table,table==='reacciones'?['user_id']:[]);
   // Writes never accept nested representation/privilege fields from the client.
   if(table==='perfiles')return fail(403);
+  if(table==='mensajes' && request.method==='PATCH') {
+    // Reading existing received messages is not publishing content. Accept only
+    // an explicit bounded set of IDs, and derive its recipient from the cookie.
+    const source=route.searchParams;
+    if(!only(payload,['leido']) || payload.leido!==true || [...source.keys()].length!==2 ||
+        source.get('select')!=='id,leido' || !source.has('id'))return fail(400);
+    const match=source.get('id').match(/^in\.\(([^)]+)\)$/);
+    const ids=match ? match[1].split(',') : [];
+    if(!ids.length || ids.length>100 || ids.some(value=>!id(value)) || new Set(ids).size!==ids.length)return fail(400);
+    const reading=new URLSearchParams({id:'in.('+ids.join(',')+')',para_user_id:'eq.'+uid,select:'id,leido'});
+    const result=await backend('/rest/v1/mensajes?'+reading,{method:'PATCH',headers:{Prefer:'return=representation'},body:'{"leido":true}'});
+    if(!result.ok)return fail(502);
+    const rows=await result.json();
+    if(!Array.isArray(rows) || rows.length>ids.length || rows.some(row=>!object(row) || !ids.includes(id(row.id)) || row.leido!==true) ||
+        new Set(rows.map(row=>id(row.id))).size!==rows.length)return fail(502);
+    return json(200,rows.map(row=>({id:row.id,leido:true})));
+  }
+  const params=query(route.search,table,table==='reacciones'?['user_id']:[]);
   if(request.method!=='DELETE' && (['conversaciones','mensajes','anuncios','reacciones'].includes(table) || (table==='artistas_sugeridos' && request.method==='POST')))await assertTermsAccepted(uid);
   if(table==='artistas_sugeridos') {
     // Suggestions are not a privilege-bearing field; a verified user may add a

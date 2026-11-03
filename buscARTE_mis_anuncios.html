@@ -2,6 +2,7 @@
 <html lang="es" data-ba-design="a2">
 <head>
 <script src="/assets/js/sesion-segura.js"></script>
+<script src="/assets/js/mensajes-lectura.js" defer></script>
   <script src="/assets/js/disciplinas.js"></script>
 <script src="/assets/js/perfil-presentacion.js" defer></script>
 <meta charset="UTF-8">
@@ -880,24 +881,7 @@
   document.addEventListener('keydown', e => { if(e.key === 'Escape') closeDeleteModal(); });
 
   async function cargarBadgeMensajes(uid) {
-    const badge = document.getElementById('nav-msg-badge');
-    if (!badge || !uid) return;
-    try {
-      const lastSeen = localStorage.getItem('ba_msg_last_seen') || new Date().toISOString();
-      const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/mensajes?para_user_id=eq.${enc(uid)}&created_at=gt.${enc(lastSeen)}&select=id&limit=99`,
-        { headers: hdrs }
-      );
-      if (!res.ok) throw new Error('badge');
-      const msgs = await res.json();
-      const count = Array.isArray(msgs) ? msgs.length : 0;
-      if (count > 0) {
-        badge.textContent = count > 99 ? '99+' : count;
-        badge.style.display = 'inline';
-      } else {
-        badge.style.display = 'none';
-      }
-    } catch(e) { if(badge) badge.style.display = 'none'; }
+    return window.BuscARTELectura?.refreshBadge();
   }
 
   // NAV SESSION
