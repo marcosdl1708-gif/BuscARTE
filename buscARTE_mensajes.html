@@ -561,30 +561,45 @@
     const top = Math.max(0,area.top), bottom = Math.min(window.innerHeight,area.bottom);
     const left = Math.max(0,area.left), right = Math.min(window.innerWidth,area.right);
     if (bottom <= top || right <= left) return;
-    const ids = [];
-    for (const element of container.querySelectorAll('.msg.received[data-message-id]')) {
-      const id = element.dataset.messageId, message = mensajesParaLectura.get(id);
-      if (!message || message.leido === true || lecturasConfirmadas.has(id) ||
-          String(message.para_user_id) !== uid || String(message.de_user_id) !== String(conv.otroId)) continue;
+    const elements = [...container.querySelectorAll('.msg[data-message-id]')];
+    let readThrough = -1;
+    for (let index = 0; index < elements.length; index++) {
+      const element = elements[index];
+      if (!mensajesParaLectura.has(element.dataset.messageId)) continue;
       const bubble = element.querySelector('.msg-bubble'), box = bubble?.getBoundingClientRect();
       if (!box || !bubble.getClientRects().length || getComputedStyle(bubble).visibility !== 'visible') continue;
-      if (box.width > 0 && box.height > 0 && box.bottom > top && box.top < bottom && box.right > left && box.left < right) ids.push(id);
-      if (ids.length === 100) break;
+      if (box.width > 0 && box.height > 0 && box.bottom > top && box.top < bottom && box.right > left && box.left < right) readThrough = index;
     }
+    // Reading reaches the last visible message, sent OR received. An older
+    // received message above a visible outgoing reply must not stay "new".
+    // Capture explicit loaded IDs now; later arrivals are never swept in.
+    const ids = [...new Set(elements.slice(0,readThrough + 1).map(element => element.dataset.messageId))].filter(id => {
+      const message = mensajesParaLectura.get(id);
+      return message && message.leido !== true && !lecturasConfirmadas.has(id) &&
+        String(message.para_user_id) === uid && String(message.de_user_id) === String(conv.otroId);
+    });
     if (!ids.length) return;
     lecturaEnCurso = true;
+    let changed = false;
     try {
-      const confirmed = await window.BuscARTELectura.mark(ids);
-      if (!lecturaIdentidadVigente() || String(miUserId) !== uid || !Array.isArray(confirmed)) return;
-      const accepted = new Set(confirmed.map(String).filter(id => ids.includes(id)));
-      if (!accepted.size) return;
-      accepted.forEach(id => lecturasConfirmadas.add(id));
-      unreadMessages = unreadMessages.filter(m => !accepted.has(String(m.id)));
-      pintarNuevos();
-      renderConversaciones();
-      window.BuscARTELectura.changed();
+      for (let offset = 0; offset < ids.length; offset += 100) {
+        if (!lecturaVisible() || convActiva !== conv || String(miUserId) !== uid) break;
+        const batch = ids.slice(offset,offset + 100);
+        const confirmed = await window.BuscARTELectura.mark(batch);
+        if (!lecturaIdentidadVigente() || String(miUserId) !== uid || !Array.isArray(confirmed)) return;
+        const accepted = new Set(confirmed.map(String).filter(id => batch.includes(id)));
+        accepted.forEach(id => lecturasConfirmadas.add(id));
+        if (accepted.size) {
+          unreadMessages = unreadMessages.filter(m => !accepted.has(String(m.id)));
+          pintarNuevos(); renderConversaciones(); changed = true;
+        }
+        if (accepted.size !== batch.length) break;
+      }
     } catch (_) { /* Keep unread until the server confirms; retry on the next user/poll event. */ }
-    finally { lecturaEnCurso = false; }
+    finally {
+      lecturaEnCurso = false;
+      if (changed && lecturaIdentidadVigente() && String(miUserId) === uid) window.BuscARTELectura.changed();
+    }
   }
 
   window.addEventListener('buscarte:lecturachange', () => { calcularNuevos(); });
@@ -775,7 +790,8 @@
       const msgs = await res.json();
       if (convActiva !== conversacionConsultada || !lecturaIdentidadVigente() || String(miUserId) !== usuarioConsultado) return;
       mensajesParaLectura = new Map(msgs.filter(m => /^[1-9]\d*$/.test(String(m.id || '')) &&
-        String(m.para_user_id) === usuarioConsultado && String(m.de_user_id) === String(conversacionConsultada.otroId))
+        ((String(m.para_user_id) === usuarioConsultado && String(m.de_user_id) === String(conversacionConsultada.otroId)) ||
+         (String(m.de_user_id) === usuarioConsultado && String(m.para_user_id) === String(conversacionConsultada.otroId))))
         .map(m => [String(m.id),m]));
       if (document.visibilityState === 'visible') {
         calcularNuevos();
@@ -822,9 +838,10 @@
       const sent = String(m.de_user_id) === String(miUserId);
       const time = new Date(m.created_at).toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit' });
       const text = formatChatMessage(m.contenido);
+      const messageId = /^[1-9]\d*$/.test(String(m.id || '')) ? ` data-message-id="${escapeHTML(m.id)}"` : '';
       html += sent
-        ? `<div class="msg sent"><div class="msg-wrap"><div class="msg-bubble">${text}</div><div class="msg-time">${escapeHTML(time)}</div></div></div>`
-        : `<div class="msg received"${/^[1-9]\d*$/.test(String(m.id || '')) ? ` data-message-id="${escapeHTML(m.id)}"` : ''}>${avatarHTML(convActiva.perfil, 'msg-avatar')}<div class="msg-wrap"><div class="msg-bubble">${text}</div><div class="msg-time">${escapeHTML(time)}</div></div></div>`;
+        ? `<div class="msg sent"${messageId}><div class="msg-wrap"><div class="msg-bubble">${text}</div><div class="msg-time">${escapeHTML(time)}</div></div></div>`
+        : `<div class="msg received"${messageId}>${avatarHTML(convActiva.perfil, 'msg-avatar')}<div class="msg-wrap"><div class="msg-bubble">${text}</div><div class="msg-time">${escapeHTML(time)}</div></div></div>`;
     });
     container.innerHTML = html;
   }

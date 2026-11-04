@@ -27,6 +27,15 @@ const conversations=[{id:10,user1_id:1,user2_id:2,ultimo_mensaje:'Un mensaje sin
   {id:11,user1_id:1,user2_id:3,ultimo_mensaje:'Otra conversación sintética',updated_at:'2026-11-01T11:00:00Z'}];
 const message=(id=91,extra={})=>({id,de_user_id:2,para_user_id:1,created_at:'2026-11-01T12:00:00Z',contenido:'Mensaje de ejemplo '+id,leido:false,...extra});
 function deferred(){let resolve;const promise=new Promise(done=>{resolve=done;});return {promise,resolve};}
+function longOutgoingTail(start=2000){
+  return Array.from({length:8},(_,i)=>message(start+i,{de_user_id:1,para_user_id:2,
+    created_at:new Date(Date.parse('2026-11-02T12:00:00Z')+i*60000).toISOString(),
+    contenido:('Invitación enviada de ejemplo para revisar el final de la conversación. ').repeat(9)}));
+}
+function batchHistory(){
+  return [...Array.from({length:205},(_,i)=>message(1000+i,{created_at:new Date(Date.parse('2026-11-01T12:00:00Z')+i*1000).toISOString()})),...longOutgoingTail()];
+}
+const batchIncoming=server=>server.messages.filter(row=>row.id>=1000&&row.id<1205);
 function picked(row,select){return select?Object.fromEntries(select.split(',').filter(key=>Object.hasOwn(row,key)).map(key=>[key,row[key]])):{...row};}
 async function fixture(t,options={}){
   const server={messages:structuredClone(options.messages||[message()]),patches:[],patchFailure:!!options.patchFailure,historyFailure:!!options.historyFailure,
@@ -146,11 +155,57 @@ test('closed mobile chat cannot read a newly polled message',async t=>{
   await f.page.evaluate(()=>cargarMensajes(false));await settle(f.page);assert.equal(f.server.messages.find(row=>row.id===92).leido,false);
   await f.page.locator('.conv-item[data-conv-id="10"]').click();await waitRead(f,92);
 });
-test('offscreen loaded messages stay unread until their bubbles are scrolled into view',async t=>{
+test('reading up to a visible point leaves later loaded messages below it unread',async t=>{
   const messages=Array.from({length:24},(_,i)=>message(100+i,{created_at:new Date(Date.parse('2026-11-01T12:00:00Z')+i*60000).toISOString(),contenido:('Texto de ejemplo para revisar lectura visible. ').repeat(5)}));
-  const f=await fixture(t,{messages});await loaded(f.page);await waitRead(f,123);
-  assert.equal(f.server.messages.find(row=>row.id===100).leido,false);
-  await f.page.locator('#chat-messages').evaluate(el=>{el.scrollTop=0;el.dispatchEvent(new Event('scroll'));});await waitRead(f,100);
+  const f=await fixture(t,{messages,focused:false});await loaded(f.page);await settle(f.page);
+  await f.page.locator('#chat-messages').evaluate(el=>{el.scrollTop=0;el.dispatchEvent(new Event('scroll'));});
+  await attention(f.page);await waitRead(f,100);
+  assert.equal(f.server.messages.find(row=>row.id===123).leido,false,'Reading old messages is not permission to sweep newer loaded messages below the viewport');
+  await f.page.locator('#chat-messages').evaluate(el=>{el.scrollTop=el.scrollHeight;el.dispatchEvent(new Event('scroll'));});await waitRead(f,123);
+});
+
+for(const width of [320,390,1440])test(width+'px: old received message above trailing sent invitations is acknowledged at the visible conversation end',async t=>{
+  const f=await fixture(t,{width,messages:[message(91,{contenido:'Recibido antiguo de ejemplo'}),...longOutgoingTail()]});
+  await loaded(f.page);await waitRead(f,91);
+  const received=f.page.locator('.msg.received[data-message-id="91"]');
+  const bounds=await received.boundingBox(),area=await f.page.locator('#chat-messages').boundingBox();
+  assert.ok(bounds.y+bounds.height<area.y,'Reproduction must keep the old received bubble above the viewport');
+  assert.equal(await f.page.locator('.conv-item[data-conv-id="10"]').evaluate(el=>el.classList.contains('unread')),false);
+  assert.ok(f.server.patches.every(call=>call.ids.every(id=>id==='91')),'Sent invitations are anchors, never acknowledgements of sent messages');
+  assert.equal(f.server.messages.filter(row=>row.de_user_id===1).every(row=>row.leido===false),true);
+});
+
+test('a loaded conversation end drains over one hundred received IDs in bounded confirmed batches',async t=>{
+  const f=await fixture(t,{messages:batchHistory()});await loaded(f.page);
+  await expectEventually(()=>batchIncoming(f.server).every(row=>row.leido===true));
+  assert.equal(f.server.patches.length,3);assert.deepEqual(f.server.patches.map(call=>call.ids.length),[100,100,5]);
+  assert.equal(new Set(f.server.patches.flatMap(call=>call.ids)).size,205);
+  assert.ok(f.server.messages.filter(row=>row.de_user_id===1).every(row=>row.leido===false));
+});
+
+for(const change of ['hidden','identity','conversation'])test('pending read batches stop before another old-chat batch after '+change,async t=>{
+  const gate=deferred(),f=await fixture(t,{width:change==='conversation'?1440:390,
+    messages:[...batchHistory(),message(99,{de_user_id:3,contenido:'Otra conversación'})],patchGate:gate});
+  t.after(()=>gate.resolve());await loaded(f.page);await expectEventually(()=>f.server.patches.length===1);
+  if(change==='hidden')await attention(f.page,{visible:false});
+  else if(change==='identity'){
+    f.state.user={...people[2]};await f.page.evaluate(()=>window.BuscARTESesion.refresh({reload:false}));
+  }else{
+    await f.page.locator('.conv-item[data-conv-id="11"]').click();
+    await f.page.waitForFunction(()=>document.getElementById('chat-header-name')?.textContent==='Artista Tres');
+  }
+  gate.resolve();await settle(f.page);await settle(f.page);
+  const oldChatPatches=f.server.patches.filter(call=>call.ids.some(id=>Number(id)>=1000&&Number(id)<1205));
+  assert.equal(oldChatPatches.length,1,'The already-dispatched batch may settle, but a changed attention context cannot start the next old-chat batch');
+  assert.ok(batchIncoming(f.server).filter(row=>row.leido===true).length<=100);
+});
+
+test('a failed later batch preserves remaining unread messages without an immediate retry loop',async t=>{
+  const f=await fixture(t,{messages:batchHistory(),beforePatch:server=>{server.beforePatch=()=>{server.patchFailure=true;};}});
+  await loaded(f.page);await expectEventually(()=>f.server.patches.length===2);await settle(f.page);await settle(f.page);
+  assert.equal(batchIncoming(f.server).filter(row=>row.leido===true).length,100);
+  assert.equal(f.server.patches.length,2,'A failed batch must stop this drain instead of spinning');
+  f.server.patchFailure=false;await attention(f.page);await expectEventually(()=>batchIncoming(f.server).every(row=>row.leido===true));
 });
 test('a failed acknowledgement preserves unread state and retries on renewed attention',async t=>{
   const f=await fixture(t,{patchFailure:true});await loaded(f.page);await expectEventually(()=>f.server.patches.length>0);await settle(f.page);
