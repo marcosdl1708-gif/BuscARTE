@@ -3,6 +3,16 @@
 Esta copia independiente es la base para los próximos bloques de mejoras web/mobile.
 No depende del repositorio original ni del worktree de Android para funcionar.
 
+## Lectura hasta el último mensaje visible — 4/11/2026
+
+**Publicado a las 11:32 ART**, fuente `b7cb290f01bdcdc47ce8945427229ddc43217cdc`, deploy `6aeb41f01c54fb1b5a0f664d`, v36. Corrige el criterio insuficiente de v35: un recibido antiguo quedaba como nuevo cuando abrir el chat llevaba al fondo y allí sólo se veían envíos propios. La suite anterior afirmaba expresamente ese comportamiento y no detectaba este caso de uso. El estado de servidor sí se guardaba; no era una pérdida general del PATCH ni se resolvía atribuyéndolo a caché.
+
+Ahora la lectura llega hasta la última burbuja visible del snapshot cargado, enviada o recibida. Sólo se confirman IDs recibidos hasta ese índice DOM, nunca enviados ni mensajes debajo del punto de lectura o llegados después de capturar el lote. Hasta 100 IDs por petición; se drena el conjunto capturado revalidando cuenta, conversación, foco, visibilidad, panel móvil y diálogos antes de cada lote. Confirmación parcial o error corta el drenaje sin descontar los pendientes no confirmados; respuesta del primer lote ya despachado puede persistir válidamente aunque la persona cambie de vista después. No hay barrido global ni backfill de cuentas: los pendientes anteriores se actualizan al abrir las conversaciones correspondientes.
+
+29/29 pruebas de navegador aislado aprobadas con fuentes congeladas, incluida reproducción exacta recibido antiguo + ocho invitaciones propias largas a 320/390/1440 sin subir manualmente; control de mensajes posteriores al ancla, lotes 100/100/5, interrupciones y fallo del segundo lote. 26/26 de empaquetado, build de 76 archivos. Sólo cambian públicamente chat y SW: las 13 Functions Node 24 y los tres cron conservan exactamente sus hashes/horarios de v35. Sin cambios de SQL, Auth, permisos, backend, correo, Android, diseño o contenido de mensajes; sin cuentas/envíos/lecturas reales de prueba. No se certifica hardware físico. Dominio verificado: 75 recursos iguales al build, 35 rutas y cuatro exclusiones privadas.
+
+Evidencia privada: `../BuscARTE-resguardos/mensajes-lectura-2026-11-04T14-30-36-705Z/` y `lectura-hasta-release-20261104/`. Diagnóstico previo sólo lectura: `mensajes-lectura-2026-11-04T14-24-55-771Z/`. Guía ajena con SHA256 `CB3FA88AECC1537AF9D936F9997934D3EB1FDB9A88779C4F5AADC9A4D688BB3F` y `preview/` preservados/excluidos. Recargar web o reabrir app conectada; una pestaña antigua mantiene su JavaScript hasta recargar. Cierre documental `[skip netlify]`, sin repetir deploy.
+
 ## Lectura de mensajes persistente — 3/11/2026
 
 **Publicado a las 11:57 ART**, fuente `37621cc75af81e9d23c59c168ab76f4a2cca2bb5`, deploy `6ae9f643906051b9e51c306a`, v35 y paquete de 76 archivos. Un único deploy por Git CD. La lectura usa ahora el campo existente `mensajes.leido`, no marcas `ba_msg_*` del navegador. Los diez encabezados/lista del chat consultan el mismo estado del servidor. Cerrar sesión o cambiar de dispositivo ya no borra las lecturas confirmadas. No se migran cuentas, crean tablas, cambian permisos o modifica el ingreso.
